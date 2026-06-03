@@ -1,0 +1,128 @@
+---
+description: 関数は result 先頭宣言・return result 終端、if はガード節で浅く（Next.js モノレポ）
+globs: apps/**/src/**/*.{ts,tsx},packages/**/src/**/*.ts,apps/**/next.config.ts
+alwaysApply: true
+---
+
+# TypeScript 関数スタイル（Next.js モノレポ）
+
+`apps/**/src/**/*.{ts,tsx}`、`apps/**/next.config.ts`、および `packages/**/src/**/*.ts` を編集・追加するときは、既存・将来のコード（`apps/web/src/lib/`、`features/`、`packages/shared` など）に合わせる。フレームワーク非依存の計算・整形・パースは `packages/shared`、Next 依存は `apps/web/src/lib/` に置く。
+
+## result の宣言と return
+
+- 戻り値を持つ関数では、先頭で `result` を宣言する（`let result` または `const result`）。
+  - **再代入・累積更新がある** → `let result`（例: `result += ...`, `result = normalize...(result)`）
+  - **一度だけ代入して返す** → `const result`（例: `const result = entries.filter(...)`, `const result = await res.json()`）
+- **終端は必ず `return result;`** とする（早期 return するガード節を除く）。式や別名をそのまま `return` しない。
+- 空文字・空配列・`null` など、型に合う初期値を付ける（`let` で後から代入する場合）。
+- **`async` でも同様**。`await` の結果を `result` に代入してから `return result;`。
+
+```typescript
+// ✅ 再代入あり → let
+export function formatAllocationLabel(ratio: number): string {
+  let result: string = "";
+
+  if (!Number.isFinite(ratio)) {
+    return result;
+  }
+
+  result = `${(ratio * 100).toFixed(1)}%`;
+  return result;
+}
+```
+
+```typescript
+// ✅ 一度だけ代入 → const（shared の純関数向け）
+export function sumWeights(weights: number[]): number {
+  const result = weights.reduce((acc, w) => acc + w, 0);
+  return result;
+}
+```
+
+```typescript
+// ✅ async + ガード節
+export async function fetchPortfolioSnapshot(url: string): Promise<PortfolioSnapshot | null> {
+  let result: PortfolioSnapshot | null = null;
+
+  const response = await fetch(url);
+  if (!response.ok) {
+    return result;
+  }
+
+  result = (await response.json()) as PortfolioSnapshot;
+  return result;
+}
+```
+
+```typescript
+// ❌ 避ける: result を使わず直接 return
+export function getTotalValue(holdings: Holding[]): number {
+  return holdings.reduce((acc, h) => acc + h.marketValue, 0);
+}
+```
+
+```typescript
+// ❌ 避ける: 別名を return（終端は return result）
+function mergeHoldings(base: Holding[], extra: Holding[]): Holding[] {
+  let result: Holding[] = base;
+  const merged = [...base, ...extra];
+  return merged;
+}
+```
+
+## if のネストを浅くする（ガード節）
+
+- `if` のブロック内にメイン処理しかない場合は、条件を反転して早期に `return result` / `continue` / `throw` し、メイン処理は外側（同じスコープ）に書く。
+- ネストが 2 段以上になる場合は、ガード節への分割を優先する。
+
+```typescript
+// ✅ ガード節 + 外側でメイン処理
+export function parseHoldingLine(line: string): Holding | null {
+  let result: Holding | null = null;
+
+  if (line.trim() === "") {
+    return result;
+  }
+
+  result = buildHoldingFromTokens(line.split("\t"));
+  return result;
+}
+```
+
+```typescript
+// ❌ 避ける: if だけで全体を包む
+export function parseHoldingLine(line: string): Holding | null {
+  let result: Holding | null = null;
+  if (line.trim() !== "") {
+    result = buildHoldingFromTokens(line.split("\t"));
+  }
+  return result;
+}
+```
+
+- ループ内のスキップは `continue` で早期に抜ける（空行・コメント行の除外など）。
+- ループで `result.push(...)` だけ行う場合は `const result: T[] = []` でもよい。終端は `return result;`。
+- **戻り値がない `void` 関数**（副作用のみ）は `return` がないため `result` パターンの対象外。
+- **React コンポーネント**（`.tsx`）も JSX を `const result = (...)` に代入し、終端は `return result;`。
+- **`metadata` や設定オブジェクト**も `const result` に組み立ててから export する。
+
+```tsx
+// ✅ React コンポーネント
+export default function Home() {
+  const result = (
+    <main>
+      <h1>Title</h1>
+    </main>
+  );
+  return result;
+}
+```
+
+```typescript
+// ✅ metadata・next.config などの export
+const result: Metadata = {
+  title: "investment-portfolio",
+  description: "…",
+};
+export const metadata = result;
+```

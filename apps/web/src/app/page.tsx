@@ -1,5 +1,5 @@
 export default function Home() {
-  return (
+  const result = (
     <main className="landing">
       <h1>investment-portfolio</h1>
       <p>
@@ -8,4 +8,5 @@ export default function Home() {
       <p className="note">GitHub Pages で公開中（初期セットアップ）</p>
     </main>
   );
+  return result;
 }
