@@ -1,0 +1,49 @@
+:root {
+  --background: #fafafa;
+  --foreground: #171717;
+  --muted: #525252;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    --muted: #a3a3a3;
+  }
+}
+
+html,
+body {
+  max-width: 100vw;
+  min-height: 100%;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.landing {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+.landing h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.landing p {
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+
+.landing .note {
+  font-size: 0.875rem;
+  margin-top: 2rem;
+}
