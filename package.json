@@ -5,6 +5,22 @@
   "scripts": {
     "dev": "npm run dev -w @repo/web",
     "build": "npm run build -w @repo/web",
-    "lint": "npm run lint -w @repo/web"
+    "lint": "npm run lint -w @repo/web",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@vitejs/plugin-react": "^5.1.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "jsdom": "^26.1.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "typescript": "^5",
+    "vitest": "^3.2.4"
   }
 }
