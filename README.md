@@ -102,8 +102,8 @@ npx serve apps/web/out
 
 ## デプロイ（GitHub Pages）
 
-1. GitHub リポジトリの **Settings → Pages → Build and deployment → Source** を **GitHub Actions** に設定する（初回のみ）。
-2. `main` ブランチへ push すると [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) がビルドし、`apps/web/out` をデプロイする。
+1. GitHub リポジトリの **Settings → Pages → Build and deployment → Source** を **GitHub Actions** に設定する（初回のみ）。ブランチデプロイのままだと `deploy-pages` が 404 になる。
+2. `main` ブランチへ push すると [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) が `configure-pages` で Pages をワークフロー用に構成し、`apps/web/out` をデプロイする。
 3. 公開 URL の例: `https://<owner>.github.io/investment-portfolio/`
 
 ## 技術スタック
