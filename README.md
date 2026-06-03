@@ -19,7 +19,7 @@
 
 npm workspaces のモノレポです。初期実装は `apps/web` のランディングページのみです。
 
-```
+```text
 investment-portfolio/
 ├── apps/
 │   └── web/                 # Next.js（GitHub Pages のデプロイ対象）
@@ -37,7 +37,7 @@ investment-portfolio/
 ```
 
 | パス | 用途 |
-|------|------|
+| --- | --- |
 | `apps/web/src/app/` | ページ・レイアウト |
 | `apps/web/src/features/<name>/` | 機能ごとのコード |
 | `packages/ui` | デザインシステム・汎用 UI |
