@@ -11,8 +11,6 @@ describe("Home", () => {
     expect(
       screen.getByText(/投資ポートフォリオの管理・分析を行うためのツールです/),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText("GitHub Pages で公開中（初期セットアップ）"),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/v0.1.0/)).toBeInTheDocument();
   });
 });

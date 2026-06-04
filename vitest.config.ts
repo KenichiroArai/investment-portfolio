@@ -12,6 +12,7 @@ export default defineConfig({
     setupFiles: ["./vitest.setup.ts"],
     include: [
       "apps/web/tests/**/*.test.{ts,tsx}",
+      "apps/api/tests/**/*.test.ts",
       "packages/*/tests/**/*.test.ts",
     ],
     coverage: {
@@ -19,14 +20,23 @@ export default defineConfig({
       include: [
         "apps/web/src/**/*.{ts,tsx}",
         "apps/web/next.config.ts",
+        "apps/api/src/**/*.ts",
         "packages/shared/src/**/*.ts",
+        "packages/db/src/**/*.ts",
         "packages/ui/src/**/*.ts",
       ],
       exclude: [
         "**/*.d.ts",
         "**/tests/**",
         "apps/web/next-env.d.ts",
+        "apps/api/src/index.ts",
+        "apps/api/src/db.ts",
         "packages/shared/src/index.ts",
+        "packages/shared/src/types.ts",
+        "packages/db/src/index.ts",
+        "packages/db/src/migrate.ts",
+        "packages/db/src/test-utils.ts",
+        "packages/db/src/schema/**",
         "packages/ui/src/index.ts",
       ],
       thresholds: {
@@ -40,6 +50,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(rootDir, "apps/web/src"),
+      "@repo/shared": path.resolve(rootDir, "packages/shared/src/index.ts"),
+      "@repo/db": path.resolve(rootDir, "packages/db/src/index.ts"),
     },
   },
 });

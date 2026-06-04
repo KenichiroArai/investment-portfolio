@@ -1,0 +1,9 @@
+export default function EditPlaceholderPage() {
+  const result = (
+    <main>
+      <h1>更新</h1>
+      <p className="note">準備中です（v0.2 以降で実装予定）。</p>
+    </main>
+  );
+  return result;
+}
