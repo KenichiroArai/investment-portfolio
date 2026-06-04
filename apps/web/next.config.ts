@@ -9,6 +9,10 @@ const result: NextConfig = {
   assetPrefix: isProd ? repoBase : "",
   trailingSlash: true,
   images: { unoptimized: true },
+  env: {
+    NEXT_PUBLIC_BASE_PATH: isProd ? repoBase : "",
+    NEXT_PUBLIC_DATA_SOURCE: isProd ? "static" : "api",
+  },
 };
 
 export default result;

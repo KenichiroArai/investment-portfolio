@@ -3,7 +3,10 @@
 import type { CurrentSnapshotDto } from "@repo/shared";
 import { useEffect, useState } from "react";
 
-import { getApiBaseUrl } from "@/lib/api-base";
+import {
+  getSnapshotFetchUrl,
+  getSnapshotLoadErrorMessage,
+} from "@/lib/data-source";
 
 type HoldingsViewProps = {
   portfolioCode: string;
@@ -42,7 +45,7 @@ export function HoldingsView({ portfolioCode }: HoldingsViewProps) {
     async function load() {
       setLoading(true);
       setError(null);
-      const url = `${getApiBaseUrl()}/portfolios/${portfolioCode}/snapshot/current`;
+      const url = getSnapshotFetchUrl(portfolioCode);
       try {
         const response = await fetch(url);
         if (cancelled) {
@@ -61,9 +64,7 @@ export function HoldingsView({ portfolioCode }: HoldingsViewProps) {
         setSnapshot(data);
       } catch {
         if (!cancelled) {
-          setError(
-            "API に接続できません。`npm run dev:api` でローカル API を起動してください。",
-          );
+          setError(getSnapshotLoadErrorMessage());
         }
       } finally {
         if (!cancelled) {

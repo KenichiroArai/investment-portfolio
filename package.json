@@ -8,11 +8,15 @@
   "scripts": {
     "dev": "npm run dev -w @repo/web",
     "dev:api": "npm run dev -w @repo/api",
+    "dev:api:sample": "npm run dev:sample -w @repo/api",
     "dev:all": "concurrently -k \"npm:dev:api\" \"npm:dev\"",
     "dev:stop": "kill-port 3000 3001",
     "build": "npm run build -w @repo/web",
     "lint": "npm run lint -w @repo/web && npm run lint -w @repo/api && npm run lint -w @repo/db && npm run lint -w @repo/shared",
     "db:migrate": "npm run db:migrate -w @repo/db",
+    "db:seed:sample": "npm run db:seed:sample -w @repo/db",
+    "db:seed:clear": "npm run db:seed:clear -w @repo/db",
+    "pages:export": "npm run pages:export -w @repo/db",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"

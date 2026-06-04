@@ -6,6 +6,8 @@ import {
   findInstrumentById,
   findSchemeById,
   getCurrentSnapshot,
+  isSampleDataModeEnabled,
+  isSampleDataSeeded,
   listPortfolios,
   replaceCurrentSnapshot,
   setInstrumentClassifications,
@@ -22,7 +24,7 @@ import {
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 
-import { getDatabase } from "./db";
+import { getDatabase, getDatabasePath } from "./db";
 
 export type CreateAppOptions = {
   getDb?: () => AppDatabase;
@@ -40,8 +42,16 @@ export function createApp(options?: CreateAppOptions) {
     }),
   );
 
-  app.get("/health", (c) => {
-    const result = c.json({ status: "ok" as const });
+  app.get("/health", async (c) => {
+    const db = resolveDb();
+    const sampleMode = isSampleDataModeEnabled();
+    const sampleSeeded = await isSampleDataSeeded(db);
+    const result = c.json({
+      status: "ok" as const,
+      sampleMode,
+      sampleSeeded,
+      databasePath: getDatabasePath(),
+    });
     return result;
   });
 

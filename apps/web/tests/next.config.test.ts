@@ -21,5 +21,18 @@ describe("next.config", () => {
     const config = (await import("../next.config")).default;
     expect(config.basePath).toBe("/investment-portfolio");
     expect(config.assetPrefix).toBe("/investment-portfolio");
+    expect(config.env).toEqual({
+      NEXT_PUBLIC_BASE_PATH: "/investment-portfolio",
+      NEXT_PUBLIC_DATA_SOURCE: "static",
+    });
+  });
+
+  it("uses api data source in development env", async () => {
+    vi.stubEnv("NODE_ENV", "development");
+    const config = (await import("../next.config")).default;
+    expect(config.env).toEqual({
+      NEXT_PUBLIC_BASE_PATH: "",
+      NEXT_PUBLIC_DATA_SOURCE: "api",
+    });
   });
 });

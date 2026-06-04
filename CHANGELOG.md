@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- SQLite サンプルデータ: `npm run db:seed:sample` / `db:seed:clear`、`SEED_SAMPLE_DATA` と `data/portfolio.sample.db` で本番用 DB と切り替え
+- API: `npm run dev:api:sample`、`/health` に `sampleMode` / `sampleSeeded`
+- GitHub Pages 向け静的 JSON 公開: `docs/data/` を正本とし、`npm run pages:export` で SQLite からエクスポート
+- 本番ビルド時に `docs/data` を `apps/web/public/data` へ同期し、明細画面が JSON を読み込む
+
 ## [0.1.0] - 2026-06-03
 
 ### Added
@@ -12,4 +21,4 @@
 ### Notes
 
 - 分析・登録・更新画面はメニューのみ（準備中）
-- マスタデータの自動シードは行わない
+- 本番用 DB の自動シードは行わない（サンプルモードのみ）

@@ -11,7 +11,10 @@
   "scripts": {
     "lint": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "tsx src/migrate.ts"
+    "db:migrate": "tsx src/migrate.ts",
+    "db:seed:sample": "tsx src/seed-sample-cli.ts on --sample",
+    "db:seed:clear": "tsx src/seed-sample-cli.ts off --sample",
+    "pages:export": "tsx src/export-pages-data.ts"
   },
   "dependencies": {
     "better-sqlite3": "^11.10.0",

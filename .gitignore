@@ -78,6 +78,9 @@ web_modules/
 .next
 out
 
+# Synced from docs/data at build time (GitHub Pages publish data)
+apps/web/public/data/
+
 # Local SQLite database
 data/
 *.db

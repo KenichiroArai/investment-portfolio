@@ -25,6 +25,7 @@ investment-portfolio/
 │   ├── shared/              # DTO・Zod スキーマ
 │   ├── tsconfig/
 │   └── ui/
+├── docs/                    # GitHub Pages 公開用データ（JSON 正本）
 ├── data/                    # SQLite（git 無視）
 └── package.json
 ```
@@ -83,11 +84,32 @@ taskkill /PID <PID> /F
 
 環境変数（任意）:
 
-- `DATABASE_PATH` — SQLite ファイル（既定: `data/portfolio.db`）
+- `DATABASE_PATH` — SQLite ファイル（既定: `data/portfolio.db`。サンプルモード時は `data/portfolio.sample.db`）
+- `SEED_SAMPLE_DATA` — `1` または `true` でサンプル DB を使い、API 起動時にサンプルデータを投入（未投入時のみ）
 - `PORT` / `HOST` — API の待ち受け（既定: `127.0.0.1:3001`）
 - `NEXT_PUBLIC_API_URL` — Web から参照する API（既定: `http://127.0.0.1:3001`）
 
-GitHub Pages の本番ビルドでは API に接続できません。明細の閲覧はローカル開発時を想定しています。
+### サンプルデータ（SQLite）
+
+開発用の iDeCo 明細サンプルを SQLite に入れられます。口座名・銘柄名に **（サンプル）** が付き、本番用 DB（`data/portfolio.db`）とはファイルを分けます。
+
+| モード | 手順 |
+| --- | --- |
+| **サンプルあり** | `npm run dev:api:sample` または `SEED_SAMPLE_DATA=1 npm run dev:api` |
+| **サンプルなし** | `npm run dev:api`（空の `portfolio.db`、または手動投入） |
+
+手動でサンプル DB だけ操作する場合:
+
+```bash
+npm run db:migrate
+npm run db:seed:sample   # data/portfolio.sample.db に投入
+npm run db:seed:clear    # サンプル DB から削除
+```
+
+`curl http://127.0.0.1:3001/health` の `sampleMode` / `sampleSeeded` で状態を確認できます。
+
+- 開発時は Web がローカル API から明細を取得します。
+- 本番（GitHub Pages）ビルドでは `docs/data/` の JSON を静的に読み込みます（登録・更新はローカルのみ）。
 
 ## 開発環境での確認
 
@@ -128,7 +150,7 @@ npm test
 
 ## 手動データ投入（例）
 
-マスタの自動シードはありません。次の順で API に POST/PUT してください（`curl` 等）。
+開発用サンプルは [サンプルデータ（SQLite）](#サンプルデータsqlite) を参照してください。本番相当の手動投入は、次の順で API に POST/PUT してください（`curl` 等）。
 
 ```bash
 # 1. 口座
@@ -192,6 +214,22 @@ npm test
 npm run test:coverage
 ```
 
+## GitHub Pages 向けデータ公開
+
+公開用 JSON の正本は [`docs/`](docs/) 以下のみです（詳細は [docs/README.md](docs/README.md)）。
+
+1. ローカル API で SQLite にデータを投入・更新する（[手動データ投入（例）](#手動データ投入例)）。
+2. エクスポートする。
+
+```bash
+npm run pages:export
+```
+
+3. `docs/data/` の変更をコミットして `main` に push する。
+4. GitHub Actions がビルド時に `docs/data` を `apps/web/public/data` へ同期し、静的サイトをデプロイする（CI では SQLite に接続しません）。
+
+初回のみ、サンプル JSON が `docs/data/portfolios/ideco/current.json` に含まれています。実データに差し替える場合は上記 1〜3 を実行してください。
+
 ## 本番ビルド（静的サイト）
 
 ```bash
@@ -199,13 +237,15 @@ npm run build
 npx serve apps/web/out
 ```
 
-`serve` 起動後: [http://localhost:3000/investment-portfolio/](http://localhost:3000/investment-portfolio/)
+`serve` 起動後: [http://localhost:3000/investment-portfolio/](http://localhost:3000/investment-portfolio/)  
+明細は `docs/data` から同期された JSON を参照します。
 
 ## デプロイ（GitHub Pages）
 
 1. **Settings → Pages → Source** を **GitHub Actions** に設定（初回のみ）。
-2. `main` へ push で [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) が `apps/web/out` をデプロイ。
-3. 公開 URL 例: `https://<owner>.github.io/investment-portfolio/`
+2. `docs/data` を含む状態で `main` へ push する（[GitHub Pages 向けデータ公開](#github-pages-向けデータ公開)）。
+3. [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) が `apps/web/out` をデプロイ。
+4. 公開 URL 例: `https://<owner>.github.io/investment-portfolio/`
 
 ## 技術スタック
 

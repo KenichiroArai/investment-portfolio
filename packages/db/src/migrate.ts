@@ -5,10 +5,10 @@ import { fileURLToPath } from "node:url";
 import { migrate } from "drizzle-orm/better-sqlite3/migrator";
 
 import { createDb } from "./client";
+import { resolveDatabasePath } from "./database-path";
 
 const packageDir = dirname(fileURLToPath(import.meta.url));
-const defaultDbPath = resolve(packageDir, "../../../data/portfolio.db");
-const databasePath = process.env.DATABASE_PATH ?? defaultDbPath;
+const databasePath = resolveDatabasePath();
 const migrationsFolder = resolve(packageDir, "../drizzle");
 
 mkdirSync(dirname(databasePath), { recursive: true });

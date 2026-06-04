@@ -25,6 +25,24 @@ describe("HoldingsView", () => {
     });
   });
 
+  it("shows static load error when fetch fails in static mode", async () => {
+    const prev = process.env.NEXT_PUBLIC_DATA_SOURCE;
+    process.env.NEXT_PUBLIC_DATA_SOURCE = "static";
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockRejectedValue(new Error("network")),
+    );
+    render(<HoldingsView portfolioCode="ideco" />);
+    await waitFor(() => {
+      expect(screen.getByText(/pages:export/)).toBeInTheDocument();
+    });
+    if (prev === undefined) {
+      delete process.env.NEXT_PUBLIC_DATA_SOURCE;
+    } else {
+      process.env.NEXT_PUBLIC_DATA_SOURCE = prev;
+    }
+  });
+
   it("renders snapshot table", async () => {
     vi.stubGlobal(
       "fetch",

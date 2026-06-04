@@ -5,23 +5,27 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { createApp } from "../src/app";
+import { initDatabase, resetDatabaseCacheForTests } from "../src/db";
 import { createTestDb } from "../../../packages/db/src/test-utils";
 
 describe("API app", () => {
   const originalDbPath = process.env.DATABASE_PATH;
 
   afterEach(() => {
+    resetDatabaseCacheForTests();
     if (originalDbPath === undefined) {
       delete process.env.DATABASE_PATH;
     } else {
       process.env.DATABASE_PATH = originalDbPath;
     }
+    delete process.env.SEED_SAMPLE_DATA;
   });
 
   it("uses default database when no getDb override", async () => {
     const path = join(tmpdir(), `api-default-${Date.now()}.db`);
     mkdirSync(tmpdir(), { recursive: true });
     process.env.DATABASE_PATH = path;
+    await initDatabase();
     const app = createApp();
     const res = await app.request("/portfolios");
     expect(res.status).toBe(200);
@@ -33,7 +37,12 @@ describe("API app", () => {
 
     const health = await app.request("/health");
     expect(health.status).toBe(200);
-    expect(await health.json()).toEqual({ status: "ok" });
+    expect(await health.json()).toEqual({
+      status: "ok",
+      sampleMode: false,
+      sampleSeeded: false,
+      databasePath: null,
+    });
 
     const list = await app.request("/portfolios");
     expect(list.status).toBe(200);
