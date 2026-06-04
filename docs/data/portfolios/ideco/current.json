@@ -1,0 +1,24 @@
+{
+  "id": "sample-snapshot",
+  "portfolioCode": "ideco",
+  "portfolioName": "iDeCo",
+  "asOfDate": "2026-06-01",
+  "lines": [
+    {
+      "id": "sample-line",
+      "instrumentId": "sample-instrument",
+      "instrumentName": "（サンプル）eMAXIS Slim 国内株式(TOPIX)",
+      "quantity": 100,
+      "marketValueMinor": 500000,
+      "bookValueMinor": null,
+      "tags": [
+        {
+          "schemeCode": "region",
+          "schemeName": "地域",
+          "valueCode": "japan",
+          "valueName": "日本"
+        }
+      ]
+    }
+  ]
+}

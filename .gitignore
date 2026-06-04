@@ -81,8 +81,8 @@ out
 # Synced from docs/data at build time (GitHub Pages publish data)
 apps/web/public/data/
 
-# Local SQLite database
-data/
+# Local SQLite database (repo root only; do not match docs/data/)
+/data/
 *.db
 
 # Nuxt.js build / generate output

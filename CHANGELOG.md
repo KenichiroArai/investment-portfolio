@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- `.gitignore` の `data/` が `docs/data/` まで無視していたため、GitHub Pages ビルドにサンプル JSON が含まれない問題を修正（`/data/` に限定）
+
 ### Added
 
 - SQLite サンプルデータ: `npm run db:seed:sample` / `db:seed:clear`、`SEED_SAMPLE_DATA` と `data/portfolio.sample.db` で本番用 DB と切り替え
