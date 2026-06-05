@@ -6,8 +6,6 @@ import {
   findInstrumentById,
   findSchemeById,
   getCurrentSnapshot,
-  isSampleDataModeEnabled,
-  isSampleDataSeeded,
   listPortfolios,
   replaceCurrentSnapshot,
   setInstrumentClassifications,
@@ -42,14 +40,9 @@ export function createApp(options?: CreateAppOptions) {
     }),
   );
 
-  app.get("/health", async (c) => {
-    const db = resolveDb();
-    const sampleMode = isSampleDataModeEnabled();
-    const sampleSeeded = await isSampleDataSeeded(db);
+  app.get("/health", (c) => {
     const result = c.json({
       status: "ok" as const,
-      sampleMode,
-      sampleSeeded,
       databasePath: getDatabasePath(),
     });
     return result;

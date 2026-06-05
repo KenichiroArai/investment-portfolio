@@ -13,7 +13,7 @@ const packageDir = dirname(fileURLToPath(import.meta.url));
 const migrationsFolder = resolve(packageDir, "../drizzle");
 
 function printUsage(): void {
-  console.error("Usage: tsx src/import-ideco-csv-cli.ts <path-to-csv> [--sample]");
+  console.error("Usage: tsx src/import-ideco-csv-cli.ts <path-to-csv>");
 }
 
 async function main() {
@@ -23,8 +23,7 @@ async function main() {
     process.exit(1);
   }
 
-  const useSampleDb = process.argv.includes("--sample");
-  const databasePath = resolveDatabasePath({ sample: useSampleDb });
+  const databasePath = resolveDatabasePath();
   mkdirSync(dirname(databasePath), { recursive: true });
   const { sqlite, db } = createDb(databasePath);
   migrate(db, { migrationsFolder });

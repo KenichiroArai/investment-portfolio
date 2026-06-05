@@ -3,14 +3,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { migrate } from "drizzle-orm/better-sqlite3/migrator";
-import {
-  createDb,
-  isSampleDataModeEnabled,
-  isSampleDataSeeded,
-  resolveDatabasePath,
-  seedSampleData,
-  type AppDatabase,
-} from "@repo/db";
+import { createDb, resolveDatabasePath, type AppDatabase } from "@repo/db";
 
 const apiDir = dirname(fileURLToPath(import.meta.url));
 const migrationsFolder = resolve(apiDir, "../../../packages/db/drizzle");
@@ -31,18 +24,6 @@ export async function initDatabase(): Promise<AppDatabase> {
   mkdirSync(dirname(databasePath), { recursive: true });
   const { sqlite, db } = createDb(databasePath);
   migrate(db, { migrationsFolder });
-
-  if (isSampleDataModeEnabled()) {
-    const seeded = await isSampleDataSeeded(db);
-    if (!seeded) {
-      const outcome = await seedSampleData(db);
-      if (outcome.status === "skipped") {
-        console.warn(
-          "[api] SEED_SAMPLE_DATA is on but sample was not applied: portfolio 'ideco' already exists with non-sample data.",
-        );
-      }
-    }
-  }
 
   cached = { db, databasePath, sqlite };
   const result = db;

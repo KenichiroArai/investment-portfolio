@@ -18,7 +18,6 @@ describe("API app", () => {
     } else {
       process.env.DATABASE_PATH = originalDbPath;
     }
-    delete process.env.SEED_SAMPLE_DATA;
   });
 
   it("uses default database when no getDb override", async () => {
@@ -39,8 +38,6 @@ describe("API app", () => {
     expect(health.status).toBe(200);
     expect(await health.json()).toEqual({
       status: "ok",
-      sampleMode: false,
-      sampleSeeded: false,
       databasePath: null,
     });
 

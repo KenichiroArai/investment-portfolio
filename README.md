@@ -84,29 +84,9 @@ taskkill /PID <PID> /F
 
 環境変数（任意）:
 
-- `DATABASE_PATH` — SQLite ファイル（既定: `data/portfolio.db`。サンプルモード時は `data/portfolio.sample.db`）
-- `SEED_SAMPLE_DATA` — `1` または `true` でサンプル DB を使い、API 起動時にサンプルデータを投入（未投入時のみ）
+- `DATABASE_PATH` — SQLite ファイル（既定: `data/portfolio.db`）
 - `PORT` / `HOST` — API の待ち受け（既定: `127.0.0.1:3001`）
 - `NEXT_PUBLIC_API_URL` — Web から参照する API（既定: `http://127.0.0.1:3001`）
-
-### サンプルデータ（SQLite）
-
-開発用の iDeCo 明細サンプルを SQLite に入れられます。口座名・銘柄名に **（サンプル）** が付き、本番用 DB（`data/portfolio.db`）とはファイルを分けます。
-
-| モード | 手順 |
-| --- | --- |
-| **サンプルあり** | `npm run dev:api:sample` または `SEED_SAMPLE_DATA=1 npm run dev:api` |
-| **サンプルなし** | `npm run dev:api`（空の `portfolio.db`、または手動投入） |
-
-手動でサンプル DB だけ操作する場合:
-
-```bash
-npm run db:migrate
-npm run db:seed:sample   # data/portfolio.sample.db に投入
-npm run db:seed:clear    # サンプル DB から削除
-```
-
-`curl http://127.0.0.1:3001/health` の `sampleMode` / `sampleSeeded` で状態を確認できます。
 
 - 開発時は Web がローカル API から明細を取得します。
 - 本番（GitHub Pages）ビルドでは `docs/data/` の JSON を静的に読み込みます（登録・更新はローカルのみ）。
@@ -156,12 +136,6 @@ iDeCo 口座の明細は、家計簿用 CSV（`番号,日付,商品タイプ,運
 npm run db:import:ideco -- "D:\SVN\日常作業\trunk\記録\家計簿\家計簿.csv"
 ```
 
-サンプル用 DB（`data/portfolio.sample.db`）へ入れる場合は `--sample` を付けます。
-
-```bash
-npm run db:import:ideco -- "D:\path\to\家計簿.csv" --sample
-```
-
 投入内容:
 
 - 口座 `ideco`（未作成なら自動作成）
@@ -172,7 +146,7 @@ npm run db:import:ideco -- "D:\path\to\家計簿.csv" --sample
 
 ## 手動データ投入（例）
 
-開発用サンプルは [サンプルデータ（SQLite）](#サンプルデータsqlite) を参照してください。本番相当の手動投入は、次の順で API に POST/PUT してください（`curl` 等）。CSV がある場合は上記 [iDeCo データ投入（家計簿 CSV）](#ideco-データ投入家計簿-csv) が簡単です。
+次の順で API に POST/PUT してください（`curl` 等）。CSV がある場合は上記 [iDeCo データ投入（家計簿 CSV）](#ideco-データ投入家計簿-csv) が簡単です。
 
 ```bash
 # 1. 口座

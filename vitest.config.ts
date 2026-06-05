@@ -37,7 +37,6 @@ export default defineConfig({
         "packages/db/src/migrate.ts",
         "packages/db/src/import-ideco-csv-cli.ts",
         "packages/db/src/export-pages-data.ts",
-        "packages/db/src/seed-sample-cli.ts",
         "packages/db/src/test-utils.ts",
         "packages/db/src/schema/**",
         "packages/ui/src/index.ts",
