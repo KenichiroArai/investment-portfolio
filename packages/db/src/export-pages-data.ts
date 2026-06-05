@@ -13,6 +13,8 @@ const docsDataRoot = resolve(repoRoot, "docs/data/portfolios");
 const databasePath = resolveDatabasePath();
 
 async function main() {
+  let result: void = undefined;
+
   const { sqlite, db } = createDb(databasePath);
   const portfolios = await listPortfolios(db);
   let exported = 0;
@@ -39,6 +41,8 @@ async function main() {
 
   sqlite.close();
   console.log(`Done. ${exported} snapshot(s) written under docs/data/portfolios/`);
+
+  return result;
 }
 
 void main();

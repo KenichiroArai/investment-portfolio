@@ -26,31 +26,33 @@ export async function createClassificationScheme(
   db: AppDatabase,
   params: CreateSchemeParams,
 ) {
+  let result: (typeof classificationSchemes.$inferSelect) | null = null;
+
   const portfolio = await findPortfolioByCode(db, params.portfolioCode);
   if (!portfolio) {
-    let result: null = null;
     return result;
   }
 
-  const row = {
+  result = {
     id: newId(),
     portfolioId: portfolio.id,
     code: params.code,
     name: params.name,
     createdAt: nowIso(),
   };
-  await db.insert(classificationSchemes).values(row);
-  const result = row;
+  await db.insert(classificationSchemes).values(result);
   return result;
 }
 
 export async function findSchemeById(db: AppDatabase, schemeId: string) {
+  let result: (typeof classificationSchemes.$inferSelect) | null = null;
+
   const rows = await db
     .select()
     .from(classificationSchemes)
     .where(eq(classificationSchemes.id, schemeId))
     .limit(1);
-  let result = rows[0] ?? null;
+  result = rows[0] ?? null;
   return result;
 }
 
@@ -59,9 +61,10 @@ export async function findSchemeByPortfolioCodeAndSchemeCode(
   portfolioCode: string,
   schemeCode: string,
 ) {
+  let result: (typeof classificationSchemes.$inferSelect) | null = null;
+
   const portfolio = await findPortfolioByCode(db, portfolioCode);
   if (!portfolio) {
-    let result: null = null;
     return result;
   }
 
@@ -75,7 +78,7 @@ export async function findSchemeByPortfolioCodeAndSchemeCode(
       ),
     )
     .limit(1);
-  let result = rows[0] ?? null;
+  result = rows[0] ?? null;
   return result;
 }
 
@@ -84,6 +87,8 @@ export async function findClassificationValueBySchemeAndCode(
   schemeId: string,
   code: string,
 ) {
+  let result: (typeof classificationValues.$inferSelect) | null = null;
+
   const rows = await db
     .select()
     .from(classificationValues)
@@ -94,7 +99,7 @@ export async function findClassificationValueBySchemeAndCode(
       ),
     )
     .limit(1);
-  let result = rows[0] ?? null;
+  result = rows[0] ?? null;
   return result;
 }
 
@@ -102,7 +107,7 @@ export async function createClassificationValue(
   db: AppDatabase,
   params: CreateValueParams,
 ) {
-  const row = {
+  let result = {
     id: newId(),
     schemeId: params.schemeId,
     code: params.code,
@@ -110,8 +115,8 @@ export async function createClassificationValue(
     sortOrder: params.sortOrder ?? 0,
     createdAt: nowIso(),
   };
-  await db.insert(classificationValues).values(row);
-  const result = row;
+
+  await db.insert(classificationValues).values(result);
   return result;
 }
 
@@ -120,36 +125,43 @@ export async function setInstrumentClassifications(
   instrumentId: string,
   classificationValueIds: string[],
 ) {
+  let result: void = undefined;
+
   await db
     .delete(instrumentClassifications)
     .where(eq(instrumentClassifications.instrumentId, instrumentId));
 
   if (classificationValueIds.length === 0) {
-    return;
+    return result;
   }
 
-  const rows = classificationValueIds.map((classificationValueId) => ({
-    instrumentId,
-    classificationValueId,
-  }));
+  const rows = classificationValueIds.map((classificationValueId) => {
+    let result = {
+      instrumentId,
+      classificationValueId,
+    };
+    return result;
+  });
   await db.insert(instrumentClassifications).values(rows);
+
+  return result;
 }
 
 export async function getTagsForInstruments(
   db: AppDatabase,
   instrumentIds: string[],
 ) {
+  type InstrumentTag = {
+    schemeCode: string;
+    schemeName: string;
+    valueCode: string;
+    valueName: string;
+    sortOrder: number;
+  };
+
+  let result = new Map<string, InstrumentTag[]>();
+
   if (instrumentIds.length === 0) {
-    const result: Map<
-      string,
-      Array<{
-        schemeCode: string;
-        schemeName: string;
-        valueCode: string;
-        valueName: string;
-        sortOrder: number;
-      }>
-    > = new Map();
     return result;
   }
 
@@ -175,16 +187,6 @@ export async function getTagsForInstruments(
       eq(classificationValues.schemeId, classificationSchemes.id),
     )
     .where(inArray(instrumentClassifications.instrumentId, instrumentIds));
-
-  type InstrumentTag = {
-    schemeCode: string;
-    schemeName: string;
-    valueCode: string;
-    valueName: string;
-    sortOrder: number;
-  };
-
-  const result = new Map<string, InstrumentTag[]>();
 
   for (const row of rows) {
     const existing = result.get(row.instrumentId) ?? [];

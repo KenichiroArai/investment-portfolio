@@ -1,5 +1,5 @@
 export default function Home() {
-  const result = (
+  let result = (
     <main className="landing">
       <h1>investment-portfolio</h1>
       <p>

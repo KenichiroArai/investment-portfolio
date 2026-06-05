@@ -11,17 +11,19 @@ export type CreatePortfolioParams = {
 };
 
 export async function listPortfolios(db: AppDatabase) {
-  const result = await db.select().from(portfolios).orderBy(portfolios.code);
+  let result = await db.select().from(portfolios).orderBy(portfolios.code);
   return result;
 }
 
 export async function findPortfolioByCode(db: AppDatabase, code: string) {
+  let result: (typeof portfolios.$inferSelect) | null = null;
+
   const rows = await db
     .select()
     .from(portfolios)
     .where(eq(portfolios.code, code))
     .limit(1);
-  let result = rows[0] ?? null;
+  result = rows[0] ?? null;
   return result;
 }
 
@@ -29,14 +31,14 @@ export async function createPortfolio(
   db: AppDatabase,
   params: CreatePortfolioParams,
 ) {
-  const row = {
+  let result = {
     id: newId(),
     code: params.code,
     name: params.name,
     kind: params.kind,
     createdAt: nowIso(),
   };
-  await db.insert(portfolios).values(row);
-  const result = row;
+
+  await db.insert(portfolios).values(result);
   return result;
 }

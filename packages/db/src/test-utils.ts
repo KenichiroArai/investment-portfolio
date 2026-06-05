@@ -12,10 +12,16 @@ const packageDir = dirname(fileURLToPath(import.meta.url));
 const migrationsFolder = resolve(packageDir, "../drizzle");
 
 export function createTestDb() {
+  let result!: {
+    sqlite: ReturnType<typeof createDb>["sqlite"];
+    db: ReturnType<typeof createDb>["db"];
+    path: string;
+  };
+
   const path = join(tmpdir(), `portfolio-test-${Date.now()}-${Math.random()}.db`);
   mkdirSync(dirname(path), { recursive: true });
   const { sqlite, db } = createDb(path);
   migrate(db, { migrationsFolder });
-  const result = { sqlite, db, path };
+  result = { sqlite, db, path };
   return result;
 }

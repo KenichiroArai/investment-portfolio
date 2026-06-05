@@ -24,7 +24,7 @@ export function buildIdecoKakeiboMetrics(params: {
   unrealizedGainMinor: number;
   unrealizedGainRate: number;
 }): HoldingLineMetricInput[] {
-  const result: HoldingLineMetricInput[] = [
+  let result: HoldingLineMetricInput[] = [
     {
       code: IDECO_KAKEIBO_METRIC_CODES.unitPricePerTenThousandLots,
       integerValue: params.unitPricePerTenThousandLots,

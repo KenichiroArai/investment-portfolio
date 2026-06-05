@@ -41,11 +41,42 @@ type MetricRow = {
   textValue: string | null;
 };
 
+type LineDto = {
+  id: string;
+  instrumentId: string;
+  instrumentName: string;
+  sortOrder: number | null;
+  quantity: number;
+  marketValueMinor: number;
+  bookValueMinor: number | null;
+  metrics: Array<{
+    code: string;
+    integerValue: number | null;
+    realValue: number | null;
+    textValue: string | null;
+  }>;
+  tags: Array<{
+    schemeCode: string;
+    schemeName: string;
+    valueCode: string;
+    valueName: string;
+  }>;
+};
+
+type CurrentSnapshotDto = {
+  id: string;
+  portfolioCode: string;
+  portfolioName: string;
+  asOfDate: string;
+  lines: LineDto[];
+};
+
 async function getMetricsForHoldingLines(
   db: AppDatabase,
   holdingLineIds: string[],
 ) {
-  const result = new Map<string, MetricRow[]>();
+  let result = new Map<string, MetricRow[]>();
+
   if (holdingLineIds.length === 0) {
     return result;
   }
@@ -71,9 +102,10 @@ async function getMetricsForHoldingLines(
 }
 
 export async function getCurrentSnapshot(db: AppDatabase, portfolioCode: string) {
+  let result: CurrentSnapshotDto | null = null;
+
   const portfolio = await findPortfolioByCode(db, portfolioCode);
   if (!portfolio) {
-    let result: null = null;
     return result;
   }
 
@@ -90,7 +122,6 @@ export async function getCurrentSnapshot(db: AppDatabase, portfolioCode: string)
 
   const snapshot = snapshots[0];
   if (!snapshot) {
-    let result: null = null;
     return result;
   }
 
@@ -108,32 +139,60 @@ export async function getCurrentSnapshot(db: AppDatabase, portfolioCode: string)
     .innerJoin(instruments, eq(holdingLines.instrumentId, instruments.id))
     .where(eq(holdingLines.snapshotId, snapshot.id));
 
-  const instrumentIds = lines.map((line) => line.instrumentId);
-  const holdingLineIds = lines.map((line) => line.id);
+  const instrumentIds = lines.map((line) => {
+    let result = line.instrumentId;
+    return result;
+  });
+  const holdingLineIds = lines.map((line) => {
+    let result = line.id;
+    return result;
+  });
   const tagsMap = await getTagsForInstruments(db, instrumentIds);
   const metricsMap = await getMetricsForHoldingLines(db, holdingLineIds);
 
   const lineDtos = lines.map((line) => {
+    let result: LineDto = {
+      id: "",
+      instrumentId: "",
+      instrumentName: "",
+      sortOrder: null,
+      quantity: 0,
+      marketValueMinor: 0,
+      bookValueMinor: null,
+      metrics: [],
+      tags: [],
+    };
+
     const rawTags = tagsMap.get(line.instrumentId) ?? [];
     const tags = [...rawTags].sort((a, b) => {
+      let result = 0;
       if (a.schemeCode !== b.schemeCode) {
-        return a.schemeCode.localeCompare(b.schemeCode);
+        result = a.schemeCode.localeCompare(b.schemeCode);
+        return result;
       }
       if (a.sortOrder !== b.sortOrder) {
-        return a.sortOrder - b.sortOrder;
+        result = a.sortOrder - b.sortOrder;
+        return result;
       }
-      return a.valueCode.localeCompare(b.valueCode);
+      result = a.valueCode.localeCompare(b.valueCode);
+      return result;
     });
     const rawMetrics = metricsMap.get(line.id) ?? [];
     const metrics = [...rawMetrics]
-      .sort((a, b) => a.code.localeCompare(b.code))
-      .map((metric) => ({
-        code: metric.code,
-        integerValue: metric.integerValue,
-        realValue: metric.realValue,
-        textValue: metric.textValue,
-      }));
-    const result = {
+      .sort((a, b) => {
+        let result = a.code.localeCompare(b.code);
+        return result;
+      })
+      .map((metric) => {
+        let result = {
+          code: metric.code,
+          integerValue: metric.integerValue,
+          realValue: metric.realValue,
+          textValue: metric.textValue,
+        };
+        return result;
+      });
+    result = {
       id: line.id,
       instrumentId: line.instrumentId,
       instrumentName: line.instrumentName,
@@ -142,30 +201,38 @@ export async function getCurrentSnapshot(db: AppDatabase, portfolioCode: string)
       marketValueMinor: line.marketValueMinor,
       bookValueMinor: line.bookValueMinor,
       metrics,
-      tags: tags.map((tag) => ({
-        schemeCode: tag.schemeCode,
-        schemeName: tag.schemeName,
-        valueCode: tag.valueCode,
-        valueName: tag.valueName,
-      })),
+      tags: tags.map((tag) => {
+        let result = {
+          schemeCode: tag.schemeCode,
+          schemeName: tag.schemeName,
+          valueCode: tag.valueCode,
+          valueName: tag.valueName,
+        };
+        return result;
+      }),
     };
     return result;
   });
 
   lineDtos.sort((a, b) => {
+    let result = 0;
     if (a.sortOrder !== null && b.sortOrder !== null && a.sortOrder !== b.sortOrder) {
-      return a.sortOrder - b.sortOrder;
+      result = a.sortOrder - b.sortOrder;
+      return result;
     }
     if (a.sortOrder !== null && b.sortOrder === null) {
-      return -1;
+      result = -1;
+      return result;
     }
     if (a.sortOrder === null && b.sortOrder !== null) {
-      return 1;
+      result = 1;
+      return result;
     }
-    return a.instrumentName.localeCompare(b.instrumentName);
+    result = a.instrumentName.localeCompare(b.instrumentName);
+    return result;
   });
 
-  const result = {
+  result = {
     id: snapshot.id,
     portfolioCode: portfolio.code,
     portfolioName: portfolio.name,
@@ -179,13 +246,16 @@ export async function replaceCurrentSnapshot(
   db: AppDatabase,
   params: ReplaceCurrentSnapshotParams,
 ) {
+  let result: Awaited<ReturnType<typeof getCurrentSnapshot>> = null;
+
   const portfolio = await findPortfolioByCode(db, params.portfolioCode);
   if (!portfolio) {
-    let result: null = null;
     return result;
   }
 
   db.transaction((tx) => {
+    let result: void = undefined;
+
     tx.update(portfolioSnapshots)
       .set({ isCurrent: 0 })
       .where(
@@ -245,8 +315,10 @@ export async function replaceCurrentSnapshot(
         tx.insert(holdingLineMetrics).values(metricRows).run();
       }
     }
+
+    return result;
   });
 
-  const result = await getCurrentSnapshot(db, params.portfolioCode);
+  result = await getCurrentSnapshot(db, params.portfolioCode);
   return result;
 }

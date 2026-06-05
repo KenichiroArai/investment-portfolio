@@ -13,10 +13,14 @@ const packageDir = dirname(fileURLToPath(import.meta.url));
 const migrationsFolder = resolve(packageDir, "../drizzle");
 
 function printUsage(): void {
+  let result: void = undefined;
   console.error("Usage: tsx src/import-ideco-csv-cli.ts <path-to-csv>");
+  return result;
 }
 
 async function main() {
+  let result: void = undefined;
+
   const csvPath = process.argv[2];
   if (!csvPath) {
     printUsage();
@@ -64,6 +68,7 @@ async function main() {
   }
 
   sqlite.close();
+  return result;
 }
 
 void main();

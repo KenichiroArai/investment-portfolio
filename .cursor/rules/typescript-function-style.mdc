@@ -1,5 +1,5 @@
 ---
-description: 関数は result 先頭宣言・return result 終端、if はガード節で浅く（Next.js モノレポ）
+description: 関数は let result 先頭宣言・return result 終端、if はガード節で浅く（Next.js モノレポ）
 globs: apps/**/src/**/*.{ts,tsx},packages/**/src/**/*.ts,apps/**/next.config.ts
 alwaysApply: true
 ---
@@ -10,15 +10,17 @@ alwaysApply: true
 
 ## result の宣言と return
 
-- 戻り値を持つ関数では、先頭で `result` を宣言する（`let result` または `const result`）。
-  - **再代入・累積更新がある** → `let result`（例: `result += ...`, `result = normalize...(result)`）
-  - **一度だけ代入して返す** → `const result`（例: `const result = entries.filter(...)`, `const result = await res.json()`）
-- **終端は必ず `return result;`** とする（早期 return するガード節を除く）。式や別名をそのまま `return` しない。
-- 空文字・空配列・`null` など、型に合う初期値を付ける（`let` で後から代入する場合）。
+- **戻り値を持つすべての関数**（named export、コールバック、React コンポーネント、ルートハンドラ、`useEffect` のクリーンアップ返却を含む）で、**先頭で `let result` を宣言**する。対象外は設けない。
+- **`result` は必ず `let`** とする（`const result` は使わない）。
+- 型に合う初期値を付ける（`null`、空文字、空配列、`undefined` など）。
+- **すべての return は `return result;`** とする（ガード節の早期 return も同様）。式や別名をそのまま `return` しない。
 - **`async` でも同様**。`await` の結果を `result` に代入してから `return result;`。
+- **副作用のみの `void` 関数**も `let result: void = undefined;` を先頭に置き、終端は `return result;`。
+- **React コンポーネント**は Hooks 呼び出しの直後に `let result` を宣言し、JSX を代入して `return result;`。
+- **`metadata` や設定オブジェクト**も `let result` に組み立ててから export する。
 
 ```typescript
-// ✅ 再代入あり → let
+// ✅ 再代入あり
 export function formatAllocationLabel(ratio: number): string {
   let result: string = "";
 
@@ -32,9 +34,10 @@ export function formatAllocationLabel(ratio: number): string {
 ```
 
 ```typescript
-// ✅ 一度だけ代入 → const（shared の純関数向け）
+// ✅ 一度だけ代入
 export function sumWeights(weights: number[]): number {
-  const result = weights.reduce((acc, w) => acc + w, 0);
+  let result = 0;
+  result = weights.reduce((acc, w) => acc + w, 0);
   return result;
 }
 ```
@@ -55,6 +58,37 @@ export async function fetchPortfolioSnapshot(url: string): Promise<PortfolioSnap
 ```
 
 ```typescript
+// ✅ void 関数
+export function resetCache(): void {
+  let result: void = undefined;
+  cache = null;
+  return result;
+}
+```
+
+```typescript
+// ✅ useEffect クリーンアップ
+useEffect(() => {
+  let result: () => void = () => {};
+  let cancelled = false;
+
+  async function load() {
+    let result: void = undefined;
+    if (cancelled) {
+      return result;
+    }
+    return result;
+  }
+
+  void load();
+  result = () => {
+    cancelled = true;
+  };
+  return result;
+}, []);
+```
+
+```typescript
 // ❌ 避ける: result を使わず直接 return
 export function getTotalValue(holdings: Holding[]): number {
   return holdings.reduce((acc, h) => acc + h.marketValue, 0);
@@ -62,9 +96,16 @@ export function getTotalValue(holdings: Holding[]): number {
 ```
 
 ```typescript
+// ❌ 避ける: const result
+export function getTotalValue(holdings: Holding[]): number {
+  const result = holdings.reduce((acc, h) => acc + h.marketValue, 0);
+  return result;
+}
+```
+
+```typescript
 // ❌ 避ける: 別名を return（終端は return result）
 function mergeHoldings(base: Holding[], extra: Holding[]): Holding[] {
-  let result: Holding[] = base;
   const merged = [...base, ...extra];
   return merged;
 }
@@ -101,15 +142,12 @@ export function parseHoldingLine(line: string): Holding | null {
 ```
 
 - ループ内のスキップは `continue` で早期に抜ける（空行・コメント行の除外など）。
-- ループで `result.push(...)` だけ行う場合は `const result: T[] = []` でもよい。終端は `return result;`。
-- **戻り値がない `void` 関数**（副作用のみ）は `return` がないため `result` パターンの対象外。
-- **React コンポーネント**（`.tsx`）も JSX を `const result = (...)` に代入し、終端は `return result;`。
-- **`metadata` や設定オブジェクト**も `const result` に組み立ててから export する。
+- ループで `result.push(...)` だけ行う場合も `let result: T[] = []` とし、終端は `return result;`。
 
 ```tsx
 // ✅ React コンポーネント
 export default function Home() {
-  const result = (
+  let result = (
     <main>
       <h1>Title</h1>
     </main>
@@ -120,7 +158,7 @@ export default function Home() {
 
 ```typescript
 // ✅ metadata・next.config などの export
-const result: Metadata = {
+let result: Metadata = {
   title: "investment-portfolio",
   description: "…",
 };

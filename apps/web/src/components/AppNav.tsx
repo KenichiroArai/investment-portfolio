@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 type NavItem = {
   href: string;
@@ -27,24 +28,29 @@ const navItems: NavItem[] = [
 ];
 
 export function AppNav() {
-  const result = (
+  let result = (
     <nav className="app-nav" aria-label="メインメニュー">
       <ul>
         {navItems.map((item) => {
+          let result: ReactNode = null;
+
           if (!item.enabled) {
-            return (
+            result = (
               <li key={item.href}>
                 <span className="app-nav__disabled" title="準備中">
                   {item.label}
                 </span>
               </li>
             );
+            return result;
           }
-          return (
+
+          result = (
             <li key={item.href}>
               <Link href={item.href}>{item.label}</Link>
             </li>
           );
+          return result;
         })}
       </ul>
     </nav>

@@ -29,6 +29,7 @@ export type CreateAppOptions = {
 };
 
 export function createApp(options?: CreateAppOptions) {
+  let result!: Hono;
   const resolveDb = options?.getDb ?? getDatabase;
   const app = new Hono();
 
@@ -41,7 +42,7 @@ export function createApp(options?: CreateAppOptions) {
   );
 
   app.get("/health", (c) => {
-    const result = c.json({
+    let result = c.json({
       status: "ok" as const,
       databasePath: getDatabasePath(),
     });
@@ -49,31 +50,37 @@ export function createApp(options?: CreateAppOptions) {
   });
 
   app.get("/portfolios", async (c) => {
+    let result!: Response;
+
     const db = resolveDb();
     const rows = await listPortfolios(db);
-    const result = c.json(rows);
+    result = c.json(rows);
     return result;
   });
 
   app.post("/portfolios", async (c) => {
+    let result!: Response;
+
     const body = await c.req.json();
     const parsed = createPortfolioSchema.safeParse(body);
     if (!parsed.success) {
-      const result = c.json({ error: parsed.error.flatten() }, 400);
+      result = c.json({ error: parsed.error.flatten() }, 400);
       return result;
     }
 
     const db = resolveDb();
     const row = await createPortfolio(db, parsed.data);
-    const result = c.json(row, 201);
+    result = c.json(row, 201);
     return result;
   });
 
   app.post("/portfolios/:code/classification-schemes", async (c) => {
+    let result!: Response;
+
     const body = await c.req.json();
     const parsed = createClassificationSchemeSchema.safeParse(body);
     if (!parsed.success) {
-      const result = c.json({ error: parsed.error.flatten() }, 400);
+      result = c.json({ error: parsed.error.flatten() }, 400);
       return result;
     }
 
@@ -83,19 +90,21 @@ export function createApp(options?: CreateAppOptions) {
       ...parsed.data,
     });
     if (!row) {
-      const result = c.json({ error: "Portfolio not found" }, 404);
+      result = c.json({ error: "Portfolio not found" }, 404);
       return result;
     }
 
-    const response = c.json(row, 201);
-    return response;
+    result = c.json(row, 201);
+    return result;
   });
 
   app.post("/classification-schemes/:id/values", async (c) => {
+    let result!: Response;
+
     const body = await c.req.json();
     const parsed = createClassificationValueSchema.safeParse(body);
     if (!parsed.success) {
-      const result = c.json({ error: parsed.error.flatten() }, 400);
+      result = c.json({ error: parsed.error.flatten() }, 400);
       return result;
     }
 
@@ -103,7 +112,7 @@ export function createApp(options?: CreateAppOptions) {
     const db = resolveDb();
     const scheme = await findSchemeById(db, schemeId);
     if (!scheme) {
-      const result = c.json({ error: "Scheme not found" }, 404);
+      result = c.json({ error: "Scheme not found" }, 404);
       return result;
     }
 
@@ -111,29 +120,33 @@ export function createApp(options?: CreateAppOptions) {
       schemeId,
       ...parsed.data,
     });
-    const result = c.json(row, 201);
+    result = c.json(row, 201);
     return result;
   });
 
   app.post("/instruments", async (c) => {
+    let result!: Response;
+
     const body = await c.req.json();
     const parsed = createInstrumentSchema.safeParse(body);
     if (!parsed.success) {
-      const result = c.json({ error: parsed.error.flatten() }, 400);
+      result = c.json({ error: parsed.error.flatten() }, 400);
       return result;
     }
 
     const db = resolveDb();
     const row = await createInstrument(db, parsed.data);
-    const result = c.json(row, 201);
+    result = c.json(row, 201);
     return result;
   });
 
   app.put("/instruments/:id/classifications", async (c) => {
+    let result!: Response;
+
     const body = await c.req.json();
     const parsed = setInstrumentClassificationsSchema.safeParse(body);
     if (!parsed.success) {
-      const result = c.json({ error: parsed.error.flatten() }, 400);
+      result = c.json({ error: parsed.error.flatten() }, 400);
       return result;
     }
 
@@ -141,7 +154,7 @@ export function createApp(options?: CreateAppOptions) {
     const db = resolveDb();
     const instrument = await findInstrumentById(db, instrumentId);
     if (!instrument) {
-      const result = c.json({ error: "Instrument not found" }, 404);
+      result = c.json({ error: "Instrument not found" }, 404);
       return result;
     }
 
@@ -150,27 +163,31 @@ export function createApp(options?: CreateAppOptions) {
       instrumentId,
       parsed.data.classificationValueIds,
     );
-    const result = c.json({ ok: true });
+    result = c.json({ ok: true });
     return result;
   });
 
   app.get("/portfolios/:code/snapshot/current", async (c) => {
+    let result!: Response;
+
     const db = resolveDb();
     const snapshot = await getCurrentSnapshot(db, c.req.param("code"));
     if (!snapshot) {
-      const result = c.json({ error: "No current snapshot" }, 404);
+      result = c.json({ error: "No current snapshot" }, 404);
       return result;
     }
 
-    const response = c.json(snapshot);
-    return response;
+    result = c.json(snapshot);
+    return result;
   });
 
   app.put("/portfolios/:code/snapshot/current", async (c) => {
+    let result!: Response;
+
     const body = await c.req.json();
     const parsed = replaceCurrentSnapshotSchema.safeParse(body);
     if (!parsed.success) {
-      const result = c.json({ error: parsed.error.flatten() }, 400);
+      result = c.json({ error: parsed.error.flatten() }, 400);
       return result;
     }
 
@@ -180,13 +197,14 @@ export function createApp(options?: CreateAppOptions) {
       ...parsed.data,
     });
     if (!snapshot) {
-      const result = c.json({ error: "Portfolio not found" }, 404);
+      result = c.json({ error: "Portfolio not found" }, 404);
       return result;
     }
 
-    const response = c.json(snapshot);
-    return response;
+    result = c.json(snapshot);
+    return result;
   });
 
-  return app;
+  result = app;
+  return result;
 }

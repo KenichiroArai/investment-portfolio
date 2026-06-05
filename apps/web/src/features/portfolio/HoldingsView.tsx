@@ -1,7 +1,7 @@
 "use client";
 
 import type { CurrentSnapshotDto } from "@repo/shared";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import {
   getSnapshotFetchUrl,
@@ -13,7 +13,7 @@ type HoldingsViewProps = {
 };
 
 function formatYen(minor: number): string {
-  const result = new Intl.NumberFormat("ja-JP", {
+  let result = new Intl.NumberFormat("ja-JP", {
     style: "currency",
     currency: "JPY",
     maximumFractionDigits: 0,
@@ -24,12 +24,18 @@ function formatYen(minor: number): string {
 function formatTags(
   tags: CurrentSnapshotDto["lines"][number]["tags"],
 ): string {
+  let result = "";
+
   if (tags.length === 0) {
-    const result = "—";
+    result = "—";
     return result;
   }
-  const result = tags
-    .map((tag) => `${tag.schemeName}: ${tag.valueName}`)
+
+  result = tags
+    .map((tag) => {
+      let result = `${tag.schemeName}: ${tag.valueName}`;
+      return result;
+    })
     .join(" / ");
   return result;
 }
@@ -40,25 +46,28 @@ export function HoldingsView({ portfolioCode }: HoldingsViewProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let result: () => void = () => {};
     let cancelled = false;
 
     async function load() {
+      let result: void = undefined;
+
       setLoading(true);
       setError(null);
       const url = getSnapshotFetchUrl(portfolioCode);
       try {
         const response = await fetch(url);
         if (cancelled) {
-          return;
+          return result;
         }
         if (response.status === 404) {
           setSnapshot(null);
           setError("明細がまだ登録されていません。");
-          return;
+          return result;
         }
         if (!response.ok) {
           setError("データの取得に失敗しました。");
-          return;
+          return result;
         }
         const data = (await response.json()) as CurrentSnapshotDto;
         setSnapshot(data);
@@ -71,31 +80,36 @@ export function HoldingsView({ portfolioCode }: HoldingsViewProps) {
           setLoading(false);
         }
       }
+
+      return result;
     }
 
     void load();
 
-    return () => {
+    result = () => {
       cancelled = true;
     };
+    return result;
   }, [portfolioCode]);
 
+  let result: ReactNode = null;
+
   if (loading) {
-    const result = <p>読み込み中…</p>;
+    result = <p>読み込み中…</p>;
     return result;
   }
 
   if (error) {
-    const result = <p className="holdings-error">{error}</p>;
+    result = <p className="holdings-error">{error}</p>;
     return result;
   }
 
   if (!snapshot) {
-    const result = <p className="holdings-error">明細がありません。</p>;
+    result = <p className="holdings-error">明細がありません。</p>;
     return result;
   }
 
-  const result = (
+  result = (
     <section className="holdings">
       <h1>
         {snapshot.portfolioName}（{snapshot.portfolioCode}）
@@ -114,14 +128,17 @@ export function HoldingsView({ portfolioCode }: HoldingsViewProps) {
             </tr>
           </thead>
           <tbody>
-            {snapshot.lines.map((line) => (
-              <tr key={line.id}>
-                <td>{line.instrumentName}</td>
-                <td>{line.quantity}</td>
-                <td>{formatYen(line.marketValueMinor)}</td>
-                <td>{formatTags(line.tags)}</td>
-              </tr>
-            ))}
+            {snapshot.lines.map((line) => {
+              let result = (
+                <tr key={line.id}>
+                  <td>{line.instrumentName}</td>
+                  <td>{line.quantity}</td>
+                  <td>{formatYen(line.marketValueMinor)}</td>
+                  <td>{formatTags(line.tags)}</td>
+                </tr>
+              );
+              return result;
+            })}
           </tbody>
         </table>
       )}

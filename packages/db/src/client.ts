@@ -9,10 +9,15 @@ export function createDb(databasePath: string): {
   sqlite: Database.Database;
   db: AppDatabase;
 } {
+  let result!: {
+    sqlite: Database.Database;
+    db: AppDatabase;
+  };
+
   const sqlite = new Database(databasePath);
   sqlite.pragma("journal_mode = WAL");
   sqlite.pragma("foreign_keys = ON");
   const db = drizzle(sqlite, { schema });
-  const result = { sqlite, db };
+  result = { sqlite, db };
   return result;
 }

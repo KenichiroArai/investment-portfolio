@@ -37,13 +37,15 @@ export type ImportIdecoKakeiboCsvResult = {
 };
 
 async function ensureIdecoPortfolio(db: AppDatabase) {
+  let result!: Awaited<ReturnType<typeof createPortfolio>>;
+
   const existing = await findPortfolioByCode(db, IDECO_PORTFOLIO_CODE);
   if (existing) {
-    const result = existing;
+    result = existing;
     return result;
   }
 
-  const result = await createPortfolio(db, {
+  result = await createPortfolio(db, {
     code: IDECO_PORTFOLIO_CODE,
     name: IDECO_PORTFOLIO_NAME,
     kind: "ideco",
@@ -52,6 +54,8 @@ async function ensureIdecoPortfolio(db: AppDatabase) {
 }
 
 async function ensureProductTypeScheme(db: AppDatabase) {
+  let result: Awaited<ReturnType<typeof findSchemeByPortfolioCodeAndSchemeCode>> = null;
+
   let scheme = await findSchemeByPortfolioCodeAndSchemeCode(
     db,
     IDECO_PORTFOLIO_CODE,
@@ -67,7 +71,6 @@ async function ensureProductTypeScheme(db: AppDatabase) {
   }
 
   if (!scheme) {
-    let result: null = null;
     return result;
   }
 
@@ -89,7 +92,7 @@ async function ensureProductTypeScheme(db: AppDatabase) {
     });
   }
 
-  const result = scheme;
+  result = scheme;
   return result;
 }
 
@@ -99,13 +102,14 @@ async function resolveInstrumentId(
   schemeId: string,
   counters: { created: number; reused: number },
 ) {
+  let result: string | null = null;
+
   const classificationValue = await findClassificationValueBySchemeAndCode(
     db,
     schemeId,
     row.productTypeCode,
   );
   if (!classificationValue) {
-    let result: null = null;
     return result;
   }
 
@@ -125,7 +129,7 @@ async function resolveInstrumentId(
     classificationValue.id,
   ]);
 
-  const result = instrument.id;
+  result = instrument.id;
   return result;
 }
 
@@ -133,10 +137,11 @@ export async function importIdecoKakeiboCsvFromParsed(
   db: AppDatabase,
   parsed: ParseIdecoKakeiboCsvResult,
 ): Promise<ImportIdecoKakeiboCsvResult | null> {
+  let result: ImportIdecoKakeiboCsvResult | null = null;
+
   await ensureIdecoPortfolio(db);
   const scheme = await ensureProductTypeScheme(db);
   if (!scheme) {
-    let result: null = null;
     return result;
   }
 
@@ -153,7 +158,6 @@ export async function importIdecoKakeiboCsvFromParsed(
   for (const row of parsed.rows) {
     const instrumentId = await resolveInstrumentId(db, row, scheme.id, counters);
     if (!instrumentId) {
-      let result: null = null;
       return result;
     }
 
@@ -178,11 +182,10 @@ export async function importIdecoKakeiboCsvFromParsed(
   });
 
   if (!snapshot) {
-    let result: null = null;
     return result;
   }
 
-  const result: ImportIdecoKakeiboCsvResult = {
+  result = {
     asOfDate: parsed.asOfDate,
     lineCount: parsed.rows.length,
     createdInstruments: counters.created,
@@ -195,12 +198,14 @@ export async function importIdecoKakeiboCsv(
   db: AppDatabase,
   csvContent: string,
 ): Promise<ImportIdecoKakeiboCsvResult | null> {
+  let result: ImportIdecoKakeiboCsvResult | null = null;
+
   const parsed = parseIdecoKakeiboCsv(csvContent);
-  const result = await importIdecoKakeiboCsvFromParsed(db, parsed);
+  result = await importIdecoKakeiboCsvFromParsed(db, parsed);
   return result;
 }
 
 export async function getIdecoCurrentSnapshot(db: AppDatabase) {
-  const result = await getCurrentSnapshot(db, IDECO_PORTFOLIO_CODE);
+  let result = await getCurrentSnapshot(db, IDECO_PORTFOLIO_CODE);
   return result;
 }

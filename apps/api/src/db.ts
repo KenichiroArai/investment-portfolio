@@ -15,8 +15,10 @@ let cached: {
 } | null = null;
 
 export async function initDatabase(): Promise<AppDatabase> {
+  let result: AppDatabase;
+
   if (cached) {
-    const result = cached.db;
+    result = cached.db;
     return result;
   }
 
@@ -26,27 +28,34 @@ export async function initDatabase(): Promise<AppDatabase> {
   migrate(db, { migrationsFolder });
 
   cached = { db, databasePath, sqlite };
-  const result = db;
+  result = db;
   return result;
 }
 
 export function getDatabase(): AppDatabase {
+  let result: AppDatabase;
+
   if (!cached) {
     throw new Error("Database not initialized. Call initDatabase() before handling requests.");
   }
-  const result = cached.db;
+
+  result = cached.db;
   return result;
 }
 
 export function getDatabasePath(): string | null {
+  let result: string | null = null;
+
   if (!cached) {
-    const result: string | null = null;
     return result;
   }
-  const result = cached.databasePath;
+
+  result = cached.databasePath;
   return result;
 }
 
 export function resetDatabaseCacheForTests(): void {
+  let result: void = undefined;
   cached = null;
+  return result;
 }

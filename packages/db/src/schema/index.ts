@@ -10,7 +10,10 @@ export const portfolios = sqliteTable(
     kind: text("kind").notNull(),
     createdAt: text("created_at").notNull(),
   },
-  (table) => [unique("portfolios_code_unique").on(table.code)],
+  (table) => {
+    let result = [unique("portfolios_code_unique").on(table.code)];
+    return result;
+  },
 );
 
 export const instruments = sqliteTable("instruments", {
@@ -28,17 +31,23 @@ export const classificationSchemes = sqliteTable(
     id: text("id").primaryKey(),
     portfolioId: text("portfolio_id")
       .notNull()
-      .references(() => portfolios.id, { onDelete: "cascade" }),
+      .references(() => {
+        let result = portfolios.id;
+        return result;
+      }, { onDelete: "cascade" }),
     code: text("code").notNull(),
     name: text("name").notNull(),
     createdAt: text("created_at").notNull(),
   },
-  (table) => [
-    unique("classification_schemes_portfolio_code_unique").on(
-      table.portfolioId,
-      table.code,
-    ),
-  ],
+  (table) => {
+    let result = [
+      unique("classification_schemes_portfolio_code_unique").on(
+        table.portfolioId,
+        table.code,
+      ),
+    ];
+    return result;
+  },
 );
 
 export const classificationValues = sqliteTable(
@@ -47,18 +56,24 @@ export const classificationValues = sqliteTable(
     id: text("id").primaryKey(),
     schemeId: text("scheme_id")
       .notNull()
-      .references(() => classificationSchemes.id, { onDelete: "cascade" }),
+      .references(() => {
+        let result = classificationSchemes.id;
+        return result;
+      }, { onDelete: "cascade" }),
     code: text("code").notNull(),
     name: text("name").notNull(),
     sortOrder: integer("sort_order").notNull().default(0),
     createdAt: text("created_at").notNull(),
   },
-  (table) => [
-    unique("classification_values_scheme_code_unique").on(
-      table.schemeId,
-      table.code,
-    ),
-  ],
+  (table) => {
+    let result = [
+      unique("classification_values_scheme_code_unique").on(
+        table.schemeId,
+        table.code,
+      ),
+    ];
+    return result;
+  },
 );
 
 export const instrumentClassifications = sqliteTable(
@@ -66,17 +81,26 @@ export const instrumentClassifications = sqliteTable(
   {
     instrumentId: text("instrument_id")
       .notNull()
-      .references(() => instruments.id, { onDelete: "cascade" }),
+      .references(() => {
+        let result = instruments.id;
+        return result;
+      }, { onDelete: "cascade" }),
     classificationValueId: text("classification_value_id")
       .notNull()
-      .references(() => classificationValues.id, { onDelete: "cascade" }),
+      .references(() => {
+        let result = classificationValues.id;
+        return result;
+      }, { onDelete: "cascade" }),
   },
-  (table) => [
-    unique("instrument_classifications_unique").on(
-      table.instrumentId,
-      table.classificationValueId,
-    ),
-  ],
+  (table) => {
+    let result = [
+      unique("instrument_classifications_unique").on(
+        table.instrumentId,
+        table.classificationValueId,
+      ),
+    ];
+    return result;
+  },
 );
 
 export const portfolioSnapshots = sqliteTable(
@@ -85,27 +109,39 @@ export const portfolioSnapshots = sqliteTable(
     id: text("id").primaryKey(),
     portfolioId: text("portfolio_id")
       .notNull()
-      .references(() => portfolios.id, { onDelete: "cascade" }),
+      .references(() => {
+        let result = portfolios.id;
+        return result;
+      }, { onDelete: "cascade" }),
     asOfDate: text("as_of_date").notNull(),
     isCurrent: integer("is_current").notNull().default(0),
     createdAt: text("created_at").notNull(),
   },
-  (table) => [
-    index("portfolio_snapshots_portfolio_current_idx").on(
-      table.portfolioId,
-      table.isCurrent,
-    ),
-  ],
+  (table) => {
+    let result = [
+      index("portfolio_snapshots_portfolio_current_idx").on(
+        table.portfolioId,
+        table.isCurrent,
+      ),
+    ];
+    return result;
+  },
 );
 
 export const holdingLines = sqliteTable("holding_lines", {
   id: text("id").primaryKey(),
   snapshotId: text("snapshot_id")
     .notNull()
-    .references(() => portfolioSnapshots.id, { onDelete: "cascade" }),
+    .references(() => {
+      let result = portfolioSnapshots.id;
+      return result;
+    }, { onDelete: "cascade" }),
   instrumentId: text("instrument_id")
     .notNull()
-    .references(() => instruments.id, { onDelete: "restrict" }),
+    .references(() => {
+      let result = instruments.id;
+      return result;
+    }, { onDelete: "restrict" }),
   sortOrder: integer("sort_order"),
   quantity: real("quantity").notNull(),
   marketValueMinor: integer("market_value_minor").notNull(),
@@ -118,95 +154,125 @@ export const holdingLineMetrics = sqliteTable(
     id: text("id").primaryKey(),
     holdingLineId: text("holding_line_id")
       .notNull()
-      .references(() => holdingLines.id, { onDelete: "cascade" }),
+      .references(() => {
+        let result = holdingLines.id;
+        return result;
+      }, { onDelete: "cascade" }),
     code: text("code").notNull(),
     integerValue: integer("integer_value"),
     realValue: real("real_value"),
     textValue: text("text_value"),
   },
-  (table) => [
-    unique("holding_line_metrics_line_code_unique").on(
-      table.holdingLineId,
-      table.code,
-    ),
-  ],
+  (table) => {
+    let result = [
+      unique("holding_line_metrics_line_code_unique").on(
+        table.holdingLineId,
+        table.code,
+      ),
+    ];
+    return result;
+  },
 );
 
-export const portfoliosRelations = relations(portfolios, ({ many }) => ({
-  classificationSchemes: many(classificationSchemes),
-  snapshots: many(portfolioSnapshots),
-}));
+export const portfoliosRelations = relations(portfolios, ({ many }) => {
+        let result = {
+    classificationSchemes: many(classificationSchemes),
+    snapshots: many(portfolioSnapshots),
+  };
+  return result;
+});
 
 export const classificationSchemesRelations = relations(
   classificationSchemes,
-  ({ one, many }) => ({
-    portfolio: one(portfolios, {
-      fields: [classificationSchemes.portfolioId],
-      references: [portfolios.id],
-    }),
-    values: many(classificationValues),
-  }),
+  ({ one, many }) => {
+    let result = {
+      portfolio: one(portfolios, {
+        fields: [classificationSchemes.portfolioId],
+        references: [portfolios.id],
+      }),
+      values: many(classificationValues),
+    };
+    return result;
+  },
 );
 
 export const classificationValuesRelations = relations(
   classificationValues,
-  ({ one, many }) => ({
-    scheme: one(classificationSchemes, {
-      fields: [classificationValues.schemeId],
-      references: [classificationSchemes.id],
-    }),
-    instrumentClassifications: many(instrumentClassifications),
-  }),
+  ({ one, many }) => {
+    let result = {
+      scheme: one(classificationSchemes, {
+        fields: [classificationValues.schemeId],
+        references: [classificationSchemes.id],
+      }),
+      instrumentClassifications: many(instrumentClassifications),
+    };
+    return result;
+  },
 );
 
-export const instrumentsRelations = relations(instruments, ({ many }) => ({
-  classifications: many(instrumentClassifications),
-  holdingLines: many(holdingLines),
-}));
+export const instrumentsRelations = relations(instruments, ({ many }) => {
+        let result = {
+    classifications: many(instrumentClassifications),
+    holdingLines: many(holdingLines),
+  };
+  return result;
+});
 
 export const instrumentClassificationsRelations = relations(
   instrumentClassifications,
-  ({ one }) => ({
-    instrument: one(instruments, {
-      fields: [instrumentClassifications.instrumentId],
-      references: [instruments.id],
-    }),
-    classificationValue: one(classificationValues, {
-      fields: [instrumentClassifications.classificationValueId],
-      references: [classificationValues.id],
-    }),
-  }),
+  ({ one }) => {
+    let result = {
+      instrument: one(instruments, {
+        fields: [instrumentClassifications.instrumentId],
+        references: [instruments.id],
+      }),
+      classificationValue: one(classificationValues, {
+        fields: [instrumentClassifications.classificationValueId],
+        references: [classificationValues.id],
+      }),
+    };
+    return result;
+  },
 );
 
 export const portfolioSnapshotsRelations = relations(
   portfolioSnapshots,
-  ({ one, many }) => ({
-    portfolio: one(portfolios, {
-      fields: [portfolioSnapshots.portfolioId],
-      references: [portfolios.id],
-    }),
-    holdingLines: many(holdingLines),
-  }),
+  ({ one, many }) => {
+    let result = {
+      portfolio: one(portfolios, {
+        fields: [portfolioSnapshots.portfolioId],
+        references: [portfolios.id],
+      }),
+      holdingLines: many(holdingLines),
+    };
+    return result;
+  },
 );
 
-export const holdingLinesRelations = relations(holdingLines, ({ one, many }) => ({
-  snapshot: one(portfolioSnapshots, {
-    fields: [holdingLines.snapshotId],
-    references: [portfolioSnapshots.id],
-  }),
-  instrument: one(instruments, {
-    fields: [holdingLines.instrumentId],
-    references: [instruments.id],
-  }),
-  metrics: many(holdingLineMetrics),
-}));
+export const holdingLinesRelations = relations(holdingLines, ({ one, many }) => {
+        let result = {
+    snapshot: one(portfolioSnapshots, {
+      fields: [holdingLines.snapshotId],
+      references: [portfolioSnapshots.id],
+    }),
+    instrument: one(instruments, {
+      fields: [holdingLines.instrumentId],
+      references: [instruments.id],
+    }),
+    metrics: many(holdingLineMetrics),
+  };
+  return result;
+});
 
 export const holdingLineMetricsRelations = relations(
   holdingLineMetrics,
-  ({ one }) => ({
-    holdingLine: one(holdingLines, {
-      fields: [holdingLineMetrics.holdingLineId],
-      references: [holdingLines.id],
-    }),
-  }),
+  ({ one }) => {
+    let result = {
+      holdingLine: one(holdingLines, {
+        fields: [holdingLineMetrics.holdingLineId],
+        references: [holdingLines.id],
+      }),
+    };
+    return result;
+  },
 );

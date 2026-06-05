@@ -15,7 +15,7 @@ export async function createInstrument(
   db: AppDatabase,
   params: CreateInstrumentParams,
 ) {
-  const row = {
+  let result = {
     id: newId(),
     name: params.name,
     instrumentType: params.instrumentType ?? "mutual_fund",
@@ -23,27 +23,31 @@ export async function createInstrument(
     externalId: params.externalId ?? null,
     createdAt: nowIso(),
   };
-  await db.insert(instruments).values(row);
-  const result = row;
+
+  await db.insert(instruments).values(result);
   return result;
 }
 
 export async function findInstrumentById(db: AppDatabase, id: string) {
+  let result: (typeof instruments.$inferSelect) | null = null;
+
   const rows = await db
     .select()
     .from(instruments)
     .where(eq(instruments.id, id))
     .limit(1);
-  let result = rows[0] ?? null;
+  result = rows[0] ?? null;
   return result;
 }
 
 export async function findInstrumentByName(db: AppDatabase, name: string) {
+  let result: (typeof instruments.$inferSelect) | null = null;
+
   const rows = await db
     .select()
     .from(instruments)
     .where(eq(instruments.name, name))
     .limit(1);
-  let result = rows[0] ?? null;
+  result = rows[0] ?? null;
   return result;
 }

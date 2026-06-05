@@ -5,12 +5,14 @@ type PageProps = {
 };
 
 export function generateStaticParams() {
-  const result = [{ code: "ideco" }];
+  let result = [{ code: "ideco" }];
   return result;
 }
 
 export default async function HoldingsPage({ params }: PageProps) {
+  let result = <HoldingsView portfolioCode="" />;
+
   const { code } = await params;
-  const result = <HoldingsView portfolioCode={code} />;
+  result = <HoldingsView portfolioCode={code} />;
   return result;
 }

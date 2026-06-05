@@ -31,7 +31,13 @@ export const IDECO_PRODUCT_TYPES: IdecoProductTypeDefinition[] = [
 ];
 
 const PRODUCT_TYPE_BY_NAME = new Map(
-  IDECO_PRODUCT_TYPES.map((item) => [item.name, item]),
+  IDECO_PRODUCT_TYPES.map((item) => {
+    let result: [string, (typeof IDECO_PRODUCT_TYPES)[number]] = [
+      item.name,
+      item,
+    ];
+    return result;
+  }),
 );
 
 export type IdecoKakeiboCsvRow = {
@@ -69,45 +75,47 @@ export function stripUtf8Bom(content: string): string {
 }
 
 export function parseJapaneseInteger(value: string): number {
+  let result = Number.NaN;
+
   const normalized = value.trim().replace(/,/g, "");
   if (normalized === "" || normalized === "-") {
-    const result = Number.NaN;
     return result;
   }
 
-  const result = Number.parseInt(normalized, 10);
+  result = Number.parseInt(normalized, 10);
   return result;
 }
 
 export function thousandsYenToYen(thousands: number): number {
-  const result = thousands * 1000;
+  let result = thousands * 1000;
   return result;
 }
 
 export function parseJapanesePercentRate(value: string): number {
+  let result = Number.NaN;
+
   const trimmed = value.trim();
   if (!trimmed.endsWith("%")) {
-    const result = Number.NaN;
     return result;
   }
 
   const normalized = trimmed.slice(0, -1).trim().replace(/,/g, "");
   if (normalized === "" || normalized === "-") {
-    const result = Number.NaN;
     return result;
   }
 
   const percent = Number.parseFloat(normalized);
   if (!Number.isFinite(percent)) {
-    const result = Number.NaN;
     return result;
   }
 
-  const result = percent / 100;
+  result = percent / 100;
   return result;
 }
 
 export function parseIdecoKakeiboDate(value: string): string {
+  let result = "";
+
   const trimmed = value.trim();
   const match = /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/.exec(trimmed);
   if (!match) {
@@ -117,21 +125,24 @@ export function parseIdecoKakeiboDate(value: string): string {
   const year = match[1];
   const month = match[2].padStart(2, "0");
   const day = match[3].padStart(2, "0");
-  const result = `${year}-${month}-${day}`;
+  result = `${year}-${month}-${day}`;
   return result;
 }
 
 export function resolveIdecoProductType(name: string): IdecoProductTypeDefinition {
+  let result: IdecoProductTypeDefinition | null = null;
+
   const definition = PRODUCT_TYPE_BY_NAME.get(name.trim());
   if (!definition) {
     throw new IdecoKakeiboCsvError(`未対応の商品タイプです: ${name}`);
   }
 
-  const result = definition;
+  result = definition;
   return result;
 }
 
 function parseCsvRecords(content: string): string[][] {
+  let result: string[][] = [];
   const records: string[][] = [];
   let currentRecord: string[] = [];
   let currentField = "";
@@ -186,11 +197,13 @@ function parseCsvRecords(content: string): string[][] {
     records.push(currentRecord);
   }
 
-  const result = records;
+  result = records;
   return result;
 }
 
 function assertHeader(headerRow: string[]): void {
+  let result: void = undefined;
+
   if (headerRow.length !== IDECO_KAKEIBO_CSV_HEADERS.length) {
     throw new IdecoKakeiboCsvError(
       `CSV ヘッダー列数が不正です（期待: ${IDECO_KAKEIBO_CSV_HEADERS.length}）`,
@@ -206,9 +219,25 @@ function assertHeader(headerRow: string[]): void {
       );
     }
   }
+
+  return result;
 }
 
 function parseDataRow(cells: string[], lineNumber: number): IdecoKakeiboCsvRow {
+  let result: IdecoKakeiboCsvRow = {
+    rowNumber: 0,
+    asOfDate: "",
+    productTypeName: "",
+    productTypeCode: "",
+    instrumentName: "",
+    unitPricePerTenThousandLots: 0,
+    quantity: 0,
+    marketValueMinor: 0,
+    bookValueMinor: 0,
+    unrealizedGainMinor: 0,
+    unrealizedGainRate: 0,
+  };
+
   if (cells.length !== IDECO_KAKEIBO_CSV_HEADERS.length) {
     throw new IdecoKakeiboCsvError(
       `${lineNumber} 行目の列数が不正です（期待: ${IDECO_KAKEIBO_CSV_HEADERS.length}）`,
@@ -249,7 +278,7 @@ function parseDataRow(cells: string[], lineNumber: number): IdecoKakeiboCsvRow {
     throw new IdecoKakeiboCsvError(`${lineNumber} 行目の残高数量が不正です`);
   }
 
-  const result: IdecoKakeiboCsvRow = {
+  result = {
     rowNumber,
     asOfDate,
     productTypeName: productType.name,
@@ -266,6 +295,8 @@ function parseDataRow(cells: string[], lineNumber: number): IdecoKakeiboCsvRow {
 }
 
 export function parseIdecoKakeiboCsv(content: string): ParseIdecoKakeiboCsvResult {
+  let result: ParseIdecoKakeiboCsvResult = { asOfDate: "", rows: [] };
+
   const normalized = stripUtf8Bom(content).trim();
   if (normalized === "") {
     throw new IdecoKakeiboCsvError("CSV が空です");
@@ -295,7 +326,7 @@ export function parseIdecoKakeiboCsv(content: string): ParseIdecoKakeiboCsvResul
     rows.push(row);
   }
 
-  const result: ParseIdecoKakeiboCsvResult = {
+  result = {
     asOfDate,
     rows,
   };

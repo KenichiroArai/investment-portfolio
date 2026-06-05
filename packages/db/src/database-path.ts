@@ -5,12 +5,13 @@ const packageDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(packageDir, "../../..");
 
 export function resolveDatabasePath(): string {
+  let result = resolve(repoRoot, "data", "portfolio.db");
+
   const explicit = process.env.DATABASE_PATH;
   if (explicit) {
-    const result = explicit;
+    result = explicit;
     return result;
   }
 
-  const result = resolve(repoRoot, "data", "portfolio.db");
   return result;
 }
