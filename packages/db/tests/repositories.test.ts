@@ -130,8 +130,20 @@ describe("portfolio repositories", () => {
       lines: [
         {
           instrumentId: instrument.id,
+          sortOrder: 1,
           quantity: 100,
           marketValueMinor: 500000,
+          bookValueMinor: 400000,
+          metrics: [
+            {
+              code: "unit_price_per_10k_lots",
+              integerValue: 12345,
+            },
+            {
+              code: "unrealized_gain_rate",
+              realValue: 0.05,
+            },
+          ],
         },
         {
           instrumentId: instrumentUntagged.id,
@@ -141,6 +153,19 @@ describe("portfolio repositories", () => {
       ],
     });
     expect(replaced?.lines).toHaveLength(2);
+    expect(replaced?.lines[0].sortOrder).toBe(1);
+    expect(replaced?.lines[0].metrics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "unit_price_per_10k_lots",
+          integerValue: 12345,
+        }),
+        expect.objectContaining({
+          code: "unrealized_gain_rate",
+          realValue: 0.05,
+        }),
+      ]),
+    );
     expect(replaced?.lines[0].tags[0].schemeCode).toBe("currency");
     expect(replaced?.lines[0].tags[1].valueName).toBe("日本");
     expect(replaced?.lines[1].tags).toHaveLength(0);

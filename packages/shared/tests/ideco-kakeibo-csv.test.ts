@@ -7,6 +7,7 @@ import {
   parseIdecoKakeiboCsv,
   parseIdecoKakeiboDate,
   parseJapaneseInteger,
+  parseJapanesePercentRate,
   resolveIdecoProductType,
   stripUtf8Bom,
   thousandsYenToYen,
@@ -23,6 +24,8 @@ describe("ideco-kakeibo-csv", () => {
     expect(parseJapaneseInteger("-")).toBeNaN();
     expect(thousandsYenToYen(130962)).toBe(130962000);
     expect(parseIdecoKakeiboDate("2026/6/2")).toBe("2026-06-02");
+    expect(parseJapanesePercentRate("2.10%")).toBe(0.021);
+    expect(parseJapanesePercentRate("-2.50%")).toBe(-0.025);
     expect(resolveIdecoProductType("国内株式").code).toBe("domestic_equity");
     expect(stripUtf8Bom("\uFEFFhello")).toBe("hello");
   });
@@ -32,10 +35,14 @@ describe("ideco-kakeibo-csv", () => {
     expect(parsed.asOfDate).toBe("2026-06-02");
     expect(parsed.rows).toHaveLength(2);
     expect(parsed.rows[0]).toMatchObject({
+      rowNumber: 1,
       instrumentName: "eMAXIS Slim 国内株式(TOPIX)",
       quantity: 41773,
       marketValueMinor: 130962000,
       bookValueMinor: 128324000,
+      unrealizedGainMinor: 2638000,
+      unrealizedGainRate: 0.021,
+      unitPricePerTenThousandLots: 31351,
       productTypeCode: "domestic_equity",
     });
     expect(parsed.rows[1].productTypeCode).toBe("foreign_equity");
@@ -97,6 +104,13 @@ describe("ideco-kakeibo-csv", () => {
     expect(() =>
       parseIdecoKakeiboCsv(
         `番号,日付,商品タイプ,運用商品名,時価単価(1万口当り),残高数量,資産残高,購入金額,損益,損益率
+1,2026/6/2,国内株式,テスト,"1","1","1","1","0",bad
+`,
+      ),
+    ).toThrow(/数値が不正/);
+    expect(() =>
+      parseIdecoKakeiboCsv(
+        `番号,日付,商品タイプ,運用商品名,時価単価(1万口当り),残高数量,資産残高,購入金額,損益,損益率
 1,2026/6/2,国内株式,テスト,"1","0","1","1","0",0%
 `,
       ),
@@ -132,17 +146,19 @@ describe("ideco-kakeibo-csv", () => {
     );
   });
 
-  it("parses rows that end with a trailing comma", () => {
-    const parsed = parseIdecoKakeiboCsv(
-      "番号,日付,商品タイプ,運用商品名,時価単価(1万口当り),残高数量,資産残高,購入金額,損益,損益率\n" +
-        '1,2026/6/2,国内株式,テスト,"1","1","1","1","0",',
-    );
-    expect(parsed.rows).toHaveLength(1);
+  it("rejects rows with missing percent rate", () => {
+    expect(() =>
+      parseIdecoKakeiboCsv(
+        "番号,日付,商品タイプ,運用商品名,時価単価(1万口当り),残高数量,資産残高,購入金額,損益,損益率\n" +
+          '1,2026/6/2,国内株式,テスト,"1","1","1","1","0",',
+      ),
+    ).toThrow(/数値が不正/);
   });
 
-  it("parses the user's kakeibo CSV fixture when present", () => {
+  it("parses the ideco holdings CSV fixture when present", () => {
     const fixturePath = resolve(
-      "d:/SVN/日常作業/trunk/記録/家計簿/家計簿.csv",
+      import.meta.dirname,
+      "../../../data/imports/ideco/holdings.csv",
     );
 
     let content = "";

@@ -1,4 +1,5 @@
 import {
+  buildIdecoKakeiboMetrics,
   IDECO_PRODUCT_TYPES,
   parseIdecoKakeiboCsv,
   type IdecoKakeiboCsvRow,
@@ -142,9 +143,11 @@ export async function importIdecoKakeiboCsvFromParsed(
   const counters = { created: 0, reused: 0 };
   const lines: Array<{
     instrumentId: string;
+    sortOrder: number;
     quantity: number;
     marketValueMinor: number;
     bookValueMinor: number;
+    metrics: ReturnType<typeof buildIdecoKakeiboMetrics>;
   }> = [];
 
   for (const row of parsed.rows) {
@@ -156,9 +159,15 @@ export async function importIdecoKakeiboCsvFromParsed(
 
     lines.push({
       instrumentId,
+      sortOrder: row.rowNumber,
       quantity: row.quantity,
       marketValueMinor: row.marketValueMinor,
       bookValueMinor: row.bookValueMinor,
+      metrics: buildIdecoKakeiboMetrics({
+        unitPricePerTenThousandLots: row.unitPricePerTenThousandLots,
+        unrealizedGainMinor: row.unrealizedGainMinor,
+        unrealizedGainRate: row.unrealizedGainRate,
+      }),
     });
   }
 

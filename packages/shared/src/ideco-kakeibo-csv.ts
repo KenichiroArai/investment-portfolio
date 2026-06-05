@@ -44,6 +44,8 @@ export type IdecoKakeiboCsvRow = {
   quantity: number;
   marketValueMinor: number;
   bookValueMinor: number;
+  unrealizedGainMinor: number;
+  unrealizedGainRate: number;
 };
 
 export type ParseIdecoKakeiboCsvResult = {
@@ -79,6 +81,29 @@ export function parseJapaneseInteger(value: string): number {
 
 export function thousandsYenToYen(thousands: number): number {
   const result = thousands * 1000;
+  return result;
+}
+
+export function parseJapanesePercentRate(value: string): number {
+  const trimmed = value.trim();
+  if (!trimmed.endsWith("%")) {
+    const result = Number.NaN;
+    return result;
+  }
+
+  const normalized = trimmed.slice(0, -1).trim().replace(/,/g, "");
+  if (normalized === "" || normalized === "-") {
+    const result = Number.NaN;
+    return result;
+  }
+
+  const percent = Number.parseFloat(normalized);
+  if (!Number.isFinite(percent)) {
+    const result = Number.NaN;
+    return result;
+  }
+
+  const result = percent / 100;
   return result;
 }
 
@@ -206,12 +231,16 @@ function parseDataRow(cells: string[], lineNumber: number): IdecoKakeiboCsvRow {
   const quantity = parseJapaneseInteger(cells[5]);
   const marketValueThousands = parseJapaneseInteger(cells[6]);
   const bookValueThousands = parseJapaneseInteger(cells[7]);
+  const unrealizedGainThousands = parseJapaneseInteger(cells[8]);
+  const unrealizedGainRate = parseJapanesePercentRate(cells[9]);
 
   if (
     !Number.isFinite(unitPricePerTenThousandLots) ||
     !Number.isFinite(quantity) ||
     !Number.isFinite(marketValueThousands) ||
-    !Number.isFinite(bookValueThousands)
+    !Number.isFinite(bookValueThousands) ||
+    !Number.isFinite(unrealizedGainThousands) ||
+    !Number.isFinite(unrealizedGainRate)
   ) {
     throw new IdecoKakeiboCsvError(`${lineNumber} 行目の数値が不正です`);
   }
@@ -230,6 +259,8 @@ function parseDataRow(cells: string[], lineNumber: number): IdecoKakeiboCsvRow {
     quantity,
     marketValueMinor: thousandsYenToYen(marketValueThousands),
     bookValueMinor: thousandsYenToYen(bookValueThousands),
+    unrealizedGainMinor: thousandsYenToYen(unrealizedGainThousands),
+    unrealizedGainRate,
   };
   return result;
 }

@@ -28,11 +28,20 @@ export const setInstrumentClassificationsSchema = z.object({
   classificationValueIds: z.array(z.string().uuid()),
 });
 
+export const holdingLineMetricInputSchema = z.object({
+  code: z.string().min(1).max(64),
+  integerValue: z.number().int().nullable().optional(),
+  realValue: z.number().nullable().optional(),
+  textValue: z.string().max(512).nullable().optional(),
+});
+
 export const holdingLineInputSchema = z.object({
   instrumentId: z.string().uuid(),
   quantity: z.number().positive(),
   marketValueMinor: z.number().int().nonnegative(),
   bookValueMinor: z.number().int().nonnegative().nullable().optional(),
+  sortOrder: z.number().int().positive().nullable().optional(),
+  metrics: z.array(holdingLineMetricInputSchema).optional(),
 });
 
 export const replaceCurrentSnapshotSchema = z.object({

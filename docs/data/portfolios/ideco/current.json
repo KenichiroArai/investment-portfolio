@@ -1,16 +1,37 @@
 {
-  "id": "5c1bcfae-81e0-4b27-a8a8-1f9c12a9f2de",
+  "id": "a8501a92-aaae-4521-aa91-f37bcf01fd11",
   "portfolioCode": "ideco",
   "portfolioName": "iDeCo",
   "asOfDate": "2026-06-02",
   "lines": [
     {
-      "id": "d4c8d47f-029a-464e-aa86-aa671c84f697",
+      "id": "dfe291ef-5f85-4fbd-b471-8d181f55ad3f",
       "instrumentId": "ce093c20-144f-442d-b9a3-158c9ecf5082",
       "instrumentName": "eMAXIS Slim 国内株式(TOPIX)",
+      "sortOrder": 1,
       "quantity": 41773,
       "marketValueMinor": 130962000,
       "bookValueMinor": 128324000,
+      "metrics": [
+        {
+          "code": "unit_price_per_10k_lots",
+          "integerValue": 31351,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 2638000,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.021,
+          "textValue": null
+        }
+      ],
       "tags": [
         {
           "schemeCode": "ideco_product_type",
@@ -21,12 +42,33 @@
       ]
     },
     {
-      "id": "c1a7cfaa-d341-49f0-9287-c7bd1aa52804",
+      "id": "f239f53b-36bf-4352-9dab-a6026ed52b58",
       "instrumentId": "a15def04-bd49-4e00-bd50-8790940bb8f8",
       "instrumentName": "SBI・全世界株式インデックス・ファンド",
+      "sortOrder": 2,
       "quantity": 195420,
       "marketValueMinor": 689832000,
       "bookValueMinor": 639296000,
+      "metrics": [
+        {
+          "code": "unit_price_per_10k_lots",
+          "integerValue": 35300,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 50536000,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.079,
+          "textValue": null
+        }
+      ],
       "tags": [
         {
           "schemeCode": "ideco_product_type",
@@ -37,12 +79,33 @@
       ]
     },
     {
-      "id": "f1e5223d-8d27-4899-bdbb-3342fcf504b4",
+      "id": "f666cc3b-abf4-4d57-a40a-ad831da9bb65",
       "instrumentId": "089c9076-f1ba-4d6e-b18d-632c7718762f",
       "instrumentName": "eMAXIS Slim 全世界株式(除く日本)",
+      "sortOrder": 3,
       "quantity": 104130,
       "marketValueMinor": 398557000,
       "bookValueMinor": 385705000,
+      "metrics": [
+        {
+          "code": "unit_price_per_10k_lots",
+          "integerValue": 38275,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 12852000,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.033,
+          "textValue": null
+        }
+      ],
       "tags": [
         {
           "schemeCode": "ideco_product_type",
@@ -53,12 +116,33 @@
       ]
     },
     {
-      "id": "0fd4c7b6-506c-444c-8e75-79e8ea517ca0",
+      "id": "2617c690-55ed-4b2f-a812-5715d057bf2b",
       "instrumentId": "9fb39016-cb96-4f8c-bdde-dad664ba8d8c",
       "instrumentName": "eMAXIS Slim 先進国株式インデックス",
+      "sortOrder": 4,
       "quantity": 8789,
       "marketValueMinor": 39546000,
       "bookValueMinor": 38644000,
+      "metrics": [
+        {
+          "code": "unit_price_per_10k_lots",
+          "integerValue": 44995,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 902000,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.023,
+          "textValue": null
+        }
+      ],
       "tags": [
         {
           "schemeCode": "ideco_product_type",
@@ -69,12 +153,33 @@
       ]
     },
     {
-      "id": "b1d9a25c-da78-4c1b-919f-facc56d2f60f",
+      "id": "db4994c8-a9d3-4c8a-ae8b-b7c534f77152",
       "instrumentId": "54122fa5-f2bf-43c2-846e-80910440d83c",
       "instrumentName": "eMAXIS Slim 米国株式(S&P500)",
+      "sortOrder": 5,
       "quantity": 12827,
       "marketValueMinor": 56923000,
       "bookValueMinor": 55330000,
+      "metrics": [
+        {
+          "code": "unit_price_per_10k_lots",
+          "integerValue": 44378,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 1593000,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.028999999999999998,
+          "textValue": null
+        }
+      ],
       "tags": [
         {
           "schemeCode": "ideco_product_type",
@@ -85,12 +190,33 @@
       ]
     },
     {
-      "id": "5af67171-4d90-46a6-9242-52ab010c3ec3",
+      "id": "97b74020-1058-4632-9143-72f4cccf5af3",
       "instrumentId": "116e717a-d04b-4d8f-b78e-3ccdd8dfc3df",
       "instrumentName": "eMAXIS Slim 新興国株式インデックス",
+      "sortOrder": 6,
       "quantity": 14501,
       "marketValueMinor": 40692000,
       "bookValueMinor": 38644000,
+      "metrics": [
+        {
+          "code": "unit_price_per_10k_lots",
+          "integerValue": 28062,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 2048000,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.053,
+          "textValue": null
+        }
+      ],
       "tags": [
         {
           "schemeCode": "ideco_product_type",
@@ -101,12 +227,33 @@
       ]
     },
     {
-      "id": "0ea02393-89ae-4404-849f-2d3da414f635",
+      "id": "0cecb4b3-ca2e-4a1f-b426-2c8403dd8b7b",
       "instrumentId": "91b40bdb-396e-4d7a-aa65-5f3c5aeb93ef",
       "instrumentName": "eMAXIS Slim 国内債券インデックス",
+      "sortOrder": 7,
       "quantity": 105743,
       "marketValueMinor": 90103000,
       "bookValueMinor": 89678000,
+      "metrics": [
+        {
+          "code": "unit_price_per_10k_lots",
+          "integerValue": 8521,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 425000,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.005,
+          "textValue": null
+        }
+      ],
       "tags": [
         {
           "schemeCode": "ideco_product_type",
@@ -117,12 +264,33 @@
       ]
     },
     {
-      "id": "78e0ee00-503e-4aef-be66-edbf15e90376",
+      "id": "b2eceb13-6124-4c80-91fd-5568cd5a159a",
       "instrumentId": "d16e0544-e5de-408c-abff-070172fbf82c",
       "instrumentName": "eMAXIS Slim 先進国債券インデックス",
+      "sortOrder": 8,
       "quantity": 81733,
       "marketValueMinor": 127953000,
       "bookValueMinor": 126175000,
+      "metrics": [
+        {
+          "code": "unit_price_per_10k_lots",
+          "integerValue": 15655,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 1778000,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.013999999999999999,
+          "textValue": null
+        }
+      ],
       "tags": [
         {
           "schemeCode": "ideco_product_type",
@@ -133,12 +301,33 @@
       ]
     },
     {
-      "id": "2abb6682-1af5-46bc-9d27-76618b77f8db",
+      "id": "68178498-409a-4e78-95bb-c4331ec01655",
       "instrumentId": "21738e53-d0e0-4422-a440-f58143d9c2de",
       "instrumentName": "iFree 新興国債券インデックス",
+      "sortOrder": 9,
       "quantity": 19345,
       "marketValueMinor": 36660000,
       "bookValueMinor": 36138000,
+      "metrics": [
+        {
+          "code": "unit_price_per_10k_lots",
+          "integerValue": 18951,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 522000,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.013999999999999999,
+          "textValue": null
+        }
+      ],
       "tags": [
         {
           "schemeCode": "ideco_product_type",
@@ -149,12 +338,33 @@
       ]
     },
     {
-      "id": "2681a546-c7dc-436c-9184-d56dc275b8c8",
+      "id": "598f7eaa-9364-4e9c-a2ac-72b0003b5a5a",
       "instrumentId": "9fdfa985-99b3-412f-af1d-3348e9babef7",
       "instrumentName": "ニッセイJリートインデックスファンド(購入・換金手数料なし)",
+      "sortOrder": 10,
       "quantity": 24368,
       "marketValueMinor": 51874000,
       "bookValueMinor": 53181000,
+      "metrics": [
+        {
+          "code": "unit_price_per_10k_lots",
+          "integerValue": 21288,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -1307000,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.025,
+          "textValue": null
+        }
+      ],
       "tags": [
         {
           "schemeCode": "ideco_product_type",
@@ -165,12 +375,33 @@
       ]
     },
     {
-      "id": "9f895eb2-d407-4771-a6d9-b836427f4fb9",
+      "id": "408c88d7-2b8d-4f2f-a088-a512a56ca931",
       "instrumentId": "9260781c-0453-4f5d-87ea-19217bc1a030",
       "instrumentName": "三井住友・DC外国リートインデックスファンド",
+      "sortOrder": 11,
       "quantity": 22596,
       "marketValueMinor": 53579000,
       "bookValueMinor": 53181000,
+      "metrics": [
+        {
+          "code": "unit_price_per_10k_lots",
+          "integerValue": 23712,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 398000,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.006999999999999999,
+          "textValue": null
+        }
+      ],
       "tags": [
         {
           "schemeCode": "ideco_product_type",
@@ -181,12 +412,33 @@
       ]
     },
     {
-      "id": "d3e63148-cc2a-4c8e-903d-5aca34c8452d",
+      "id": "b586ad50-e429-4a78-80f4-774814ef8f2b",
       "instrumentId": "0f9b3746-c1a0-4238-9080-99caf357455e",
       "instrumentName": "eMAXIS Slim バランス(8資産均等型)",
+      "sortOrder": 12,
       "quantity": 181645,
       "marketValueMinor": 387521000,
       "bookValueMinor": 371859000,
+      "metrics": [
+        {
+          "code": "unit_price_per_10k_lots",
+          "integerValue": 21334,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 15662000,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.042,
+          "textValue": null
+        }
+      ],
       "tags": [
         {
           "schemeCode": "ideco_product_type",
@@ -197,12 +449,33 @@
       ]
     },
     {
-      "id": "c2c006c7-7fb1-4644-839d-c7375950257b",
+      "id": "9294d166-2c45-4fa7-835e-63d94226fa31",
       "instrumentId": "3ace33a3-36f0-475b-94c5-2fb02ceee153",
       "instrumentName": "iFree 年金バランス",
+      "sortOrder": 13,
       "quantity": 124896,
       "marketValueMinor": 244433000,
       "bookValueMinor": 239715000,
+      "metrics": [
+        {
+          "code": "unit_price_per_10k_lots",
+          "integerValue": 19571,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 4718000,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.02,
+          "textValue": null
+        }
+      ],
       "tags": [
         {
           "schemeCode": "ideco_product_type",
@@ -213,12 +486,33 @@
       ]
     },
     {
-      "id": "8bb629d3-2abe-4374-8ed0-cfcefee3db02",
+      "id": "83018fc3-a216-4bd9-8c82-7b1510be6a8a",
       "instrumentId": "8d171cfd-64ad-4a8e-9ce7-7f331608615b",
       "instrumentName": "三菱UFJ純金ファンド(愛称:ファインゴールド)",
+      "sortOrder": 14,
       "quantity": 183256,
       "marketValueMinor": 992331000,
       "bookValueMinor": 626252000,
+      "metrics": [
+        {
+          "code": "unit_price_per_10k_lots",
+          "integerValue": 54150,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 366079000,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.585,
+          "textValue": null
+        }
+      ],
       "tags": [
         {
           "schemeCode": "ideco_product_type",
@@ -229,12 +523,33 @@
       ]
     },
     {
-      "id": "ca9f58fd-cd39-4906-a84b-c67c40719553",
+      "id": "e06b5d08-9cb5-4e16-803f-1be042e1acdc",
       "instrumentId": "53bdddb7-cab9-48eb-9f3e-9bf731df27b7",
       "instrumentName": "セレブライフ・ストーリー2045",
+      "sortOrder": 15,
       "quantity": 41723,
       "marketValueMinor": 100381000,
       "bookValueMinor": 100104000,
+      "metrics": [
+        {
+          "code": "unit_price_per_10k_lots",
+          "integerValue": 24059,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 277000,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.003,
+          "textValue": null
+        }
+      ],
       "tags": [
         {
           "schemeCode": "ideco_product_type",

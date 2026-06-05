@@ -106,10 +106,31 @@ export const holdingLines = sqliteTable("holding_lines", {
   instrumentId: text("instrument_id")
     .notNull()
     .references(() => instruments.id, { onDelete: "restrict" }),
+  sortOrder: integer("sort_order"),
   quantity: real("quantity").notNull(),
   marketValueMinor: integer("market_value_minor").notNull(),
   bookValueMinor: integer("book_value_minor"),
 });
+
+export const holdingLineMetrics = sqliteTable(
+  "holding_line_metrics",
+  {
+    id: text("id").primaryKey(),
+    holdingLineId: text("holding_line_id")
+      .notNull()
+      .references(() => holdingLines.id, { onDelete: "cascade" }),
+    code: text("code").notNull(),
+    integerValue: integer("integer_value"),
+    realValue: real("real_value"),
+    textValue: text("text_value"),
+  },
+  (table) => [
+    unique("holding_line_metrics_line_code_unique").on(
+      table.holdingLineId,
+      table.code,
+    ),
+  ],
+);
 
 export const portfoliosRelations = relations(portfolios, ({ many }) => ({
   classificationSchemes: many(classificationSchemes),
@@ -168,7 +189,7 @@ export const portfolioSnapshotsRelations = relations(
   }),
 );
 
-export const holdingLinesRelations = relations(holdingLines, ({ one }) => ({
+export const holdingLinesRelations = relations(holdingLines, ({ one, many }) => ({
   snapshot: one(portfolioSnapshots, {
     fields: [holdingLines.snapshotId],
     references: [portfolioSnapshots.id],
@@ -177,4 +198,15 @@ export const holdingLinesRelations = relations(holdingLines, ({ one }) => ({
     fields: [holdingLines.instrumentId],
     references: [instruments.id],
   }),
+  metrics: many(holdingLineMetrics),
 }));
+
+export const holdingLineMetricsRelations = relations(
+  holdingLineMetrics,
+  ({ one }) => ({
+    holdingLine: one(holdingLines, {
+      fields: [holdingLineMetrics.holdingLineId],
+      references: [holdingLines.id],
+    }),
+  }),
+);

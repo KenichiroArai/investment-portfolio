@@ -26,7 +26,8 @@ investment-portfolio/
 │   ├── tsconfig/
 │   └── ui/
 ├── docs/                    # GitHub Pages 公開用データ（JSON 正本）
-├── data/                    # SQLite（git 無視）
+├── dev/                     # 開発者向け資料（DB 確認 SQL 等）
+├── data/                    # ローカルデータ（SQLite・投入用 CSV、git 無視）
 └── package.json
 ```
 
@@ -85,6 +86,16 @@ taskkill /PID <PID> /F
 環境変数（任意）:
 
 - `DATABASE_PATH` — SQLite ファイル（既定: `data/portfolio.db`）
+
+`data/` はローカル専用です（`.gitignore` で除外）。SQLite と投入用 CSV コピーをまとめて置きます。
+
+```text
+data/
+├── portfolio.db              # SQLite（migrate / import で生成）
+└── imports/
+    └── ideco/
+        └── holdings.csv      # 明細 CSV のローカルコピー（正本は SVN）
+```
 - `PORT` / `HOST` — API の待ち受け（既定: `127.0.0.1:3001`）
 - `NEXT_PUBLIC_API_URL` — Web から参照する API（既定: `http://127.0.0.1:3001`）
 
@@ -128,13 +139,27 @@ npm test
 
 カバレッジ付きで確認する場合は `npm run test:coverage`（詳細は [テスト](#テスト)）。
 
-## iDeCo データ投入（家計簿 CSV）
+## iDeCo データ投入（明細 CSV）
 
-iDeCo 口座の明細は、家計簿用 CSV（`番号,日付,商品タイプ,運用商品名,...` 形式）から SQLite へ一括投入できます。iDeCo 専用の CLI です。
+iDeCo 口座の明細は、保有明細 CSV（`番号,日付,商品タイプ,運用商品名,...` 形式）から SQLite へ一括投入できます。iDeCo 専用の CLI です。
+
+正本（リポジトリ外）:
+
+```text
+D:\SVN\日常作業\trunk\記録\家計簿\家計簿.csv
+```
 
 ```bash
 npm run db:import:ideco -- "D:\SVN\日常作業\trunk\記録\家計簿\家計簿.csv"
 ```
+
+ローカルコピー（`data/imports/ideco/holdings.csv`）を使う場合:
+
+```bash
+npm run db:import:ideco -- data/imports/ideco/holdings.csv
+```
+
+`data/` 配下は個人データのため Git 管理しません。初回は SVN 正本を `data/imports/ideco/holdings.csv` にコピーしてください。
 
 投入内容:
 
@@ -144,9 +169,11 @@ npm run db:import:ideco -- "D:\SVN\日常作業\trunk\記録\家計簿\家計簿
 
 投入後、GitHub Pages 用 JSON を更新する場合は [GitHub Pages 向けデータ公開](#github-pages-向けデータ公開) の `npm run pages:export` を実行してください。ローカル API で確認する場合は `npm run dev:api` 起動後、**口座明細（iDeCo）** を開きます。
 
+SQLite の内容を SQL で確認する場合は [dev/sql/README.md](dev/sql/README.md) を参照してください。
+
 ## 手動データ投入（例）
 
-次の順で API に POST/PUT してください（`curl` 等）。CSV がある場合は上記 [iDeCo データ投入（家計簿 CSV）](#ideco-データ投入家計簿-csv) が簡単です。
+次の順で API に POST/PUT してください（`curl` 等）。CSV がある場合は上記 [iDeCo データ投入（明細 CSV）](#ideco-データ投入明細-csv) が簡単です。
 
 ```bash
 # 1. 口座

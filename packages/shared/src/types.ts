@@ -1,9 +1,13 @@
+import type { HoldingLineMetricDto } from "./holding-line-metrics";
+
 export type ClassificationTagDto = {
   schemeCode: string;
   schemeName: string;
   valueCode: string;
   valueName: string;
 };
+
+export type { HoldingLineMetricDto };
 
 export type PortfolioDto = {
   id: string;
@@ -16,9 +20,11 @@ export type HoldingLineDto = {
   id: string;
   instrumentId: string;
   instrumentName: string;
+  sortOrder: number | null;
   quantity: number;
   marketValueMinor: number;
   bookValueMinor: number | null;
+  metrics: HoldingLineMetricDto[];
   tags: ClassificationTagDto[];
 };
 

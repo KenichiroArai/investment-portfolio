@@ -5,6 +5,7 @@ import {
   importIdecoKakeiboCsv,
   importIdecoKakeiboCsvFromParsed,
 } from "../src/import-ideco-csv";
+import { IDECO_KAKEIBO_METRIC_CODES } from "@repo/shared";
 import * as classifications from "../src/repositories/classifications";
 import * as snapshots from "../src/repositories/snapshots";
 import { createTestDb } from "../src/test-utils";
@@ -44,11 +45,34 @@ describe("importIdecoKakeiboCsv", () => {
     expect(snapshot).not.toBeNull();
     expect(snapshot?.lines).toHaveLength(2);
     expect(snapshot?.lines[0]).toMatchObject({
+      sortOrder: 1,
       instrumentName: "eMAXIS Slim 国内株式(TOPIX)",
       quantity: 41773,
       marketValueMinor: 130962000,
       bookValueMinor: 128324000,
     });
+    expect(snapshot?.lines[0].metrics).toEqual(
+      expect.arrayContaining([
+        {
+          code: IDECO_KAKEIBO_METRIC_CODES.unitPricePerTenThousandLots,
+          integerValue: 31351,
+          realValue: null,
+          textValue: null,
+        },
+        {
+          code: IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor,
+          integerValue: 2638000,
+          realValue: null,
+          textValue: null,
+        },
+        {
+          code: IDECO_KAKEIBO_METRIC_CODES.unrealizedGainRate,
+          integerValue: null,
+          realValue: 0.021,
+          textValue: null,
+        },
+      ]),
+    );
     expect(snapshot?.lines[0].tags).toEqual([
       {
         schemeCode: "ideco_product_type",
@@ -100,6 +124,8 @@ describe("importIdecoKakeiboCsv", () => {
           quantity: 1,
           marketValueMinor: 1000,
           bookValueMinor: 1000,
+          unrealizedGainMinor: 0,
+          unrealizedGainRate: 0,
         },
       ],
     });
@@ -122,6 +148,8 @@ describe("importIdecoKakeiboCsv", () => {
           quantity: 1,
           marketValueMinor: 1000,
           bookValueMinor: 1000,
+          unrealizedGainMinor: 0,
+          unrealizedGainRate: 0,
         },
       ],
     });
