@@ -1,11 +1,18 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { HoldingsView } from "@/features/portfolio/HoldingsView";
+import {
+  HoldingsView,
+  noopEffectCleanup,
+} from "@/features/portfolio/HoldingsView";
 
 describe("HoldingsView", () => {
   afterEach(() => {
     vi.unstubAllGlobals();
+  });
+
+  it("noopEffectCleanup is a no-op", () => {
+    expect(noopEffectCleanup()).toBeUndefined();
   });
 
   it("shows loading state initially", () => {

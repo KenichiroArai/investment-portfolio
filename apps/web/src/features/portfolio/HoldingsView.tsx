@@ -12,6 +12,11 @@ type HoldingsViewProps = {
   portfolioCode: string;
 };
 
+export function noopEffectCleanup(): void {
+  let result: void = undefined;
+  return result;
+}
+
 function formatYen(minor: number): string {
   let result = new Intl.NumberFormat("ja-JP", {
     style: "currency",
@@ -46,7 +51,7 @@ export function HoldingsView({ portfolioCode }: HoldingsViewProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let result: () => void = () => {};
+    let result: () => void = noopEffectCleanup;
     let cancelled = false;
 
     async function load() {
