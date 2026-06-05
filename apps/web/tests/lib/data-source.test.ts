@@ -66,4 +66,12 @@ describe("data-source", () => {
       "/data/portfolios/ideco/current.json",
     );
   });
+
+  it("trims trailing slash from basePath for static JSON", () => {
+    process.env.NEXT_PUBLIC_DATA_SOURCE = "static";
+    process.env.NEXT_PUBLIC_BASE_PATH = "/investment-portfolio/";
+    expect(getSnapshotFetchUrl("ideco")).toBe(
+      "/investment-portfolio/data/portfolios/ideco/current.json",
+    );
+  });
 });

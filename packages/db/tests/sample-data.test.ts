@@ -5,6 +5,7 @@ import {
   isSampleDataSeeded,
   seedSampleData,
 } from "../src/sample-data";
+import { createPortfolio } from "../src/repositories/portfolios";
 import { getCurrentSnapshot } from "../src/repositories/snapshots";
 import { createTestDb } from "../src/test-utils";
 
@@ -42,5 +43,26 @@ describe("sample data", () => {
     expect(cleared.status).toBe("cleared");
     expect(await isSampleDataSeeded(db)).toBe(false);
     expect(await getCurrentSnapshot(db, "ideco")).toBeNull();
+  });
+
+  it("skips seeding when non-sample ideco portfolio exists", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+
+    const outcome = await seedSampleData(db);
+    expect(outcome).toEqual({
+      status: "skipped",
+      reason: "non_sample_portfolio_exists",
+    });
+  });
+
+  it("reports not_present when clearing absent sample data", async () => {
+    const db = setup();
+    const outcome = await clearSampleData(db);
+    expect(outcome).toEqual({ status: "not_present" });
   });
 });

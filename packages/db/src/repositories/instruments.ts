@@ -37,3 +37,13 @@ export async function findInstrumentById(db: AppDatabase, id: string) {
   let result = rows[0] ?? null;
   return result;
 }
+
+export async function findInstrumentByName(db: AppDatabase, name: string) {
+  const rows = await db
+    .select()
+    .from(instruments)
+    .where(eq(instruments.name, name))
+    .limit(1);
+  let result = rows[0] ?? null;
+  return result;
+}

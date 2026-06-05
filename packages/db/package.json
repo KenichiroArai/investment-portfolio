@@ -14,7 +14,8 @@
     "db:migrate": "tsx src/migrate.ts",
     "db:seed:sample": "tsx src/seed-sample-cli.ts on --sample",
     "db:seed:clear": "tsx src/seed-sample-cli.ts off --sample",
-    "pages:export": "tsx src/export-pages-data.ts"
+    "pages:export": "tsx src/export-pages-data.ts",
+    "db:import:ideco": "tsx src/import-ideco-csv-cli.ts"
   },
   "dependencies": {
     "better-sqlite3": "^11.10.0",

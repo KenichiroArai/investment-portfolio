@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
   createClassificationScheme,
   createClassificationValue,
+  findSchemeByPortfolioCodeAndSchemeCode,
   getTagsForInstruments,
   setInstrumentClassifications,
 } from "../src/repositories/classifications";
@@ -46,6 +47,16 @@ describe("portfolio repositories", () => {
     expect(missing).toBeNull();
     const noSnapshot = await getCurrentSnapshot(db, "ideco");
     expect(noSnapshot).toBeNull();
+  });
+
+  it("returns null for unknown portfolio scheme lookup", async () => {
+    const db = setup();
+    const missing = await findSchemeByPortfolioCodeAndSchemeCode(
+      db,
+      "missing",
+      "region",
+    );
+    expect(missing).toBeNull();
   });
 
   it("returns null when replacing snapshot for unknown portfolio", async () => {

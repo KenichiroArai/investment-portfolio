@@ -1,4 +1,4 @@
-import { eq, inArray } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 
 import type { AppDatabase } from "../client";
 import { newId, nowIso } from "../id";
@@ -49,6 +49,50 @@ export async function findSchemeById(db: AppDatabase, schemeId: string) {
     .select()
     .from(classificationSchemes)
     .where(eq(classificationSchemes.id, schemeId))
+    .limit(1);
+  let result = rows[0] ?? null;
+  return result;
+}
+
+export async function findSchemeByPortfolioCodeAndSchemeCode(
+  db: AppDatabase,
+  portfolioCode: string,
+  schemeCode: string,
+) {
+  const portfolio = await findPortfolioByCode(db, portfolioCode);
+  if (!portfolio) {
+    let result: null = null;
+    return result;
+  }
+
+  const rows = await db
+    .select()
+    .from(classificationSchemes)
+    .where(
+      and(
+        eq(classificationSchemes.portfolioId, portfolio.id),
+        eq(classificationSchemes.code, schemeCode),
+      ),
+    )
+    .limit(1);
+  let result = rows[0] ?? null;
+  return result;
+}
+
+export async function findClassificationValueBySchemeAndCode(
+  db: AppDatabase,
+  schemeId: string,
+  code: string,
+) {
+  const rows = await db
+    .select()
+    .from(classificationValues)
+    .where(
+      and(
+        eq(classificationValues.schemeId, schemeId),
+        eq(classificationValues.code, code),
+      ),
+    )
     .limit(1);
   let result = rows[0] ?? null;
   return result;

@@ -1,9 +1,15 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import HoldingsPage from "@/app/portfolios/[code]/holdings/page";
+import HoldingsPage, {
+  generateStaticParams,
+} from "@/app/portfolios/[code]/holdings/page";
 
 describe("HoldingsPage", () => {
+  it("exposes static params for ideco", () => {
+    expect(generateStaticParams()).toEqual([{ code: "ideco" }]);
+  });
+
   it("renders holdings view for portfolio code", async () => {
     vi.stubGlobal(
       "fetch",

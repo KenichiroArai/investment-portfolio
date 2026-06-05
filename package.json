@@ -17,6 +17,7 @@
     "db:seed:sample": "npm run db:seed:sample -w @repo/db",
     "db:seed:clear": "npm run db:seed:clear -w @repo/db",
     "pages:export": "npm run pages:export -w @repo/db",
+    "db:import:ideco": "npm run db:import:ideco -w @repo/db",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"

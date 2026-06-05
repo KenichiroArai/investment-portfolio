@@ -1,22 +1,246 @@
 {
-  "id": "sample-snapshot",
+  "id": "5c1bcfae-81e0-4b27-a8a8-1f9c12a9f2de",
   "portfolioCode": "ideco",
   "portfolioName": "iDeCo",
-  "asOfDate": "2026-06-01",
+  "asOfDate": "2026-06-02",
   "lines": [
     {
-      "id": "sample-line",
-      "instrumentId": "sample-instrument",
-      "instrumentName": "（サンプル）eMAXIS Slim 国内株式(TOPIX)",
-      "quantity": 100,
-      "marketValueMinor": 500000,
-      "bookValueMinor": null,
+      "id": "d4c8d47f-029a-464e-aa86-aa671c84f697",
+      "instrumentId": "ce093c20-144f-442d-b9a3-158c9ecf5082",
+      "instrumentName": "eMAXIS Slim 国内株式(TOPIX)",
+      "quantity": 41773,
+      "marketValueMinor": 130962000,
+      "bookValueMinor": 128324000,
       "tags": [
         {
-          "schemeCode": "region",
-          "schemeName": "地域",
-          "valueCode": "japan",
-          "valueName": "日本"
+          "schemeCode": "ideco_product_type",
+          "schemeName": "商品タイプ",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式"
+        }
+      ]
+    },
+    {
+      "id": "c1a7cfaa-d341-49f0-9287-c7bd1aa52804",
+      "instrumentId": "a15def04-bd49-4e00-bd50-8790940bb8f8",
+      "instrumentName": "SBI・全世界株式インデックス・ファンド",
+      "quantity": 195420,
+      "marketValueMinor": 689832000,
+      "bookValueMinor": 639296000,
+      "tags": [
+        {
+          "schemeCode": "ideco_product_type",
+          "schemeName": "商品タイプ",
+          "valueCode": "domestic_foreign_equity",
+          "valueName": "内外株式"
+        }
+      ]
+    },
+    {
+      "id": "f1e5223d-8d27-4899-bdbb-3342fcf504b4",
+      "instrumentId": "089c9076-f1ba-4d6e-b18d-632c7718762f",
+      "instrumentName": "eMAXIS Slim 全世界株式(除く日本)",
+      "quantity": 104130,
+      "marketValueMinor": 398557000,
+      "bookValueMinor": 385705000,
+      "tags": [
+        {
+          "schemeCode": "ideco_product_type",
+          "schemeName": "商品タイプ",
+          "valueCode": "foreign_equity",
+          "valueName": "海外株式"
+        }
+      ]
+    },
+    {
+      "id": "0fd4c7b6-506c-444c-8e75-79e8ea517ca0",
+      "instrumentId": "9fb39016-cb96-4f8c-bdde-dad664ba8d8c",
+      "instrumentName": "eMAXIS Slim 先進国株式インデックス",
+      "quantity": 8789,
+      "marketValueMinor": 39546000,
+      "bookValueMinor": 38644000,
+      "tags": [
+        {
+          "schemeCode": "ideco_product_type",
+          "schemeName": "商品タイプ",
+          "valueCode": "foreign_equity",
+          "valueName": "海外株式"
+        }
+      ]
+    },
+    {
+      "id": "b1d9a25c-da78-4c1b-919f-facc56d2f60f",
+      "instrumentId": "54122fa5-f2bf-43c2-846e-80910440d83c",
+      "instrumentName": "eMAXIS Slim 米国株式(S&P500)",
+      "quantity": 12827,
+      "marketValueMinor": 56923000,
+      "bookValueMinor": 55330000,
+      "tags": [
+        {
+          "schemeCode": "ideco_product_type",
+          "schemeName": "商品タイプ",
+          "valueCode": "foreign_equity",
+          "valueName": "海外株式"
+        }
+      ]
+    },
+    {
+      "id": "5af67171-4d90-46a6-9242-52ab010c3ec3",
+      "instrumentId": "116e717a-d04b-4d8f-b78e-3ccdd8dfc3df",
+      "instrumentName": "eMAXIS Slim 新興国株式インデックス",
+      "quantity": 14501,
+      "marketValueMinor": 40692000,
+      "bookValueMinor": 38644000,
+      "tags": [
+        {
+          "schemeCode": "ideco_product_type",
+          "schemeName": "商品タイプ",
+          "valueCode": "foreign_equity",
+          "valueName": "海外株式"
+        }
+      ]
+    },
+    {
+      "id": "0ea02393-89ae-4404-849f-2d3da414f635",
+      "instrumentId": "91b40bdb-396e-4d7a-aa65-5f3c5aeb93ef",
+      "instrumentName": "eMAXIS Slim 国内債券インデックス",
+      "quantity": 105743,
+      "marketValueMinor": 90103000,
+      "bookValueMinor": 89678000,
+      "tags": [
+        {
+          "schemeCode": "ideco_product_type",
+          "schemeName": "商品タイプ",
+          "valueCode": "domestic_bond",
+          "valueName": "国内債券"
+        }
+      ]
+    },
+    {
+      "id": "78e0ee00-503e-4aef-be66-edbf15e90376",
+      "instrumentId": "d16e0544-e5de-408c-abff-070172fbf82c",
+      "instrumentName": "eMAXIS Slim 先進国債券インデックス",
+      "quantity": 81733,
+      "marketValueMinor": 127953000,
+      "bookValueMinor": 126175000,
+      "tags": [
+        {
+          "schemeCode": "ideco_product_type",
+          "schemeName": "商品タイプ",
+          "valueCode": "foreign_bond",
+          "valueName": "海外債券"
+        }
+      ]
+    },
+    {
+      "id": "2abb6682-1af5-46bc-9d27-76618b77f8db",
+      "instrumentId": "21738e53-d0e0-4422-a440-f58143d9c2de",
+      "instrumentName": "iFree 新興国債券インデックス",
+      "quantity": 19345,
+      "marketValueMinor": 36660000,
+      "bookValueMinor": 36138000,
+      "tags": [
+        {
+          "schemeCode": "ideco_product_type",
+          "schemeName": "商品タイプ",
+          "valueCode": "foreign_bond",
+          "valueName": "海外債券"
+        }
+      ]
+    },
+    {
+      "id": "2681a546-c7dc-436c-9184-d56dc275b8c8",
+      "instrumentId": "9fdfa985-99b3-412f-af1d-3348e9babef7",
+      "instrumentName": "ニッセイJリートインデックスファンド(購入・換金手数料なし)",
+      "quantity": 24368,
+      "marketValueMinor": 51874000,
+      "bookValueMinor": 53181000,
+      "tags": [
+        {
+          "schemeCode": "ideco_product_type",
+          "schemeName": "商品タイプ",
+          "valueCode": "domestic_reit",
+          "valueName": "国内不動産投信"
+        }
+      ]
+    },
+    {
+      "id": "9f895eb2-d407-4771-a6d9-b836427f4fb9",
+      "instrumentId": "9260781c-0453-4f5d-87ea-19217bc1a030",
+      "instrumentName": "三井住友・DC外国リートインデックスファンド",
+      "quantity": 22596,
+      "marketValueMinor": 53579000,
+      "bookValueMinor": 53181000,
+      "tags": [
+        {
+          "schemeCode": "ideco_product_type",
+          "schemeName": "商品タイプ",
+          "valueCode": "foreign_reit",
+          "valueName": "海外不動産投信"
+        }
+      ]
+    },
+    {
+      "id": "d3e63148-cc2a-4c8e-903d-5aca34c8452d",
+      "instrumentId": "0f9b3746-c1a0-4238-9080-99caf357455e",
+      "instrumentName": "eMAXIS Slim バランス(8資産均等型)",
+      "quantity": 181645,
+      "marketValueMinor": 387521000,
+      "bookValueMinor": 371859000,
+      "tags": [
+        {
+          "schemeCode": "ideco_product_type",
+          "schemeName": "商品タイプ",
+          "valueCode": "balanced",
+          "valueName": "内外資産複合"
+        }
+      ]
+    },
+    {
+      "id": "c2c006c7-7fb1-4644-839d-c7375950257b",
+      "instrumentId": "3ace33a3-36f0-475b-94c5-2fb02ceee153",
+      "instrumentName": "iFree 年金バランス",
+      "quantity": 124896,
+      "marketValueMinor": 244433000,
+      "bookValueMinor": 239715000,
+      "tags": [
+        {
+          "schemeCode": "ideco_product_type",
+          "schemeName": "商品タイプ",
+          "valueCode": "balanced",
+          "valueName": "内外資産複合"
+        }
+      ]
+    },
+    {
+      "id": "8bb629d3-2abe-4374-8ed0-cfcefee3db02",
+      "instrumentId": "8d171cfd-64ad-4a8e-9ce7-7f331608615b",
+      "instrumentName": "三菱UFJ純金ファンド(愛称:ファインゴールド)",
+      "quantity": 183256,
+      "marketValueMinor": 992331000,
+      "bookValueMinor": 626252000,
+      "tags": [
+        {
+          "schemeCode": "ideco_product_type",
+          "schemeName": "商品タイプ",
+          "valueCode": "domestic_other",
+          "valueName": "国内その他資産"
+        }
+      ]
+    },
+    {
+      "id": "ca9f58fd-cd39-4906-a84b-c67c40719553",
+      "instrumentId": "53bdddb7-cab9-48eb-9f3e-9bf731df27b7",
+      "instrumentName": "セレブライフ・ストーリー2045",
+      "quantity": 41723,
+      "marketValueMinor": 100381000,
+      "bookValueMinor": 100104000,
+      "tags": [
+        {
+          "schemeCode": "ideco_product_type",
+          "schemeName": "商品タイプ",
+          "valueCode": "balanced",
+          "valueName": "内外資産複合"
         }
       ]
     }

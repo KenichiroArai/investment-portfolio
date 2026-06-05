@@ -148,9 +148,31 @@ npm test
 
 カバレッジ付きで確認する場合は `npm run test:coverage`（詳細は [テスト](#テスト)）。
 
+## iDeCo データ投入（家計簿 CSV）
+
+iDeCo 口座の明細は、家計簿用 CSV（`番号,日付,商品タイプ,運用商品名,...` 形式）から SQLite へ一括投入できます。iDeCo 専用の CLI です。
+
+```bash
+npm run db:import:ideco -- "D:\SVN\日常作業\trunk\記録\家計簿\家計簿.csv"
+```
+
+サンプル用 DB（`data/portfolio.sample.db`）へ入れる場合は `--sample` を付けます。
+
+```bash
+npm run db:import:ideco -- "D:\path\to\家計簿.csv" --sample
+```
+
+投入内容:
+
+- 口座 `ideco`（未作成なら自動作成）
+- 分類体系 `ideco_product_type`（商品タイプ）と各銘柄へのタグ付け
+- 最新明細（`asOfDate` は CSV の日付列、`資産残高`・`購入金額` は千円→円に変換）
+
+投入後、GitHub Pages 用 JSON を更新する場合は [GitHub Pages 向けデータ公開](#github-pages-向けデータ公開) の `npm run pages:export` を実行してください。ローカル API で確認する場合は `npm run dev:api` 起動後、**口座明細（iDeCo）** を開きます。
+
 ## 手動データ投入（例）
 
-開発用サンプルは [サンプルデータ（SQLite）](#サンプルデータsqlite) を参照してください。本番相当の手動投入は、次の順で API に POST/PUT してください（`curl` 等）。
+開発用サンプルは [サンプルデータ（SQLite）](#サンプルデータsqlite) を参照してください。本番相当の手動投入は、次の順で API に POST/PUT してください（`curl` 等）。CSV がある場合は上記 [iDeCo データ投入（家計簿 CSV）](#ideco-データ投入家計簿-csv) が簡単です。
 
 ```bash
 # 1. 口座
