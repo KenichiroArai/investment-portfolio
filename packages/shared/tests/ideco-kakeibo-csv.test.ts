@@ -26,6 +26,10 @@ describe("ideco-kakeibo-csv", () => {
     expect(parseIdecoKakeiboDate("2026/6/2")).toBe("2026-06-02");
     expect(parseJapanesePercentRate("2.10%")).toBe(0.021);
     expect(parseJapanesePercentRate("-2.50%")).toBe(-0.025);
+    expect(parseJapanesePercentRate("bad")).toBeNaN();
+    expect(parseJapanesePercentRate("%")).toBeNaN();
+    expect(parseJapanesePercentRate("-%")).toBeNaN();
+    expect(parseJapanesePercentRate("abc%")).toBeNaN();
     expect(resolveIdecoProductType("国内株式").code).toBe("domestic_equity");
     expect(stripUtf8Bom("\uFEFFhello")).toBe("hello");
   });

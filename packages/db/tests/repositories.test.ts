@@ -194,6 +194,48 @@ describe("portfolio repositories", () => {
     expect(tags.size).toBe(0);
   });
 
+  it("sorts snapshot lines by sortOrder then instrument name", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+
+    const instrumentAlpha = await createInstrument(db, { name: "Alpha Fund" });
+    const instrumentBeta = await createInstrument(db, { name: "Beta Fund" });
+    const instrumentGamma = await createInstrument(db, { name: "Gamma Fund" });
+
+    const replaced = await replaceCurrentSnapshot(db, {
+      portfolioCode: "ideco",
+      asOfDate: "2026-06-01",
+      lines: [
+        {
+          instrumentId: instrumentBeta.id,
+          quantity: 1,
+          marketValueMinor: 1000,
+        },
+        {
+          instrumentId: instrumentAlpha.id,
+          quantity: 1,
+          marketValueMinor: 2000,
+        },
+        {
+          instrumentId: instrumentGamma.id,
+          sortOrder: 1,
+          quantity: 1,
+          marketValueMinor: 3000,
+        },
+      ],
+    });
+
+    expect(replaced?.lines.map((line) => line.instrumentName)).toEqual([
+      "Gamma Fund",
+      "Alpha Fund",
+      "Beta Fund",
+    ]);
+  });
+
   it("clears classifications when empty list is set", async () => {
     const db = setup();
     const instrument = await createInstrument(db, { name: "Empty tags" });
