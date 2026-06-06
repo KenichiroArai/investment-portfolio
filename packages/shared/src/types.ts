@@ -36,11 +36,17 @@ export type HoldingLineDto = {
   tags: ClassificationTagDto[];
 };
 
+export type AnalysisSchemeConfig = {
+  schemeCode: string;
+  schemeName: string;
+};
+
 export type CurrentSnapshotDto = {
   id: string;
   portfolioCode: string;
   portfolioName: string;
   asOfDate: string;
+  analysisSchemes: AnalysisSchemeConfig[];
   lines: HoldingLineDto[];
 };
 

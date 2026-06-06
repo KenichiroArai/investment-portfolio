@@ -70,6 +70,38 @@ describe("ideco csv parsers", () => {
 `,
     );
     expect(analysis.mappings[0].productTypeCode).toBe("domestic_equity");
+    expect(analysis.axes.map((axis) => axis.axisName)).toEqual([
+      "地域分類",
+      "資産分類",
+    ]);
+  });
+
+  it("parses modern three-column analysis csv", () => {
+    const analysis = parseIdecoAnalysisCsv(
+      `分析軸名,カテゴリ名,メンバー名
+商品タイプ,すべて,all
+地域分類,国内,国内株式
+資産分類,株式,国内株式
+商品分類,国内株式,国内株式
+商品グループ,主要資産,国内株式
+`,
+    );
+    expect(analysis.axes.map((axis) => axis.axisName)).toEqual([
+      "商品タイプ",
+      "地域分類",
+      "資産分類",
+      "商品分類",
+      "商品グループ",
+    ]);
+    expect(analysis.memberMappings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          schemeCode: "ideco_product_group",
+          memberName: "国内株式",
+          categoryName: "主要資産",
+        }),
+      ]),
+    );
   });
 
   it("rejects invalid holdings csv", () => {

@@ -13,6 +13,8 @@ export const IDECO_SCHEME_CODES = {
   instrumentStatus: "ideco_instrument_status",
   region: "ideco_region",
   assetClass: "ideco_asset_class",
+  productCategory: "ideco_product_category",
+  productGroup: "ideco_product_group",
 } as const;
 
 export const IDECO_SCHEME_NAMES = {
@@ -22,7 +24,20 @@ export const IDECO_SCHEME_NAMES = {
   [IDECO_SCHEME_CODES.instrumentStatus]: "ステータス",
   [IDECO_SCHEME_CODES.region]: "地域分類",
   [IDECO_SCHEME_CODES.assetClass]: "資産分類",
+  [IDECO_SCHEME_CODES.productCategory]: "商品分類",
+  [IDECO_SCHEME_CODES.productGroup]: "商品グループ",
 } as const;
+
+export const IDECO_INSTRUMENT_METADATA_SCHEME_CODES = new Set<string>([
+  IDECO_SCHEME_CODES.majorCategory,
+  IDECO_SCHEME_CODES.productStyle,
+  IDECO_SCHEME_CODES.instrumentStatus,
+]);
+
+export const IDECO_PRODUCT_GROUPS: IdecoClassificationDefinition[] = [
+  { name: "主要資産", code: "major_assets", sortOrder: 0 },
+  { name: "その他", code: "other", sortOrder: 1 },
+];
 
 export const IDECO_PRODUCT_TYPES: IdecoClassificationDefinition[] = [
   { name: "国内株式", code: "domestic_equity", sortOrder: 0 },
@@ -206,4 +221,117 @@ export function resolveIdecoAnalysisTags(
 export function productTypeCodeFromName(name: string): string {
   let result = resolveIdecoProductType(name).code;
   return result;
+}
+
+const ANALYSIS_AXIS_NAME_TO_SCHEME_CODE = new Map<string, string>(
+  Object.entries(IDECO_SCHEME_NAMES).map(([schemeCode, schemeName]) => {
+    let result: [string, string] = [schemeName, schemeCode];
+    return result;
+  }),
+);
+
+const REGION_BY_NAME = new Map(
+  IDECO_REGIONS.map((item) => {
+    let result: [string, IdecoClassificationDefinition] = [item.name, item];
+    return result;
+  }),
+);
+
+const ASSET_CLASS_BY_NAME = new Map(
+  IDECO_ASSET_CLASSES.map((item) => {
+    let result: [string, IdecoClassificationDefinition] = [item.name, item];
+    return result;
+  }),
+);
+
+const PRODUCT_GROUP_BY_NAME = new Map(
+  IDECO_PRODUCT_GROUPS.map((item) => {
+    let result: [string, IdecoClassificationDefinition] = [item.name, item];
+    return result;
+  }),
+);
+
+export function isIdecoAnalysisSchemeCode(schemeCode: string): boolean {
+  let result = false;
+
+  if (!schemeCode.startsWith("ideco_")) {
+    return result;
+  }
+
+  if (IDECO_INSTRUMENT_METADATA_SCHEME_CODES.has(schemeCode)) {
+    return result;
+  }
+
+  result = true;
+  return result;
+}
+
+export function resolveIdecoAnalysisAxisSchemeCode(axisName: string): string {
+  let result = "";
+
+  const trimmed = axisName.trim();
+  if (trimmed === "") {
+    return result;
+  }
+
+  const known = ANALYSIS_AXIS_NAME_TO_SCHEME_CODE.get(trimmed);
+  if (known) {
+    result = known;
+    return result;
+  }
+
+  throw new IdecoCsvError(`未対応の分析軸名です: ${axisName}`);
+}
+
+export function resolveIdecoAnalysisCategoryDefinition(
+  schemeCode: string,
+  categoryName: string,
+): IdecoClassificationDefinition {
+  let result: IdecoClassificationDefinition | null = null;
+
+  const trimmed = categoryName.trim();
+  if (trimmed === "" || trimmed === "すべて") {
+    throw new IdecoCsvError(`分析カテゴリ名が不正です: ${categoryName}`);
+  }
+
+  if (schemeCode === IDECO_SCHEME_CODES.productType) {
+    result = resolveIdecoProductType(trimmed);
+    return result;
+  }
+
+  if (schemeCode === IDECO_SCHEME_CODES.productCategory) {
+    result = resolveIdecoProductType(trimmed);
+    return result;
+  }
+
+  if (schemeCode === IDECO_SCHEME_CODES.region) {
+    const region = REGION_BY_NAME.get(trimmed);
+    if (!region) {
+      throw new IdecoCsvError(`未対応の地域分類です: ${categoryName}`);
+    }
+    result = region;
+    return result;
+  }
+
+  if (schemeCode === IDECO_SCHEME_CODES.assetClass) {
+    const assetClass = ASSET_CLASS_BY_NAME.get(trimmed);
+    if (!assetClass) {
+      throw new IdecoCsvError(`未対応の資産分類です: ${categoryName}`);
+    }
+    result = assetClass;
+    return result;
+  }
+
+  if (schemeCode === IDECO_SCHEME_CODES.productGroup) {
+    const productGroup = PRODUCT_GROUP_BY_NAME.get(trimmed);
+    if (!productGroup) {
+      throw new IdecoCsvError(`未対応の商品グループです: ${categoryName}`);
+    }
+    result = productGroup;
+    return result;
+  }
+
+  throw new IdecoCsvError(
+    `分析軸 ${schemeCode} のカテゴリ解決に未対応です: ${categoryName}`,
+  );
 }

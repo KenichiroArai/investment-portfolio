@@ -3,12 +3,12 @@
 import Link from "next/link";
 import {
   buildAllocationBySchemeWithLines,
-  listAnalysisSchemesForPortfolio,
+  resolveAnalysisSchemes,
   sumSnapshotMarketValue,
   type AnalysisSchemeConfig,
   type CurrentSnapshotDto,
 } from "@repo/shared";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { AllocationPanel } from "@/features/analysis/AllocationPanel";
 import { formatYen } from "@/lib/format-yen";
@@ -26,23 +26,7 @@ export function AnalysisView({
   portfolioCode,
   portfolioKind,
 }: AnalysisViewProps) {
-  const schemeConfigs = useMemo(
-    () => listAnalysisSchemesForPortfolio(portfolioKind),
-    [portfolioKind],
-  );
   const [selectedSchemeCode, setSelectedSchemeCode] = useState("");
-  const activeSchemeCode = useMemo(() => {
-    let result = schemeConfigs[0]?.schemeCode ?? "";
-
-    const selected = schemeConfigs.find(
-      (config) => config.schemeCode === selectedSchemeCode,
-    );
-    if (selected) {
-      result = selected.schemeCode;
-    }
-
-    return result;
-  }, [schemeConfigs, selectedSchemeCode]);
   const [snapshot, setSnapshot] = useState<CurrentSnapshotDto | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -124,6 +108,20 @@ export function AnalysisView({
     );
     return result;
   }
+
+  const schemeConfigs = resolveAnalysisSchemes(snapshot, portfolioKind);
+  const activeSchemeCode = (() => {
+    let activeResult = schemeConfigs[0]?.schemeCode ?? "";
+
+    const selected = schemeConfigs.find(
+      (config) => config.schemeCode === selectedSchemeCode,
+    );
+    if (selected) {
+      activeResult = selected.schemeCode;
+    }
+
+    return activeResult;
+  })();
 
   if (schemeConfigs.length === 0) {
     result = (

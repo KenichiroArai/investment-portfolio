@@ -1,22 +1,21 @@
 import {
   buildIdecoInstrumentAttributes,
   buildIdecoKakeiboMetrics,
-  IDECO_ASSET_CLASSES,
   IDECO_INSTRUMENT_ATTRIBUTE_CODES,
   IDECO_INSTRUMENT_STATUSES,
   IDECO_MAJOR_CATEGORIES,
   IDECO_PRODUCT_STYLES,
   IDECO_PRODUCT_TYPES,
-  IDECO_REGIONS,
   IDECO_SCHEME_CODES,
   IDECO_SCHEME_NAMES,
   parseIdecoAnalysisCsv,
   parseIdecoHoldingsCsv,
   parseIdecoInstrumentsCsv,
   parseIdecoProductTypesCsv,
-  resolveIdecoAnalysisTags,
+  type IdecoAnalysisMemberMapping,
   type IdecoClassificationDefinition,
   type IdecoInstrumentCsvRow,
+  type ParseIdecoAnalysisCsvResult,
   type ParseIdecoHoldingsCsvResult,
 } from "@repo/shared";
 
@@ -222,18 +221,85 @@ async function seedIdecoClassifications(
     IDECO_SCHEME_NAMES[IDECO_SCHEME_CODES.instrumentStatus],
     IDECO_INSTRUMENT_STATUSES,
   );
-  await ensureSchemeWithValues(
-    db,
-    IDECO_SCHEME_CODES.region,
-    IDECO_SCHEME_NAMES[IDECO_SCHEME_CODES.region],
-    IDECO_REGIONS,
-  );
-  await ensureSchemeWithValues(
-    db,
-    IDECO_SCHEME_CODES.assetClass,
-    IDECO_SCHEME_NAMES[IDECO_SCHEME_CODES.assetClass],
-    IDECO_ASSET_CLASSES,
-  );
+
+  return result;
+}
+
+function buildAnalysisValuesForAxis(
+  schemeCode: string,
+  analysisParsed: ParseIdecoAnalysisCsvResult,
+): IdecoClassificationDefinition[] {
+  let result: IdecoClassificationDefinition[] = [];
+  const values = new Map<string, IdecoClassificationDefinition>();
+  let sortOrder = 0;
+
+  for (const mapping of analysisParsed.memberMappings) {
+    if (mapping.schemeCode !== schemeCode) {
+      continue;
+    }
+
+    if (values.has(mapping.categoryCode)) {
+      continue;
+    }
+
+    values.set(mapping.categoryCode, {
+      name: mapping.categoryName,
+      code: mapping.categoryCode,
+      sortOrder,
+    });
+    sortOrder += 1;
+  }
+
+  result = [...values.values()];
+  return result;
+}
+
+async function seedAnalysisFromCsv(
+  db: AppDatabase,
+  analysisParsed: ParseIdecoAnalysisCsvResult,
+) {
+  let result: void = undefined;
+
+  for (const axis of analysisParsed.axes) {
+    const values = buildAnalysisValuesForAxis(axis.schemeCode, analysisParsed);
+    if (values.length === 0) {
+      continue;
+    }
+
+    await ensureSchemeWithValues(
+      db,
+      axis.schemeCode,
+      axis.axisName,
+      values,
+    );
+  }
+
+  return result;
+}
+
+function buildAnalysisTagsFromMappings(
+  productTypeName: string,
+  memberMappings: IdecoAnalysisMemberMapping[],
+) {
+  let result: Array<{ schemeCode: string; valueCode: string }> = [];
+  const seen = new Set<string>();
+
+  for (const mapping of memberMappings) {
+    if (mapping.memberName !== productTypeName) {
+      continue;
+    }
+
+    const key = `${mapping.schemeCode}:${mapping.categoryCode}`;
+    if (seen.has(key)) {
+      continue;
+    }
+
+    seen.add(key);
+    result.push({
+      schemeCode: mapping.schemeCode,
+      valueCode: mapping.categoryCode,
+    });
+  }
 
   return result;
 }
@@ -241,6 +307,7 @@ async function seedIdecoClassifications(
 async function resolveInstrumentClassificationIds(
   db: AppDatabase,
   row: IdecoInstrumentCsvRow,
+  analysisParsed: ParseIdecoAnalysisCsvResult,
 ) {
   let result: string[] = [];
 
@@ -269,18 +336,12 @@ async function resolveInstrumentClassificationIds(
     });
   }
 
-  const analysisTags = resolveIdecoAnalysisTags(row.productTypeCode);
-  if (analysisTags) {
-    valueCodes.push(
-      {
-        schemeCode: IDECO_SCHEME_CODES.region,
-        valueCode: analysisTags.regionCode,
-      },
-      {
-        schemeCode: IDECO_SCHEME_CODES.assetClass,
-        valueCode: analysisTags.assetClassCode,
-      },
-    );
+  const analysisTags = buildAnalysisTagsFromMappings(
+    row.productTypeName,
+    analysisParsed.memberMappings,
+  );
+  for (const tag of analysisTags) {
+    valueCodes.push(tag);
   }
 
   for (const entry of valueCodes) {
@@ -302,6 +363,7 @@ async function importInstrumentsFromParsed(
   db: AppDatabase,
   rows: IdecoInstrumentCsvRow[],
   counters: { created: number; reused: number },
+  analysisParsed: ParseIdecoAnalysisCsvResult,
 ) {
   let result: Map<string, string> = new Map();
 
@@ -344,7 +406,11 @@ async function importInstrumentsFromParsed(
       }),
     );
 
-    const classificationValueIds = await resolveInstrumentClassificationIds(db, row);
+    const classificationValueIds = await resolveInstrumentClassificationIds(
+      db,
+      row,
+      analysisParsed,
+    );
     if (classificationValueIds.length === 0) {
       return result;
     }
@@ -406,7 +472,7 @@ export async function importIdecoData(
   let result: ImportIdecoDataResult | null = null;
 
   const productTypesParsed = parseIdecoProductTypesCsv(files.productTypesCsv);
-  parseIdecoAnalysisCsv(files.analysisCsv);
+  const analysisParsed = parseIdecoAnalysisCsv(files.analysisCsv);
   const instrumentsParsed = parseIdecoInstrumentsCsv(files.instrumentsCsv);
   const holdingsParsed = parseIdecoHoldingsCsv(files.holdingsCsv);
 
@@ -417,12 +483,14 @@ export async function importIdecoData(
     ...instrumentsParsed.rows.map((row) => row.productTypeName),
   ];
   await seedIdecoClassifications(db, productTypeNames);
+  await seedAnalysisFromCsv(db, analysisParsed);
 
   const counters = { created: 0, reused: 0 };
   const instrumentIdByShortName = await importInstrumentsFromParsed(
     db,
     instrumentsParsed.rows,
     counters,
+    analysisParsed,
   );
   if (instrumentIdByShortName.size !== instrumentsParsed.rows.length) {
     return result;

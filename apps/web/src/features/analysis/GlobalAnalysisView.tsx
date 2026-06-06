@@ -3,7 +3,7 @@
 import Link from "next/link";
 import {
   buildAllocationBySchemeWithLinesFromSnapshots,
-  listAnalysisSchemesForPortfolio,
+  mergeAnalysisSchemesFromSnapshots,
   mergeSnapshotsForGlobalAnalysis,
   type CurrentSnapshotDto,
 } from "@repo/shared";
@@ -25,7 +25,7 @@ export function GlobalAnalysisView() {
   const [loading, setLoading] = useState(true);
   const [selectedSchemeCode, setSelectedSchemeCode] = useState("");
   const schemeConfigs = useMemo(() => {
-    let result = listAnalysisSchemesForPortfolio("ideco");
+    let result = mergeAnalysisSchemesFromSnapshots(snapshots);
 
     if (portfolios.length > 0) {
       const kinds = new Set(portfolios.map((portfolio) => portfolio.kind));
@@ -35,7 +35,7 @@ export function GlobalAnalysisView() {
     }
 
     return result;
-  }, [portfolios]);
+  }, [portfolios, snapshots]);
   const activeSchemeCode = useMemo(() => {
     let result = schemeConfigs[0]?.schemeCode ?? "";
 

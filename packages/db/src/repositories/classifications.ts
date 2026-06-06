@@ -1,4 +1,5 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
+import { isIdecoAnalysisSchemeCode } from "@repo/shared";
 
 import type { AppDatabase } from "../client";
 import { newId, nowIso } from "../id";
@@ -143,6 +144,40 @@ export async function setInstrumentClassifications(
     return result;
   });
   await db.insert(instrumentClassifications).values(rows);
+
+  return result;
+}
+
+export async function listAnalysisSchemesForPortfolio(
+  db: AppDatabase,
+  portfolioCode: string,
+) {
+  let result: Array<{ schemeCode: string; schemeName: string }> = [];
+
+  const portfolio = await findPortfolioByCode(db, portfolioCode);
+  if (!portfolio) {
+    return result;
+  }
+
+  const rows = await db
+    .select({
+      schemeCode: classificationSchemes.code,
+      schemeName: classificationSchemes.name,
+      createdAt: classificationSchemes.createdAt,
+    })
+    .from(classificationSchemes)
+    .where(eq(classificationSchemes.portfolioId, portfolio.id))
+    .orderBy(asc(classificationSchemes.createdAt));
+
+  for (const row of rows) {
+    if (!isIdecoAnalysisSchemeCode(row.schemeCode)) {
+      continue;
+    }
+    result.push({
+      schemeCode: row.schemeCode,
+      schemeName: row.schemeName,
+    });
+  }
 
   return result;
 }

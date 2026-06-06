@@ -8,7 +8,10 @@ import {
   instruments,
   portfolioSnapshots,
 } from "../schema/index";
-import { getTagsForInstruments } from "./classifications";
+import {
+  getTagsForInstruments,
+  listAnalysisSchemesForPortfolio,
+} from "./classifications";
 import { getAttributesForInstruments } from "./instruments";
 import { findPortfolioByCode } from "./portfolios";
 
@@ -72,6 +75,10 @@ type CurrentSnapshotDto = {
   portfolioCode: string;
   portfolioName: string;
   asOfDate: string;
+  analysisSchemes: Array<{
+    schemeCode: string;
+    schemeName: string;
+  }>;
   lines: LineDto[];
 };
 
@@ -254,11 +261,14 @@ export async function getCurrentSnapshot(db: AppDatabase, portfolioCode: string)
     return result;
   });
 
+  const analysisSchemes = await listAnalysisSchemesForPortfolio(db, portfolioCode);
+
   result = {
     id: snapshot.id,
     portfolioCode: portfolio.code,
     portfolioName: portfolio.name,
     asOfDate: snapshot.asOfDate,
+    analysisSchemes,
     lines: lineDtos,
   };
   return result;

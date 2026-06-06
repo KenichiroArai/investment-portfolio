@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 
-import { listAnalysisSchemesForPortfolio } from "../src/analysis-schemes";
 import { IDECO_SCHEME_CODES } from "../src/ideco-analysis";
 import {
   buildAllocationByScheme,
@@ -133,6 +132,7 @@ describe("snapshot-allocation", () => {
         portfolioCode: "ideco",
         portfolioName: "iDeCo",
         asOfDate: "2026-06-01",
+        analysisSchemes: [],
         lines: [
           makeLine(
             100_000,
@@ -153,6 +153,7 @@ describe("snapshot-allocation", () => {
         portfolioCode: "ideco2",
         portfolioName: "iDeCo 2",
         asOfDate: "2026-06-01",
+        analysisSchemes: [],
         lines: [
           makeLine(
             200_000,
@@ -188,6 +189,12 @@ describe("snapshot-allocation", () => {
         portfolioCode: "ideco",
         portfolioName: "iDeCo",
         asOfDate: "2026-06-01",
+        analysisSchemes: [
+          {
+            schemeCode: IDECO_SCHEME_CODES.region,
+            schemeName: "地域分類",
+          },
+        ],
         lines: [
           makeLine(100_000, [
             {
@@ -201,7 +208,7 @@ describe("snapshot-allocation", () => {
       },
     ];
 
-    const schemes = listAnalysisSchemesForPortfolio("ideco");
+    const schemes = snapshots[0]?.analysisSchemes ?? [];
     const merged = mergeSnapshotsForGlobalAnalysis(snapshots, schemes);
     expect(merged.totalMarketValueMinor).toBe(100_000);
     expect(merged.portfolios[0]?.portfolioCode).toBe("ideco");
