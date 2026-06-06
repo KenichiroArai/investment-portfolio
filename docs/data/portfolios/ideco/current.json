@@ -1,13 +1,13 @@
 {
-  "id": "a8501a92-aaae-4521-aa91-f37bcf01fd11",
+  "id": "4d779bca-8cd7-4eec-902a-28f6ae41ea71",
   "portfolioCode": "ideco",
   "portfolioName": "iDeCo",
   "asOfDate": "2026-06-02",
   "lines": [
     {
-      "id": "dfe291ef-5f85-4fbd-b471-8d181f55ad3f",
-      "instrumentId": "ce093c20-144f-442d-b9a3-158c9ecf5082",
-      "instrumentName": "eMAXIS Slim 国内株式(TOPIX)",
+      "id": "219f2449-6421-4e0e-83d8-19200f267427",
+      "instrumentId": "13462933-8a0b-48f4-912a-3bfd25762509",
+      "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 国内株式（ＴＯＰＩＸ）",
       "sortOrder": 1,
       "quantity": 41773,
       "marketValueMinor": 130962000,
@@ -32,19 +32,69 @@
           "textValue": null
         }
       ],
+      "instrumentAttributes": [
+        {
+          "code": "provider",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "三菱UFJアセットマネジメント"
+        },
+        {
+          "code": "short_name",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "eMAXIS Slim 国内株式(TOPIX)"
+        },
+        {
+          "code": "trust_fee_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0.143以内"
+        },
+        {
+          "code": "trust_reserve_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0"
+        }
+      ],
       "tags": [
+        {
+          "schemeCode": "ideco_asset_class",
+          "schemeName": "資産分類",
+          "valueCode": "equity",
+          "valueName": "株式"
+        },
+        {
+          "schemeCode": "ideco_major_category",
+          "schemeName": "大分類",
+          "valueCode": "mutual_fund",
+          "valueName": "投資信託"
+        },
+        {
+          "schemeCode": "ideco_product_style",
+          "schemeName": "商品タイプ(スタイル)",
+          "valueCode": "passive",
+          "valueName": "パッシブ"
+        },
         {
           "schemeCode": "ideco_product_type",
           "schemeName": "商品タイプ",
           "valueCode": "domestic_equity",
           "valueName": "国内株式"
+        },
+        {
+          "schemeCode": "ideco_region",
+          "schemeName": "地域分類",
+          "valueCode": "domestic",
+          "valueName": "国内"
         }
       ]
     },
     {
-      "id": "f239f53b-36bf-4352-9dab-a6026ed52b58",
-      "instrumentId": "a15def04-bd49-4e00-bd50-8790940bb8f8",
-      "instrumentName": "SBI・全世界株式インデックス・ファンド",
+      "id": "6bccac3d-b8af-45cf-b729-a5e2d5cd2cb0",
+      "instrumentId": "31275e89-c5aa-46ec-8108-bc56f6ea17b2",
+      "instrumentName": "ＳＢＩ・全世界株式インデックス・ファンド",
       "sortOrder": 2,
       "quantity": 195420,
       "marketValueMinor": 689832000,
@@ -69,19 +119,69 @@
           "textValue": null
         }
       ],
+      "instrumentAttributes": [
+        {
+          "code": "provider",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "SBIアセットマネジメント"
+        },
+        {
+          "code": "short_name",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "SBI・全世界株式インデックス・ファンド"
+        },
+        {
+          "code": "trust_fee_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0.1022%程度"
+        },
+        {
+          "code": "trust_reserve_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0"
+        }
+      ],
       "tags": [
+        {
+          "schemeCode": "ideco_asset_class",
+          "schemeName": "資産分類",
+          "valueCode": "equity",
+          "valueName": "株式"
+        },
+        {
+          "schemeCode": "ideco_major_category",
+          "schemeName": "大分類",
+          "valueCode": "mutual_fund",
+          "valueName": "投資信託"
+        },
+        {
+          "schemeCode": "ideco_product_style",
+          "schemeName": "商品タイプ(スタイル)",
+          "valueCode": "passive",
+          "valueName": "パッシブ"
+        },
         {
           "schemeCode": "ideco_product_type",
           "schemeName": "商品タイプ",
           "valueCode": "domestic_foreign_equity",
           "valueName": "内外株式"
+        },
+        {
+          "schemeCode": "ideco_region",
+          "schemeName": "地域分類",
+          "valueCode": "domestic_foreign",
+          "valueName": "内外"
         }
       ]
     },
     {
-      "id": "f666cc3b-abf4-4d57-a40a-ad831da9bb65",
-      "instrumentId": "089c9076-f1ba-4d6e-b18d-632c7718762f",
-      "instrumentName": "eMAXIS Slim 全世界株式(除く日本)",
+      "id": "bc2ff1e8-07c5-4b14-b572-8d7d9562507f",
+      "instrumentId": "362250ad-b3df-44b8-a221-a599b923e754",
+      "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 全世界株式（除く日本）",
       "sortOrder": 3,
       "quantity": 104130,
       "marketValueMinor": 398557000,
@@ -106,19 +206,69 @@
           "textValue": null
         }
       ],
+      "instrumentAttributes": [
+        {
+          "code": "provider",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "三菱UFJアセットマネジメント"
+        },
+        {
+          "code": "short_name",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "eMAXIS Slim 全世界株式(除く日本)"
+        },
+        {
+          "code": "trust_fee_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0.05775以内"
+        },
+        {
+          "code": "trust_reserve_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0"
+        }
+      ],
       "tags": [
+        {
+          "schemeCode": "ideco_asset_class",
+          "schemeName": "資産分類",
+          "valueCode": "equity",
+          "valueName": "株式"
+        },
+        {
+          "schemeCode": "ideco_major_category",
+          "schemeName": "大分類",
+          "valueCode": "mutual_fund",
+          "valueName": "投資信託"
+        },
+        {
+          "schemeCode": "ideco_product_style",
+          "schemeName": "商品タイプ(スタイル)",
+          "valueCode": "passive",
+          "valueName": "パッシブ"
+        },
         {
           "schemeCode": "ideco_product_type",
           "schemeName": "商品タイプ",
           "valueCode": "foreign_equity",
           "valueName": "海外株式"
+        },
+        {
+          "schemeCode": "ideco_region",
+          "schemeName": "地域分類",
+          "valueCode": "foreign",
+          "valueName": "海外"
         }
       ]
     },
     {
-      "id": "2617c690-55ed-4b2f-a812-5715d057bf2b",
-      "instrumentId": "9fb39016-cb96-4f8c-bdde-dad664ba8d8c",
-      "instrumentName": "eMAXIS Slim 先進国株式インデックス",
+      "id": "19889a46-1538-4712-bf90-419b167aaf97",
+      "instrumentId": "e251ef8b-9dc7-443f-9a76-8ae44ba08faa",
+      "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 先進国株式インデックス",
       "sortOrder": 4,
       "quantity": 8789,
       "marketValueMinor": 39546000,
@@ -143,19 +293,69 @@
           "textValue": null
         }
       ],
+      "instrumentAttributes": [
+        {
+          "code": "provider",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "三菱UFJアセットマネジメント"
+        },
+        {
+          "code": "short_name",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "eMAXIS Slim 先進国株式インデックス"
+        },
+        {
+          "code": "trust_fee_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0.09889以内"
+        },
+        {
+          "code": "trust_reserve_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0"
+        }
+      ],
       "tags": [
+        {
+          "schemeCode": "ideco_asset_class",
+          "schemeName": "資産分類",
+          "valueCode": "equity",
+          "valueName": "株式"
+        },
+        {
+          "schemeCode": "ideco_major_category",
+          "schemeName": "大分類",
+          "valueCode": "mutual_fund",
+          "valueName": "投資信託"
+        },
+        {
+          "schemeCode": "ideco_product_style",
+          "schemeName": "商品タイプ(スタイル)",
+          "valueCode": "passive",
+          "valueName": "パッシブ"
+        },
         {
           "schemeCode": "ideco_product_type",
           "schemeName": "商品タイプ",
           "valueCode": "foreign_equity",
           "valueName": "海外株式"
+        },
+        {
+          "schemeCode": "ideco_region",
+          "schemeName": "地域分類",
+          "valueCode": "foreign",
+          "valueName": "海外"
         }
       ]
     },
     {
-      "id": "db4994c8-a9d3-4c8a-ae8b-b7c534f77152",
-      "instrumentId": "54122fa5-f2bf-43c2-846e-80910440d83c",
-      "instrumentName": "eMAXIS Slim 米国株式(S&P500)",
+      "id": "083d514d-a900-478e-85b1-577d1f3218cd",
+      "instrumentId": "e6dc9d16-d6b0-4a65-ab00-e5c4d338df88",
+      "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 米国株式（Ｓ＆Ｐ５００）",
       "sortOrder": 5,
       "quantity": 12827,
       "marketValueMinor": 56923000,
@@ -176,23 +376,73 @@
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.028999999999999998,
+          "realValue": 0.029,
           "textValue": null
         }
       ],
+      "instrumentAttributes": [
+        {
+          "code": "provider",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "三菱UFJアセットマネジメント"
+        },
+        {
+          "code": "short_name",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "eMAXIS Slim 米国株式(S&P500)"
+        },
+        {
+          "code": "trust_fee_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0.08140以内"
+        },
+        {
+          "code": "trust_reserve_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0"
+        }
+      ],
       "tags": [
+        {
+          "schemeCode": "ideco_asset_class",
+          "schemeName": "資産分類",
+          "valueCode": "equity",
+          "valueName": "株式"
+        },
+        {
+          "schemeCode": "ideco_major_category",
+          "schemeName": "大分類",
+          "valueCode": "mutual_fund",
+          "valueName": "投資信託"
+        },
+        {
+          "schemeCode": "ideco_product_style",
+          "schemeName": "商品タイプ(スタイル)",
+          "valueCode": "passive",
+          "valueName": "パッシブ"
+        },
         {
           "schemeCode": "ideco_product_type",
           "schemeName": "商品タイプ",
           "valueCode": "foreign_equity",
           "valueName": "海外株式"
+        },
+        {
+          "schemeCode": "ideco_region",
+          "schemeName": "地域分類",
+          "valueCode": "foreign",
+          "valueName": "海外"
         }
       ]
     },
     {
-      "id": "97b74020-1058-4632-9143-72f4cccf5af3",
-      "instrumentId": "116e717a-d04b-4d8f-b78e-3ccdd8dfc3df",
-      "instrumentName": "eMAXIS Slim 新興国株式インデックス",
+      "id": "96d2c24c-903b-4f86-8269-7e80f8257d0a",
+      "instrumentId": "a3028224-f890-4258-b8f9-417133d7cf6a",
+      "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 新興国株式インデックス",
       "sortOrder": 6,
       "quantity": 14501,
       "marketValueMinor": 40692000,
@@ -217,19 +467,69 @@
           "textValue": null
         }
       ],
+      "instrumentAttributes": [
+        {
+          "code": "provider",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "三菱UFJアセットマネジメント"
+        },
+        {
+          "code": "short_name",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "eMAXIS Slim 新興国株式インデックス"
+        },
+        {
+          "code": "trust_fee_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0.1518以内"
+        },
+        {
+          "code": "trust_reserve_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0"
+        }
+      ],
       "tags": [
+        {
+          "schemeCode": "ideco_asset_class",
+          "schemeName": "資産分類",
+          "valueCode": "equity",
+          "valueName": "株式"
+        },
+        {
+          "schemeCode": "ideco_major_category",
+          "schemeName": "大分類",
+          "valueCode": "mutual_fund",
+          "valueName": "投資信託"
+        },
+        {
+          "schemeCode": "ideco_product_style",
+          "schemeName": "商品タイプ(スタイル)",
+          "valueCode": "passive",
+          "valueName": "パッシブ"
+        },
         {
           "schemeCode": "ideco_product_type",
           "schemeName": "商品タイプ",
           "valueCode": "foreign_equity",
           "valueName": "海外株式"
+        },
+        {
+          "schemeCode": "ideco_region",
+          "schemeName": "地域分類",
+          "valueCode": "foreign",
+          "valueName": "海外"
         }
       ]
     },
     {
-      "id": "0cecb4b3-ca2e-4a1f-b426-2c8403dd8b7b",
-      "instrumentId": "91b40bdb-396e-4d7a-aa65-5f3c5aeb93ef",
-      "instrumentName": "eMAXIS Slim 国内債券インデックス",
+      "id": "984b0d6c-754a-4d30-98e1-b7711ec002c6",
+      "instrumentId": "bb25c6ee-a8d6-402d-b971-67f1e582c69a",
+      "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 国内債券インデックス",
       "sortOrder": 7,
       "quantity": 105743,
       "marketValueMinor": 90103000,
@@ -254,19 +554,75 @@
           "textValue": null
         }
       ],
+      "instrumentAttributes": [
+        {
+          "code": "provider",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "三菱UFJアセットマネジメント"
+        },
+        {
+          "code": "short_name",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "eMAXIS Slim 国内債券インデックス"
+        },
+        {
+          "code": "trust_fee_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0.132以内"
+        },
+        {
+          "code": "trust_reserve_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0"
+        }
+      ],
       "tags": [
+        {
+          "schemeCode": "ideco_asset_class",
+          "schemeName": "資産分類",
+          "valueCode": "bond",
+          "valueName": "債券"
+        },
+        {
+          "schemeCode": "ideco_instrument_status",
+          "schemeName": "ステータス",
+          "valueCode": "exclusion_pending",
+          "valueName": "除外手続中"
+        },
+        {
+          "schemeCode": "ideco_major_category",
+          "schemeName": "大分類",
+          "valueCode": "mutual_fund",
+          "valueName": "投資信託"
+        },
+        {
+          "schemeCode": "ideco_product_style",
+          "schemeName": "商品タイプ(スタイル)",
+          "valueCode": "passive",
+          "valueName": "パッシブ"
+        },
         {
           "schemeCode": "ideco_product_type",
           "schemeName": "商品タイプ",
           "valueCode": "domestic_bond",
           "valueName": "国内債券"
+        },
+        {
+          "schemeCode": "ideco_region",
+          "schemeName": "地域分類",
+          "valueCode": "domestic",
+          "valueName": "国内"
         }
       ]
     },
     {
-      "id": "b2eceb13-6124-4c80-91fd-5568cd5a159a",
-      "instrumentId": "d16e0544-e5de-408c-abff-070172fbf82c",
-      "instrumentName": "eMAXIS Slim 先進国債券インデックス",
+      "id": "a9e8778d-7c01-415e-97af-2057e9bfe817",
+      "instrumentId": "f74a084e-8eee-45c3-abef-a9337b908b01",
+      "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 先進国債券インデックス",
       "sortOrder": 8,
       "quantity": 81733,
       "marketValueMinor": 127953000,
@@ -287,23 +643,73 @@
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.013999999999999999,
+          "realValue": 0.014,
           "textValue": null
         }
       ],
+      "instrumentAttributes": [
+        {
+          "code": "provider",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "三菱UFJアセットマネジメント"
+        },
+        {
+          "code": "short_name",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "eMAXIS Slim 先進国債券インデックス"
+        },
+        {
+          "code": "trust_fee_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0.154以内"
+        },
+        {
+          "code": "trust_reserve_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0"
+        }
+      ],
       "tags": [
+        {
+          "schemeCode": "ideco_asset_class",
+          "schemeName": "資産分類",
+          "valueCode": "bond",
+          "valueName": "債券"
+        },
+        {
+          "schemeCode": "ideco_major_category",
+          "schemeName": "大分類",
+          "valueCode": "mutual_fund",
+          "valueName": "投資信託"
+        },
+        {
+          "schemeCode": "ideco_product_style",
+          "schemeName": "商品タイプ(スタイル)",
+          "valueCode": "passive",
+          "valueName": "パッシブ"
+        },
         {
           "schemeCode": "ideco_product_type",
           "schemeName": "商品タイプ",
           "valueCode": "foreign_bond",
           "valueName": "海外債券"
+        },
+        {
+          "schemeCode": "ideco_region",
+          "schemeName": "地域分類",
+          "valueCode": "foreign",
+          "valueName": "海外"
         }
       ]
     },
     {
-      "id": "68178498-409a-4e78-95bb-c4331ec01655",
-      "instrumentId": "21738e53-d0e0-4422-a440-f58143d9c2de",
-      "instrumentName": "iFree 新興国債券インデックス",
+      "id": "62012ea8-05dd-4133-ba41-0d3c03f39d88",
+      "instrumentId": "d642675f-5dd0-42df-8feb-63429b27ca60",
+      "instrumentName": "ｉＦｒｅｅ 新興国債券インデックス",
       "sortOrder": 9,
       "quantity": 19345,
       "marketValueMinor": 36660000,
@@ -324,23 +730,73 @@
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.013999999999999999,
+          "realValue": 0.014,
           "textValue": null
         }
       ],
+      "instrumentAttributes": [
+        {
+          "code": "provider",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "大和アセットマネジメント"
+        },
+        {
+          "code": "short_name",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "iFree 新興国債券インデックス"
+        },
+        {
+          "code": "trust_fee_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0.242000"
+        },
+        {
+          "code": "trust_reserve_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0"
+        }
+      ],
       "tags": [
+        {
+          "schemeCode": "ideco_asset_class",
+          "schemeName": "資産分類",
+          "valueCode": "bond",
+          "valueName": "債券"
+        },
+        {
+          "schemeCode": "ideco_major_category",
+          "schemeName": "大分類",
+          "valueCode": "mutual_fund",
+          "valueName": "投資信託"
+        },
+        {
+          "schemeCode": "ideco_product_style",
+          "schemeName": "商品タイプ(スタイル)",
+          "valueCode": "passive",
+          "valueName": "パッシブ"
+        },
         {
           "schemeCode": "ideco_product_type",
           "schemeName": "商品タイプ",
           "valueCode": "foreign_bond",
           "valueName": "海外債券"
+        },
+        {
+          "schemeCode": "ideco_region",
+          "schemeName": "地域分類",
+          "valueCode": "foreign",
+          "valueName": "海外"
         }
       ]
     },
     {
-      "id": "598f7eaa-9364-4e9c-a2ac-72b0003b5a5a",
-      "instrumentId": "9fdfa985-99b3-412f-af1d-3348e9babef7",
-      "instrumentName": "ニッセイJリートインデックスファンド(購入・換金手数料なし)",
+      "id": "6796c157-8466-4a63-b702-12e3da52f842",
+      "instrumentId": "37996eea-0305-4a45-8400-996f1962292c",
+      "instrumentName": "ニッセイＪリートインデックスファンド（購入・換金手数料なし）",
       "sortOrder": 10,
       "quantity": 24368,
       "marketValueMinor": 51874000,
@@ -365,19 +821,69 @@
           "textValue": null
         }
       ],
+      "instrumentAttributes": [
+        {
+          "code": "provider",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ニッセイアセットマネジメント"
+        },
+        {
+          "code": "short_name",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ニッセイJリートインデックス(購入・換金手数料なし)"
+        },
+        {
+          "code": "trust_fee_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0.275000"
+        },
+        {
+          "code": "trust_reserve_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0"
+        }
+      ],
       "tags": [
+        {
+          "schemeCode": "ideco_asset_class",
+          "schemeName": "資産分類",
+          "valueCode": "real_estate",
+          "valueName": "不動産"
+        },
+        {
+          "schemeCode": "ideco_major_category",
+          "schemeName": "大分類",
+          "valueCode": "mutual_fund",
+          "valueName": "投資信託"
+        },
+        {
+          "schemeCode": "ideco_product_style",
+          "schemeName": "商品タイプ(スタイル)",
+          "valueCode": "passive",
+          "valueName": "パッシブ"
+        },
         {
           "schemeCode": "ideco_product_type",
           "schemeName": "商品タイプ",
           "valueCode": "domestic_reit",
           "valueName": "国内不動産投信"
+        },
+        {
+          "schemeCode": "ideco_region",
+          "schemeName": "地域分類",
+          "valueCode": "domestic",
+          "valueName": "国内"
         }
       ]
     },
     {
-      "id": "408c88d7-2b8d-4f2f-a088-a512a56ca931",
-      "instrumentId": "9260781c-0453-4f5d-87ea-19217bc1a030",
-      "instrumentName": "三井住友・DC外国リートインデックスファンド",
+      "id": "9827e602-fad3-4e8c-91c2-c6ab60f233e0",
+      "instrumentId": "c991d741-dcd5-479f-abd9-7da4a97e7547",
+      "instrumentName": "三井住友・ＤＣ外国リートインデックスファンド",
       "sortOrder": 11,
       "quantity": 22596,
       "marketValueMinor": 53579000,
@@ -398,23 +904,73 @@
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.006999999999999999,
+          "realValue": 0.007,
           "textValue": null
         }
       ],
+      "instrumentAttributes": [
+        {
+          "code": "provider",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "三井住友DSアセットマネジメント"
+        },
+        {
+          "code": "short_name",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "三井住友・DC外国リートインデックスファンド"
+        },
+        {
+          "code": "trust_fee_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0.297以内"
+        },
+        {
+          "code": "trust_reserve_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0"
+        }
+      ],
       "tags": [
+        {
+          "schemeCode": "ideco_asset_class",
+          "schemeName": "資産分類",
+          "valueCode": "real_estate",
+          "valueName": "不動産"
+        },
+        {
+          "schemeCode": "ideco_major_category",
+          "schemeName": "大分類",
+          "valueCode": "mutual_fund",
+          "valueName": "投資信託"
+        },
+        {
+          "schemeCode": "ideco_product_style",
+          "schemeName": "商品タイプ(スタイル)",
+          "valueCode": "passive",
+          "valueName": "パッシブ"
+        },
         {
           "schemeCode": "ideco_product_type",
           "schemeName": "商品タイプ",
           "valueCode": "foreign_reit",
           "valueName": "海外不動産投信"
+        },
+        {
+          "schemeCode": "ideco_region",
+          "schemeName": "地域分類",
+          "valueCode": "foreign",
+          "valueName": "海外"
         }
       ]
     },
     {
-      "id": "b586ad50-e429-4a78-80f4-774814ef8f2b",
-      "instrumentId": "0f9b3746-c1a0-4238-9080-99caf357455e",
-      "instrumentName": "eMAXIS Slim バランス(8資産均等型)",
+      "id": "893861a9-61f1-4df5-beb0-7bd965be4568",
+      "instrumentId": "ba158649-918a-42c7-824b-021765191743",
+      "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ バランス（８資産均等型）",
       "sortOrder": 12,
       "quantity": 181645,
       "marketValueMinor": 387521000,
@@ -439,19 +995,69 @@
           "textValue": null
         }
       ],
+      "instrumentAttributes": [
+        {
+          "code": "provider",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "三菱UFJアセットマネジメント"
+        },
+        {
+          "code": "short_name",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "eMAXIS Slim ﾊﾞﾗﾝｽ(8資産均等型)"
+        },
+        {
+          "code": "trust_fee_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0.143以内"
+        },
+        {
+          "code": "trust_reserve_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0"
+        }
+      ],
       "tags": [
+        {
+          "schemeCode": "ideco_asset_class",
+          "schemeName": "資産分類",
+          "valueCode": "balanced",
+          "valueName": "複合"
+        },
+        {
+          "schemeCode": "ideco_major_category",
+          "schemeName": "大分類",
+          "valueCode": "mutual_fund",
+          "valueName": "投資信託"
+        },
+        {
+          "schemeCode": "ideco_product_style",
+          "schemeName": "商品タイプ(スタイル)",
+          "valueCode": "passive",
+          "valueName": "パッシブ"
+        },
         {
           "schemeCode": "ideco_product_type",
           "schemeName": "商品タイプ",
           "valueCode": "balanced",
           "valueName": "内外資産複合"
+        },
+        {
+          "schemeCode": "ideco_region",
+          "schemeName": "地域分類",
+          "valueCode": "domestic_foreign",
+          "valueName": "内外"
         }
       ]
     },
     {
-      "id": "9294d166-2c45-4fa7-835e-63d94226fa31",
-      "instrumentId": "3ace33a3-36f0-475b-94c5-2fb02ceee153",
-      "instrumentName": "iFree 年金バランス",
+      "id": "1321bf4c-2d70-4894-911a-eee2dd42b3ce",
+      "instrumentId": "47ccafe2-9d8f-49a7-b922-cf2e484a7860",
+      "instrumentName": "ｉＦｒｅｅ 年金バランス",
       "sortOrder": 13,
       "quantity": 124896,
       "marketValueMinor": 244433000,
@@ -476,19 +1082,69 @@
           "textValue": null
         }
       ],
+      "instrumentAttributes": [
+        {
+          "code": "provider",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "大和アセットマネジメント"
+        },
+        {
+          "code": "short_name",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "iFree 年金ﾊﾞﾗﾝｽ"
+        },
+        {
+          "code": "trust_fee_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0.174900"
+        },
+        {
+          "code": "trust_reserve_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0"
+        }
+      ],
       "tags": [
+        {
+          "schemeCode": "ideco_asset_class",
+          "schemeName": "資産分類",
+          "valueCode": "balanced",
+          "valueName": "複合"
+        },
+        {
+          "schemeCode": "ideco_major_category",
+          "schemeName": "大分類",
+          "valueCode": "mutual_fund",
+          "valueName": "投資信託"
+        },
+        {
+          "schemeCode": "ideco_product_style",
+          "schemeName": "商品タイプ(スタイル)",
+          "valueCode": "active",
+          "valueName": "アクティブ"
+        },
         {
           "schemeCode": "ideco_product_type",
           "schemeName": "商品タイプ",
           "valueCode": "balanced",
           "valueName": "内外資産複合"
+        },
+        {
+          "schemeCode": "ideco_region",
+          "schemeName": "地域分類",
+          "valueCode": "domestic_foreign",
+          "valueName": "内外"
         }
       ]
     },
     {
-      "id": "83018fc3-a216-4bd9-8c82-7b1510be6a8a",
-      "instrumentId": "8d171cfd-64ad-4a8e-9ce7-7f331608615b",
-      "instrumentName": "三菱UFJ純金ファンド(愛称:ファインゴールド)",
+      "id": "4ad55ade-0f0b-440e-811c-6b235466e00f",
+      "instrumentId": "68b9b628-c237-4397-8530-c099d33c6658",
+      "instrumentName": "三菱ＵＦＪ 純金ファンド（愛称：ファインゴールド）",
       "sortOrder": 14,
       "quantity": 183256,
       "marketValueMinor": 992331000,
@@ -513,17 +1169,67 @@
           "textValue": null
         }
       ],
+      "instrumentAttributes": [
+        {
+          "code": "provider",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "三菱UFJアセットマネジメント"
+        },
+        {
+          "code": "short_name",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "三菱UFJ純金ﾌｧﾝﾄﾞ"
+        },
+        {
+          "code": "trust_fee_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0.99%程度"
+        },
+        {
+          "code": "trust_reserve_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0"
+        }
+      ],
       "tags": [
+        {
+          "schemeCode": "ideco_asset_class",
+          "schemeName": "資産分類",
+          "valueCode": "other",
+          "valueName": "その他"
+        },
+        {
+          "schemeCode": "ideco_major_category",
+          "schemeName": "大分類",
+          "valueCode": "mutual_fund",
+          "valueName": "投資信託"
+        },
+        {
+          "schemeCode": "ideco_product_style",
+          "schemeName": "商品タイプ(スタイル)",
+          "valueCode": "active",
+          "valueName": "アクティブ"
+        },
         {
           "schemeCode": "ideco_product_type",
           "schemeName": "商品タイプ",
           "valueCode": "domestic_other",
           "valueName": "国内その他資産"
+        },
+        {
+          "schemeCode": "ideco_region",
+          "schemeName": "地域分類",
+          "valueCode": "domestic",
+          "valueName": "国内"
         }
       ]
     },
     {
-      "id": "e06b5d08-9cb5-4e16-803f-1be042e1acdc",
+      "id": "c304b20c-e8c8-4143-bb9b-210a000cf05f",
       "instrumentId": "53bdddb7-cab9-48eb-9f3e-9bf731df27b7",
       "instrumentName": "セレブライフ・ストーリー2045",
       "sortOrder": 15,
@@ -550,12 +1256,62 @@
           "textValue": null
         }
       ],
+      "instrumentAttributes": [
+        {
+          "code": "provider",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "SBIアセットマネジメント"
+        },
+        {
+          "code": "short_name",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ｾﾚﾌﾞﾗｲﾌ・ｽﾄｰﾘｰ2045"
+        },
+        {
+          "code": "trust_fee_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0.6496%程度"
+        },
+        {
+          "code": "trust_reserve_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0.300"
+        }
+      ],
       "tags": [
+        {
+          "schemeCode": "ideco_asset_class",
+          "schemeName": "資産分類",
+          "valueCode": "balanced",
+          "valueName": "複合"
+        },
+        {
+          "schemeCode": "ideco_major_category",
+          "schemeName": "大分類",
+          "valueCode": "mutual_fund",
+          "valueName": "投資信託"
+        },
+        {
+          "schemeCode": "ideco_product_style",
+          "schemeName": "商品タイプ(スタイル)",
+          "valueCode": "active",
+          "valueName": "アクティブ"
+        },
         {
           "schemeCode": "ideco_product_type",
           "schemeName": "商品タイプ",
           "valueCode": "balanced",
           "valueName": "内外資産複合"
+        },
+        {
+          "schemeCode": "ideco_region",
+          "schemeName": "地域分類",
+          "valueCode": "domestic_foreign",
+          "valueName": "内外"
         }
       ]
     }

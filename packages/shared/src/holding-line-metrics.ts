@@ -12,7 +12,7 @@ export type HoldingLineMetricInput = {
   textValue?: string | null;
 };
 
-/** iDeCo 家計簿 CSV 投入時に holding_line_metrics へ書き込む code */
+/** iDeCo 明細 CSV 投入時に holding_line_metrics へ書き込む code */
 export const IDECO_KAKEIBO_METRIC_CODES = {
   unitPricePerTenThousandLots: "unit_price_per_10k_lots",
   unrealizedGainMinor: "unrealized_gain_minor",

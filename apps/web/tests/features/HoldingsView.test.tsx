@@ -69,6 +69,8 @@ describe("HoldingsView", () => {
               quantity: 10,
               marketValueMinor: 10000,
               bookValueMinor: null,
+              metrics: [],
+              instrumentAttributes: [],
               tags: [
                 {
                   schemeCode: "region",
@@ -136,6 +138,8 @@ describe("HoldingsView", () => {
               quantity: 1,
               marketValueMinor: 100,
               bookValueMinor: null,
+              metrics: [],
+              instrumentAttributes: [],
               tags: [],
             },
           ],

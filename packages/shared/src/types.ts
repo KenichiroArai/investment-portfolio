@@ -1,5 +1,12 @@
 import type { HoldingLineMetricDto } from "./holding-line-metrics";
 
+export type InstrumentAttributeDto = {
+  code: string;
+  integerValue: number | null;
+  realValue: number | null;
+  textValue: string | null;
+};
+
 export type ClassificationTagDto = {
   schemeCode: string;
   schemeName: string;
@@ -25,6 +32,7 @@ export type HoldingLineDto = {
   marketValueMinor: number;
   bookValueMinor: number | null;
   metrics: HoldingLineMetricDto[];
+  instrumentAttributes: InstrumentAttributeDto[];
   tags: ClassificationTagDto[];
 };
 

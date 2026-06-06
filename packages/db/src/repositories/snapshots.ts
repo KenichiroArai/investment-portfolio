@@ -9,6 +9,7 @@ import {
   portfolioSnapshots,
 } from "../schema/index";
 import { getTagsForInstruments } from "./classifications";
+import { getAttributesForInstruments } from "./instruments";
 import { findPortfolioByCode } from "./portfolios";
 
 export type HoldingLineMetricInput = {
@@ -41,6 +42,13 @@ type MetricRow = {
   textValue: string | null;
 };
 
+type AttributeRow = {
+  code: string;
+  integerValue: number | null;
+  realValue: number | null;
+  textValue: string | null;
+};
+
 type LineDto = {
   id: string;
   instrumentId: string;
@@ -49,12 +57,8 @@ type LineDto = {
   quantity: number;
   marketValueMinor: number;
   bookValueMinor: number | null;
-  metrics: Array<{
-    code: string;
-    integerValue: number | null;
-    realValue: number | null;
-    textValue: string | null;
-  }>;
+  metrics: AttributeRow[];
+  instrumentAttributes: AttributeRow[];
   tags: Array<{
     schemeCode: string;
     schemeName: string;
@@ -149,6 +153,7 @@ export async function getCurrentSnapshot(db: AppDatabase, portfolioCode: string)
   });
   const tagsMap = await getTagsForInstruments(db, instrumentIds);
   const metricsMap = await getMetricsForHoldingLines(db, holdingLineIds);
+  const attributesMap = await getAttributesForInstruments(db, instrumentIds);
 
   const lineDtos = lines.map((line) => {
     let result: LineDto = {
@@ -160,6 +165,7 @@ export async function getCurrentSnapshot(db: AppDatabase, portfolioCode: string)
       marketValueMinor: 0,
       bookValueMinor: null,
       metrics: [],
+      instrumentAttributes: [],
       tags: [],
     };
 
@@ -192,6 +198,21 @@ export async function getCurrentSnapshot(db: AppDatabase, portfolioCode: string)
         };
         return result;
       });
+    const rawAttributes = attributesMap.get(line.instrumentId) ?? [];
+    const instrumentAttributes = [...rawAttributes]
+      .sort((a, b) => {
+        let result = a.code.localeCompare(b.code);
+        return result;
+      })
+      .map((attribute) => {
+        let result = {
+          code: attribute.code,
+          integerValue: attribute.integerValue,
+          realValue: attribute.realValue,
+          textValue: attribute.textValue,
+        };
+        return result;
+      });
     result = {
       id: line.id,
       instrumentId: line.instrumentId,
@@ -201,6 +222,7 @@ export async function getCurrentSnapshot(db: AppDatabase, portfolioCode: string)
       marketValueMinor: line.marketValueMinor,
       bookValueMinor: line.bookValueMinor,
       metrics,
+      instrumentAttributes,
       tags: tags.map((tag) => {
         let result = {
           schemeCode: tag.schemeCode,

@@ -168,7 +168,9 @@ describe("portfolio repositories", () => {
     );
     expect(replaced?.lines[0].tags[0].schemeCode).toBe("currency");
     expect(replaced?.lines[0].tags[1].valueName).toBe("日本");
+    expect(replaced?.lines[0].instrumentAttributes).toEqual([]);
     expect(replaced?.lines[1].tags).toHaveLength(0);
+    expect(replaced?.lines[1].instrumentAttributes).toEqual([]);
 
     const again = await replaceCurrentSnapshot(db, {
       portfolioCode: "ideco",

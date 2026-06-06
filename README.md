@@ -93,8 +93,7 @@ taskkill /PID <PID> /F
 data/
 ├── portfolio.db              # SQLite（migrate / import で生成）
 └── imports/
-    └── ideco/
-        └── holdings.csv      # 明細 CSV のローカルコピー（正本は SVN）
+    └── ideco/                # 4 CSV（商品タイプ・分析・銘柄の情報・明細）
 ```
 - `PORT` / `HOST` — API の待ち受け（既定: `127.0.0.1:3001`）
 - `NEXT_PUBLIC_API_URL` — Web から参照する API（既定: `http://127.0.0.1:3001`）
@@ -139,33 +138,22 @@ npm test
 
 カバレッジ付きで確認する場合は `npm run test:coverage`（詳細は [テスト](#テスト)）。
 
-## iDeCo データ投入（明細 CSV）
+## iDeCo データ投入（4 CSV ディレクトリ）
 
-iDeCo 口座の明細は、保有明細 CSV（`番号,日付,商品タイプ,運用商品名,...` 形式）から SQLite へ一括投入できます。iDeCo 専用の CLI です。
-
-正本（リポジトリ外）:
-
-```text
-D:\SVN\日常作業\trunk\記録\家計簿\家計簿.csv
-```
+iDeCo 口座のデータは `data/imports/ideco/` 以下の4 CSV から SQLite へ一括投入します。CSV 対応の詳細は [dev/sql/ideco/README.md](dev/sql/ideco/README.md) を参照してください。
 
 ```bash
-npm run db:import:ideco -- "D:\SVN\日常作業\trunk\記録\家計簿\家計簿.csv"
+npm run db:import:ideco -- data/imports/ideco
 ```
 
-ローカルコピー（`data/imports/ideco/holdings.csv`）を使う場合:
-
-```bash
-npm run db:import:ideco -- data/imports/ideco/holdings.csv
-```
-
-`data/` 配下は個人データのため Git 管理しません。初回は SVN 正本を `data/imports/ideco/holdings.csv` にコピーしてください。
+`data/` 配下は個人データのため Git 管理しません。
 
 投入内容:
 
 - 口座 `ideco`（未作成なら自動作成）
-- 分類体系 `ideco_product_type`（商品タイプ）と各銘柄へのタグ付け
-- 最新明細（`asOfDate` は CSV の日付列、`資産残高`・`購入金額` は千円→円に変換）
+- 分類体系（商品タイプ・大分類・スタイル・ステータス・地域・資産）と銘柄へのタグ付け
+- 銘柄マスタ（属性: 略称・提供会社・信託報酬など）
+- 最新明細（`asOfDate` は明細 CSV の日付列、金額は千円→円に変換）
 
 投入後、GitHub Pages 用 JSON を更新する場合は [GitHub Pages 向けデータ公開](#github-pages-向けデータ公開) の `npm run pages:export` を実行してください。ローカル API で確認する場合は `npm run dev:api` 起動後、**口座明細（iDeCo）** を開きます。
 
