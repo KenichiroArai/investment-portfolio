@@ -153,7 +153,7 @@ npm run db:import:ideco -- data/imports/ideco
 - 口座 `ideco`（未作成なら自動作成）
 - 分類体系（商品タイプ・大分類・スタイル・ステータス・地域・資産）と銘柄へのタグ付け
 - 銘柄マスタ（属性: 略称・提供会社・信託報酬など）
-- 最新明細（`asOfDate` は明細 CSV の日付列、金額は千円→円に変換）
+- 最新明細（`asOfDate` は明細 CSV の日付列、金額は円のまま保存）
 
 投入後、GitHub Pages 用 JSON を更新する場合は [GitHub Pages 向けデータ公開](#github-pages-向けデータ公開) の `npm run pages:export` を実行してください。ローカル API で確認する場合は `npm run dev:api` 起動後、**口座明細（iDeCo）** を開きます。
 

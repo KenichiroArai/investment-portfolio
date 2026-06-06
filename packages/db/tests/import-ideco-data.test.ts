@@ -61,8 +61,8 @@ describe("importIdecoData", () => {
       sortOrder: 1,
       instrumentName: "ｅＭＡＸＩＳ Ｓｌｉｍ 国内株式（ＴＯＰＩＸ）",
       quantity: 41773,
-      marketValueMinor: 130962000,
-      bookValueMinor: 128324000,
+      marketValueMinor: 130962,
+      bookValueMinor: 128324,
     });
     expect(snapshot?.lines[0].metrics).toEqual(
       expect.arrayContaining([

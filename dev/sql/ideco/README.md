@@ -75,7 +75,7 @@ npm run db:import:ideco -- data/imports/ideco
 | metric code | 元列（明細.csv） | 値の例 |
 | --- | --- | --- |
 | `unit_price_per_10k_lots` | 時価単価(1万口当り) | `31351` |
-| `unrealized_gain_minor` | 損益（千円→円） | `2638000`（CSV 2638 千円） |
+| `unrealized_gain_minor` | 損益（円） | `2638`（CSV 損益列） |
 | `unrealized_gain_rate` | 損益率 | `0.021`（2.1%） |
 
 ## 明細 CSV 列対応
@@ -87,8 +87,8 @@ npm run db:import:ideco -- data/imports/ideco
 | 運用商品名 | フルネームまたは略称で銘柄突合 → `holding_lines.instrument_id` |
 | 時価単価(1万口当り) | metric `unit_price_per_10k_lots` |
 | 残高数量 | `holding_lines.quantity` |
-| 資産残高 | `holding_lines.market_value_minor`（千円→円×1000） |
-| 購入金額 | `holding_lines.book_value_minor`（千円→円×1000） |
+| 資産残高 | `holding_lines.market_value_minor`（円） |
+| 購入金額 | `holding_lines.book_value_minor`（円） |
 | 損益 | metric `unrealized_gain_minor` |
 | 損益率 | metric `unrealized_gain_rate` |
 

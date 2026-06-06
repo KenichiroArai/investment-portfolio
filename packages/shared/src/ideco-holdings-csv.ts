@@ -5,7 +5,6 @@ import {
   parseIdecoDate,
   parseJapaneseInteger,
   stripUtf8Bom,
-  thousandsYenToYen,
 } from "./ideco-csv-utils";
 
 export const IDECO_HOLDINGS_CSV_HEADERS = [
@@ -94,17 +93,17 @@ function parseHoldingsDataRow(
 
   const unitPricePerTenThousandLots = parseJapaneseInteger(cells[3]);
   const quantity = parseJapaneseInteger(cells[4]);
-  const marketValueThousands = parseJapaneseInteger(cells[5]);
-  const bookValueThousands = parseJapaneseInteger(cells[6]);
-  const unrealizedGainThousands = parseJapaneseInteger(cells[7]);
+  const marketValueYen = parseJapaneseInteger(cells[5]);
+  const bookValueYen = parseJapaneseInteger(cells[6]);
+  const unrealizedGainYen = parseJapaneseInteger(cells[7]);
   const unrealizedGainRate = parseGainRate(cells[8]);
 
   if (
     !Number.isFinite(unitPricePerTenThousandLots) ||
     !Number.isFinite(quantity) ||
-    !Number.isFinite(marketValueThousands) ||
-    !Number.isFinite(bookValueThousands) ||
-    !Number.isFinite(unrealizedGainThousands) ||
+    !Number.isFinite(marketValueYen) ||
+    !Number.isFinite(bookValueYen) ||
+    !Number.isFinite(unrealizedGainYen) ||
     !Number.isFinite(unrealizedGainRate)
   ) {
     throw new IdecoCsvError(`${lineNumber} 行目の数値が不正です`);
@@ -120,9 +119,9 @@ function parseHoldingsDataRow(
     instrumentName,
     unitPricePerTenThousandLots,
     quantity,
-    marketValueMinor: thousandsYenToYen(marketValueThousands),
-    bookValueMinor: thousandsYenToYen(bookValueThousands),
-    unrealizedGainMinor: thousandsYenToYen(unrealizedGainThousands),
+    marketValueMinor: marketValueYen,
+    bookValueMinor: bookValueYen,
+    unrealizedGainMinor: unrealizedGainYen,
     unrealizedGainRate,
   };
   return result;

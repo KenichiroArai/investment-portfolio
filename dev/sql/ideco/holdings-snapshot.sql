@@ -12,9 +12,9 @@ SELECT
   asset_class.value_name AS "資産分類",
   unit_price.integer_value AS "時価単価(1万口当り)",
   hl.quantity AS "残高数量",
-  hl.market_value_minor / 1000 AS "資産残高_千円",
-  hl.book_value_minor / 1000 AS "購入金額_千円",
-  gain.integer_value / 1000 AS "損益_千円",
+  hl.market_value_minor AS "資産残高_円",
+  hl.book_value_minor AS "購入金額_円",
+  gain.integer_value AS "損益_円",
   printf('%.1f%%', gain_rate.real_value * 100) AS "損益率"
 FROM portfolios p
 JOIN portfolio_snapshots ps ON ps.portfolio_id = p.id AND ps.is_current = 1

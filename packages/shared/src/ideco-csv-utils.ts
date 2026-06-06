@@ -25,11 +25,6 @@ export function parseJapaneseInteger(value: string): number {
   return result;
 }
 
-export function thousandsYenToYen(thousands: number): number {
-  let result = thousands * 1000;
-  return result;
-}
-
 export function parseJapanesePercentRate(value: string): number {
   let result = Number.NaN;
 

@@ -14,7 +14,6 @@ import {
   parseJapaneseInteger,
   parseJapanesePercentRate,
   stripUtf8Bom,
-  thousandsYenToYen,
 } from "../src/ideco-csv-utils";
 import { parseIdecoHoldingsCsv } from "../src/ideco-holdings-csv";
 import { parseIdecoInstrumentsCsv } from "../src/ideco-instruments-csv";
@@ -28,7 +27,6 @@ const HOLDINGS_CSV = `番号,日付,運用商品名,時価単価(1万口当り),
 describe("ideco csv parsers", () => {
   it("parses shared numeric and date helpers", () => {
     expect(parseJapaneseInteger("31,351")).toBe(31351);
-    expect(thousandsYenToYen(130962)).toBe(130962000);
     expect(parseIdecoDate("2026/6/2")).toBe("2026-06-02");
     expect(parseJapanesePercentRate("2.10%")).toBe(0.021);
     expect(parseGainRate("0.021")).toBe(0.021);
@@ -60,6 +58,9 @@ describe("ideco csv parsers", () => {
     expect(holdings.asOfDate).toBe("2026-06-02");
     expect(holdings.rows[0]).toMatchObject({
       instrumentName: "eMAXIS Slim 国内株式(TOPIX)",
+      marketValueMinor: 130962,
+      bookValueMinor: 128324,
+      unrealizedGainMinor: 2638,
       unrealizedGainRate: 0.021,
     });
     expect(holdings.rows[1].unrealizedGainRate).toBe(0.033);
