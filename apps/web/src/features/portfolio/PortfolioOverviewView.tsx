@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import type { CurrentSnapshotDto } from "@repo/shared";
+import { sumSnapshotMarketValue } from "@repo/shared";
 import { useEffect, useState, type ReactNode } from "react";
 
 import { formatYen } from "@/lib/format-yen";
@@ -9,41 +11,19 @@ import {
   getSnapshotLoadErrorMessage,
 } from "@/lib/data-source";
 
-type HoldingsViewProps = {
+type PortfolioOverviewViewProps = {
   portfolioCode: string;
 };
 
-export function noopEffectCleanup(): void {
-  let result: void = undefined;
-  return result;
-}
-
-function formatTags(
-  tags: CurrentSnapshotDto["lines"][number]["tags"],
-): string {
-  let result = "";
-
-  if (tags.length === 0) {
-    result = "—";
-    return result;
-  }
-
-  result = tags
-    .map((tag) => {
-      let result = `${tag.schemeName}: ${tag.valueName}`;
-      return result;
-    })
-    .join(" / ");
-  return result;
-}
-
-export function HoldingsView({ portfolioCode }: HoldingsViewProps) {
+export function PortfolioOverviewView({
+  portfolioCode,
+}: PortfolioOverviewViewProps) {
   const [snapshot, setSnapshot] = useState<CurrentSnapshotDto | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let result: () => void = noopEffectCleanup;
+    let result: () => void = () => {};
     let cancelled = false;
 
     async function load() {
@@ -92,54 +72,63 @@ export function HoldingsView({ portfolioCode }: HoldingsViewProps) {
   let result: ReactNode = null;
 
   if (loading) {
-    result = <p>読み込み中…</p>;
+    result = (
+      <main>
+        <p>読み込み中…</p>
+      </main>
+    );
     return result;
   }
 
   if (error) {
-    result = <p className="holdings-error">{error}</p>;
+    result = (
+      <main>
+        <h1>{portfolioCode}</h1>
+        <p className="holdings-error">{error}</p>
+      </main>
+    );
     return result;
   }
 
   if (!snapshot) {
-    result = <p className="holdings-error">明細がありません。</p>;
+    result = (
+      <main>
+        <h1>{portfolioCode}</h1>
+        <p className="holdings-error">明細がありません。</p>
+      </main>
+    );
     return result;
   }
 
+  const totalValue = sumSnapshotMarketValue(snapshot.lines);
+
   result = (
-    <section className="holdings">
+    <main className="portfolio-overview">
       <h1>
         {snapshot.portfolioName}（{snapshot.portfolioCode}）
       </h1>
       <p className="holdings-meta">基準日: {snapshot.asOfDate}</p>
-      {snapshot.lines.length === 0 ? (
-        <p>保有銘柄がありません。</p>
-      ) : (
-        <table className="holdings-table">
-          <thead>
-            <tr>
-              <th>銘柄</th>
-              <th>口数</th>
-              <th>評価額</th>
-              <th>分類タグ</th>
-            </tr>
-          </thead>
-          <tbody>
-            {snapshot.lines.map((line) => {
-              let result = (
-                <tr key={line.id}>
-                  <td>{line.instrumentName}</td>
-                  <td>{line.quantity}</td>
-                  <td>{formatYen(line.marketValueMinor)}</td>
-                  <td>{formatTags(line.tags)}</td>
-                </tr>
-              );
-              return result;
-            })}
-          </tbody>
-        </table>
-      )}
-    </section>
+      <dl className="overview-stats">
+        <div>
+          <dt>評価額合計</dt>
+          <dd>{formatYen(totalValue)}</dd>
+        </div>
+        <div>
+          <dt>保有銘柄数</dt>
+          <dd>{snapshot.lines.length}</dd>
+        </div>
+      </dl>
+      <nav className="overview-links" aria-label="クイックリンク">
+        <ul>
+          <li>
+            <Link href={`/portfolios/${portfolioCode}/holdings/`}>明細を見る</Link>
+          </li>
+          <li>
+            <Link href={`/portfolios/${portfolioCode}/analysis/`}>分析を見る</Link>
+          </li>
+        </ul>
+      </nav>
+    </main>
   );
   return result;
 }

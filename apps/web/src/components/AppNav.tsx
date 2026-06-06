@@ -9,22 +9,7 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { href: "/", label: "ホーム", enabled: true },
-  {
-    href: "/portfolios/ideco/holdings/",
-    label: "口座明細（iDeCo）",
-    enabled: true,
-  },
-  {
-    href: "/portfolios/ideco/register/",
-    label: "登録",
-    enabled: false,
-  },
-  {
-    href: "/portfolios/ideco/edit/",
-    label: "更新",
-    enabled: false,
-  },
-  { href: "/analysis/", label: "分析", enabled: false },
+  { href: "/analysis/", label: "全体分析", enabled: true },
 ];
 
 export function AppNav() {

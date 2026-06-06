@@ -4,14 +4,12 @@ import { describe, expect, it } from "vitest";
 import { AppNav } from "@/components/AppNav";
 
 describe("AppNav", () => {
-  it("renders enabled and disabled menu items", () => {
+  it("renders global navigation links", () => {
     render(<AppNav />);
     expect(screen.getByRole("link", { name: "ホーム" })).toHaveAttribute("href", "/");
-    expect(screen.getByRole("link", { name: "口座明細（iDeCo）" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "全体分析" })).toHaveAttribute(
       "href",
-      "/portfolios/ideco/holdings",
+      "/analysis",
     );
-    expect(screen.getByText("登録")).toHaveClass("app-nav__disabled");
-    expect(screen.getByText("分析")).toHaveClass("app-nav__disabled");
   });
 });

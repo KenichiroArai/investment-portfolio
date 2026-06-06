@@ -2,6 +2,13 @@ import { getApiBaseUrl } from "@/lib/api-base";
 
 export type DataSource = "api" | "static";
 
+export type PortfolioListItem = {
+  id: string;
+  code: string;
+  name: string;
+  kind: string;
+};
+
 export function getDataSource(): DataSource {
   let result: DataSource = "api";
 
@@ -33,6 +40,23 @@ export function getSnapshotFetchUrl(portfolioCode: string): string {
   }
 
   result = `${getApiBaseUrl()}/portfolios/${portfolioCode}/snapshot/current`;
+  return result;
+}
+
+export function getPortfoliosFetchUrl(): string {
+  let result = "";
+
+  const source = getDataSource();
+  if (source === "static") {
+    const basePath = getBasePath();
+    const prefix = basePath.endsWith("/")
+      ? basePath.slice(0, -1)
+      : basePath;
+    result = `${prefix}/data/portfolios.json`;
+    return result;
+  }
+
+  result = `${getApiBaseUrl()}/portfolios`;
   return result;
 }
 

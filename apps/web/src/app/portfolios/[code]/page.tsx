@@ -1,4 +1,4 @@
-import { HoldingsView } from "@/features/portfolio/HoldingsView";
+import { PortfolioOverviewView } from "@/features/portfolio/PortfolioOverviewView";
 import { generatePortfolioStaticParams } from "@/lib/portfolio-catalog";
 
 type PageProps = {
@@ -10,10 +10,10 @@ export function generateStaticParams() {
   return result;
 }
 
-export default async function HoldingsPage({ params }: PageProps) {
-  let result = <HoldingsView portfolioCode="" />;
+export default async function PortfolioOverviewPage({ params }: PageProps) {
+  let result = <PortfolioOverviewView portfolioCode="" />;
 
   const { code } = await params;
-  result = <HoldingsView portfolioCode={code} />;
+  result = <PortfolioOverviewView portfolioCode={code} />;
   return result;
 }

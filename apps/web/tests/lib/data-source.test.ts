@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   getBasePath,
   getDataSource,
+  getPortfoliosFetchUrl,
   getSnapshotFetchUrl,
   getSnapshotLoadErrorMessage,
 } from "@/lib/data-source";
@@ -39,6 +40,7 @@ describe("data-source", () => {
     expect(getSnapshotFetchUrl("ideco")).toBe(
       "http://127.0.0.1:3001/portfolios/ideco/snapshot/current",
     );
+    expect(getPortfoliosFetchUrl()).toBe("http://127.0.0.1:3001/portfolios");
     expect(getSnapshotLoadErrorMessage()).toMatch(/API に接続できません/);
   });
 
@@ -56,6 +58,9 @@ describe("data-source", () => {
     expect(getBasePath()).toBe("/investment-portfolio");
     expect(getSnapshotFetchUrl("ideco")).toBe(
       "/investment-portfolio/data/portfolios/ideco/current.json",
+    );
+    expect(getPortfoliosFetchUrl()).toBe(
+      "/investment-portfolio/data/portfolios.json",
     );
     expect(getSnapshotLoadErrorMessage()).toMatch(/pages:export/);
   });

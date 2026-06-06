@@ -10,6 +10,7 @@ import { getCurrentSnapshot } from "./repositories/snapshots";
 const packageDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(packageDir, "../../..");
 const docsDataRoot = resolve(repoRoot, "docs/data/portfolios");
+const docsPortfoliosIndexPath = resolve(repoRoot, "docs/data/portfolios.json");
 const databasePath = resolveDatabasePath();
 
 async function main() {
@@ -18,6 +19,22 @@ async function main() {
   const { sqlite, db } = createDb(databasePath);
   const portfolios = await listPortfolios(db);
   let exported = 0;
+
+  writeFileSync(
+    docsPortfoliosIndexPath,
+    `${JSON.stringify(
+      portfolios.map((portfolio) => ({
+        id: portfolio.id,
+        code: portfolio.code,
+        name: portfolio.name,
+        kind: portfolio.kind,
+      })),
+      null,
+      2,
+    )}\n`,
+    "utf8",
+  );
+  console.log(`Exported: ${docsPortfoliosIndexPath}`);
 
   for (const portfolio of portfolios) {
     const snapshot = await getCurrentSnapshot(db, portfolio.code);

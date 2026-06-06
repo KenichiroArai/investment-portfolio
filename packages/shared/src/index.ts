@@ -1,4 +1,6 @@
+export * from "./analysis-schemes";
 export * from "./holding-line-metrics";
+export * from "./snapshot-allocation";
 export * from "./ideco-analysis";
 export * from "./ideco-analysis-csv";
 export * from "./ideco-csv-utils";
