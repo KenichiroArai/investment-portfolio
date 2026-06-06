@@ -10,6 +10,7 @@ import {
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { AllocationPanel } from "@/features/analysis/AllocationPanel";
+import { AnalysisPanelSummary } from "@/features/analysis/AnalysisPanelSummary";
 import { formatPercent, formatYen } from "@/lib/format-yen";
 import {
   getPortfoliosFetchUrl,
@@ -224,6 +225,10 @@ export function GlobalAnalysisView() {
           </div>
           <section className="analysis-panel">
             <h2>全口座合算 — {activeScheme?.schemeName}</h2>
+            <AnalysisPanelSummary
+              axisTotalMinor={allocation.totalMarketValueMinor}
+              assetTotalMinor={merged.totalMarketValueMinor}
+            />
             <AllocationPanel
               slices={allocation.slices}
               showPortfolioColumn

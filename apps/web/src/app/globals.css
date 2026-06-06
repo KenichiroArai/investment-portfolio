@@ -250,6 +250,20 @@ main,
   font-weight: 600;
 }
 
+.analysis-panel__summary {
+  color: var(--muted);
+  font-size: 0.9375rem;
+  margin: -0.25rem 0 1rem;
+}
+
+.analysis-panel__summary p {
+  margin: 0 0 0.25rem;
+}
+
+.analysis-panel__summary p:last-child {
+  margin-bottom: 0;
+}
+
 .analysis-axis-tabs {
   display: flex;
   flex-wrap: wrap;

@@ -11,6 +11,7 @@ import {
 import { useEffect, useState, type ReactNode } from "react";
 
 import { AllocationPanel } from "@/features/analysis/AllocationPanel";
+import { AnalysisPanelSummary } from "@/features/analysis/AnalysisPanelSummary";
 import { formatYen } from "@/lib/format-yen";
 import {
   getSnapshotFetchUrl,
@@ -182,6 +183,10 @@ export function AnalysisView({
       </div>
       <section className="analysis-panel">
         <h2>{activeScheme.schemeName}</h2>
+        <AnalysisPanelSummary
+          axisTotalMinor={allocation.totalMarketValueMinor}
+          assetTotalMinor={totalValue}
+        />
         <AllocationPanel slices={allocation.slices} />
       </section>
     </main>

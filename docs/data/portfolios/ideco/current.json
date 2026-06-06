@@ -1,11 +1,33 @@
 {
-  "id": "a0185b3f-5470-4bba-9d9d-d13d5725cdcc",
+  "id": "1787e3a8-d7fc-437f-81f5-d3f2832b6178",
   "portfolioCode": "ideco",
   "portfolioName": "iDeCo",
   "asOfDate": "2026-06-02",
+  "analysisSchemes": [
+    {
+      "schemeCode": "ideco_product_type",
+      "schemeName": "商品タイプ"
+    },
+    {
+      "schemeCode": "ideco_region",
+      "schemeName": "地域分類"
+    },
+    {
+      "schemeCode": "ideco_asset_class",
+      "schemeName": "資産分類"
+    },
+    {
+      "schemeCode": "ideco_product_category",
+      "schemeName": "商品分類"
+    },
+    {
+      "schemeCode": "ideco_product_group",
+      "schemeName": "商品グループ"
+    }
+  ],
   "lines": [
     {
-      "id": "41e1e7e0-69ae-4141-8c7b-51fbee516484",
+      "id": "823dc417-cb5e-465e-beec-27af6e42c8ee",
       "instrumentId": "13462933-8a0b-48f4-912a-3bfd25762509",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 国内株式（ＴＯＰＩＸ）",
       "sortOrder": 1,
@@ -72,6 +94,18 @@
           "valueName": "投資信託"
         },
         {
+          "schemeCode": "ideco_product_category",
+          "schemeName": "商品分類",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式"
+        },
+        {
+          "schemeCode": "ideco_product_group",
+          "schemeName": "商品グループ",
+          "valueCode": "major_assets",
+          "valueName": "主要資産"
+        },
+        {
           "schemeCode": "ideco_product_style",
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
@@ -92,7 +126,7 @@
       ]
     },
     {
-      "id": "538d175c-b137-4034-8c22-e11b0ad1a011",
+      "id": "0dd21f9e-c65f-4d12-ade9-a1df70fabf9c",
       "instrumentId": "31275e89-c5aa-46ec-8108-bc56f6ea17b2",
       "instrumentName": "ＳＢＩ・全世界株式インデックス・ファンド",
       "sortOrder": 2,
@@ -159,6 +193,18 @@
           "valueName": "投資信託"
         },
         {
+          "schemeCode": "ideco_product_category",
+          "schemeName": "商品分類",
+          "valueCode": "domestic_foreign_equity",
+          "valueName": "内外株式"
+        },
+        {
+          "schemeCode": "ideco_product_group",
+          "schemeName": "商品グループ",
+          "valueCode": "major_assets",
+          "valueName": "主要資産"
+        },
+        {
           "schemeCode": "ideco_product_style",
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
@@ -173,13 +219,13 @@
         {
           "schemeCode": "ideco_region",
           "schemeName": "地域分類",
-          "valueCode": "domestic_foreign",
-          "valueName": "内外"
+          "valueCode": "foreign",
+          "valueName": "海外"
         }
       ]
     },
     {
-      "id": "26162a9c-ec44-4a46-8ed9-865bd31fb4fa",
+      "id": "520584d3-789d-4366-9585-75362ce60ca5",
       "instrumentId": "362250ad-b3df-44b8-a221-a599b923e754",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 全世界株式（除く日本）",
       "sortOrder": 3,
@@ -246,6 +292,18 @@
           "valueName": "投資信託"
         },
         {
+          "schemeCode": "ideco_product_category",
+          "schemeName": "商品分類",
+          "valueCode": "foreign_equity",
+          "valueName": "海外株式"
+        },
+        {
+          "schemeCode": "ideco_product_group",
+          "schemeName": "商品グループ",
+          "valueCode": "major_assets",
+          "valueName": "主要資産"
+        },
+        {
           "schemeCode": "ideco_product_style",
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
@@ -266,7 +324,7 @@
       ]
     },
     {
-      "id": "5d481137-cdd0-4d49-aaf7-25fcf2abb058",
+      "id": "d9f2de51-b16c-44c2-b9d1-11b4a1401d66",
       "instrumentId": "e251ef8b-9dc7-443f-9a76-8ae44ba08faa",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 先進国株式インデックス",
       "sortOrder": 4,
@@ -333,6 +391,18 @@
           "valueName": "投資信託"
         },
         {
+          "schemeCode": "ideco_product_category",
+          "schemeName": "商品分類",
+          "valueCode": "foreign_equity",
+          "valueName": "海外株式"
+        },
+        {
+          "schemeCode": "ideco_product_group",
+          "schemeName": "商品グループ",
+          "valueCode": "major_assets",
+          "valueName": "主要資産"
+        },
+        {
           "schemeCode": "ideco_product_style",
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
@@ -353,7 +423,7 @@
       ]
     },
     {
-      "id": "aa754f0b-9009-455c-b004-f2a5b12740bc",
+      "id": "eda49f4a-1c95-49e5-8ba2-e38aae5c3631",
       "instrumentId": "e6dc9d16-d6b0-4a65-ab00-e5c4d338df88",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 米国株式（Ｓ＆Ｐ５００）",
       "sortOrder": 5,
@@ -420,6 +490,18 @@
           "valueName": "投資信託"
         },
         {
+          "schemeCode": "ideco_product_category",
+          "schemeName": "商品分類",
+          "valueCode": "foreign_equity",
+          "valueName": "海外株式"
+        },
+        {
+          "schemeCode": "ideco_product_group",
+          "schemeName": "商品グループ",
+          "valueCode": "major_assets",
+          "valueName": "主要資産"
+        },
+        {
           "schemeCode": "ideco_product_style",
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
@@ -440,7 +522,7 @@
       ]
     },
     {
-      "id": "375d75ec-2b3a-4655-a161-d01359e32592",
+      "id": "ecf9d731-315f-4ced-9766-0b522a334e5f",
       "instrumentId": "a3028224-f890-4258-b8f9-417133d7cf6a",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 新興国株式インデックス",
       "sortOrder": 6,
@@ -507,6 +589,18 @@
           "valueName": "投資信託"
         },
         {
+          "schemeCode": "ideco_product_category",
+          "schemeName": "商品分類",
+          "valueCode": "foreign_equity",
+          "valueName": "海外株式"
+        },
+        {
+          "schemeCode": "ideco_product_group",
+          "schemeName": "商品グループ",
+          "valueCode": "major_assets",
+          "valueName": "主要資産"
+        },
+        {
           "schemeCode": "ideco_product_style",
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
@@ -527,7 +621,7 @@
       ]
     },
     {
-      "id": "80300e53-6fa8-4a45-9d80-f20d1bd7bc0e",
+      "id": "ce4d3317-1d36-4da5-9172-2468e4101a4c",
       "instrumentId": "bb25c6ee-a8d6-402d-b971-67f1e582c69a",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 国内債券インデックス",
       "sortOrder": 7,
@@ -600,6 +694,18 @@
           "valueName": "投資信託"
         },
         {
+          "schemeCode": "ideco_product_category",
+          "schemeName": "商品分類",
+          "valueCode": "domestic_bond",
+          "valueName": "国内債券"
+        },
+        {
+          "schemeCode": "ideco_product_group",
+          "schemeName": "商品グループ",
+          "valueCode": "major_assets",
+          "valueName": "主要資産"
+        },
+        {
           "schemeCode": "ideco_product_style",
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
@@ -620,7 +726,7 @@
       ]
     },
     {
-      "id": "fe907ad4-f87d-4a31-863a-c8d403a9c742",
+      "id": "44950c8c-0c44-4a0b-9478-9e0d0b2b42f7",
       "instrumentId": "f74a084e-8eee-45c3-abef-a9337b908b01",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 先進国債券インデックス",
       "sortOrder": 8,
@@ -687,6 +793,18 @@
           "valueName": "投資信託"
         },
         {
+          "schemeCode": "ideco_product_category",
+          "schemeName": "商品分類",
+          "valueCode": "foreign_bond",
+          "valueName": "海外債券"
+        },
+        {
+          "schemeCode": "ideco_product_group",
+          "schemeName": "商品グループ",
+          "valueCode": "major_assets",
+          "valueName": "主要資産"
+        },
+        {
           "schemeCode": "ideco_product_style",
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
@@ -707,7 +825,7 @@
       ]
     },
     {
-      "id": "b4f3dce4-3812-44d4-8770-4c4dd709bf65",
+      "id": "74b40cb0-c32b-45ab-a017-bcbdd732972c",
       "instrumentId": "d642675f-5dd0-42df-8feb-63429b27ca60",
       "instrumentName": "ｉＦｒｅｅ 新興国債券インデックス",
       "sortOrder": 9,
@@ -774,6 +892,18 @@
           "valueName": "投資信託"
         },
         {
+          "schemeCode": "ideco_product_category",
+          "schemeName": "商品分類",
+          "valueCode": "foreign_bond",
+          "valueName": "海外債券"
+        },
+        {
+          "schemeCode": "ideco_product_group",
+          "schemeName": "商品グループ",
+          "valueCode": "major_assets",
+          "valueName": "主要資産"
+        },
+        {
           "schemeCode": "ideco_product_style",
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
@@ -794,7 +924,7 @@
       ]
     },
     {
-      "id": "fbc79bc8-a2ed-4737-94b5-7189975f8de1",
+      "id": "00fa4284-b299-478c-9864-e227e5ae3845",
       "instrumentId": "37996eea-0305-4a45-8400-996f1962292c",
       "instrumentName": "ニッセイＪリートインデックスファンド（購入・換金手数料なし）",
       "sortOrder": 10,
@@ -861,6 +991,12 @@
           "valueName": "投資信託"
         },
         {
+          "schemeCode": "ideco_product_group",
+          "schemeName": "商品グループ",
+          "valueCode": "major_assets",
+          "valueName": "主要資産"
+        },
+        {
           "schemeCode": "ideco_product_style",
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
@@ -881,7 +1017,7 @@
       ]
     },
     {
-      "id": "cb8c2379-6109-455b-ba3f-2df6cdbb2fc7",
+      "id": "f22534c7-c6a7-47b5-a585-559d949bc712",
       "instrumentId": "c991d741-dcd5-479f-abd9-7da4a97e7547",
       "instrumentName": "三井住友・ＤＣ外国リートインデックスファンド",
       "sortOrder": 11,
@@ -948,6 +1084,12 @@
           "valueName": "投資信託"
         },
         {
+          "schemeCode": "ideco_product_group",
+          "schemeName": "商品グループ",
+          "valueCode": "major_assets",
+          "valueName": "主要資産"
+        },
+        {
           "schemeCode": "ideco_product_style",
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
@@ -968,7 +1110,7 @@
       ]
     },
     {
-      "id": "b1d296f4-d669-47d2-bfee-b1b54c786fe0",
+      "id": "dda0f9c7-d572-43a0-ba3d-ab8fdba16ba7",
       "instrumentId": "ba158649-918a-42c7-824b-021765191743",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ バランス（８資産均等型）",
       "sortOrder": 12,
@@ -1035,6 +1177,12 @@
           "valueName": "投資信託"
         },
         {
+          "schemeCode": "ideco_product_group",
+          "schemeName": "商品グループ",
+          "valueCode": "other",
+          "valueName": "その他"
+        },
+        {
           "schemeCode": "ideco_product_style",
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
@@ -1049,13 +1197,13 @@
         {
           "schemeCode": "ideco_region",
           "schemeName": "地域分類",
-          "valueCode": "domestic_foreign",
-          "valueName": "内外"
+          "valueCode": "foreign",
+          "valueName": "海外"
         }
       ]
     },
     {
-      "id": "06b428a2-d1c2-4f15-b436-92527a6bd250",
+      "id": "1dbe7323-8d5f-404c-870d-c763f527fc29",
       "instrumentId": "47ccafe2-9d8f-49a7-b922-cf2e484a7860",
       "instrumentName": "ｉＦｒｅｅ 年金バランス",
       "sortOrder": 13,
@@ -1122,6 +1270,12 @@
           "valueName": "投資信託"
         },
         {
+          "schemeCode": "ideco_product_group",
+          "schemeName": "商品グループ",
+          "valueCode": "other",
+          "valueName": "その他"
+        },
+        {
           "schemeCode": "ideco_product_style",
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "active",
@@ -1136,13 +1290,13 @@
         {
           "schemeCode": "ideco_region",
           "schemeName": "地域分類",
-          "valueCode": "domestic_foreign",
-          "valueName": "内外"
+          "valueCode": "foreign",
+          "valueName": "海外"
         }
       ]
     },
     {
-      "id": "6237c828-9de1-42df-ad72-c02f5f669379",
+      "id": "4cf21caa-410e-4efb-990d-15325441c688",
       "instrumentId": "68b9b628-c237-4397-8530-c099d33c6658",
       "instrumentName": "三菱ＵＦＪ 純金ファンド（愛称：ファインゴールド）",
       "sortOrder": 14,
@@ -1209,6 +1363,12 @@
           "valueName": "投資信託"
         },
         {
+          "schemeCode": "ideco_product_group",
+          "schemeName": "商品グループ",
+          "valueCode": "other",
+          "valueName": "その他"
+        },
+        {
           "schemeCode": "ideco_product_style",
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "active",
@@ -1229,7 +1389,7 @@
       ]
     },
     {
-      "id": "11062f2a-1e32-42e0-88ce-5bdcc94dc5d3",
+      "id": "99d9e510-d2c8-4fa3-a0ee-44c33f98d60f",
       "instrumentId": "53bdddb7-cab9-48eb-9f3e-9bf731df27b7",
       "instrumentName": "セレブライフ・ストーリー2045",
       "sortOrder": 15,
@@ -1296,6 +1456,12 @@
           "valueName": "投資信託"
         },
         {
+          "schemeCode": "ideco_product_group",
+          "schemeName": "商品グループ",
+          "valueCode": "other",
+          "valueName": "その他"
+        },
+        {
           "schemeCode": "ideco_product_style",
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "active",
@@ -1310,8 +1476,8 @@
         {
           "schemeCode": "ideco_region",
           "schemeName": "地域分類",
-          "valueCode": "domestic_foreign",
-          "valueName": "内外"
+          "valueCode": "foreign",
+          "valueName": "海外"
         }
       ]
     }

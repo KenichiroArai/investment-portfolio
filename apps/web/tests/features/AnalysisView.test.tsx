@@ -63,6 +63,9 @@ describe("AnalysisView", () => {
       expect(screen.getByText(/評価額合計/)).toBeInTheDocument();
     });
 
+    expect(screen.getByText(/分類対象額/)).toBeInTheDocument();
+    expect(screen.queryByText(/未分類/)).not.toBeInTheDocument();
+
     expect(screen.getByRole("heading", { name: "地域分類" })).toBeInTheDocument();
     expect(screen.getAllByText("国内").length).toBeGreaterThanOrEqual(1);
     expect(
@@ -72,5 +75,42 @@ describe("AnalysisView", () => {
     fireEvent.click(screen.getByRole("tab", { name: "資産分類" }));
     expect(screen.getByRole("heading", { name: "資産分類" })).toBeInTheDocument();
     expect(screen.getAllByText("株式").length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("shows uncovered amount when lines lack tags for the active scheme", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          ...snapshotFixture,
+          lines: [
+            ...snapshotFixture.lines,
+            {
+              id: "line-2",
+              instrumentId: "inst-2",
+              instrumentName: "未分類銘柄",
+              sortOrder: 1,
+              quantity: 1,
+              marketValueMinor: 50_000,
+              bookValueMinor: null,
+              metrics: [],
+              instrumentAttributes: [],
+              tags: [],
+            },
+          ],
+        }),
+      }),
+    );
+
+    render(<AnalysisView portfolioCode="ideco" portfolioKind="ideco" />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/分類対象額/)).toBeInTheDocument();
+    });
+
+    expect(screen.getByText(/資産全体の 66\.7%/)).toBeInTheDocument();
+    expect(screen.getByText(/未分類:.*50,000/)).toBeInTheDocument();
   });
 });
