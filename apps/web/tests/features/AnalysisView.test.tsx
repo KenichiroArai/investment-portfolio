@@ -60,10 +60,13 @@ describe("AnalysisView", () => {
     });
 
     expect(screen.getByRole("heading", { name: "地域分類" })).toBeInTheDocument();
-    expect(screen.getByText("国内")).toBeInTheDocument();
+    expect(screen.getAllByText("国内").length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getByRole("button", { name: "国内 の内訳を開く" }),
+    ).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("tab", { name: "資産分類" }));
     expect(screen.getByRole("heading", { name: "資産分類" })).toBeInTheDocument();
-    expect(screen.getByText("株式")).toBeInTheDocument();
+    expect(screen.getAllByText("株式").length).toBeGreaterThanOrEqual(1);
   });
 });

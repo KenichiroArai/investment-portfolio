@@ -3,7 +3,7 @@
 import type { CurrentSnapshotDto } from "@repo/shared";
 import { useEffect, useState, type ReactNode } from "react";
 
-import { formatYen } from "@/lib/format-yen";
+import { HoldingsDetailTable } from "@/features/holdings/HoldingsDetailTable";
 import {
   getSnapshotFetchUrl,
   getSnapshotLoadErrorMessage,
@@ -15,25 +15,6 @@ type HoldingsViewProps = {
 
 export function noopEffectCleanup(): void {
   let result: void = undefined;
-  return result;
-}
-
-function formatTags(
-  tags: CurrentSnapshotDto["lines"][number]["tags"],
-): string {
-  let result = "";
-
-  if (tags.length === 0) {
-    result = "—";
-    return result;
-  }
-
-  result = tags
-    .map((tag) => {
-      let result = `${tag.schemeName}: ${tag.valueName}`;
-      return result;
-    })
-    .join(" / ");
   return result;
 }
 
@@ -115,29 +96,7 @@ export function HoldingsView({ portfolioCode }: HoldingsViewProps) {
       {snapshot.lines.length === 0 ? (
         <p>保有銘柄がありません。</p>
       ) : (
-        <table className="holdings-table">
-          <thead>
-            <tr>
-              <th>銘柄</th>
-              <th>口数</th>
-              <th>評価額</th>
-              <th>分類タグ</th>
-            </tr>
-          </thead>
-          <tbody>
-            {snapshot.lines.map((line) => {
-              let result = (
-                <tr key={line.id}>
-                  <td>{line.instrumentName}</td>
-                  <td>{line.quantity}</td>
-                  <td>{formatYen(line.marketValueMinor)}</td>
-                  <td>{formatTags(line.tags)}</td>
-                </tr>
-              );
-              return result;
-            })}
-          </tbody>
-        </table>
+        <HoldingsDetailTable lines={snapshot.lines} />
       )}
     </section>
   );

@@ -2,15 +2,14 @@
 
 import Link from "next/link";
 import {
-  buildAllocationByScheme,
+  buildAllocationBySchemeWithLinesFromSnapshots,
   listAnalysisSchemesForPortfolio,
   mergeSnapshotsForGlobalAnalysis,
   type CurrentSnapshotDto,
 } from "@repo/shared";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
-import { AllocationChart } from "@/features/analysis/AllocationChart";
-import { AllocationTable } from "@/features/analysis/AllocationTable";
+import { AllocationPanel } from "@/features/analysis/AllocationPanel";
 import { formatPercent, formatYen } from "@/lib/format-yen";
 import {
   getPortfoliosFetchUrl,
@@ -153,8 +152,8 @@ export function GlobalAnalysisView() {
   );
   const allocation =
     activeScheme !== undefined
-      ? buildAllocationByScheme(
-          snapshots.flatMap((snapshot) => snapshot.lines),
+      ? buildAllocationBySchemeWithLinesFromSnapshots(
+          snapshots,
           activeScheme.schemeCode,
           activeScheme.schemeName,
         )
@@ -225,10 +224,10 @@ export function GlobalAnalysisView() {
           </div>
           <section className="analysis-panel">
             <h2>全口座合算 — {activeScheme?.schemeName}</h2>
-            <div className="analysis-panel__content">
-              <AllocationChart slices={allocation.slices} />
-              <AllocationTable slices={allocation.slices} />
-            </div>
+            <AllocationPanel
+              slices={allocation.slices}
+              showPortfolioColumn
+            />
           </section>
         </>
       ) : (

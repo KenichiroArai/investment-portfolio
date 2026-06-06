@@ -321,20 +321,57 @@ main,
   gap: 1rem;
 }
 
-.allocation-chart__donut {
-  width: 12rem;
-  height: 12rem;
-  border-radius: 50%;
-  margin: 0 auto;
+.allocation-panel__chart-area {
   position: relative;
 }
 
-.allocation-chart__donut::after {
-  content: "";
-  position: absolute;
-  inset: 22%;
-  border-radius: 50%;
+.allocation-chart__svg {
+  width: 12rem;
+  height: 12rem;
+  margin: 0 auto;
+  display: block;
+}
+
+.allocation-chart__slice {
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.allocation-chart__slice--dimmed {
+  opacity: 0.35;
+}
+
+.allocation-chart__empty {
+  fill: #e5e5e5;
+}
+
+@media (prefers-color-scheme: dark) {
+  .allocation-chart__empty {
+    fill: #404040;
+  }
+}
+
+.allocation-chart__tooltip {
+  position: fixed;
+  z-index: 20;
+  transform: translate(0.75rem, 0.75rem);
+  pointer-events: none;
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid #e5e5e5;
   background: var(--background);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.12);
+  font-size: 0.8125rem;
+  max-width: 16rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .allocation-chart__tooltip {
+    border-color: #404040;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.35);
+  }
 }
 
 .allocation-chart__legend {
@@ -350,6 +387,81 @@ main,
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.25rem;
+}
+
+.allocation-chart__legend li:focus-visible {
+  outline: 2px solid var(--foreground);
+  outline-offset: 2px;
+}
+
+.allocation-chart__legend-item--dimmed {
+  opacity: 0.45;
+}
+
+.allocation-table__expand {
+  font: inherit;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  width: 1.5rem;
+}
+
+.allocation-table__row--highlight td {
+  background: #eff6ff;
+}
+
+@media (prefers-color-scheme: dark) {
+  .allocation-table__row--highlight td {
+    background: #172554;
+  }
+}
+
+.allocation-table__detail {
+  padding: 0 !important;
+  background: #fafafa;
+}
+
+@media (prefers-color-scheme: dark) {
+  .allocation-table__detail {
+    background: #0a0a0a;
+  }
+}
+
+.allocation-line-breakdown {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.allocation-line-breakdown th,
+.allocation-line-breakdown td {
+  border: 1px solid #e5e5e5;
+  padding: 0.375rem 0.5rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+@media (prefers-color-scheme: dark) {
+  .allocation-line-breakdown th,
+  .allocation-line-breakdown td {
+    border-color: #262626;
+  }
+}
+
+.allocation-line-breakdown th {
+  background: #f5f5f5;
+  font-weight: 600;
+}
+
+@media (prefers-color-scheme: dark) {
+  .allocation-line-breakdown th {
+    background: #171717;
+  }
 }
 
 .allocation-chart__swatch {

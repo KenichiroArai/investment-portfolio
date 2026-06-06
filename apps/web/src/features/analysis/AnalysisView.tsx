@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import {
-  buildAllocationByScheme,
+  buildAllocationBySchemeWithLines,
   listAnalysisSchemesForPortfolio,
   sumSnapshotMarketValue,
   type AnalysisSchemeConfig,
@@ -10,8 +10,7 @@ import {
 } from "@repo/shared";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
-import { AllocationChart } from "@/features/analysis/AllocationChart";
-import { AllocationTable } from "@/features/analysis/AllocationTable";
+import { AllocationPanel } from "@/features/analysis/AllocationPanel";
 import { formatYen } from "@/lib/format-yen";
 import {
   getSnapshotFetchUrl,
@@ -139,7 +138,7 @@ export function AnalysisView({
   const activeScheme = schemeConfigs.find(
     (config) => config.schemeCode === activeSchemeCode,
   ) as AnalysisSchemeConfig;
-  const allocation = buildAllocationByScheme(
+  const allocation = buildAllocationBySchemeWithLines(
     snapshot.lines,
     activeScheme.schemeCode,
     activeScheme.schemeName,
@@ -185,10 +184,7 @@ export function AnalysisView({
       </div>
       <section className="analysis-panel">
         <h2>{activeScheme.schemeName}</h2>
-        <div className="analysis-panel__content">
-          <AllocationChart slices={allocation.slices} />
-          <AllocationTable slices={allocation.slices} />
-        </div>
+        <AllocationPanel slices={allocation.slices} />
       </section>
     </main>
   );

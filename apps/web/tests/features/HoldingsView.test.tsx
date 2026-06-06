@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
@@ -8,6 +8,7 @@ import {
 
 describe("HoldingsView", () => {
   afterEach(() => {
+    cleanup();
     vi.unstubAllGlobals();
   });
 
@@ -87,6 +88,8 @@ describe("HoldingsView", () => {
     render(<HoldingsView portfolioCode="ideco" />);
     await waitFor(() => {
       expect(screen.getByText("テストファンド")).toBeInTheDocument();
+      expect(screen.getByRole("columnheader", { name: "評価額" })).toBeInTheDocument();
+      expect(screen.getByRole("columnheader", { name: "分類" })).toBeInTheDocument();
       expect(screen.getByText(/地域: 日本/)).toBeInTheDocument();
     });
   });
@@ -106,7 +109,7 @@ describe("HoldingsView", () => {
     });
   });
 
-  it("shows messages for 404 and empty tags", async () => {
+  it("shows messages for 404 and lines without metrics", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue({
@@ -119,6 +122,8 @@ describe("HoldingsView", () => {
     await waitFor(() => {
       expect(screen.getByText(/明細がまだ登録されていません/)).toBeInTheDocument();
     });
+
+    cleanup();
 
     vi.stubGlobal(
       "fetch",
@@ -148,7 +153,8 @@ describe("HoldingsView", () => {
     );
     render(<HoldingsView portfolioCode="ideco" />);
     await waitFor(() => {
-      expect(screen.getByText("—")).toBeInTheDocument();
+      expect(screen.getByText("無タグ")).toBeInTheDocument();
+      expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(1);
     });
   });
 
