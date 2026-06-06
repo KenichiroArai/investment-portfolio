@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import {
+  resolveIdecoAnalysisAxisSchemeCode,
   resolveIdecoAnalysisTags,
   resolveIdecoProductType,
 } from "../src/ideco-analysis";
@@ -13,6 +14,7 @@ import {
   parseIdecoDate,
   parseJapaneseInteger,
   parseJapanesePercentRate,
+  stableIdecoCodeSuffix,
   stripUtf8Bom,
 } from "../src/ideco-csv-utils";
 import { parseIdecoHoldingsCsv } from "../src/ideco-holdings-csv";
@@ -103,6 +105,55 @@ describe("ideco csv parsers", () => {
         }),
       ]),
     );
+  });
+
+  it("parses analysis csv with major asset axis and unknown axes", () => {
+    const analysis = parseIdecoAnalysisCsv(
+      `分析軸名,カテゴリ名,メンバー名
+商品タイプ,すべて,all
+地域分類,国内,国内株式
+地域分類,海外,海外株式
+資産分類,株式,国内株式
+資産分類,株式,海外株式
+主要資産,国内株式,国内株式
+主要資産,海外株式,海外株式
+商品グループ,主要資産,国内株式
+商品グループ,主要資産,海外株式
+カスタム軸,テストカテゴリ,国内株式
+`,
+    );
+
+    expect(analysis.axes.map((axis) => axis.axisName)).toEqual([
+      "商品タイプ",
+      "地域分類",
+      "資産分類",
+      "主要資産",
+      "商品グループ",
+      "カスタム軸",
+    ]);
+    expect(
+      analysis.axes.find((axis) => axis.axisName === "主要資産")?.schemeCode,
+    ).toBe(`ideco_axis_${stableIdecoCodeSuffix("主要資産")}`);
+    expect(
+      analysis.axes.find((axis) => axis.axisName === "カスタム軸")?.schemeCode,
+    ).toBe(`ideco_axis_${stableIdecoCodeSuffix("カスタム軸")}`);
+    expect(analysis.memberMappings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          axisName: "主要資産",
+          memberName: "国内株式",
+          categoryName: "国内株式",
+          categoryCode: "domestic_equity",
+        }),
+        expect.objectContaining({
+          axisName: "カスタム軸",
+          memberName: "国内株式",
+          categoryName: "テストカテゴリ",
+          categoryCode: stableIdecoCodeSuffix("テストカテゴリ"),
+        }),
+      ]),
+    );
+    expect(() => resolveIdecoAnalysisAxisSchemeCode("未知の軸")).not.toThrow();
   });
 
   it("rejects invalid holdings csv", () => {

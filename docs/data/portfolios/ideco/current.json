@@ -1,5 +1,5 @@
 {
-  "id": "af1605ae-71bf-499a-99d0-6642ba5f329d",
+  "id": "93628a3c-e887-4dd1-bf37-c4ea4411d615",
   "portfolioCode": "ideco",
   "portfolioName": "iDeCo",
   "asOfDate": "2026-06-02",
@@ -17,17 +17,25 @@
       "schemeName": "資産分類"
     },
     {
-      "schemeCode": "ideco_product_category",
-      "schemeName": "商品分類"
-    },
-    {
       "schemeCode": "ideco_product_group",
       "schemeName": "商品グループ"
+    },
+    {
+      "schemeCode": "ideco_axis_9b6ea403",
+      "schemeName": "主要資産"
+    },
+    {
+      "schemeCode": "ideco_axis_7452352e",
+      "schemeName": "主要資産：地域分類"
+    },
+    {
+      "schemeCode": "ideco_axis_40470d15",
+      "schemeName": "主要資産：資産分類"
     }
   ],
   "lines": [
     {
-      "id": "d6545b63-b738-41e1-b6d7-7bf53cfafaa6",
+      "id": "088ce461-b059-411f-a05c-8d68538f76a9",
       "instrumentId": "13462933-8a0b-48f4-912a-3bfd25762509",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 国内株式（ＴＯＰＩＸ）",
       "sortOrder": 1,
@@ -88,16 +96,28 @@
           "valueName": "株式"
         },
         {
+          "schemeCode": "ideco_axis_40470d15",
+          "schemeName": "主要資産：資産分類",
+          "valueCode": "equity",
+          "valueName": "株式"
+        },
+        {
+          "schemeCode": "ideco_axis_7452352e",
+          "schemeName": "主要資産：地域分類",
+          "valueCode": "domestic",
+          "valueName": "国内"
+        },
+        {
+          "schemeCode": "ideco_axis_9b6ea403",
+          "schemeName": "主要資産",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式"
+        },
+        {
           "schemeCode": "ideco_major_category",
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託"
-        },
-        {
-          "schemeCode": "ideco_product_category",
-          "schemeName": "商品分類",
-          "valueCode": "domestic_equity",
-          "valueName": "国内株式"
         },
         {
           "schemeCode": "ideco_product_group",
@@ -126,7 +146,7 @@
       ]
     },
     {
-      "id": "996c63e9-58cc-478a-b337-d37e184b2fe6",
+      "id": "cb0f5ddc-e2fe-4c47-a915-92827b94c692",
       "instrumentId": "31275e89-c5aa-46ec-8108-bc56f6ea17b2",
       "instrumentName": "ＳＢＩ・全世界株式インデックス・ファンド",
       "sortOrder": 2,
@@ -187,16 +207,28 @@
           "valueName": "株式"
         },
         {
+          "schemeCode": "ideco_axis_40470d15",
+          "schemeName": "主要資産：資産分類",
+          "valueCode": "equity",
+          "valueName": "株式"
+        },
+        {
+          "schemeCode": "ideco_axis_7452352e",
+          "schemeName": "主要資産：地域分類",
+          "valueCode": "foreign",
+          "valueName": "海外"
+        },
+        {
+          "schemeCode": "ideco_axis_9b6ea403",
+          "schemeName": "主要資産",
+          "valueCode": "domestic_foreign_equity",
+          "valueName": "内外株式"
+        },
+        {
           "schemeCode": "ideco_major_category",
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託"
-        },
-        {
-          "schemeCode": "ideco_product_category",
-          "schemeName": "商品分類",
-          "valueCode": "domestic_foreign_equity",
-          "valueName": "内外株式"
         },
         {
           "schemeCode": "ideco_product_group",
@@ -225,7 +257,7 @@
       ]
     },
     {
-      "id": "6b6bbb88-32fc-42c1-b2cf-843e57db84a1",
+      "id": "ccfb5fd4-2502-47d1-9aa5-f9152e99eef0",
       "instrumentId": "362250ad-b3df-44b8-a221-a599b923e754",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 全世界株式（除く日本）",
       "sortOrder": 3,
@@ -286,16 +318,28 @@
           "valueName": "株式"
         },
         {
+          "schemeCode": "ideco_axis_40470d15",
+          "schemeName": "主要資産：資産分類",
+          "valueCode": "equity",
+          "valueName": "株式"
+        },
+        {
+          "schemeCode": "ideco_axis_7452352e",
+          "schemeName": "主要資産：地域分類",
+          "valueCode": "foreign",
+          "valueName": "海外"
+        },
+        {
+          "schemeCode": "ideco_axis_9b6ea403",
+          "schemeName": "主要資産",
+          "valueCode": "foreign_equity",
+          "valueName": "海外株式"
+        },
+        {
           "schemeCode": "ideco_major_category",
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託"
-        },
-        {
-          "schemeCode": "ideco_product_category",
-          "schemeName": "商品分類",
-          "valueCode": "foreign_equity",
-          "valueName": "海外株式"
         },
         {
           "schemeCode": "ideco_product_group",
@@ -324,7 +368,7 @@
       ]
     },
     {
-      "id": "ce7ef97b-72ca-4c2d-88c0-a2c9a034607f",
+      "id": "a6ae131f-9956-452a-ae24-290e5f9fcb0c",
       "instrumentId": "e251ef8b-9dc7-443f-9a76-8ae44ba08faa",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 先進国株式インデックス",
       "sortOrder": 4,
@@ -385,16 +429,28 @@
           "valueName": "株式"
         },
         {
+          "schemeCode": "ideco_axis_40470d15",
+          "schemeName": "主要資産：資産分類",
+          "valueCode": "equity",
+          "valueName": "株式"
+        },
+        {
+          "schemeCode": "ideco_axis_7452352e",
+          "schemeName": "主要資産：地域分類",
+          "valueCode": "foreign",
+          "valueName": "海外"
+        },
+        {
+          "schemeCode": "ideco_axis_9b6ea403",
+          "schemeName": "主要資産",
+          "valueCode": "foreign_equity",
+          "valueName": "海外株式"
+        },
+        {
           "schemeCode": "ideco_major_category",
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託"
-        },
-        {
-          "schemeCode": "ideco_product_category",
-          "schemeName": "商品分類",
-          "valueCode": "foreign_equity",
-          "valueName": "海外株式"
         },
         {
           "schemeCode": "ideco_product_group",
@@ -423,7 +479,7 @@
       ]
     },
     {
-      "id": "45a35d08-0254-425b-bd1e-a14f0c8419fe",
+      "id": "1ce2cf40-3397-4b64-be19-c6d780370f1f",
       "instrumentId": "e6dc9d16-d6b0-4a65-ab00-e5c4d338df88",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 米国株式（Ｓ＆Ｐ５００）",
       "sortOrder": 5,
@@ -484,16 +540,28 @@
           "valueName": "株式"
         },
         {
+          "schemeCode": "ideco_axis_40470d15",
+          "schemeName": "主要資産：資産分類",
+          "valueCode": "equity",
+          "valueName": "株式"
+        },
+        {
+          "schemeCode": "ideco_axis_7452352e",
+          "schemeName": "主要資産：地域分類",
+          "valueCode": "foreign",
+          "valueName": "海外"
+        },
+        {
+          "schemeCode": "ideco_axis_9b6ea403",
+          "schemeName": "主要資産",
+          "valueCode": "foreign_equity",
+          "valueName": "海外株式"
+        },
+        {
           "schemeCode": "ideco_major_category",
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託"
-        },
-        {
-          "schemeCode": "ideco_product_category",
-          "schemeName": "商品分類",
-          "valueCode": "foreign_equity",
-          "valueName": "海外株式"
         },
         {
           "schemeCode": "ideco_product_group",
@@ -522,7 +590,7 @@
       ]
     },
     {
-      "id": "81131631-e4db-4016-b678-79f205a1ccd2",
+      "id": "2f7cc726-10e4-4004-a48f-43de457a3413",
       "instrumentId": "a3028224-f890-4258-b8f9-417133d7cf6a",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 新興国株式インデックス",
       "sortOrder": 6,
@@ -583,16 +651,28 @@
           "valueName": "株式"
         },
         {
+          "schemeCode": "ideco_axis_40470d15",
+          "schemeName": "主要資産：資産分類",
+          "valueCode": "equity",
+          "valueName": "株式"
+        },
+        {
+          "schemeCode": "ideco_axis_7452352e",
+          "schemeName": "主要資産：地域分類",
+          "valueCode": "foreign",
+          "valueName": "海外"
+        },
+        {
+          "schemeCode": "ideco_axis_9b6ea403",
+          "schemeName": "主要資産",
+          "valueCode": "foreign_equity",
+          "valueName": "海外株式"
+        },
+        {
           "schemeCode": "ideco_major_category",
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託"
-        },
-        {
-          "schemeCode": "ideco_product_category",
-          "schemeName": "商品分類",
-          "valueCode": "foreign_equity",
-          "valueName": "海外株式"
         },
         {
           "schemeCode": "ideco_product_group",
@@ -621,7 +701,7 @@
       ]
     },
     {
-      "id": "cb787156-188b-4fdf-94d6-f90cd1a53f50",
+      "id": "b63d48d1-8469-41d9-834c-f0503a9bd7ac",
       "instrumentId": "bb25c6ee-a8d6-402d-b971-67f1e582c69a",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 国内債券インデックス",
       "sortOrder": 7,
@@ -682,6 +762,24 @@
           "valueName": "債券"
         },
         {
+          "schemeCode": "ideco_axis_40470d15",
+          "schemeName": "主要資産：資産分類",
+          "valueCode": "bond",
+          "valueName": "債券"
+        },
+        {
+          "schemeCode": "ideco_axis_7452352e",
+          "schemeName": "主要資産：地域分類",
+          "valueCode": "domestic",
+          "valueName": "国内"
+        },
+        {
+          "schemeCode": "ideco_axis_9b6ea403",
+          "schemeName": "主要資産",
+          "valueCode": "domestic_bond",
+          "valueName": "国内債券"
+        },
+        {
           "schemeCode": "ideco_instrument_status",
           "schemeName": "ステータス",
           "valueCode": "exclusion_pending",
@@ -692,12 +790,6 @@
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託"
-        },
-        {
-          "schemeCode": "ideco_product_category",
-          "schemeName": "商品分類",
-          "valueCode": "domestic_bond",
-          "valueName": "国内債券"
         },
         {
           "schemeCode": "ideco_product_group",
@@ -726,7 +818,7 @@
       ]
     },
     {
-      "id": "989a3084-94f1-423f-b95f-e6afd9148c80",
+      "id": "25bb5a36-c7f4-466e-a02e-0d7fb2e72afe",
       "instrumentId": "f74a084e-8eee-45c3-abef-a9337b908b01",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 先進国債券インデックス",
       "sortOrder": 8,
@@ -787,16 +879,28 @@
           "valueName": "債券"
         },
         {
+          "schemeCode": "ideco_axis_40470d15",
+          "schemeName": "主要資産：資産分類",
+          "valueCode": "bond",
+          "valueName": "債券"
+        },
+        {
+          "schemeCode": "ideco_axis_7452352e",
+          "schemeName": "主要資産：地域分類",
+          "valueCode": "foreign",
+          "valueName": "海外"
+        },
+        {
+          "schemeCode": "ideco_axis_9b6ea403",
+          "schemeName": "主要資産",
+          "valueCode": "foreign_bond",
+          "valueName": "海外債券"
+        },
+        {
           "schemeCode": "ideco_major_category",
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託"
-        },
-        {
-          "schemeCode": "ideco_product_category",
-          "schemeName": "商品分類",
-          "valueCode": "foreign_bond",
-          "valueName": "海外債券"
         },
         {
           "schemeCode": "ideco_product_group",
@@ -825,7 +929,7 @@
       ]
     },
     {
-      "id": "066855d8-b850-41b5-b129-6cab1c2cc7b0",
+      "id": "35ac5bfa-5491-4cff-95d4-3590b026312d",
       "instrumentId": "d642675f-5dd0-42df-8feb-63429b27ca60",
       "instrumentName": "ｉＦｒｅｅ 新興国債券インデックス",
       "sortOrder": 9,
@@ -886,16 +990,28 @@
           "valueName": "債券"
         },
         {
+          "schemeCode": "ideco_axis_40470d15",
+          "schemeName": "主要資産：資産分類",
+          "valueCode": "bond",
+          "valueName": "債券"
+        },
+        {
+          "schemeCode": "ideco_axis_7452352e",
+          "schemeName": "主要資産：地域分類",
+          "valueCode": "foreign",
+          "valueName": "海外"
+        },
+        {
+          "schemeCode": "ideco_axis_9b6ea403",
+          "schemeName": "主要資産",
+          "valueCode": "foreign_bond",
+          "valueName": "海外債券"
+        },
+        {
           "schemeCode": "ideco_major_category",
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託"
-        },
-        {
-          "schemeCode": "ideco_product_category",
-          "schemeName": "商品分類",
-          "valueCode": "foreign_bond",
-          "valueName": "海外債券"
         },
         {
           "schemeCode": "ideco_product_group",
@@ -924,7 +1040,7 @@
       ]
     },
     {
-      "id": "da769688-55a0-4c02-90c0-56c1871fc31e",
+      "id": "144d2136-cecf-4daa-9dc5-d51ce2de2079",
       "instrumentId": "37996eea-0305-4a45-8400-996f1962292c",
       "instrumentName": "ニッセイＪリートインデックスファンド（購入・換金手数料なし）",
       "sortOrder": 10,
@@ -985,6 +1101,24 @@
           "valueName": "不動産"
         },
         {
+          "schemeCode": "ideco_axis_40470d15",
+          "schemeName": "主要資産：資産分類",
+          "valueCode": "real_estate",
+          "valueName": "不動産"
+        },
+        {
+          "schemeCode": "ideco_axis_7452352e",
+          "schemeName": "主要資産：地域分類",
+          "valueCode": "domestic",
+          "valueName": "国内"
+        },
+        {
+          "schemeCode": "ideco_axis_9b6ea403",
+          "schemeName": "主要資産",
+          "valueCode": "domestic_reit",
+          "valueName": "国内不動産投信"
+        },
+        {
           "schemeCode": "ideco_major_category",
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
@@ -1017,7 +1151,7 @@
       ]
     },
     {
-      "id": "9897588d-0417-4b54-8a72-de04c085f013",
+      "id": "eb35799d-d27f-4df9-a3f4-061fd5962369",
       "instrumentId": "c991d741-dcd5-479f-abd9-7da4a97e7547",
       "instrumentName": "三井住友・ＤＣ外国リートインデックスファンド",
       "sortOrder": 11,
@@ -1078,6 +1212,24 @@
           "valueName": "不動産"
         },
         {
+          "schemeCode": "ideco_axis_40470d15",
+          "schemeName": "主要資産：資産分類",
+          "valueCode": "real_estate",
+          "valueName": "不動産"
+        },
+        {
+          "schemeCode": "ideco_axis_7452352e",
+          "schemeName": "主要資産：地域分類",
+          "valueCode": "foreign",
+          "valueName": "海外"
+        },
+        {
+          "schemeCode": "ideco_axis_9b6ea403",
+          "schemeName": "主要資産",
+          "valueCode": "foreign_reit",
+          "valueName": "海外不動産投信"
+        },
+        {
           "schemeCode": "ideco_major_category",
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
@@ -1110,7 +1262,7 @@
       ]
     },
     {
-      "id": "53a45203-9b35-4a22-a62f-9d9f0762d987",
+      "id": "96d35897-a189-4865-97b4-09de03b6a5fd",
       "instrumentId": "ba158649-918a-42c7-824b-021765191743",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ バランス（８資産均等型）",
       "sortOrder": 12,
@@ -1203,7 +1355,7 @@
       ]
     },
     {
-      "id": "1d0b841d-707b-4dc3-a65c-26818dc12100",
+      "id": "7c3cd8d9-dee1-426e-b748-53e7124783dc",
       "instrumentId": "47ccafe2-9d8f-49a7-b922-cf2e484a7860",
       "instrumentName": "ｉＦｒｅｅ 年金バランス",
       "sortOrder": 13,
@@ -1296,7 +1448,7 @@
       ]
     },
     {
-      "id": "31566a1f-6432-41d7-ad70-e28e91645977",
+      "id": "4119d083-ba94-4e5b-b6a1-65352c271c07",
       "instrumentId": "68b9b628-c237-4397-8530-c099d33c6658",
       "instrumentName": "三菱ＵＦＪ 純金ファンド（愛称：ファインゴールド）",
       "sortOrder": 14,
@@ -1389,7 +1541,7 @@
       ]
     },
     {
-      "id": "7053b4d3-f9e2-46ee-b9d0-880f95780ef9",
+      "id": "31a1875b-1a53-4ff7-9997-da3ac77e10c6",
       "instrumentId": "53bdddb7-cab9-48eb-9f3e-9bf731df27b7",
       "instrumentName": "セレブライフ・ストーリー2045",
       "sortOrder": 15,

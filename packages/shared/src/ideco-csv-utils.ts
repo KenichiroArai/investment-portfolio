@@ -13,6 +13,19 @@ export function stripUtf8Bom(content: string): string {
   return result;
 }
 
+export function stableIdecoCodeSuffix(label: string): string {
+  let result = "";
+
+  let hash = 0x811c9dc5;
+  for (let index = 0; index < label.length; index += 1) {
+    hash ^= label.charCodeAt(index);
+    hash = Math.imul(hash, 0x01000193);
+  }
+
+  result = (hash >>> 0).toString(16).padStart(8, "0");
+  return result;
+}
+
 export function parseJapaneseInteger(value: string): number {
   let result = Number.NaN;
 

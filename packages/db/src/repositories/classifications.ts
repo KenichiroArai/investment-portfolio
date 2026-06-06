@@ -1,4 +1,4 @@
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray, notInArray } from "drizzle-orm";
 import { isIdecoAnalysisSchemeCode } from "@repo/shared";
 
 import type { AppDatabase } from "../client";
@@ -118,6 +118,109 @@ export async function createClassificationValue(
   };
 
   await db.insert(classificationValues).values(result);
+  return result;
+}
+
+export async function listClassificationValuesBySchemeId(
+  db: AppDatabase,
+  schemeId: string,
+) {
+  let result: (typeof classificationValues.$inferSelect)[] = [];
+
+  result = await db
+    .select()
+    .from(classificationValues)
+    .where(eq(classificationValues.schemeId, schemeId));
+  return result;
+}
+
+export async function updateClassificationValue(
+  db: AppDatabase,
+  valueId: string,
+  params: { name: string; sortOrder: number },
+) {
+  let result: void = undefined;
+
+  await db
+    .update(classificationValues)
+    .set({
+      name: params.name,
+      sortOrder: params.sortOrder,
+    })
+    .where(eq(classificationValues.id, valueId));
+
+  return result;
+}
+
+export async function deleteClassificationValuesBySchemeIdNotInCodes(
+  db: AppDatabase,
+  schemeId: string,
+  keepCodes: string[],
+) {
+  let result: void = undefined;
+
+  if (keepCodes.length === 0) {
+    await db
+      .delete(classificationValues)
+      .where(eq(classificationValues.schemeId, schemeId));
+    return result;
+  }
+
+  await db
+    .delete(classificationValues)
+    .where(
+      and(
+        eq(classificationValues.schemeId, schemeId),
+        notInArray(classificationValues.code, keepCodes),
+      ),
+    );
+
+  return result;
+}
+
+export async function listClassificationSchemesByPortfolioCode(
+  db: AppDatabase,
+  portfolioCode: string,
+) {
+  let result: (typeof classificationSchemes.$inferSelect)[] = [];
+
+  const portfolio = await findPortfolioByCode(db, portfolioCode);
+  if (!portfolio) {
+    return result;
+  }
+
+  result = await db
+    .select()
+    .from(classificationSchemes)
+    .where(eq(classificationSchemes.portfolioId, portfolio.id));
+  return result;
+}
+
+export async function updateClassificationSchemeName(
+  db: AppDatabase,
+  schemeId: string,
+  name: string,
+) {
+  let result: void = undefined;
+
+  await db
+    .update(classificationSchemes)
+    .set({ name })
+    .where(eq(classificationSchemes.id, schemeId));
+
+  return result;
+}
+
+export async function deleteClassificationSchemeById(
+  db: AppDatabase,
+  schemeId: string,
+) {
+  let result: void = undefined;
+
+  await db
+    .delete(classificationSchemes)
+    .where(eq(classificationSchemes.id, schemeId));
+
   return result;
 }
 

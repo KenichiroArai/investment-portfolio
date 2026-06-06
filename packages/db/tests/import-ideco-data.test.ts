@@ -12,6 +12,11 @@ import {
   getIdecoCurrentSnapshot,
   importIdecoData,
 } from "../src/import-ideco-data";
+import {
+  findClassificationValueBySchemeAndCode,
+  findSchemeByPortfolioCodeAndSchemeCode,
+  listAnalysisSchemesForPortfolio,
+} from "../src/repositories/classifications";
 import { createTestDb } from "../src/test-utils";
 
 const FIXTURE_DIR = resolve(import.meta.dirname, "fixtures/ideco");
@@ -120,5 +125,130 @@ describe("importIdecoData", () => {
 `,
     });
     expect(outcome).toBeNull();
+  });
+
+  it("removes analysis schemes and values that disappear from csv", async () => {
+    const db = setup();
+    const baseFiles = {
+      productTypesCsv: readFixture("商品タイプ.csv"),
+      instrumentsCsv: readFixture("銘柄の情報.csv"),
+      holdingsCsv: readFixture("明細.csv"),
+    };
+    const fullAnalysisCsv = `分析軸名,カテゴリ名,メンバー名
+地域分類,国内,国内株式
+資産分類,株式,国内株式
+商品グループ,主要資産,国内株式
+`;
+    const reducedAnalysisCsv = `分析軸名,カテゴリ名,メンバー名
+地域分類,国内,国内株式
+`;
+
+    const first = await importIdecoData(db, {
+      ...baseFiles,
+      analysisCsv: fullAnalysisCsv,
+    });
+    expect(first).not.toBeNull();
+
+    let assetClassScheme = await findSchemeByPortfolioCodeAndSchemeCode(
+      db,
+      "ideco",
+      IDECO_SCHEME_CODES.assetClass,
+    );
+    expect(assetClassScheme).not.toBeNull();
+
+    let productGroupScheme = await findSchemeByPortfolioCodeAndSchemeCode(
+      db,
+      "ideco",
+      IDECO_SCHEME_CODES.productGroup,
+    );
+    expect(productGroupScheme).not.toBeNull();
+
+    const second = await importIdecoData(db, {
+      ...baseFiles,
+      analysisCsv: reducedAnalysisCsv,
+    });
+    expect(second).not.toBeNull();
+
+    assetClassScheme = await findSchemeByPortfolioCodeAndSchemeCode(
+      db,
+      "ideco",
+      IDECO_SCHEME_CODES.assetClass,
+    );
+    expect(assetClassScheme).toBeNull();
+
+    productGroupScheme = await findSchemeByPortfolioCodeAndSchemeCode(
+      db,
+      "ideco",
+      IDECO_SCHEME_CODES.productGroup,
+    );
+    expect(productGroupScheme).toBeNull();
+
+    const regionScheme = await findSchemeByPortfolioCodeAndSchemeCode(
+      db,
+      "ideco",
+      IDECO_SCHEME_CODES.region,
+    );
+    expect(regionScheme).not.toBeNull();
+
+    const foreignRegion = await findClassificationValueBySchemeAndCode(
+      db,
+      regionScheme!.id,
+      "foreign",
+    );
+    expect(foreignRegion).toBeNull();
+
+    const analysisSchemes = await listAnalysisSchemesForPortfolio(db, "ideco");
+    expect(analysisSchemes.map((scheme) => scheme.schemeCode)).toEqual([
+      IDECO_SCHEME_CODES.productType,
+      IDECO_SCHEME_CODES.region,
+    ]);
+  });
+
+  it("removes product types that disappear from csv", async () => {
+    const db = setup();
+    const domesticInstrumentCsv = `No.,大分類,商品タイプ,商品タイプ(スタイル),ステータス,運用商品名,運用商品名(略称),提供・委託会社,信託報酬（％）（税込）,信託財産保留額（％）
+1,投資信託,国内株式,パッシブ,,ｅＭＡＸＩＳ Ｓｌｉｍ 国内株式（ＴＯＰＩＸ）,eMAXIS Slim 国内株式(TOPIX),三菱UFJアセットマネジメント,0.143以内,0
+`;
+    const domesticHoldingsCsv = `番号,日付,運用商品名,時価単価(1万口当り),残高数量,資産残高,購入金額,損益,損益率
+1,2026/06/02,eMAXIS Slim 国内株式(TOPIX),"31351","41773","130962","128324","2638","0.021"
+`;
+    const baseFiles = {
+      analysisCsv: readFixture("分析.csv"),
+    };
+
+    await importIdecoData(db, {
+      ...baseFiles,
+      productTypesCsv: `商品タイプ\n国内株式\n海外株式\n`,
+      instrumentsCsv: domesticInstrumentCsv,
+      holdingsCsv: domesticHoldingsCsv,
+    });
+
+    const productTypeScheme = await findSchemeByPortfolioCodeAndSchemeCode(
+      db,
+      "ideco",
+      IDECO_SCHEME_CODES.productType,
+    );
+    expect(productTypeScheme).not.toBeNull();
+
+    let foreignEquity = await findClassificationValueBySchemeAndCode(
+      db,
+      productTypeScheme!.id,
+      "foreign_equity",
+    );
+    expect(foreignEquity).not.toBeNull();
+
+    await importIdecoData(db, {
+      ...baseFiles,
+      productTypesCsv: `商品タイプ\n国内株式\n`,
+      instrumentsCsv: domesticInstrumentCsv,
+      holdingsCsv: domesticHoldingsCsv,
+    });
+
+    foreignEquity = await findClassificationValueBySchemeAndCode(
+      db,
+      productTypeScheme!.id,
+      "foreign_equity",
+    );
+    expect(foreignEquity).toBeNull();
   });
 });

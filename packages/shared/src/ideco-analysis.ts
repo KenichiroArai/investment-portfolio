@@ -1,4 +1,4 @@
-import { IdecoCsvError } from "./ideco-csv-utils";
+import { IdecoCsvError, stableIdecoCodeSuffix } from "./ideco-csv-utils";
 
 export type IdecoClassificationDefinition = {
   name: string;
@@ -280,7 +280,45 @@ export function resolveIdecoAnalysisAxisSchemeCode(axisName: string): string {
     return result;
   }
 
-  throw new IdecoCsvError(`未対応の分析軸名です: ${axisName}`);
+  result = `ideco_axis_${stableIdecoCodeSuffix(trimmed)}`;
+  return result;
+}
+
+export function tryResolveIdecoClassificationByName(
+  name: string,
+): IdecoClassificationDefinition | null {
+  let result: IdecoClassificationDefinition | null = null;
+
+  const trimmed = name.trim();
+  if (trimmed === "") {
+    return result;
+  }
+
+  const productType = PRODUCT_TYPE_BY_NAME.get(trimmed);
+  if (productType) {
+    result = productType;
+    return result;
+  }
+
+  const productGroup = PRODUCT_GROUP_BY_NAME.get(trimmed);
+  if (productGroup) {
+    result = productGroup;
+    return result;
+  }
+
+  const region = REGION_BY_NAME.get(trimmed);
+  if (region) {
+    result = region;
+    return result;
+  }
+
+  const assetClass = ASSET_CLASS_BY_NAME.get(trimmed);
+  if (assetClass) {
+    result = assetClass;
+    return result;
+  }
+
+  return result;
 }
 
 export function resolveIdecoAnalysisCategoryDefinition(
@@ -331,7 +369,16 @@ export function resolveIdecoAnalysisCategoryDefinition(
     return result;
   }
 
-  throw new IdecoCsvError(
-    `分析軸 ${schemeCode} のカテゴリ解決に未対応です: ${categoryName}`,
-  );
+  const known = tryResolveIdecoClassificationByName(trimmed);
+  if (known) {
+    result = known;
+    return result;
+  }
+
+  result = {
+    name: trimmed,
+    code: stableIdecoCodeSuffix(trimmed),
+    sortOrder: 0,
+  };
+  return result;
 }

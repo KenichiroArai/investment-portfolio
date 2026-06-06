@@ -8,6 +8,7 @@ import {
   IDECO_PRODUCT_TYPES,
   IDECO_SCHEME_CODES,
   IDECO_SCHEME_NAMES,
+  isIdecoAnalysisSchemeCode,
   parseIdecoAnalysisCsv,
   parseIdecoHoldingsCsv,
   parseIdecoInstrumentsCsv,
@@ -23,9 +24,14 @@ import type { AppDatabase } from "./client";
 import {
   createClassificationScheme,
   createClassificationValue,
+  deleteClassificationSchemeById,
+  deleteClassificationValuesBySchemeIdNotInCodes,
   findClassificationValueBySchemeAndCode,
   findSchemeByPortfolioCodeAndSchemeCode,
+  listClassificationSchemesByPortfolioCode,
   setInstrumentClassifications,
+  updateClassificationSchemeName,
+  updateClassificationValue,
 } from "./repositories/classifications";
 import {
   findInstrumentByAttributeTextValue,
@@ -99,7 +105,7 @@ async function ensureIdecoPortfolio(db: AppDatabase) {
   return result;
 }
 
-async function ensureSchemeWithValues(
+async function syncSchemeWithValues(
   db: AppDatabase,
   schemeCode: string,
   schemeName: string,
@@ -125,13 +131,29 @@ async function ensureSchemeWithValues(
     return result;
   }
 
+  if (scheme.name !== schemeName) {
+    await updateClassificationSchemeName(db, scheme.id, schemeName);
+  }
+
+  const keepCodes: string[] = [];
   for (const value of values) {
+    keepCodes.push(value.code);
+
     const existingValue = await findClassificationValueBySchemeAndCode(
       db,
       scheme.id,
       value.code,
     );
     if (existingValue) {
+      if (
+        existingValue.name !== value.name ||
+        existingValue.sortOrder !== value.sortOrder
+      ) {
+        await updateClassificationValue(db, existingValue.id, {
+          name: value.name,
+          sortOrder: value.sortOrder,
+        });
+      }
       continue;
     }
 
@@ -142,6 +164,8 @@ async function ensureSchemeWithValues(
       sortOrder: value.sortOrder,
     });
   }
+
+  await deleteClassificationValuesBySchemeIdNotInCodes(db, scheme.id, keepCodes);
 
   result = scheme.id;
   return result;
@@ -176,16 +200,13 @@ async function ensureClassificationValueId(
   return result;
 }
 
-async function seedIdecoClassifications(
+async function syncIdecoClassifications(
   db: AppDatabase,
   productTypeNames: string[],
 ) {
   let result: void = undefined;
 
   const productTypes = new Map<string, IdecoClassificationDefinition>();
-  for (const definition of IDECO_PRODUCT_TYPES) {
-    productTypes.set(definition.name, definition);
-  }
   for (const name of productTypeNames) {
     const definition = IDECO_PRODUCT_TYPES.find((item) => item.name === name);
     if (definition) {
@@ -193,7 +214,7 @@ async function seedIdecoClassifications(
     }
   }
 
-  const productTypeSchemeId = await ensureSchemeWithValues(
+  const productTypeSchemeId = await syncSchemeWithValues(
     db,
     IDECO_SCHEME_CODES.productType,
     IDECO_SCHEME_NAMES[IDECO_SCHEME_CODES.productType],
@@ -203,19 +224,19 @@ async function seedIdecoClassifications(
     return result;
   }
 
-  await ensureSchemeWithValues(
+  await syncSchemeWithValues(
     db,
     IDECO_SCHEME_CODES.majorCategory,
     IDECO_SCHEME_NAMES[IDECO_SCHEME_CODES.majorCategory],
     IDECO_MAJOR_CATEGORIES,
   );
-  await ensureSchemeWithValues(
+  await syncSchemeWithValues(
     db,
     IDECO_SCHEME_CODES.productStyle,
     IDECO_SCHEME_NAMES[IDECO_SCHEME_CODES.productStyle],
     IDECO_PRODUCT_STYLES,
   );
-  await ensureSchemeWithValues(
+  await syncSchemeWithValues(
     db,
     IDECO_SCHEME_CODES.instrumentStatus,
     IDECO_SCHEME_NAMES[IDECO_SCHEME_CODES.instrumentStatus],
@@ -254,24 +275,52 @@ function buildAnalysisValuesForAxis(
   return result;
 }
 
-async function seedAnalysisFromCsv(
+async function syncAnalysisFromCsv(
   db: AppDatabase,
   analysisParsed: ParseIdecoAnalysisCsvResult,
 ) {
   let result: void = undefined;
 
+  const axisSchemeCodes = new Set(
+    analysisParsed.axes.map((axis) => axis.schemeCode),
+  );
+
   for (const axis of analysisParsed.axes) {
+    if (axis.schemeCode === IDECO_SCHEME_CODES.productType) {
+      continue;
+    }
+
     const values = buildAnalysisValuesForAxis(axis.schemeCode, analysisParsed);
     if (values.length === 0) {
       continue;
     }
 
-    await ensureSchemeWithValues(
+    await syncSchemeWithValues(
       db,
       axis.schemeCode,
       axis.axisName,
       values,
     );
+  }
+
+  const existingSchemes = await listClassificationSchemesByPortfolioCode(
+    db,
+    IDECO_PORTFOLIO_CODE,
+  );
+  for (const scheme of existingSchemes) {
+    if (!isIdecoAnalysisSchemeCode(scheme.code)) {
+      continue;
+    }
+
+    if (scheme.code === IDECO_SCHEME_CODES.productType) {
+      continue;
+    }
+
+    if (axisSchemeCodes.has(scheme.code)) {
+      continue;
+    }
+
+    await deleteClassificationSchemeById(db, scheme.id);
   }
 
   return result;
@@ -482,8 +531,8 @@ export async function importIdecoData(
     ...productTypesParsed.rows.map((row) => row.name),
     ...instrumentsParsed.rows.map((row) => row.productTypeName),
   ];
-  await seedIdecoClassifications(db, productTypeNames);
-  await seedAnalysisFromCsv(db, analysisParsed);
+  await syncIdecoClassifications(db, productTypeNames);
+  await syncAnalysisFromCsv(db, analysisParsed);
 
   const counters = { created: 0, reused: 0 };
   const instrumentIdByShortName = await importInstrumentsFromParsed(
