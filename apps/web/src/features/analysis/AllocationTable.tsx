@@ -1,8 +1,15 @@
-import type { AllocationSliceWithLines } from "@repo/shared";
-import { Fragment } from "react";
+"use client";
 
+import type { AllocationSliceWithLines } from "@repo/shared";
+import { sortAllocationSlices } from "@repo/shared";
+import { Fragment, useMemo } from "react";
+
+import { SortableTableHeader } from "@/components/SortableTableHeader";
 import { AllocationLineBreakdown } from "@/features/analysis/AllocationLineBreakdown";
+import { useTableSort } from "@/hooks/useTableSort";
 import { formatPercent, formatYen } from "@/lib/format-yen";
+
+type AllocationSortColumn = "valueName" | "marketValue" | "weight";
 
 type AllocationTableProps = {
   slices: AllocationSliceWithLines[];
@@ -23,23 +30,49 @@ export function AllocationTable({
   onSliceLeave,
   onToggleExpand,
 }: AllocationTableProps) {
+  const { sortColumn, sortDirection, toggleSort } =
+    useTableSort<AllocationSortColumn>("marketValue", "desc");
+
+  const sortedSlices = useMemo(() => {
+    let result = sortAllocationSlices(slices, sortColumn, sortDirection);
+    return result;
+  }, [slices, sortColumn, sortDirection]);
+
   let result = (
     <table className="allocation-table">
       <thead>
         <tr>
           <th aria-label="展開" />
-          <th>分類</th>
-          <th>評価額</th>
-          <th>構成比</th>
+          <SortableTableHeader
+            label="分類"
+            column="valueName"
+            activeColumn={sortColumn}
+            direction={sortDirection}
+            onSort={toggleSort}
+          />
+          <SortableTableHeader
+            label="評価額"
+            column="marketValue"
+            activeColumn={sortColumn}
+            direction={sortDirection}
+            onSort={toggleSort}
+          />
+          <SortableTableHeader
+            label="構成比"
+            column="weight"
+            activeColumn={sortColumn}
+            direction={sortDirection}
+            onSort={toggleSort}
+          />
         </tr>
       </thead>
       <tbody>
-        {slices.length === 0 ? (
+        {sortedSlices.length === 0 ? (
           <tr>
             <td colSpan={4}>該当する分類タグがありません。</td>
           </tr>
         ) : (
-          slices.map((slice) => {
+          sortedSlices.map((slice) => {
             const isExpanded = expandedValueCode === slice.valueCode;
             const isHighlighted = highlightedValueCode === slice.valueCode;
             const rowClassName = isHighlighted

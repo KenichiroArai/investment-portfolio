@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { HoldingsDetailTable } from "@/features/holdings/HoldingsDetailTable";
@@ -84,5 +84,37 @@ describe("HoldingsDetailTable", () => {
     expect(screen.getByText("国内")).toBeInTheDocument();
     expect(screen.getByText("株式")).toBeInTheDocument();
     expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("sorts rows when a column header is clicked", () => {
+    const lines = [
+      makeLine({
+        id: "low",
+        instrumentName: "評価額小",
+        marketValueMinor: 100,
+      }),
+      makeLine({
+        id: "high",
+        instrumentName: "評価額大",
+        marketValueMinor: 500,
+      }),
+    ];
+
+    render(
+      <HoldingsDetailTable lines={lines} classificationSchemes={[]} />,
+    );
+
+    const rows = () =>
+      screen.getAllByRole("row").slice(1).map((row) => row.textContent);
+
+    expect(rows()[0]).toContain("評価額小");
+
+    fireEvent.click(screen.getByRole("button", { name: /資産残高/ }));
+
+    expect(rows()[0]).toContain("評価額小");
+
+    fireEvent.click(screen.getByRole("button", { name: /資産残高/ }));
+
+    expect(rows()[0]).toContain("評価額大");
   });
 });

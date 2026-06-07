@@ -1,13 +1,19 @@
+"use client";
+
 import {
   IDECO_KAKEIBO_METRIC_CODES,
+  sortHoldingLineDetailRows,
   type HoldingLineMetricDto,
 } from "@repo/shared";
+import { useMemo } from "react";
 
+import { SortableTableHeader } from "@/components/SortableTableHeader";
 import {
   formatLineMetric,
   formatMetricLabel,
 } from "@/lib/format-holding-line";
 import { formatPercent, formatYen } from "@/lib/format-yen";
+import { useTableSort } from "@/hooks/useTableSort";
 
 export const HOLDING_LINE_DETAIL_WEIGHT_COLUMN_LABEL = "分類内構成比";
 
@@ -20,6 +26,15 @@ export type HoldingLineDetailRow = {
   metrics: HoldingLineMetricDto[];
   portfolioName?: string;
 };
+
+type HoldingLineDetailSortColumn =
+  | "portfolioName"
+  | "instrumentName"
+  | "quantity"
+  | "marketValue"
+  | "weight"
+  | "unrealizedGain"
+  | "unrealizedGainRate";
 
 type HoldingLineDetailTableProps = {
   rows: HoldingLineDetailRow[];
@@ -34,21 +49,77 @@ export function HoldingLineDetailTable({
   showPortfolioColumn = false,
   className = "holding-line-detail-table",
 }: HoldingLineDetailTableProps) {
+  const { sortColumn, sortDirection, toggleSort } =
+    useTableSort<HoldingLineDetailSortColumn>("marketValue", "desc");
+
+  const sortedRows = useMemo(() => {
+    let result = sortHoldingLineDetailRows(rows, sortColumn, sortDirection);
+    return result;
+  }, [rows, sortColumn, sortDirection]);
+
   let result = (
     <table className={className}>
       <thead>
         <tr>
-          {showPortfolioColumn ? <th>口座</th> : null}
-          <th>銘柄</th>
-          <th>口数</th>
-          <th>評価額</th>
-          <th>{weightColumnLabel}</th>
-          <th>{formatMetricLabel(IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor)}</th>
-          <th>{formatMetricLabel(IDECO_KAKEIBO_METRIC_CODES.unrealizedGainRate)}</th>
+          {showPortfolioColumn ? (
+            <SortableTableHeader
+              label="口座"
+              column="portfolioName"
+              activeColumn={sortColumn}
+              direction={sortDirection}
+              onSort={toggleSort}
+            />
+          ) : null}
+          <SortableTableHeader
+            label="銘柄"
+            column="instrumentName"
+            activeColumn={sortColumn}
+            direction={sortDirection}
+            onSort={toggleSort}
+          />
+          <SortableTableHeader
+            label="口数"
+            column="quantity"
+            activeColumn={sortColumn}
+            direction={sortDirection}
+            onSort={toggleSort}
+          />
+          <SortableTableHeader
+            label="評価額"
+            column="marketValue"
+            activeColumn={sortColumn}
+            direction={sortDirection}
+            onSort={toggleSort}
+          />
+          <SortableTableHeader
+            label={weightColumnLabel}
+            column="weight"
+            activeColumn={sortColumn}
+            direction={sortDirection}
+            onSort={toggleSort}
+          />
+          <SortableTableHeader
+            label={formatMetricLabel(
+              IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor,
+            )}
+            column="unrealizedGain"
+            activeColumn={sortColumn}
+            direction={sortDirection}
+            onSort={toggleSort}
+          />
+          <SortableTableHeader
+            label={formatMetricLabel(
+              IDECO_KAKEIBO_METRIC_CODES.unrealizedGainRate,
+            )}
+            column="unrealizedGainRate"
+            activeColumn={sortColumn}
+            direction={sortDirection}
+            onSort={toggleSort}
+          />
         </tr>
       </thead>
       <tbody>
-        {rows.map((row) => {
+        {sortedRows.map((row) => {
           let tableRow = (
             <tr key={row.id}>
               {showPortfolioColumn ? (

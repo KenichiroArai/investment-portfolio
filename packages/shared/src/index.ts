@@ -12,4 +12,5 @@ export * from "./ideco-instruments-csv";
 export * from "./ideco-portfolio-metrics";
 export * from "./ideco-product-types-csv";
 export * from "./schemas";
+export * from "./table-sort";
 export * from "./types";
