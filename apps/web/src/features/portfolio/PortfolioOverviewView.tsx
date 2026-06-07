@@ -24,15 +24,32 @@ type PortfolioOverviewViewProps = {
   portfolioCode: string;
 };
 
+const GAIN_RATE_ON_CONTRIBUTIONS_HINT = "損益 ÷ 拠出金累計";
+const GAIN_RATE_ON_ASSET_BALANCE_HINT = "損益 ÷ 資産残高";
+
 type AssetStatusFieldProps = {
   label: string;
   value: string;
+  labelHint?: string;
 };
 
-function AssetStatusField({ label, value }: AssetStatusFieldProps) {
+function AssetStatusField({ label, value, labelHint }: AssetStatusFieldProps) {
+  let labelNode: ReactNode = label;
+
+  if (labelHint) {
+    labelNode = (
+      <span className="asset-status__label-hint" tabIndex={0}>
+        {label}
+        <span className="asset-status__hint-popup" role="tooltip">
+          {labelHint}
+        </span>
+      </span>
+    );
+  }
+
   let result = (
     <div className="asset-status__field">
-      <div className="asset-status__label">{label}</div>
+      <div className="asset-status__label">{labelNode}</div>
       <div className="asset-status__value">{value}</div>
     </div>
   );
@@ -169,12 +186,14 @@ export function PortfolioOverviewView({
           <AssetStatusField
             label="損益率"
             value={gainRateOnContributionsLabel}
+            labelHint={GAIN_RATE_ON_CONTRIBUTIONS_HINT}
           />
         </div>
         <div className="asset-status__row">
           <AssetStatusField
             label="利益率"
             value={gainRateOnAssetBalanceLabel}
+            labelHint={GAIN_RATE_ON_ASSET_BALANCE_HINT}
           />
         </div>
       </section>

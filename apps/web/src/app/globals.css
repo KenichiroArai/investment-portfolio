@@ -535,6 +535,41 @@ main,
   align-items: center;
 }
 
+.asset-status__label-hint {
+  position: relative;
+  cursor: help;
+  text-decoration: underline dotted;
+  text-underline-offset: 0.15em;
+}
+
+.asset-status__hint-popup {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 0.35rem);
+  z-index: 10;
+  min-width: max-content;
+  max-width: 16rem;
+  padding: 0.375rem 0.5rem;
+  background: #1f2937;
+  color: #f9fafb;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 0.25rem;
+  white-space: nowrap;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    opacity 0.15s,
+    visibility 0.15s;
+}
+
+.asset-status__label-hint:hover .asset-status__hint-popup,
+.asset-status__label-hint:focus-visible .asset-status__hint-popup {
+  visibility: visible;
+  opacity: 1;
+}
+
 .asset-status__value {
   background: #fff;
   padding: 0.625rem 0.75rem;
@@ -569,6 +604,11 @@ main,
 
   .asset-status__label {
     background: #171717;
+  }
+
+  .asset-status__hint-popup {
+    background: #374151;
+    color: #f3f4f6;
   }
 
   .asset-status__value {
