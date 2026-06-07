@@ -89,6 +89,7 @@ describe("ideco csv parsers", () => {
 商品グループ,主要資産,国内株式
 `,
     );
+    expect(analysis.productTypeAxisName).toBe("商品タイプ");
     expect(analysis.axes.map((axis) => axis.axisName)).toEqual([
       "商品タイプ",
       "地域分類",
@@ -96,6 +97,9 @@ describe("ideco csv parsers", () => {
       "商品分類",
       "商品グループ",
     ]);
+    expect(
+      analysis.axes.find((axis) => axis.axisName === "商品タイプ")?.schemeCode,
+    ).toBe("ideco_product_type");
     expect(analysis.memberMappings).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -105,6 +109,22 @@ describe("ideco csv parsers", () => {
         }),
       ]),
     );
+  });
+
+  it("uses sentinel row axis name as product type display label", () => {
+    const analysis = parseIdecoAnalysisCsv(
+      `分析軸名,カテゴリ名,メンバー名
+すべて,すべて,all
+地域分類,国内,国内株式
+資産分類,株式,国内株式
+`,
+    );
+    expect(analysis.productTypeAxisName).toBe("すべて");
+    expect(analysis.axes[0]).toEqual({
+      axisName: "すべて",
+      schemeCode: "ideco_product_type",
+      sortOrder: 0,
+    });
   });
 
   it("parses analysis csv with major asset axis and unknown axes", () => {

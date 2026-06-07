@@ -127,6 +127,39 @@ describe("importIdecoData", () => {
     expect(outcome).toBeNull();
   });
 
+  it("applies product type axis display name from analysis csv sentinel row", async () => {
+    const db = setup();
+    const analysisCsv = `分析軸名,カテゴリ名,メンバー名
+すべて,すべて,all
+地域分類,国内,国内株式
+資産分類,株式,国内株式
+`;
+    const outcome = await importIdecoData(db, {
+      productTypesCsv: readFixture("商品タイプ.csv"),
+      analysisCsv,
+      instrumentsCsv: readFixture("銘柄の情報.csv"),
+      holdingsCsv: readFixture("明細.csv"),
+    });
+    expect(outcome).not.toBeNull();
+
+    const productTypeScheme = await findSchemeByPortfolioCodeAndSchemeCode(
+      db,
+      "ideco",
+      IDECO_SCHEME_CODES.productType,
+    );
+    expect(productTypeScheme?.name).toBe("すべて");
+
+    const snapshot = await getIdecoCurrentSnapshot(db);
+    expect(snapshot?.analysisSchemes).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          schemeCode: IDECO_SCHEME_CODES.productType,
+          schemeName: "すべて",
+        }),
+      ]),
+    );
+  });
+
   it("removes analysis schemes and values that disappear from csv", async () => {
     const db = setup();
     const baseFiles = {

@@ -203,6 +203,7 @@ async function ensureClassificationValueId(
 async function syncIdecoClassifications(
   db: AppDatabase,
   productTypeNames: string[],
+  productTypeAxisName: string | null,
 ) {
   let result: void = undefined;
 
@@ -214,10 +215,13 @@ async function syncIdecoClassifications(
     }
   }
 
+  const productTypeSchemeName =
+    productTypeAxisName ?? IDECO_SCHEME_NAMES[IDECO_SCHEME_CODES.productType];
+
   const productTypeSchemeId = await syncSchemeWithValues(
     db,
     IDECO_SCHEME_CODES.productType,
-    IDECO_SCHEME_NAMES[IDECO_SCHEME_CODES.productType],
+    productTypeSchemeName,
     [...productTypes.values()],
   );
   if (!productTypeSchemeId) {
@@ -531,7 +535,11 @@ export async function importIdecoData(
     ...productTypesParsed.rows.map((row) => row.name),
     ...instrumentsParsed.rows.map((row) => row.productTypeName),
   ];
-  await syncIdecoClassifications(db, productTypeNames);
+  await syncIdecoClassifications(
+    db,
+    productTypeNames,
+    analysisParsed.productTypeAxisName,
+  );
   await syncAnalysisFromCsv(db, analysisParsed);
 
   const counters = { created: 0, reused: 0 };

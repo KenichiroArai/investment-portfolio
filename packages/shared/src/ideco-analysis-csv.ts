@@ -1,4 +1,5 @@
 import {
+  IDECO_SCHEME_CODES,
   resolveIdecoAnalysisAxisSchemeCode,
   resolveIdecoAnalysisCategoryDefinition,
   resolveIdecoProductType,
@@ -51,6 +52,8 @@ export type ParseIdecoAnalysisCsvResult = {
   axes: IdecoAnalysisAxis[];
   memberMappings: IdecoAnalysisMemberMapping[];
   mappings: IdecoAnalysisMappingRow[];
+  /** `カテゴリ名=すべて` かつ `メンバー名=all` の宣言行から得る商品タイプ軸の表示名 */
+  productTypeAxisName: string | null;
 };
 
 function assertHeader(
@@ -97,6 +100,34 @@ function isLegacyAnalysisHeader(headerRow: string[]): boolean {
     }
   }
 
+  result = true;
+  return result;
+}
+
+function isProductTypeAxisSentinelRow(
+  categoryName: string,
+  memberName: string,
+): boolean {
+  let result = categoryName.trim() === "すべて" && memberName.trim() === "all";
+  return result;
+}
+
+function pushProductTypeAnalysisAxis(
+  axes: IdecoAnalysisAxis[],
+  productTypeAxisAdded: boolean,
+  axisName: string,
+): boolean {
+  let result = productTypeAxisAdded;
+
+  if (result) {
+    return result;
+  }
+
+  axes.push({
+    axisName: axisName.trim(),
+    schemeCode: IDECO_SCHEME_CODES.productType,
+    sortOrder: axes.length,
+  });
   result = true;
   return result;
 }
@@ -158,6 +189,7 @@ function parseLegacyAnalysisRows(records: string[][]): ParseIdecoAnalysisCsvResu
     axes: [],
     memberMappings: [],
     mappings: [],
+    productTypeAxisName: null,
   };
 
   const axisNames: string[] = [];
@@ -215,10 +247,12 @@ function parseModernAnalysisRows(records: string[][]): ParseIdecoAnalysisCsvResu
     axes: [],
     memberMappings: [],
     mappings: [],
+    productTypeAxisName: null,
   };
 
   const axisNames: string[] = [];
   const mappings: IdecoAnalysisMappingRow[] = [];
+  let productTypeAxisAdded = false;
 
   for (let index = 1; index < records.length; index += 1) {
     const cells = records[index];
@@ -227,6 +261,16 @@ function parseModernAnalysisRows(records: string[][]): ParseIdecoAnalysisCsvResu
     const memberName = cells[2]?.trim() ?? "";
 
     if (axisName === "") {
+      continue;
+    }
+
+    if (isProductTypeAxisSentinelRow(categoryName, memberName)) {
+      result.productTypeAxisName = axisName;
+      productTypeAxisAdded = pushProductTypeAnalysisAxis(
+        result.axes,
+        productTypeAxisAdded,
+        axisName,
+      );
       continue;
     }
 
@@ -271,6 +315,7 @@ export function parseIdecoAnalysisCsv(content: string): ParseIdecoAnalysisCsvRes
     axes: [],
     memberMappings: [],
     mappings: [],
+    productTypeAxisName: null,
   };
 
   const normalized = stripUtf8Bom(content).trim();
