@@ -12,6 +12,7 @@ const snapshotFixture = {
     { schemeCode: "ideco_region", schemeName: "地域分類" },
     { schemeCode: "ideco_asset_class", schemeName: "資産分類" },
   ],
+  metrics: [],
   lines: [
     {
       id: "line-1",

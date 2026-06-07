@@ -35,6 +35,13 @@ export const holdingLineMetricInputSchema = z.object({
   textValue: z.string().max(512).nullable().optional(),
 });
 
+export const portfolioSnapshotMetricInputSchema = z.object({
+  code: z.string().min(1).max(64),
+  integerValue: z.number().int().nullable().optional(),
+  realValue: z.number().nullable().optional(),
+  textValue: z.string().max(512).nullable().optional(),
+});
+
 export const holdingLineInputSchema = z.object({
   instrumentId: z.string().uuid(),
   quantity: z.number().positive(),
@@ -47,6 +54,7 @@ export const holdingLineInputSchema = z.object({
 export const replaceCurrentSnapshotSchema = z.object({
   asOfDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   lines: z.array(holdingLineInputSchema),
+  metrics: z.array(portfolioSnapshotMetricInputSchema).optional(),
 });
 
 export type CreatePortfolioInput = z.infer<typeof createPortfolioSchema>;

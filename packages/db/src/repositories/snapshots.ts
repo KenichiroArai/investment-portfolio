@@ -6,6 +6,7 @@ import {
   holdingLineMetrics,
   holdingLines,
   instruments,
+  portfolioSnapshotMetrics,
   portfolioSnapshots,
 } from "../schema/index";
 import {
@@ -16,6 +17,13 @@ import { getAttributesForInstruments } from "./instruments";
 import { findPortfolioByCode } from "./portfolios";
 
 export type HoldingLineMetricInput = {
+  code: string;
+  integerValue?: number | null;
+  realValue?: number | null;
+  textValue?: string | null;
+};
+
+export type PortfolioSnapshotMetricInput = {
   code: string;
   integerValue?: number | null;
   realValue?: number | null;
@@ -35,6 +43,7 @@ export type ReplaceCurrentSnapshotParams = {
   portfolioCode: string;
   asOfDate: string;
   lines: HoldingLineInput[];
+  metrics?: PortfolioSnapshotMetricInput[];
 };
 
 type MetricRow = {
@@ -70,6 +79,13 @@ type LineDto = {
   }>;
 };
 
+type SnapshotMetricRow = {
+  code: string;
+  integerValue: number | null;
+  realValue: number | null;
+  textValue: string | null;
+};
+
 type CurrentSnapshotDto = {
   id: string;
   portfolioCode: string;
@@ -79,8 +95,37 @@ type CurrentSnapshotDto = {
     schemeCode: string;
     schemeName: string;
   }>;
+  metrics: SnapshotMetricRow[];
   lines: LineDto[];
 };
+
+async function getMetricsForSnapshot(db: AppDatabase, snapshotId: string) {
+  let result: SnapshotMetricRow[] = [];
+
+  const rows = await db
+    .select({
+      code: portfolioSnapshotMetrics.code,
+      integerValue: portfolioSnapshotMetrics.integerValue,
+      realValue: portfolioSnapshotMetrics.realValue,
+      textValue: portfolioSnapshotMetrics.textValue,
+    })
+    .from(portfolioSnapshotMetrics)
+    .where(eq(portfolioSnapshotMetrics.snapshotId, snapshotId));
+
+  result = [...rows]
+    .sort((a, b) => a.code.localeCompare(b.code))
+    .map((row) => {
+      let metric: SnapshotMetricRow = {
+        code: row.code,
+        integerValue: row.integerValue,
+        realValue: row.realValue,
+        textValue: row.textValue,
+      };
+      return metric;
+    });
+
+  return result;
+}
 
 async function getMetricsForHoldingLines(
   db: AppDatabase,
@@ -262,6 +307,7 @@ export async function getCurrentSnapshot(db: AppDatabase, portfolioCode: string)
   });
 
   const analysisSchemes = await listAnalysisSchemesForPortfolio(db, portfolioCode);
+  const metrics = await getMetricsForSnapshot(db, snapshot.id);
 
   result = {
     id: snapshot.id,
@@ -269,6 +315,7 @@ export async function getCurrentSnapshot(db: AppDatabase, portfolioCode: string)
     portfolioName: portfolio.name,
     asOfDate: snapshot.asOfDate,
     analysisSchemes,
+    metrics,
     lines: lineDtos,
   };
   return result;
@@ -346,6 +393,30 @@ export async function replaceCurrentSnapshot(
       if (metricRows.length > 0) {
         tx.insert(holdingLineMetrics).values(metricRows).run();
       }
+    }
+
+    const snapshotMetricRows: Array<{
+      id: string;
+      snapshotId: string;
+      code: string;
+      integerValue: number | null;
+      realValue: number | null;
+      textValue: string | null;
+    }> = [];
+
+    for (const metric of params.metrics ?? []) {
+      snapshotMetricRows.push({
+        id: newId(),
+        snapshotId: snapshot.id,
+        code: metric.code,
+        integerValue: metric.integerValue ?? null,
+        realValue: metric.realValue ?? null,
+        textValue: metric.textValue ?? null,
+      });
+    }
+
+    if (snapshotMetricRows.length > 0) {
+      tx.insert(portfolioSnapshotMetrics).values(snapshotMetricRows).run();
     }
 
     return result;

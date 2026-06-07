@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
   IDECO_INSTRUMENT_ATTRIBUTE_CODES,
   IDECO_KAKEIBO_METRIC_CODES,
+  IDECO_PORTFOLIO_METRIC_CODES,
   IDECO_SCHEME_CODES,
 } from "@repo/shared";
 
@@ -26,6 +27,26 @@ function readFixture(name: string): string {
   return result;
 }
 
+function readIdecoImportFiles(
+  overrides: Partial<{
+    productTypesCsv: string;
+    analysisCsv: string;
+    instrumentsCsv: string;
+    holdingsCsv: string;
+    genericCsv: string;
+  }> = {},
+) {
+  let result = {
+    productTypesCsv: readFixture("商品タイプ.csv"),
+    analysisCsv: readFixture("分析.csv"),
+    instrumentsCsv: readFixture("銘柄の情報.csv"),
+    holdingsCsv: readFixture("明細.csv"),
+    genericCsv: readFixture("汎用.csv"),
+    ...overrides,
+  };
+  return result;
+}
+
 describe("importIdecoData", () => {
   const instances: ReturnType<typeof createTestDb>[] = [];
 
@@ -44,12 +65,7 @@ describe("importIdecoData", () => {
 
   it("imports ideco directory fixtures into portfolio and snapshot", async () => {
     const db = setup();
-    const first = await importIdecoData(db, {
-      productTypesCsv: readFixture("商品タイプ.csv"),
-      analysisCsv: readFixture("分析.csv"),
-      instrumentsCsv: readFixture("銘柄の情報.csv"),
-      holdingsCsv: readFixture("明細.csv"),
-    });
+    const first = await importIdecoData(db, readIdecoImportFiles());
 
     expect(first).toMatchObject({
       asOfDate: "2026-06-02",
@@ -101,13 +117,16 @@ describe("importIdecoData", () => {
         }),
       ]),
     );
+    expect(snapshot?.metrics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: IDECO_PORTFOLIO_METRIC_CODES.totalContributions,
+          integerValue: 9_999_999,
+        }),
+      ]),
+    );
 
-    const second = await importIdecoData(db, {
-      productTypesCsv: readFixture("商品タイプ.csv"),
-      analysisCsv: readFixture("分析.csv"),
-      instrumentsCsv: readFixture("銘柄の情報.csv"),
-      holdingsCsv: readFixture("明細.csv"),
-    });
+    const second = await importIdecoData(db, readIdecoImportFiles());
     expect(second).toMatchObject({
       createdInstruments: 0,
       reusedInstruments: 2,
@@ -116,14 +135,14 @@ describe("importIdecoData", () => {
 
   it("returns null when holdings reference unknown short name", async () => {
     const db = setup();
-    const outcome = await importIdecoData(db, {
-      productTypesCsv: readFixture("商品タイプ.csv"),
-      analysisCsv: readFixture("分析.csv"),
-      instrumentsCsv: readFixture("銘柄の情報.csv"),
-      holdingsCsv: `番号,日付,運用商品名,時価単価(1万口当り),残高数量,資産残高,購入金額,損益,損益率
+    const outcome = await importIdecoData(
+      db,
+      readIdecoImportFiles({
+        holdingsCsv: `番号,日付,運用商品名,時価単価(1万口当り),残高数量,資産残高,購入金額,損益,損益率
 1,2026/06/02,存在しない銘柄,"1","1","1","1","0",0.021
 `,
-    });
+      }),
+    );
     expect(outcome).toBeNull();
   });
 
@@ -134,12 +153,12 @@ describe("importIdecoData", () => {
 地域分類,国内,国内株式
 資産分類,株式,国内株式
 `;
-    const outcome = await importIdecoData(db, {
-      productTypesCsv: readFixture("商品タイプ.csv"),
-      analysisCsv,
-      instrumentsCsv: readFixture("銘柄の情報.csv"),
-      holdingsCsv: readFixture("明細.csv"),
-    });
+    const outcome = await importIdecoData(
+      db,
+      readIdecoImportFiles({
+        analysisCsv,
+      }),
+    );
     expect(outcome).not.toBeNull();
 
     const productTypeScheme = await findSchemeByPortfolioCodeAndSchemeCode(
@@ -162,11 +181,7 @@ describe("importIdecoData", () => {
 
   it("removes analysis schemes and values that disappear from csv", async () => {
     const db = setup();
-    const baseFiles = {
-      productTypesCsv: readFixture("商品タイプ.csv"),
-      instrumentsCsv: readFixture("銘柄の情報.csv"),
-      holdingsCsv: readFixture("明細.csv"),
-    };
+    const baseFiles = readIdecoImportFiles();
     const fullAnalysisCsv = `分析軸名,カテゴリ名,メンバー名
 地域分類,国内,国内株式
 資産分類,株式,国内株式
@@ -245,9 +260,7 @@ describe("importIdecoData", () => {
     const domesticHoldingsCsv = `番号,日付,運用商品名,時価単価(1万口当り),残高数量,資産残高,購入金額,損益,損益率
 1,2026/06/02,eMAXIS Slim 国内株式(TOPIX),"31351","41773","130962","128324","2638","0.021"
 `;
-    const baseFiles = {
-      analysisCsv: readFixture("分析.csv"),
-    };
+    const baseFiles = readIdecoImportFiles();
 
     await importIdecoData(db, {
       ...baseFiles,

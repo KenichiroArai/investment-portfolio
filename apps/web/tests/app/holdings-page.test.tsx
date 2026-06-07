@@ -22,6 +22,7 @@ describe("HoldingsPage", () => {
           portfolioName: "iDeCo",
           asOfDate: "2026-06-01",
           analysisSchemes: [],
+          metrics: [],
           lines: [],
         }),
       }),

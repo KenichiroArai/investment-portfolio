@@ -2,6 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import { IDECO_SCHEME_CODES } from "../src/ideco-analysis";
 import { IDECO_KAKEIBO_METRIC_CODES } from "../src/holding-line-metrics";
+import { IDECO_PORTFOLIO_METRIC_CODES } from "../src/ideco-portfolio-metrics";
+import {
+  computeSnapshotGainRate,
+  computeSnapshotPortfolioGainMinor,
+  resolveSnapshotTotalContributions,
+} from "../src/portfolio-snapshot-metrics";
 import {
   buildAllocationByScheme,
   buildAllocationBySchemeWithLinesFromSnapshots,
@@ -79,11 +85,72 @@ describe("snapshot-allocation", () => {
     expect(sumSnapshotUnrealizedGainMinor(lines)).toBe(30_000);
   });
 
+  it("prefers portfolio metric for total contributions", () => {
+    const snapshot: CurrentSnapshotDto = {
+      id: "snap-1",
+      portfolioCode: "ideco",
+      portfolioName: "iDeCo",
+      asOfDate: "2026-06-01",
+      analysisSchemes: [],
+      metrics: [
+        {
+          code: IDECO_PORTFOLIO_METRIC_CODES.totalContributions,
+          integerValue: 2_716_679,
+          realValue: null,
+          textValue: null,
+        },
+      ],
+      lines: [
+        makeLine(100_000, [], { bookValueMinor: 80_000 }),
+        makeLine(200_000, [], { bookValueMinor: 150_000 }),
+      ],
+    };
+
+    expect(resolveSnapshotTotalContributions(snapshot)).toBe(2_716_679);
+  });
+
+  it("falls back to book value sum when portfolio metric is absent", () => {
+    const snapshot: CurrentSnapshotDto = {
+      id: "snap-1",
+      portfolioCode: "nisa",
+      portfolioName: "NISA",
+      asOfDate: "2026-06-01",
+      analysisSchemes: [],
+      metrics: [],
+      lines: [
+        makeLine(100_000, [], { bookValueMinor: 80_000 }),
+        makeLine(200_000, [], { bookValueMinor: 150_000 }),
+      ],
+    };
+
+    expect(resolveSnapshotTotalContributions(snapshot)).toBe(230_000);
+  });
+
   it("computes unrealized gain rate", () => {
     expect(computeSnapshotUnrealizedGainRate(30_000, 230_000)).toBeCloseTo(
       30_000 / 230_000,
     );
     expect(computeSnapshotUnrealizedGainRate(30_000, 0)).toBeNull();
+  });
+
+  it("computes portfolio gain from asset balance and contributions", () => {
+    expect(computeSnapshotPortfolioGainMinor(300_000, 2716679)).toBe(
+      300_000 - 2_716_679,
+    );
+  });
+
+  it("computes gain rate against contributions and asset balance", () => {
+    const gain = 50_000;
+    const contributions = 250_000;
+    const assetBalance = 300_000;
+
+    expect(computeSnapshotGainRate(gain, contributions)).toBeCloseTo(
+      gain / contributions,
+    );
+    expect(computeSnapshotGainRate(gain, assetBalance)).toBeCloseTo(
+      gain / assetBalance,
+    );
+    expect(computeSnapshotGainRate(gain, 0)).toBeNull();
   });
 
   it("groups lines by scheme code", () => {
@@ -179,6 +246,7 @@ describe("snapshot-allocation", () => {
         portfolioName: "iDeCo",
         asOfDate: "2026-06-01",
         analysisSchemes: [],
+        metrics: [],
         lines: [
           makeLine(
             100_000,
@@ -200,6 +268,7 @@ describe("snapshot-allocation", () => {
         portfolioName: "iDeCo 2",
         asOfDate: "2026-06-01",
         analysisSchemes: [],
+        metrics: [],
         lines: [
           makeLine(
             200_000,
@@ -241,6 +310,7 @@ describe("snapshot-allocation", () => {
             schemeName: "地域分類",
           },
         ],
+        metrics: [],
         lines: [
           makeLine(100_000, [
             {

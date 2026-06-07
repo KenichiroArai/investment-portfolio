@@ -182,6 +182,33 @@ export const holdingLines = sqliteTable("holding_lines", {
   bookValueMinor: integer("book_value_minor"), // 簿価
 });
 
+/** スナップショット指標 — スナップショットごとの可変指標（EAV）。詳細は packages/db/README.md */
+export const portfolioSnapshotMetrics = sqliteTable(
+  "portfolio_snapshot_metrics",
+  {
+    id: text("id").primaryKey(), // ID
+    snapshotId: text("snapshot_id")
+      .notNull()
+      .references(() => {
+        let result = portfolioSnapshots.id;
+        return result;
+      }, { onDelete: "cascade" }), // スナップショットID
+    code: text("code").notNull(), // 指標コード
+    integerValue: integer("integer_value"), // 整数値
+    realValue: real("real_value"), // 実数値
+    textValue: text("text_value"), // 文字列値
+  },
+  (table) => {
+    let result = [
+      unique("portfolio_snapshot_metrics_snapshot_code_unique").on(
+        table.snapshotId,
+        table.code,
+      ),
+    ];
+    return result;
+  },
+);
+
 /** 保有明細指標 — 明細行ごとの可変指標（EAV）。詳細は packages/db/README.md */
 export const holdingLineMetrics = sqliteTable(
   "holding_line_metrics",
@@ -300,6 +327,21 @@ export const portfolioSnapshotsRelations = relations(
         references: [portfolios.id],
       }),
       holdingLines: many(holdingLines),
+      metrics: many(portfolioSnapshotMetrics),
+    };
+    return result;
+  },
+);
+
+/** スナップショット指標リレーション */
+export const portfolioSnapshotMetricsRelations = relations(
+  portfolioSnapshotMetrics,
+  ({ one }) => {
+    let result = {
+      snapshot: one(portfolioSnapshots, {
+        fields: [portfolioSnapshotMetrics.snapshotId],
+        references: [portfolioSnapshots.id],
+      }),
     };
     return result;
   },

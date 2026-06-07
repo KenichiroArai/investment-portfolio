@@ -33,6 +33,7 @@ const IDECO_CSV_FILES = {
   analysis: "分析.csv",
   instruments: "銘柄の情報.csv",
   holdings: "明細.csv",
+  generic: "汎用.csv",
 } as const;
 
 function printUsage(): void {
@@ -79,6 +80,7 @@ async function main() {
       analysisCsv: readRequiredCsv(resolvedDir, IDECO_CSV_FILES.analysis),
       instrumentsCsv: readRequiredCsv(resolvedDir, IDECO_CSV_FILES.instruments),
       holdingsCsv: readRequiredCsv(resolvedDir, IDECO_CSV_FILES.holdings),
+      genericCsv: readRequiredCsv(resolvedDir, IDECO_CSV_FILES.generic),
     });
     if (!outcome) {
       console.error("iDeCo データの投入に失敗しました。");

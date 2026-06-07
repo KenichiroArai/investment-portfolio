@@ -151,6 +151,12 @@ describe("portfolio repositories", () => {
           marketValueMinor: 1000,
         },
       ],
+      metrics: [
+        {
+          code: "ideco_total_contributions",
+          integerValue: 2_500_000,
+        },
+      ],
     });
     expect(replaced?.lines).toHaveLength(2);
     expect(replaced?.lines[0].sortOrder).toBe(1);
@@ -171,6 +177,14 @@ describe("portfolio repositories", () => {
     expect(replaced?.lines[0].instrumentAttributes).toEqual([]);
     expect(replaced?.lines[1].tags).toHaveLength(0);
     expect(replaced?.lines[1].instrumentAttributes).toEqual([]);
+    expect(replaced?.metrics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "ideco_total_contributions",
+          integerValue: 2_500_000,
+        }),
+      ]),
+    );
 
     const again = await replaceCurrentSnapshot(db, {
       portfolioCode: "ideco",

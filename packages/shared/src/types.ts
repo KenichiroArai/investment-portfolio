@@ -1,4 +1,5 @@
 import type { HoldingLineMetricDto } from "./holding-line-metrics";
+import type { PortfolioSnapshotMetricDto } from "./portfolio-snapshot-metrics";
 
 export type InstrumentAttributeDto = {
   code: string;
@@ -14,7 +15,7 @@ export type ClassificationTagDto = {
   valueName: string;
 };
 
-export type { HoldingLineMetricDto };
+export type { HoldingLineMetricDto, PortfolioSnapshotMetricDto };
 
 export type PortfolioDto = {
   id: string;
@@ -47,6 +48,7 @@ export type CurrentSnapshotDto = {
   portfolioName: string;
   asOfDate: string;
   analysisSchemes: AnalysisSchemeConfig[];
+  metrics: PortfolioSnapshotMetricDto[];
   lines: HoldingLineDto[];
 };
 

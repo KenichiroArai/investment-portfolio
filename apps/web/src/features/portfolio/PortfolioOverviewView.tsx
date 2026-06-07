@@ -3,10 +3,10 @@
 import Link from "next/link";
 import type { CurrentSnapshotDto } from "@repo/shared";
 import {
-  computeSnapshotUnrealizedGainRate,
-  sumSnapshotBookValue,
+  computeSnapshotGainRate,
+  computeSnapshotPortfolioGainMinor,
+  resolveSnapshotTotalContributions,
   sumSnapshotMarketValue,
-  sumSnapshotUnrealizedGainMinor,
 } from "@repo/shared";
 import { useEffect, useState, type ReactNode } from "react";
 
@@ -125,14 +125,27 @@ export function PortfolioOverviewView({
   }
 
   const assetBalance = sumSnapshotMarketValue(snapshot.lines);
-  const totalContributions = sumSnapshotBookValue(snapshot.lines);
-  const unrealizedGain = sumSnapshotUnrealizedGainMinor(snapshot.lines);
-  const gainRate = computeSnapshotUnrealizedGainRate(
-    unrealizedGain,
+  const totalContributions = resolveSnapshotTotalContributions(snapshot);
+  const portfolioGain = computeSnapshotPortfolioGainMinor(
+    assetBalance,
     totalContributions,
   );
-  const gainRateLabel =
-    gainRate === null ? "—" : formatPercent(gainRate);
+  const gainRateOnContributions = computeSnapshotGainRate(
+    portfolioGain,
+    totalContributions,
+  );
+  const gainRateOnAssetBalance = computeSnapshotGainRate(
+    portfolioGain,
+    assetBalance,
+  );
+  const gainRateOnContributionsLabel =
+    gainRateOnContributions === null
+      ? "—"
+      : formatPercent(gainRateOnContributions);
+  const gainRateOnAssetBalanceLabel =
+    gainRateOnAssetBalance === null
+      ? "—"
+      : formatPercent(gainRateOnAssetBalance);
 
   result = (
     <main className="portfolio-overview">
@@ -152,8 +165,17 @@ export function PortfolioOverviewView({
           />
         </div>
         <div className="asset-status__row">
-          <AssetStatusField label="損益" value={formatYen(unrealizedGain)} />
-          <AssetStatusField label="損益率" value={gainRateLabel} />
+          <AssetStatusField label="損益" value={formatYen(portfolioGain)} />
+          <AssetStatusField
+            label="損益率"
+            value={gainRateOnContributionsLabel}
+          />
+        </div>
+        <div className="asset-status__row">
+          <AssetStatusField
+            label="利益率"
+            value={gainRateOnAssetBalanceLabel}
+          />
         </div>
       </section>
       <nav className="overview-links" aria-label="クイックリンク">

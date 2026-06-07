@@ -10,6 +10,7 @@ import {
   IDECO_SCHEME_NAMES,
   isIdecoAnalysisSchemeCode,
   parseIdecoAnalysisCsv,
+  parseIdecoGenericCsv,
   parseIdecoHoldingsCsv,
   parseIdecoInstrumentsCsv,
   parseIdecoProductTypesCsv,
@@ -17,6 +18,7 @@ import {
   type IdecoClassificationDefinition,
   type IdecoInstrumentCsvRow,
   type ParseIdecoAnalysisCsvResult,
+  type ParseIdecoGenericCsvResult,
   type ParseIdecoHoldingsCsvResult,
 } from "@repo/shared";
 
@@ -86,6 +88,7 @@ export type IdecoImportFiles = {
   analysisCsv: string;
   instrumentsCsv: string;
   holdingsCsv: string;
+  genericCsv: string;
 };
 
 async function ensureIdecoPortfolio(db: AppDatabase) {
@@ -478,6 +481,7 @@ async function importInstrumentsFromParsed(
 async function importHoldingsFromParsed(
   db: AppDatabase,
   parsed: ParseIdecoHoldingsCsvResult,
+  genericParsed: ParseIdecoGenericCsvResult,
 ) {
   let result: Awaited<ReturnType<typeof replaceCurrentSnapshot>> = null;
 
@@ -514,6 +518,7 @@ async function importHoldingsFromParsed(
     portfolioCode: IDECO_PORTFOLIO_CODE,
     asOfDate: parsed.asOfDate,
     lines,
+    metrics: genericParsed.metrics,
   });
   return result;
 }
@@ -528,6 +533,7 @@ export async function importIdecoData(
   const analysisParsed = parseIdecoAnalysisCsv(files.analysisCsv);
   const instrumentsParsed = parseIdecoInstrumentsCsv(files.instrumentsCsv);
   const holdingsParsed = parseIdecoHoldingsCsv(files.holdingsCsv);
+  const genericParsed = parseIdecoGenericCsv(files.genericCsv);
 
   await ensureIdecoPortfolio(db);
 
@@ -553,7 +559,7 @@ export async function importIdecoData(
     return result;
   }
 
-  const snapshot = await importHoldingsFromParsed(db, holdingsParsed);
+  const snapshot = await importHoldingsFromParsed(db, holdingsParsed, genericParsed);
   if (!snapshot) {
     return result;
   }

@@ -63,6 +63,7 @@ describe("HoldingsView", () => {
           portfolioName: "iDeCo",
           asOfDate: "2026-06-01",
           analysisSchemes: [],
+          metrics: [],
           lines: [
             {
               id: "l1",
@@ -138,6 +139,7 @@ describe("HoldingsView", () => {
           portfolioName: "iDeCo",
           asOfDate: "2026-06-01",
           analysisSchemes: [],
+          metrics: [],
           lines: [
             {
               id: "l1",
@@ -183,6 +185,7 @@ describe("HoldingsView", () => {
         portfolioName: "iDeCo",
         asOfDate: "2026-06-01",
         analysisSchemes: [],
+        metrics: [],
         lines: [],
       }),
     });
@@ -217,6 +220,7 @@ describe("HoldingsView", () => {
           portfolioName: "iDeCo",
           asOfDate: "2026-06-01",
           analysisSchemes: [],
+          metrics: [],
           lines: [],
         }),
       }),

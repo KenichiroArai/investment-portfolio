@@ -93,7 +93,7 @@ taskkill /PID <PID> /F
 data/
 ├── portfolio.db              # SQLite（migrate / import で生成）
 └── imports/
-    └── ideco/                # 4 CSV（商品タイプ・分析・銘柄の情報・明細）
+    └── ideco/                # 5 CSV（商品タイプ・分析・銘柄の情報・明細・汎用）
 ```
 - `PORT` / `HOST` — API の待ち受け（既定: `127.0.0.1:3001`）
 - `NEXT_PUBLIC_API_URL` — Web から参照する API（既定: `http://127.0.0.1:3001`）
@@ -138,9 +138,9 @@ npm test
 
 カバレッジ付きで確認する場合は `npm run test:coverage`（詳細は [テスト](#テスト)）。
 
-## iDeCo データ投入（4 CSV ディレクトリ）
+## iDeCo データ投入（5 CSV ディレクトリ）
 
-iDeCo 口座のデータは `data/imports/ideco/` 以下の4 CSV から SQLite へ一括投入します。CSV 対応の詳細は [dev/sql/ideco/README.md](dev/sql/ideco/README.md) を参照してください。
+iDeCo 口座のデータは `data/imports/ideco/` 以下の5 CSV から SQLite へ一括投入します。CSV 対応の詳細は [dev/sql/ideco/README.md](dev/sql/ideco/README.md) を参照してください。
 
 ```bash
 npm run db:import:ideco -- data/imports/ideco
@@ -154,6 +154,7 @@ npm run db:import:ideco -- data/imports/ideco
 - 分類体系（商品タイプ・大分類・スタイル・ステータス・地域・資産）と銘柄へのタグ付け
 - 銘柄マスタ（属性: 略称・提供会社・信託報酬など）
 - 最新明細（`asOfDate` は明細 CSV の日付列、金額は円のまま保存）
+- 口座レベル指標（汎用 CSV の拠出金累計など）
 
 投入後、GitHub Pages 用 JSON を更新する場合は [GitHub Pages 向けデータ公開](#github-pages-向けデータ公開) の `npm run pages:export` を実行してください。ローカル API で確認する場合は `npm run dev:api` 起動後、**口座明細（iDeCo）** を開きます。
 

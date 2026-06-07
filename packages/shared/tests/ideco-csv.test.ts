@@ -17,8 +17,10 @@ import {
   stableIdecoCodeSuffix,
   stripUtf8Bom,
 } from "../src/ideco-csv-utils";
+import { parseIdecoGenericCsv } from "../src/ideco-generic-csv";
 import { parseIdecoHoldingsCsv } from "../src/ideco-holdings-csv";
 import { parseIdecoInstrumentsCsv } from "../src/ideco-instruments-csv";
+import { IDECO_PORTFOLIO_METRIC_CODES } from "../src/ideco-portfolio-metrics";
 import { parseIdecoProductTypesCsv } from "../src/ideco-product-types-csv";
 
 const HOLDINGS_CSV = `番号,日付,運用商品名,時価単価(1万口当り),残高数量,資産残高,購入金額,損益,損益率
@@ -186,6 +188,26 @@ describe("ideco csv parsers", () => {
 `,
       ),
     ).toThrow(/残高数量が不正/);
+  });
+
+  it("parses ideco generic csv", () => {
+    const parsed = parseIdecoGenericCsv(`汎用名,汎用値
+拠出金累計,"2,716,679"
+`);
+    expect(parsed.metrics).toEqual([
+      {
+        code: IDECO_PORTFOLIO_METRIC_CODES.totalContributions,
+        integerValue: 2_716_679,
+      },
+    ]);
+  });
+
+  it("rejects unknown generic csv labels", () => {
+    expect(() =>
+      parseIdecoGenericCsv(`汎用名,汎用値
+不明な項目,100
+`),
+    ).toThrow(IdecoCsvError);
   });
 
   it("parses ideco fixture directory csv when present", () => {

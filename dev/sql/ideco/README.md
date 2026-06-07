@@ -10,6 +10,7 @@ iDeCo 口座（`portfolios.code = 'ideco'`）向けの CSV 投入・DB 格納の
 | `分析.csv` | 商品タイプ → 地域・資産の対応検証 | 2 |
 | `銘柄の情報.csv` | 銘柄マスタ（属性・分類タグ） | 3 |
 | `明細.csv` | 保有スナップショット | 4 |
+| `汎用.csv` | 口座レベル指標（拠出金累計など） | 5 |
 
 投入コマンド:
 
@@ -69,6 +70,14 @@ npm run db:import:ideco -- data/imports/ideco
 | `provider` | 提供・委託会社 | `三菱UFJアセットマネジメント` |
 | `trust_fee_text` | 信託報酬（％）（税込） | `0.143以内` |
 | `trust_reserve_text` | 信託財産保留額（％） | `0` |
+
+## スナップショット指標（`portfolio_snapshot_metrics`）
+
+| metric code | 元列（汎用.csv） | 値の例 |
+| --- | --- | --- |
+| `ideco_total_contributions` | 拠出金累計 | `2716679` |
+
+iDeCo では明細の購入金額合算では口座全体の拠出金累計を得られないため、`汎用.csv` で別途投入します。
 
 ## 保有明細指標（`holding_line_metrics`）
 
