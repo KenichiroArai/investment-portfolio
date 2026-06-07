@@ -1,13 +1,17 @@
 import { describe, expect, it } from "vitest";
 
 import { IDECO_SCHEME_CODES } from "../src/ideco-analysis";
+import { IDECO_KAKEIBO_METRIC_CODES } from "../src/holding-line-metrics";
 import {
   buildAllocationByScheme,
   buildAllocationBySchemeWithLinesFromSnapshots,
+  computeSnapshotUnrealizedGainRate,
   groupSnapshotLinesByTag,
   groupSnapshotLinesByTagWithLines,
   mergeSnapshotsForGlobalAnalysis,
+  sumSnapshotBookValue,
   sumSnapshotMarketValue,
+  sumSnapshotUnrealizedGainMinor,
 } from "../src/snapshot-allocation";
 import type { CurrentSnapshotDto, HoldingLineDto } from "../src/types";
 
@@ -38,6 +42,48 @@ describe("snapshot-allocation", () => {
       makeLine(200_000, []),
     ];
     expect(sumSnapshotMarketValue(lines)).toBe(300_000);
+  });
+
+  it("sums book values", () => {
+    const lines = [
+      makeLine(100_000, [], { bookValueMinor: 80_000 }),
+      makeLine(200_000, [], { bookValueMinor: 150_000 }),
+      makeLine(50_000, [], { bookValueMinor: null }),
+    ];
+    expect(sumSnapshotBookValue(lines)).toBe(230_000);
+  });
+
+  it("sums unrealized gain from metrics", () => {
+    const lines = [
+      makeLine(100_000, [], {
+        metrics: [
+          {
+            code: IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor,
+            integerValue: 10_000,
+            realValue: null,
+            textValue: null,
+          },
+        ],
+      }),
+      makeLine(200_000, [], {
+        metrics: [
+          {
+            code: IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor,
+            integerValue: 20_000,
+            realValue: null,
+            textValue: null,
+          },
+        ],
+      }),
+    ];
+    expect(sumSnapshotUnrealizedGainMinor(lines)).toBe(30_000);
+  });
+
+  it("computes unrealized gain rate", () => {
+    expect(computeSnapshotUnrealizedGainRate(30_000, 230_000)).toBeCloseTo(
+      30_000 / 230_000,
+    );
+    expect(computeSnapshotUnrealizedGainRate(30_000, 0)).toBeNull();
   });
 
   it("groups lines by scheme code", () => {

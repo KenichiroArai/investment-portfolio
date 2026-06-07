@@ -7,6 +7,17 @@ export function formatYen(minor: number): string {
   return result;
 }
 
+export function formatAsOfDateJa(iso: string): string {
+  let result = iso;
+  const parts = iso.split("-");
+
+  if (parts.length === 3) {
+    result = `${parts[0]}/${parts[1]}/${parts[2]}`;
+  }
+
+  return result;
+}
+
 export function formatPercent(ratio: number): string {
   let result = "—";
 

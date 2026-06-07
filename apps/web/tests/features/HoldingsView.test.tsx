@@ -89,7 +89,8 @@ describe("HoldingsView", () => {
     render(<HoldingsView portfolioCode="ideco" />);
     await waitFor(() => {
       expect(screen.getByText("テストファンド")).toBeInTheDocument();
-      expect(screen.getByRole("columnheader", { name: "評価額" })).toBeInTheDocument();
+      expect(screen.getByRole("columnheader", { name: "資産残高" })).toBeInTheDocument();
+      expect(screen.getByRole("columnheader", { name: "購入金額" })).toBeInTheDocument();
       expect(screen.getByRole("columnheader", { name: "分類" })).toBeInTheDocument();
       expect(screen.getByText(/地域: 日本/)).toBeInTheDocument();
     });

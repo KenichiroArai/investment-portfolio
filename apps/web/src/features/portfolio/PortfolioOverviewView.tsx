@@ -2,10 +2,19 @@
 
 import Link from "next/link";
 import type { CurrentSnapshotDto } from "@repo/shared";
-import { sumSnapshotMarketValue } from "@repo/shared";
+import {
+  computeSnapshotUnrealizedGainRate,
+  sumSnapshotBookValue,
+  sumSnapshotMarketValue,
+  sumSnapshotUnrealizedGainMinor,
+} from "@repo/shared";
 import { useEffect, useState, type ReactNode } from "react";
 
-import { formatYen } from "@/lib/format-yen";
+import {
+  formatAsOfDateJa,
+  formatPercent,
+  formatYen,
+} from "@/lib/format-yen";
 import {
   getSnapshotFetchUrl,
   getSnapshotLoadErrorMessage,
@@ -14,6 +23,21 @@ import {
 type PortfolioOverviewViewProps = {
   portfolioCode: string;
 };
+
+type AssetStatusFieldProps = {
+  label: string;
+  value: string;
+};
+
+function AssetStatusField({ label, value }: AssetStatusFieldProps) {
+  let result = (
+    <div className="asset-status__field">
+      <div className="asset-status__label">{label}</div>
+      <div className="asset-status__value">{value}</div>
+    </div>
+  );
+  return result;
+}
 
 export function PortfolioOverviewView({
   portfolioCode,
@@ -100,24 +124,38 @@ export function PortfolioOverviewView({
     return result;
   }
 
-  const totalValue = sumSnapshotMarketValue(snapshot.lines);
+  const assetBalance = sumSnapshotMarketValue(snapshot.lines);
+  const totalContributions = sumSnapshotBookValue(snapshot.lines);
+  const unrealizedGain = sumSnapshotUnrealizedGainMinor(snapshot.lines);
+  const gainRate = computeSnapshotUnrealizedGainRate(
+    unrealizedGain,
+    totalContributions,
+  );
+  const gainRateLabel =
+    gainRate === null ? "—" : formatPercent(gainRate);
 
   result = (
     <main className="portfolio-overview">
-      <h1>
-        {snapshot.portfolioName}（{snapshot.portfolioCode}）
-      </h1>
-      <p className="holdings-meta">基準日: {snapshot.asOfDate}</p>
-      <dl className="overview-stats">
-        <div>
-          <dt>評価額合計</dt>
-          <dd>{formatYen(totalValue)}</dd>
+      <h1 className="asset-status__title">資産状況</h1>
+      <div className="asset-status__banner">
+        現在の資産状況 {formatAsOfDateJa(snapshot.asOfDate)} 現在
+      </div>
+      <section className="asset-status__panel" aria-label="資産状況サマリー">
+        <div className="asset-status__row">
+          <AssetStatusField
+            label="資産残高"
+            value={formatYen(assetBalance)}
+          />
+          <AssetStatusField
+            label="拠出金累計"
+            value={formatYen(totalContributions)}
+          />
         </div>
-        <div>
-          <dt>保有銘柄数</dt>
-          <dd>{snapshot.lines.length}</dd>
+        <div className="asset-status__row">
+          <AssetStatusField label="損益" value={formatYen(unrealizedGain)} />
+          <AssetStatusField label="損益率" value={gainRateLabel} />
         </div>
-      </dl>
+      </section>
       <nav className="overview-links" aria-label="クイックリンク">
         <ul>
           <li>

@@ -42,8 +42,8 @@ export function HoldingsDetailTable({ lines }: HoldingsDetailTableProps) {
               IDECO_KAKEIBO_METRIC_CODES.unitPricePerTenThousandLots,
             )}
           </th>
-          <th>評価額</th>
-          <th>簿価</th>
+          <th>資産残高</th>
+          <th>購入金額</th>
           <th>
             {formatMetricLabel(IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor)}
           </th>

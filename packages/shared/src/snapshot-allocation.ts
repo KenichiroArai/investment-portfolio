@@ -1,4 +1,20 @@
+import { IDECO_KAKEIBO_METRIC_CODES } from "./holding-line-metrics";
+import type { HoldingLineMetricDto } from "./holding-line-metrics";
 import type { CurrentSnapshotDto, HoldingLineDto } from "./types";
+
+function getLineMetricIntegerValue(
+  metrics: HoldingLineMetricDto[],
+  code: string,
+): number {
+  let result = 0;
+  const metric = metrics.find((item) => item.code === code);
+
+  if (metric?.integerValue !== null && metric?.integerValue !== undefined) {
+    result = metric.integerValue;
+  }
+
+  return result;
+}
 
 export type AllocationSlice = {
   valueCode: string;
@@ -53,6 +69,45 @@ export function sumSnapshotMarketValue(lines: HoldingLineDto[]): number {
     result += line.marketValueMinor;
   }
 
+  return result;
+}
+
+export function sumSnapshotBookValue(lines: HoldingLineDto[]): number {
+  let result = 0;
+
+  for (const line of lines) {
+    if (line.bookValueMinor !== null) {
+      result += line.bookValueMinor;
+    }
+  }
+
+  return result;
+}
+
+export function sumSnapshotUnrealizedGainMinor(lines: HoldingLineDto[]): number {
+  let result = 0;
+
+  for (const line of lines) {
+    result += getLineMetricIntegerValue(
+      line.metrics,
+      IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor,
+    );
+  }
+
+  return result;
+}
+
+export function computeSnapshotUnrealizedGainRate(
+  unrealizedGainMinor: number,
+  bookValueMinor: number,
+): number | null {
+  let result: number | null = null;
+
+  if (bookValueMinor === 0) {
+    return result;
+  }
+
+  result = unrealizedGainMinor / bookValueMinor;
   return result;
 }
 
