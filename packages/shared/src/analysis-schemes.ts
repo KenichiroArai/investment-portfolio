@@ -1,4 +1,9 @@
-import type { AnalysisSchemeConfig, CurrentSnapshotDto } from "./types";
+import type {
+  AnalysisSchemeConfig,
+  ClassificationTagDto,
+  CurrentSnapshotDto,
+  HoldingLineDto,
+} from "./types";
 
 export type { AnalysisSchemeConfig };
 
@@ -42,6 +47,61 @@ export function mergeAnalysisSchemesFromSnapshots(
       }
       seen.add(scheme.schemeCode);
       result.push(scheme);
+    }
+  }
+
+  return result;
+}
+
+export function findClassificationTagValue(
+  tags: ClassificationTagDto[],
+  schemeCode: string,
+): string | null {
+  let result: string | null = null;
+
+  const tag = tags.find((item) => item.schemeCode === schemeCode);
+  if (!tag) {
+    return result;
+  }
+
+  result = tag.valueName;
+  return result;
+}
+
+export function collectHoldingsClassificationSchemes(
+  analysisSchemes: AnalysisSchemeConfig[],
+  lines: HoldingLineDto[],
+): AnalysisSchemeConfig[] {
+  let result: AnalysisSchemeConfig[] = [];
+  const seen = new Set<string>();
+
+  for (const scheme of analysisSchemes) {
+    if (seen.has(scheme.schemeCode)) {
+      continue;
+    }
+    seen.add(scheme.schemeCode);
+    result.push(scheme);
+  }
+
+  const sortedLines = [...lines].sort((left, right) => {
+    const leftOrder = left.sortOrder ?? Number.MAX_SAFE_INTEGER;
+    const rightOrder = right.sortOrder ?? Number.MAX_SAFE_INTEGER;
+    if (leftOrder !== rightOrder) {
+      return leftOrder - rightOrder;
+    }
+    return 0;
+  });
+
+  for (const line of sortedLines) {
+    for (const tag of line.tags) {
+      if (seen.has(tag.schemeCode)) {
+        continue;
+      }
+      seen.add(tag.schemeCode);
+      result.push({
+        schemeCode: tag.schemeCode,
+        schemeName: tag.schemeName,
+      });
     }
   }
 

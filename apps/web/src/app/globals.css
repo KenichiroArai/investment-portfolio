@@ -108,6 +108,12 @@ main,
   color: #b91c1c;
 }
 
+.holdings-table-wrapper {
+  overflow-x: auto;
+  margin: 0 -0.25rem;
+  padding: 0 0.25rem;
+}
+
 .holdings-table {
   width: 100%;
   border-collapse: collapse;
@@ -138,6 +144,42 @@ main,
   .holdings-table th {
     background: #171717;
   }
+}
+
+.holdings-table__instrument-col {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 10rem;
+  max-width: 16rem;
+  background: var(--background);
+}
+
+.holdings-table thead .holdings-table__instrument-col {
+  background: #f5f5f5;
+}
+
+@media (prefers-color-scheme: dark) {
+  .holdings-table thead .holdings-table__instrument-col {
+    background: #171717;
+  }
+}
+
+.holdings-table__classification-col {
+  min-width: 4.5rem;
+  font-size: 0.875rem;
+}
+
+.holdings-table thead .holdings-table__classification-col {
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  max-width: 6.5rem;
+}
+
+.holdings-table tbody .holdings-table__classification-col {
+  white-space: nowrap;
 }
 
 .note {

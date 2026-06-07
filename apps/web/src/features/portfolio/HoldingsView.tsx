@@ -1,6 +1,9 @@
 "use client";
 
-import type { CurrentSnapshotDto } from "@repo/shared";
+import {
+  collectHoldingsClassificationSchemes,
+  type CurrentSnapshotDto,
+} from "@repo/shared";
 import { useEffect, useState, type ReactNode } from "react";
 
 import { HoldingsDetailTable } from "@/features/holdings/HoldingsDetailTable";
@@ -96,7 +99,13 @@ export function HoldingsView({ portfolioCode }: HoldingsViewProps) {
       {snapshot.lines.length === 0 ? (
         <p>保有銘柄がありません。</p>
       ) : (
-        <HoldingsDetailTable lines={snapshot.lines} />
+        <HoldingsDetailTable
+          lines={snapshot.lines}
+          classificationSchemes={collectHoldingsClassificationSchemes(
+            snapshot.analysisSchemes,
+            snapshot.lines,
+          )}
+        />
       )}
     </section>
   );
