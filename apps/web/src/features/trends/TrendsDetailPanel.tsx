@@ -118,7 +118,7 @@ export function TrendsDetailPanel() {
         </p>
       ) : null}
       <section className="trends-detail__section">
-        <h2>総資産・損益</h2>
+        <h2>総資産</h2>
         <TrendBarChart
           labels={labels}
           sourceDates={sourceDates}
@@ -132,6 +132,18 @@ export function TrendsDetailPanel() {
               values: displayTrendPoints.map((point) => point.totalMarketValueMinor),
               formatValue: (value) => formatYen(value),
             },
+          ]}
+        />
+      </section>
+
+      <section className="trends-detail__section">
+        <h2>損益</h2>
+        <TrendBarChart
+          labels={labels}
+          sourceDates={sourceDates}
+          mode="grouped"
+          formatYAxis={formatYenManAxis}
+          series={[
             {
               key: "gain",
               label: "評価損益",

@@ -92,7 +92,8 @@ describe("TrendsDetailPanel", () => {
         screen.getByText("月次表示（各月の最終基準日）・金額単位: 万円"),
       ).toBeInTheDocument();
       expect(screen.getAllByText("2026年6月").length).toBeGreaterThan(0);
-      expect(screen.getByText("総資産・損益")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "総資産" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "損益" })).toBeInTheDocument();
     });
   });
 });
