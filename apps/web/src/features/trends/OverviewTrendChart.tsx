@@ -1,13 +1,12 @@
 "use client";
 
+import { computeTrendPeriodDeltas } from "@repo/shared";
 import type { ReactNode } from "react";
 
 import { TrendBarChart } from "@/features/trends/TrendBarChart";
-import {
-  formatTrendChartCaption,
-  formatYen,
-  formatYenManAxis,
-} from "@/lib/format-yen";
+import { TrendLineChart } from "@/features/trends/TrendLineChart";
+import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
+import { formatYen } from "@/lib/format-yen";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
 
 export function OverviewTrendChart() {
@@ -32,13 +31,31 @@ export function OverviewTrendChart() {
 
   const labels = displayTrendPoints.map((point) => point.bucketLabel);
   const sourceDates = displayTrendPoints.map((point) => point.sourceAsOfDate);
+  const hasMultipleBuckets = displayTrendPoints.length >= 2;
+
+  const deltaSeries: TrendChartSeries[] = [
+    {
+      key: "market-value-delta",
+      label: "評価額の変化",
+      color: "#2563eb",
+      values: computeTrendPeriodDeltas(
+        displayTrendPoints.map((point) => point.totalMarketValueMinor),
+      ),
+      formatValue: (value) => formatYen(value),
+    },
+    {
+      key: "gain-delta",
+      label: "評価損益の変化",
+      color: "#16a34a",
+      values: computeTrendPeriodDeltas(
+        displayTrendPoints.map((point) => point.unrealizedGainMinor),
+      ),
+      formatValue: (value) => formatYen(value),
+    },
+  ];
 
   result = (
     <section className="overview-trend">
-      <h2>資産推移</h2>
-      <p className="trends-detail__unit-label">
-        {formatTrendChartCaption(trendDisplayUnitLabel)}
-      </p>
       {displayTrendPoints.length === 1 ? (
         <p className="trends-detail__single-bucket-note">
           この期間は1か月分のデータです
@@ -46,11 +63,13 @@ export function OverviewTrendChart() {
       ) : null}
       <TrendBarChart
         className="overview-trend__chart"
+        title="資産推移"
+        caption={trendDisplayUnitLabel}
+        valueKind="yen"
         height={180}
         labels={labels}
         sourceDates={sourceDates}
         mode="grouped"
-        formatYAxis={formatYenManAxis}
         series={[
           {
             key: "market-value",
@@ -68,6 +87,20 @@ export function OverviewTrendChart() {
           },
         ]}
       />
+      {hasMultipleBuckets ? (
+        <div className="trends-detail__subsection">
+          <TrendLineChart
+            className="overview-trend__chart"
+            title="前回比の変化"
+            caption={trendDisplayUnitLabel}
+            valueKind="yen"
+            height={180}
+            labels={labels}
+            sourceDates={sourceDates}
+            series={deltaSeries}
+          />
+        </div>
+      ) : null}
     </section>
   );
   return result;

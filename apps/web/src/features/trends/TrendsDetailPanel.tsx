@@ -1,16 +1,23 @@
 "use client";
 
+import { computeTrendPeriodDeltas } from "@repo/shared";
 import { useState, type ReactNode } from "react";
 
 import { getAllocationChartColor } from "@/features/analysis/chart-colors";
 import { TrendBarChart } from "@/features/trends/TrendBarChart";
-import {
-  formatPercent,
-  formatTrendChartCaption,
-  formatYen,
-  formatYenManAxis,
-} from "@/lib/format-yen";
+import { TrendLineChart } from "@/features/trends/TrendLineChart";
+import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
+import { formatPercent, formatYen } from "@/lib/format-yen";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
+
+function mapSeriesToDeltas(series: TrendChartSeries[]): TrendChartSeries[] {
+  let result: TrendChartSeries[] = [];
+  result = series.map((item) => ({
+    ...item,
+    values: computeTrendPeriodDeltas(item.values),
+  }));
+  return result;
+}
 
 export function TrendsDetailPanel() {
   const {
@@ -48,14 +55,10 @@ export function TrendsDetailPanel() {
     (scheme) => scheme.schemeCode === activeSchemeCode,
   );
 
+  const hasMultipleBuckets = displayTrendPoints.length >= 2;
+
   const allocationSeries = (() => {
-    let seriesResult: Array<{
-      key: string;
-      label: string;
-      color: string;
-      values: Array<number | null>;
-      formatValue?: (value: number) => string;
-    }> = [];
+    let seriesResult: TrendChartSeries[] = [];
     const valueCodes = new Set<string>();
     for (const point of displayTrendPoints) {
       const slices = point.allocationsByScheme[activeSchemeCode] ?? [];
@@ -88,7 +91,9 @@ export function TrendsDetailPanel() {
     return seriesResult;
   })();
 
-  const gainRateSeries = [
+  const allocationDeltaSeries = mapSeriesToDeltas(allocationSeries);
+
+  const gainRateSeries: TrendChartSeries[] = [
     {
       key: "gain-rate-book",
       label: "簿価ベース利益率",
@@ -107,23 +112,47 @@ export function TrendsDetailPanel() {
     item.values.some((value) => value !== null && Number.isFinite(value)),
   );
 
+  const gainRateDeltaSeries = mapSeriesToDeltas(gainRateSeries);
+
+  const marketValueDeltaSeries: TrendChartSeries[] = [
+    {
+      key: "market-value-delta",
+      label: "評価額の変化",
+      color: "#2563eb",
+      values: computeTrendPeriodDeltas(
+        displayTrendPoints.map((point) => point.totalMarketValueMinor),
+      ),
+      formatValue: (value) => formatYen(value),
+    },
+  ];
+
+  const gainDeltaSeries: TrendChartSeries[] = [
+    {
+      key: "gain-delta",
+      label: "評価損益の変化",
+      color: "#16a34a",
+      values: computeTrendPeriodDeltas(
+        displayTrendPoints.map((point) => point.unrealizedGainMinor),
+      ),
+      formatValue: (value) => formatYen(value),
+    },
+  ];
+
   result = (
     <div className="trends-detail">
-      <p className="trends-detail__unit-label">
-        {formatTrendChartCaption(trendDisplayUnitLabel)}
-      </p>
       {displayTrendPoints.length === 1 ? (
         <p className="trends-detail__single-bucket-note">
           この期間は1か月分のデータです
         </p>
       ) : null}
       <section className="trends-detail__section">
-        <h2>総資産</h2>
         <TrendBarChart
+          title="総資産"
+          caption={trendDisplayUnitLabel}
+          valueKind="yen"
           labels={labels}
           sourceDates={sourceDates}
           mode="grouped"
-          formatYAxis={formatYenManAxis}
           series={[
             {
               key: "market-value",
@@ -134,15 +163,28 @@ export function TrendsDetailPanel() {
             },
           ]}
         />
+        {hasMultipleBuckets ? (
+          <div className="trends-detail__subsection">
+            <TrendLineChart
+              title="前回比の変化"
+              caption={trendDisplayUnitLabel}
+              valueKind="yen"
+              labels={labels}
+              sourceDates={sourceDates}
+              series={marketValueDeltaSeries}
+            />
+          </div>
+        ) : null}
       </section>
 
       <section className="trends-detail__section">
-        <h2>損益</h2>
         <TrendBarChart
+          title="損益"
+          caption={trendDisplayUnitLabel}
+          valueKind="yen"
           labels={labels}
           sourceDates={sourceDates}
           mode="grouped"
-          formatYAxis={formatYenManAxis}
           series={[
             {
               key: "gain",
@@ -153,24 +195,48 @@ export function TrendsDetailPanel() {
             },
           ]}
         />
+        {hasMultipleBuckets ? (
+          <div className="trends-detail__subsection">
+            <TrendLineChart
+              title="前回比の変化"
+              caption={trendDisplayUnitLabel}
+              valueKind="yen"
+              labels={labels}
+              sourceDates={sourceDates}
+              series={gainDeltaSeries}
+            />
+          </div>
+        ) : null}
       </section>
 
       {gainRateSeries.length > 0 ? (
         <section className="trends-detail__section">
-          <h2>利益率</h2>
           <TrendBarChart
+            title="利益率"
+            caption={trendDisplayUnitLabel}
+            valueKind="percent"
             labels={labels}
             sourceDates={sourceDates}
             mode="grouped"
-            formatYAxis={(value) => formatPercent(value)}
             series={gainRateSeries}
           />
+          {hasMultipleBuckets && gainRateDeltaSeries.length > 0 ? (
+            <div className="trends-detail__subsection">
+              <TrendLineChart
+                title="前回比の変化"
+                caption={trendDisplayUnitLabel}
+                valueKind="percent"
+                labels={labels}
+                sourceDates={sourceDates}
+                series={gainRateDeltaSeries}
+              />
+            </div>
+          ) : null}
         </section>
       ) : null}
 
       {schemeCodes.length > 0 && allocationSeries.length > 0 ? (
         <section className="trends-detail__section">
-          <h2>分析軸別構成比</h2>
           <div className="analysis-axis-tabs" role="tablist" aria-label="分析軸">
             {schemeCodes.map((scheme) => {
               let tab = (
@@ -196,14 +262,43 @@ export function TrendsDetailPanel() {
             <p className="trends-detail__scheme-label">{activeScheme.schemeName}</p>
           ) : null}
           <TrendBarChart
+            title="分析軸別構成比"
+            caption={trendDisplayUnitLabel}
+            valueKind="percent"
             labels={labels}
             sourceDates={sourceDates}
             mode="stacked"
             valueDomain={{ min: 0, max: 1 }}
-            formatYAxis={(value) => formatPercent(value)}
             series={allocationSeries}
             height={240}
           />
+          {hasMultipleBuckets ? (
+            <>
+              <div className="trends-detail__subsection">
+                <TrendLineChart
+                  title="構成比の推移"
+                  caption={trendDisplayUnitLabel}
+                  valueKind="percent"
+                  labels={labels}
+                  sourceDates={sourceDates}
+                  domainMode="fitData"
+                  series={allocationSeries}
+                  height={240}
+                />
+              </div>
+              <div className="trends-detail__subsection">
+                <TrendLineChart
+                  title="前回比の変化"
+                  caption={trendDisplayUnitLabel}
+                  valueKind="percent"
+                  labels={labels}
+                  sourceDates={sourceDates}
+                  series={allocationDeltaSeries}
+                  height={240}
+                />
+              </div>
+            </>
+          ) : null}
         </section>
       ) : null}
     </div>

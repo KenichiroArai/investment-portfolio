@@ -86,13 +86,36 @@ describe("TrendBarChart", () => {
     expect(axisLabels).toEqual(["0", "100", "200", "300", "400"]);
   });
 
+  it("shows yen unit on each y-axis tick", () => {
+    const { container } = render(
+      <TrendBarChart
+        labels={["2026年6月"]}
+        valueKind="yen"
+        series={[
+          {
+            key: "market-value",
+            label: "評価額",
+            color: "#2563eb",
+            values: [3_441_347],
+          },
+        ]}
+      />,
+    );
+
+    const axisLabels = Array.from(
+      container.querySelectorAll(".trend-bar-chart__y-label"),
+    ).map((node) => node.textContent);
+    expect(axisLabels.every((label) => label?.endsWith("万円"))).toBe(true);
+    expect(container.querySelector(".trend-chart__y-unit")).toBeNull();
+  });
+
   it("uses 25% axis ticks for stacked ratio charts", () => {
-    render(
+    const { container } = render(
       <TrendBarChart
         labels={["2026年6月"]}
         mode="stacked"
         valueDomain={{ min: 0, max: 1 }}
-        formatYAxis={(value) => formatPercent(value)}
+        valueKind="percent"
         series={[
           {
             key: "equity",
@@ -110,7 +133,10 @@ describe("TrendBarChart", () => {
       />,
     );
 
-    const axisLabels = screen.getAllByText(/%$/).map((node) => node.textContent);
-    expect(axisLabels).toEqual(["0.0%", "25.0%", "50.0%", "75.0%", "100.0%"]);
+    const axisLabels = Array.from(
+      container.querySelectorAll(".trend-bar-chart__y-label"),
+    ).map((node) => node.textContent);
+    expect(axisLabels).toEqual(["0.00%", "25%", "50%", "75%", "100%"]);
+    expect(container.querySelector(".trend-chart__y-unit")).toBeNull();
   });
 });

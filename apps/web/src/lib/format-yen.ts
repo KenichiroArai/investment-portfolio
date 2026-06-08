@@ -29,6 +29,30 @@ export function formatPercent(ratio: number): string {
   return result;
 }
 
+export function formatPercentAxis(ratio: number): string {
+  let result = "0%";
+
+  if (!Number.isFinite(ratio)) {
+    return result;
+  }
+
+  const percent = ratio * 100;
+  const abs = Math.abs(percent);
+
+  if (abs >= 10) {
+    result = `${percent.toFixed(0)}%`;
+    return result;
+  }
+
+  if (abs >= 1) {
+    result = `${percent.toFixed(1)}%`;
+    return result;
+  }
+
+  result = `${percent.toFixed(2)}%`;
+  return result;
+}
+
 function formatManNumber(man: number): string {
   let result = "0";
   const abs = Math.abs(man);
@@ -73,7 +97,53 @@ export function formatYenManAxis(minor: number): string {
   return result;
 }
 
+export function formatYenAxis(minor: number): string {
+  let result = "0";
+
+  if (!Number.isFinite(minor)) {
+    return result;
+  }
+
+  result = new Intl.NumberFormat("ja-JP", {
+    maximumFractionDigits: 0,
+  }).format(minor);
+  return result;
+}
+
+export function formatYenAxisLabel(minor: number): string {
+  let result = "0円";
+
+  if (!Number.isFinite(minor)) {
+    return result;
+  }
+
+  result = `${formatYenAxis(minor)}円`;
+  return result;
+}
+
+export type TrendChartValueUnit = "yenMan" | "yen" | "percent";
+
+export function formatTrendChartMeta(
+  displayUnitLabel: string,
+  valueUnit: TrendChartValueUnit,
+): string {
+  let result = displayUnitLabel;
+
+  if (valueUnit === "yenMan") {
+    result = `${displayUnitLabel}・金額単位: 万円`;
+    return result;
+  }
+
+  if (valueUnit === "yen") {
+    result = `${displayUnitLabel}・金額単位: 円`;
+    return result;
+  }
+
+  result = `${displayUnitLabel}・単位: %`;
+  return result;
+}
+
 export function formatTrendChartCaption(displayUnitLabel: string): string {
-  let result = `${displayUnitLabel}・金額単位: 万円`;
+  let result = formatTrendChartMeta(displayUnitLabel, "yenMan");
   return result;
 }

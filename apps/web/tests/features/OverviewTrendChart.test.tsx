@@ -1,16 +1,16 @@
 import { cleanup, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { TrendsDetailPanel } from "@/features/trends/TrendsDetailPanel";
+import { OverviewTrendChart } from "@/features/trends/OverviewTrendChart";
 import { renderWithPortfolioTime } from "../helpers/portfolio-time-test-utils";
 
-describe("TrendsDetailPanel", () => {
+describe("OverviewTrendChart", () => {
   afterEach(() => {
     cleanup();
     vi.unstubAllGlobals();
   });
 
-  it("renders monthly aggregated bar chart labels", async () => {
+  it("renders delta line chart when multiple buckets exist", async () => {
     const trendsResponse = {
       portfolioCode: "ideco",
       from: "2026-05-31",
@@ -85,21 +85,13 @@ describe("TrendsDetailPanel", () => {
       }),
     );
 
-    renderWithPortfolioTime(<TrendsDetailPanel />);
+    renderWithPortfolioTime(<OverviewTrendChart />);
 
     await waitFor(() => {
-      expect(
-        screen.getAllByText("月次表示（各月の最終基準日）").length,
-      ).toBeGreaterThan(0);
-      expect(
-        document.querySelectorAll(".trend-bar-chart__y-label, .trend-line-chart__y-label").length,
-      ).toBeGreaterThan(0);
-      expect(screen.getAllByText("2026年5月").length).toBeGreaterThan(0);
-      expect(screen.getAllByText("2026年6月").length).toBeGreaterThan(0);
-      expect(screen.getByRole("heading", { name: "総資産" })).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: "損益" })).toBeInTheDocument();
-      expect(screen.getAllByRole("heading", { name: "前回比の変化" }).length).toBeGreaterThan(0);
-      expect(screen.getAllByLabelText("推移折れ線グラフ").length).toBeGreaterThan(0);
+      expect(screen.getByRole("heading", { name: "資産推移" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "前回比の変化" })).toBeInTheDocument();
+      expect(screen.getByLabelText("推移棒グラフ")).toBeInTheDocument();
+      expect(screen.getByLabelText("推移折れ線グラフ")).toBeInTheDocument();
     });
   });
 });

@@ -1,17 +1,17 @@
 "use client";
 
-import { buildNiceAxisScale } from "@repo/shared";
+import {
+  buildNiceAxisScale,
+  type TrendChartValueKind,
+} from "@repo/shared";
 import { useMemo, useState, type ReactNode } from "react";
 
+import { TrendChartHeader } from "@/features/trends/TrendChartHeader";
+import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
+import { useTrendYAxis } from "@/features/trends/use-trend-y-axis";
 import { formatAsOfDateJa } from "@/lib/format-yen";
 
-export type TrendBarSeries = {
-  key: string;
-  label: string;
-  color: string;
-  values: Array<number | null>;
-  formatValue?: (value: number) => string;
-};
+export type TrendBarSeries = TrendChartSeries;
 
 type TrendBarChartMode = "grouped" | "stacked";
 
@@ -24,10 +24,14 @@ type TrendBarChartProps = {
   className?: string;
   valueDomain?: { min: number; max: number };
   formatYAxis?: (value: number) => string;
+  valueKind?: TrendChartValueKind;
+  title?: string;
+  titleLevel?: "h2" | "h3";
+  caption?: string;
 };
 
 const CHART_HEIGHT = 220;
-const PADDING = { top: 16, right: 16, bottom: 48, left: 72 };
+const PADDING = { top: 16, right: 16, bottom: 48, left: 88 };
 const MIN_BAR_SLOT_WIDTH = 56;
 const MAX_BAR_SLOT_WIDTH = 96;
 
@@ -56,6 +60,10 @@ export function TrendBarChart({
   className,
   valueDomain,
   formatYAxis,
+  valueKind,
+  title,
+  titleLevel = "h2",
+  caption,
 }: TrendBarChartProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
@@ -70,6 +78,7 @@ export function TrendBarChart({
   const activeSeries = series.filter((item) =>
     item.values.some((value) => value !== null && Number.isFinite(value)),
   );
+  const yAxis = useTrendYAxis(activeSeries, valueKind, formatYAxis);
 
   const { minValue, maxValue, yAxisTicks } = useMemo(() => {
     let rawMin = Number.POSITIVE_INFINITY;
@@ -148,6 +157,9 @@ export function TrendBarChart({
 
   result = (
     <div className={className ? `trend-bar-chart ${className}` : "trend-bar-chart"}>
+      {title ? (
+        <TrendChartHeader title={title} titleLevel={titleLevel} caption={caption} />
+      ) : null}
       <div className="trend-bar-chart__scroll">
         <svg
           viewBox={`0 0 ${chartWidth} ${height}`}
@@ -174,11 +186,7 @@ export function TrendBarChart({
                     textAnchor="end"
                     className="trend-bar-chart__y-label"
                   >
-                    {formatYAxis
-                      ? formatYAxis(tick)
-                      : activeSeries[0]?.formatValue
-                        ? activeSeries[0].formatValue(tick)
-                        : String(tick)}
+                    {yAxis.formatTick(tick)}
                   </text>
                 </g>
               );
