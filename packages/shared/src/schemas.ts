@@ -71,3 +71,16 @@ export type SetInstrumentClassificationsInput = z.infer<
 export type ReplaceCurrentSnapshotInput = z.infer<
   typeof replaceCurrentSnapshotSchema
 >;
+
+export const snapshotTrendsQuerySchema = z.object({
+  from: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  to: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+});
+
+export type SnapshotTrendsQueryInput = z.infer<typeof snapshotTrendsQuerySchema>;

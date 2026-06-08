@@ -6,18 +6,23 @@ import {
   findInstrumentById,
   findSchemeById,
   getCurrentSnapshot,
+  getSnapshotByDate,
+  getSnapshotsInDateRange,
   listPortfolios,
+  listSnapshotDates,
   replaceCurrentSnapshot,
   setInstrumentClassifications,
   type AppDatabase,
 } from "@repo/db";
 import {
+  buildSnapshotTrends,
   createClassificationSchemeSchema,
   createClassificationValueSchema,
   createInstrumentSchema,
   createPortfolioSchema,
   replaceCurrentSnapshotSchema,
   setInstrumentClassificationsSchema,
+  snapshotTrendsQuerySchema,
 } from "@repo/shared";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
@@ -164,6 +169,90 @@ export function createApp(options?: CreateAppOptions) {
       parsed.data.classificationValueIds,
     );
     result = c.json({ ok: true });
+    return result;
+  });
+
+  app.get("/portfolios/:code/snapshots", async (c) => {
+    let result!: Response;
+
+    const db = resolveDb();
+    const portfolioCode = c.req.param("code");
+    const dates = await listSnapshotDates(db, portfolioCode);
+    if (dates.length === 0) {
+      const portfolio = await listPortfolios(db);
+      const exists = portfolio.some((item) => item.code === portfolioCode);
+      if (!exists) {
+        result = c.json({ error: "Portfolio not found" }, 404);
+        return result;
+      }
+    }
+
+    result = c.json({
+      portfolioCode,
+      dates,
+    });
+    return result;
+  });
+
+  app.get("/portfolios/:code/snapshots/trends", async (c) => {
+    let result!: Response;
+
+    const query = snapshotTrendsQuerySchema.safeParse({
+      from: c.req.query("from"),
+      to: c.req.query("to"),
+    });
+    if (!query.success) {
+      result = c.json({ error: query.error.flatten() }, 400);
+      return result;
+    }
+
+    const db = resolveDb();
+    const portfolioCode = c.req.param("code");
+    const dateList = await listSnapshotDates(db, portfolioCode);
+    if (dateList.length === 0) {
+      const portfolio = await listPortfolios(db);
+      const exists = portfolio.some((item) => item.code === portfolioCode);
+      if (!exists) {
+        result = c.json({ error: "Portfolio not found" }, 404);
+        return result;
+      }
+      result = c.json({
+        portfolioCode,
+        from: query.data.from ?? "",
+        to: query.data.to ?? "",
+        points: [],
+      });
+      return result;
+    }
+
+    const sortedDates = [...dateList]
+      .map((item) => item.asOfDate)
+      .sort((left, right) => left.localeCompare(right));
+    const from = query.data.from ?? sortedDates[0];
+    const to = query.data.to ?? sortedDates[sortedDates.length - 1];
+    const snapshots = await getSnapshotsInDateRange(db, portfolioCode, from, to);
+    const trends = buildSnapshotTrends(portfolioCode, snapshots, from, to);
+    result = c.json(trends);
+    return result;
+  });
+
+  app.get("/portfolios/:code/snapshots/:asOfDate", async (c) => {
+    let result!: Response;
+
+    const asOfDate = c.req.param("asOfDate");
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(asOfDate)) {
+      result = c.json({ error: "Invalid asOfDate" }, 400);
+      return result;
+    }
+
+    const db = resolveDb();
+    const snapshot = await getSnapshotByDate(db, c.req.param("code"), asOfDate);
+    if (!snapshot) {
+      result = c.json({ error: "Snapshot not found" }, 404);
+      return result;
+    }
+
+    result = c.json(snapshot);
     return result;
   });
 

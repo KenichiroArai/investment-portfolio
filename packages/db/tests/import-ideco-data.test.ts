@@ -13,6 +13,7 @@ import {
   getIdecoCurrentSnapshot,
   importIdecoData,
 } from "../src/import-ideco-data";
+import { getSnapshotByDate, listSnapshotDates } from "../src/repositories/snapshots";
 import {
   findClassificationValueBySchemeAndCode,
   findSchemeByPortfolioCodeAndSchemeCode,
@@ -131,6 +132,34 @@ describe("importIdecoData", () => {
       createdInstruments: 0,
       reusedInstruments: 2,
     });
+  });
+
+  it("imports multiple as-of dates from holdings csv", async () => {
+    const db = setup();
+    const holdingsCsv = `番号,日付,運用商品名,時価単価(1万口当り),残高数量,資産残高,購入金額,損益,損益率
+1,2026/06/02,eMAXIS Slim 国内株式(TOPIX),"31351","41773","130962","128324","2638","0.021"
+2,2026/06/07,eMAXIS Slim 全世界株式(除く日本),"38275","104130","398557","385705","12852","0.033"
+`;
+    const outcome = await importIdecoData(
+      db,
+      readIdecoImportFiles({
+        holdingsCsv,
+      }),
+    );
+    expect(outcome).toMatchObject({
+      asOfDate: "2026-06-07",
+      lineCount: 1,
+    });
+
+    const current = await getIdecoCurrentSnapshot(db);
+    expect(current?.asOfDate).toBe("2026-06-07");
+    const dates = await listSnapshotDates(db, "ideco");
+    expect(dates.map((item) => item.asOfDate)).toEqual([
+      "2026-06-07",
+      "2026-06-02",
+    ]);
+    const older = await getSnapshotByDate(db, "ideco", "2026-06-02");
+    expect(older?.lines).toHaveLength(1);
   });
 
   it("returns null when holdings reference unknown short name", async () => {

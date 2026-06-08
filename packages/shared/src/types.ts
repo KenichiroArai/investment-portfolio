@@ -52,6 +52,18 @@ export type CurrentSnapshotDto = {
   lines: HoldingLineDto[];
 };
 
+export type SnapshotDateListItemDto = {
+  asOfDate: string;
+  isCurrent: boolean;
+};
+
+export type SnapshotDateListDto = {
+  portfolioCode: string;
+  dates: SnapshotDateListItemDto[];
+};
+
+export type { SnapshotTrendPointDto, SnapshotTrendsDto } from "./snapshot-trends";
+
 export type HealthDto = {
   status: "ok";
 };

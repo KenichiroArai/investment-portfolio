@@ -26,20 +26,80 @@ export function getBasePath(): string {
   return result;
 }
 
+function getStaticDataPrefix(): string {
+  let result = "";
+  const basePath = getBasePath();
+  result = basePath.endsWith("/") ? basePath.slice(0, -1) : basePath;
+  return result;
+}
+
 export function getSnapshotFetchUrl(portfolioCode: string): string {
   let result = "";
 
   const source = getDataSource();
   if (source === "static") {
-    const basePath = getBasePath();
-    const prefix = basePath.endsWith("/")
-      ? basePath.slice(0, -1)
-      : basePath;
-    result = `${prefix}/data/portfolios/${portfolioCode}/current.json`;
+    result = `${getStaticDataPrefix()}/data/portfolios/${portfolioCode}/current.json`;
     return result;
   }
 
   result = `${getApiBaseUrl()}/portfolios/${portfolioCode}/snapshot/current`;
+  return result;
+}
+
+export function getSnapshotDatesFetchUrl(portfolioCode: string): string {
+  let result = "";
+
+  const source = getDataSource();
+  if (source === "static") {
+    result = `${getStaticDataPrefix()}/data/portfolios/${portfolioCode}/snapshots-index.json`;
+    return result;
+  }
+
+  result = `${getApiBaseUrl()}/portfolios/${portfolioCode}/snapshots`;
+  return result;
+}
+
+export function getSnapshotByDateFetchUrl(
+  portfolioCode: string,
+  asOfDate: string,
+): string {
+  let result = "";
+
+  const source = getDataSource();
+  if (source === "static") {
+    result = `${getStaticDataPrefix()}/data/portfolios/${portfolioCode}/snapshots/${asOfDate}.json`;
+    return result;
+  }
+
+  result = `${getApiBaseUrl()}/portfolios/${portfolioCode}/snapshots/${asOfDate}`;
+  return result;
+}
+
+export function getSnapshotTrendsFetchUrl(
+  portfolioCode: string,
+  from?: string,
+  to?: string,
+): string {
+  let result = "";
+
+  const source = getDataSource();
+  if (source === "static") {
+    result = `${getStaticDataPrefix()}/data/portfolios/${portfolioCode}/trends-summary.json`;
+    return result;
+  }
+
+  const params = new URLSearchParams();
+  if (from) {
+    params.set("from", from);
+  }
+  if (to) {
+    params.set("to", to);
+  }
+  const query = params.toString();
+  result = `${getApiBaseUrl()}/portfolios/${portfolioCode}/snapshots/trends`;
+  if (query !== "") {
+    result = `${result}?${query}`;
+  }
   return result;
 }
 

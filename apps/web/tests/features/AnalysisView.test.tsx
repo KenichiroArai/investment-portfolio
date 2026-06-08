@@ -1,7 +1,11 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { AnalysisView } from "@/features/analysis/AnalysisView";
+import {
+  createPortfolioFetchMock,
+  renderWithPortfolioTime,
+} from "../helpers/portfolio-time-test-utils";
 
 const snapshotFixture = {
   id: "snap-1",
@@ -51,14 +55,14 @@ describe("AnalysisView", () => {
   it("renders allocation by active scheme", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: async () => snapshotFixture,
+      createPortfolioFetchMock({
+        snapshot: snapshotFixture,
       }),
     );
 
-    render(<AnalysisView portfolioCode="ideco" portfolioKind="ideco" />);
+    renderWithPortfolioTime(
+      <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+    );
 
     await waitFor(() => {
       expect(screen.getByText(/評価額合計/)).toBeInTheDocument();
@@ -81,10 +85,8 @@ describe("AnalysisView", () => {
   it("shows uncovered amount when lines lack tags for the active scheme", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: async () => ({
+      createPortfolioFetchMock({
+        snapshot: {
           ...snapshotFixture,
           lines: [
             ...snapshotFixture.lines,
@@ -101,11 +103,13 @@ describe("AnalysisView", () => {
               tags: [],
             },
           ],
-        }),
+        },
       }),
     );
 
-    render(<AnalysisView portfolioCode="ideco" portfolioKind="ideco" />);
+    renderWithPortfolioTime(
+      <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+    );
 
     await waitFor(() => {
       expect(screen.getByText(/分類対象額/)).toBeInTheDocument();

@@ -11,7 +11,7 @@ import {
   isIdecoAnalysisSchemeCode,
   parseIdecoAnalysisCsv,
   parseIdecoGenericCsv,
-  parseIdecoHoldingsCsv,
+  parseIdecoHoldingsCsvByDate,
   parseIdecoInstrumentsCsv,
   parseIdecoProductTypesCsv,
   type IdecoAnalysisMemberMapping,
@@ -19,7 +19,8 @@ import {
   type IdecoInstrumentCsvRow,
   type ParseIdecoAnalysisCsvResult,
   type ParseIdecoGenericCsvResult,
-  type ParseIdecoHoldingsCsvResult,
+  type IdecoHoldingsCsvRow,
+  type ParseIdecoHoldingsCsvByDateResult,
 } from "@repo/shared";
 
 import type { AppDatabase } from "./client";
@@ -70,7 +71,11 @@ import {
   createPortfolio,
   findPortfolioByCode,
 } from "./repositories/portfolios";
-import { getCurrentSnapshot, replaceCurrentSnapshot } from "./repositories/snapshots";
+import {
+  getCurrentSnapshot,
+  setCurrentSnapshot,
+  upsertSnapshotByDate,
+} from "./repositories/snapshots";
 
 const IDECO_PORTFOLIO_CODE = "ideco";
 const IDECO_PORTFOLIO_NAME = "iDeCo";
@@ -478,29 +483,24 @@ async function importInstrumentsFromParsed(
   return result;
 }
 
-async function importHoldingsFromParsed(
-  db: AppDatabase,
-  parsed: ParseIdecoHoldingsCsvResult,
-  genericParsed: ParseIdecoGenericCsvResult,
-) {
-  let result: Awaited<ReturnType<typeof replaceCurrentSnapshot>> = null;
-
-  const lines: Array<{
+async function buildHoldingLinesFromRows(db: AppDatabase, rows: IdecoHoldingsCsvRow[]) {
+  let result: Array<{
     instrumentId: string;
     sortOrder: number;
     quantity: number;
     marketValueMinor: number;
     bookValueMinor: number;
     metrics: ReturnType<typeof buildIdecoKakeiboMetrics>;
-  }> = [];
+  }> | null = [];
 
-  for (const row of parsed.rows) {
+  for (const row of rows) {
     const instrumentId = await resolveHoldingInstrumentId(db, row.instrumentName);
     if (!instrumentId) {
+      result = null;
       return result;
     }
 
-    lines.push({
+    result.push({
       instrumentId,
       sortOrder: row.rowNumber,
       quantity: row.quantity,
@@ -514,12 +514,49 @@ async function importHoldingsFromParsed(
     });
   }
 
-  result = await replaceCurrentSnapshot(db, {
-    portfolioCode: IDECO_PORTFOLIO_CODE,
-    asOfDate: parsed.asOfDate,
-    lines,
-    metrics: genericParsed.metrics,
-  });
+  return result;
+}
+
+async function importHoldingsFromParsedByDate(
+  db: AppDatabase,
+  parsed: ParseIdecoHoldingsCsvByDateResult,
+  genericParsed: ParseIdecoGenericCsvResult,
+) {
+  let result: Awaited<ReturnType<typeof getCurrentSnapshot>> = null;
+
+  if (parsed.snapshots.length === 0) {
+    return result;
+  }
+
+  const latestAsOfDate = parsed.snapshots[parsed.snapshots.length - 1].asOfDate;
+
+  for (const group of parsed.snapshots) {
+    const lines = await buildHoldingLinesFromRows(db, group.rows);
+    if (!lines) {
+      return result;
+    }
+
+    const isLatest = group.asOfDate === latestAsOfDate;
+    const snapshot = await upsertSnapshotByDate(db, {
+      portfolioCode: IDECO_PORTFOLIO_CODE,
+      asOfDate: group.asOfDate,
+      lines,
+      metrics: isLatest ? genericParsed.metrics : undefined,
+      setAsCurrent: isLatest,
+    });
+    if (!snapshot) {
+      return result;
+    }
+    if (isLatest) {
+      result = snapshot;
+    }
+  }
+
+  if (result) {
+    return result;
+  }
+
+  result = await setCurrentSnapshot(db, IDECO_PORTFOLIO_CODE, latestAsOfDate);
   return result;
 }
 
@@ -532,7 +569,7 @@ export async function importIdecoData(
   const productTypesParsed = parseIdecoProductTypesCsv(files.productTypesCsv);
   const analysisParsed = parseIdecoAnalysisCsv(files.analysisCsv);
   const instrumentsParsed = parseIdecoInstrumentsCsv(files.instrumentsCsv);
-  const holdingsParsed = parseIdecoHoldingsCsv(files.holdingsCsv);
+  const holdingsParsed = parseIdecoHoldingsCsvByDate(files.holdingsCsv);
   const genericParsed = parseIdecoGenericCsv(files.genericCsv);
 
   await ensureIdecoPortfolio(db);
@@ -559,14 +596,15 @@ export async function importIdecoData(
     return result;
   }
 
-  const snapshot = await importHoldingsFromParsed(db, holdingsParsed, genericParsed);
+  const snapshot = await importHoldingsFromParsedByDate(db, holdingsParsed, genericParsed);
   if (!snapshot) {
     return result;
   }
 
+  const latestGroup = holdingsParsed.snapshots[holdingsParsed.snapshots.length - 1];
   result = {
-    asOfDate: holdingsParsed.asOfDate,
-    lineCount: holdingsParsed.rows.length,
+    asOfDate: latestGroup.asOfDate,
+    lineCount: latestGroup.rows.length,
     instrumentCount: instrumentsParsed.rows.length,
     createdInstruments: counters.created,
     reusedInstruments: counters.reused,

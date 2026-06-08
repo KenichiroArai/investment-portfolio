@@ -25,6 +25,7 @@ const CONTEXT_TABS: ContextTab[] = [
   { segment: "", label: "概要", enabled: true },
   { segment: "holdings", label: "明細", enabled: true },
   { segment: "analysis", label: "分析", enabled: true },
+  { segment: "trends", label: "推移", enabled: true },
   { segment: "register", label: "登録", enabled: true },
   { segment: "edit", label: "更新", enabled: true },
 ];
@@ -50,6 +51,11 @@ function isTabActive(pathname: string, portfolioCode: string, segment: string): 
 
   if (segment === "analysis") {
     result = pathname.startsWith(`${base}/analysis`);
+    return result;
+  }
+
+  if (segment === "trends") {
+    result = pathname.startsWith(`${base}/trends`);
     return result;
   }
 

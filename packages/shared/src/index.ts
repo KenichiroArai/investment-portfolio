@@ -2,6 +2,8 @@ export * from "./analysis-schemes";
 export * from "./holding-line-metrics";
 export * from "./portfolio-snapshot-metrics";
 export * from "./snapshot-allocation";
+export * from "./snapshot-time-range";
+export * from "./snapshot-trends";
 export * from "./ideco-analysis";
 export * from "./ideco-analysis-csv";
 export * from "./ideco-csv-utils";

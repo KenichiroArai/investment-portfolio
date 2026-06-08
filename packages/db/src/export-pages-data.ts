@@ -2,10 +2,16 @@ import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { buildSnapshotTrends } from "@repo/shared";
+
 import { createDb } from "./client";
 import { resolveDatabasePath } from "./database-path";
 import { listPortfolios } from "./repositories/portfolios";
-import { getCurrentSnapshot } from "./repositories/snapshots";
+import {
+  getCurrentSnapshot,
+  getSnapshotByDate,
+  listSnapshotDates,
+} from "./repositories/snapshots";
 
 const packageDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(packageDir, "../../..");
@@ -54,6 +60,60 @@ async function main() {
     writeFileSync(outPath, `${JSON.stringify(snapshot, null, 2)}\n`, "utf8");
     exported += 1;
     console.log(`Exported: ${outPath}`);
+
+    const dates = await listSnapshotDates(db, portfolio.code);
+    const snapshotsDir = resolve(outDir, "snapshots");
+    mkdirSync(snapshotsDir, { recursive: true });
+
+    writeFileSync(
+      resolve(outDir, "snapshots-index.json"),
+      `${JSON.stringify(
+        {
+          portfolioCode: portfolio.code,
+          dates,
+        },
+        null,
+        2,
+      )}\n`,
+      "utf8",
+    );
+    console.log(`Exported: ${resolve(outDir, "snapshots-index.json")}`);
+
+    const snapshotsForTrends = [];
+    for (const dateItem of dates) {
+      const datedSnapshot = await getSnapshotByDate(
+        db,
+        portfolio.code,
+        dateItem.asOfDate,
+      );
+      if (!datedSnapshot) {
+        continue;
+      }
+      writeFileSync(
+        resolve(snapshotsDir, `${dateItem.asOfDate}.json`),
+        `${JSON.stringify(datedSnapshot, null, 2)}\n`,
+        "utf8",
+      );
+      snapshotsForTrends.push(datedSnapshot);
+    }
+
+    if (snapshotsForTrends.length > 0) {
+      const sortedDates = [...dates]
+        .map((item) => item.asOfDate)
+        .sort((left, right) => left.localeCompare(right));
+      const trends = buildSnapshotTrends(
+        portfolio.code,
+        snapshotsForTrends,
+        sortedDates[0],
+        sortedDates[sortedDates.length - 1],
+      );
+      writeFileSync(
+        resolve(outDir, "trends-summary.json"),
+        `${JSON.stringify(trends, null, 2)}\n`,
+        "utf8",
+      );
+      console.log(`Exported: ${resolve(outDir, "trends-summary.json")}`);
+    }
   }
 
   sqlite.close();

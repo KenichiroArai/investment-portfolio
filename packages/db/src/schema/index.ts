@@ -156,6 +156,10 @@ export const portfolioSnapshots = sqliteTable(
         table.portfolioId,
         table.isCurrent,
       ),
+      unique("portfolio_snapshots_portfolio_date_unique").on(
+        table.portfolioId,
+        table.asOfDate,
+      ),
     ];
     return result;
   },

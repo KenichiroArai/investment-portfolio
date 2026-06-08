@@ -1,0 +1,13 @@
+{
+  "portfolioCode": "ideco",
+  "dates": [
+    {
+      "asOfDate": "2026-06-07",
+      "isCurrent": true
+    },
+    {
+      "asOfDate": "2026-06-02",
+      "isCurrent": false
+    }
+  ]
+}

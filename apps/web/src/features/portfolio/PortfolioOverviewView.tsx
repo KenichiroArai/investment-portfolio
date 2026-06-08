@@ -1,24 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import type { CurrentSnapshotDto } from "@repo/shared";
 import {
   computeSnapshotGainRate,
   computeSnapshotPortfolioGainMinor,
   resolveSnapshotTotalContributions,
   sumSnapshotMarketValue,
 } from "@repo/shared";
-import { useEffect, useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 
+import { OverviewTrendChart } from "@/features/trends/OverviewTrendChart";
+import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
 import {
   formatAsOfDateJa,
   formatPercent,
   formatYen,
 } from "@/lib/format-yen";
-import {
-  getSnapshotFetchUrl,
-  getSnapshotLoadErrorMessage,
-} from "@/lib/data-source";
 
 type PortfolioOverviewViewProps = {
   portfolioCode: string;
@@ -59,60 +56,20 @@ function AssetStatusField({ label, value, labelHint }: AssetStatusFieldProps) {
 export function PortfolioOverviewView({
   portfolioCode,
 }: PortfolioOverviewViewProps) {
-  const [snapshot, setSnapshot] = useState<CurrentSnapshotDto | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let result: () => void = () => {};
-    let cancelled = false;
-
-    async function load() {
-      let result: void = undefined;
-
-      setLoading(true);
-      setError(null);
-      const url = getSnapshotFetchUrl(portfolioCode);
-      try {
-        const response = await fetch(url);
-        if (cancelled) {
-          return result;
-        }
-        if (response.status === 404) {
-          setSnapshot(null);
-          setError("明細がまだ登録されていません。");
-          return result;
-        }
-        if (!response.ok) {
-          setError("データの取得に失敗しました。");
-          return result;
-        }
-        const data = (await response.json()) as CurrentSnapshotDto;
-        setSnapshot(data);
-      } catch {
-        if (!cancelled) {
-          setError(getSnapshotLoadErrorMessage());
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-
-      return result;
-    }
-
-    void load();
-
-    result = () => {
-      cancelled = true;
-    };
-    return result;
-  }, [portfolioCode]);
+  const {
+    snapshot,
+    loadingSnapshot,
+    loadingDates,
+    error,
+    selectedAsOfDate,
+    isHistoricalView,
+    currentAsOfDate,
+    trends,
+  } = usePortfolioTime();
 
   let result: ReactNode = null;
 
-  if (loading) {
+  if (loadingDates || loadingSnapshot) {
     result = (
       <main>
         <p>読み込み中…</p>
@@ -164,12 +121,22 @@ export function PortfolioOverviewView({
       ? "—"
       : formatPercent(gainRateOnAssetBalance);
 
+  const latestPoint =
+    trends?.points.find((point) => point.asOfDate === currentAsOfDate) ??
+    trends?.points[trends.points.length - 1];
+  const deltaHint =
+    isHistoricalView && latestPoint
+      ? `最新比 評価額 ${formatYen(latestPoint.totalMarketValueMinor - assetBalance)}`
+      : null;
+
   result = (
     <main className="portfolio-overview">
       <h1 className="asset-status__title">資産状況</h1>
       <div className="asset-status__banner">
-        現在の資産状況 {formatAsOfDateJa(snapshot.asOfDate)} 現在
+        資産状況 {formatAsOfDateJa(selectedAsOfDate ?? snapshot.asOfDate)}
+        {isHistoricalView ? "（履歴）" : " 現在"}
       </div>
+      {deltaHint ? <p className="overview-delta-hint">{deltaHint}</p> : null}
       <section className="asset-status__panel" aria-label="資産状況サマリー">
         <div className="asset-status__row">
           <AssetStatusField
@@ -197,6 +164,7 @@ export function PortfolioOverviewView({
           />
         </div>
       </section>
+      <OverviewTrendChart />
       <nav className="overview-links" aria-label="クイックリンク">
         <ul>
           <li>
@@ -204,6 +172,9 @@ export function PortfolioOverviewView({
           </li>
           <li>
             <Link href={`/portfolios/${portfolioCode}/analysis/`}>分析を見る</Link>
+          </li>
+          <li>
+            <Link href={`/portfolios/${portfolioCode}/trends/`}>推移を見る</Link>
           </li>
         </ul>
       </nav>

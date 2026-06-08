@@ -6,17 +6,13 @@ import {
   resolveAnalysisSchemes,
   sumSnapshotMarketValue,
   type AnalysisSchemeConfig,
-  type CurrentSnapshotDto,
 } from "@repo/shared";
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import { AllocationPanel } from "@/features/analysis/AllocationPanel";
 import { AnalysisPanelSummary } from "@/features/analysis/AnalysisPanelSummary";
-import { formatYen } from "@/lib/format-yen";
-import {
-  getSnapshotFetchUrl,
-  getSnapshotLoadErrorMessage,
-} from "@/lib/data-source";
+import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
+import { formatAsOfDateJa, formatYen } from "@/lib/format-yen";
 
 type AnalysisViewProps = {
   portfolioCode: string;
@@ -28,60 +24,18 @@ export function AnalysisView({
   portfolioKind,
 }: AnalysisViewProps) {
   const [selectedSchemeCode, setSelectedSchemeCode] = useState("");
-  const [snapshot, setSnapshot] = useState<CurrentSnapshotDto | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let result: () => void = () => {};
-    let cancelled = false;
-
-    async function load() {
-      let result: void = undefined;
-
-      setLoading(true);
-      setError(null);
-      const url = getSnapshotFetchUrl(portfolioCode);
-      try {
-        const response = await fetch(url);
-        if (cancelled) {
-          return result;
-        }
-        if (response.status === 404) {
-          setSnapshot(null);
-          setError("明細がまだ登録されていません。");
-          return result;
-        }
-        if (!response.ok) {
-          setError("データの取得に失敗しました。");
-          return result;
-        }
-        const data = (await response.json()) as CurrentSnapshotDto;
-        setSnapshot(data);
-      } catch {
-        if (!cancelled) {
-          setError(getSnapshotLoadErrorMessage());
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-
-      return result;
-    }
-
-    void load();
-
-    result = () => {
-      cancelled = true;
-    };
-    return result;
-  }, [portfolioCode]);
+  const {
+    snapshot,
+    loadingSnapshot,
+    loadingDates,
+    error,
+    selectedAsOfDate,
+    isHistoricalView,
+  } = usePortfolioTime();
 
   let result: ReactNode = null;
 
-  if (loading) {
+  if (loadingDates || loadingSnapshot) {
     result = (
       <main>
         <p>読み込み中…</p>
@@ -151,7 +105,12 @@ export function AnalysisView({
           <h1>
             分析 — {snapshot.portfolioName}（{snapshot.portfolioCode}）
           </h1>
-          <p className="holdings-meta">基準日: {snapshot.asOfDate}</p>
+          <p className="holdings-meta">
+            基準日: {formatAsOfDateJa(selectedAsOfDate ?? snapshot.asOfDate)}
+            {isHistoricalView ? (
+              <span className="snapshot-time-bar__badge">履歴表示中</span>
+            ) : null}
+          </p>
           <p className="analysis-page__total">評価額合計: {formatYen(totalValue)}</p>
         </div>
         <p className="note">

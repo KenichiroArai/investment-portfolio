@@ -14,7 +14,11 @@ import {
 } from "../src/repositories/portfolios";
 import {
   getCurrentSnapshot,
+  getSnapshotByDate,
+  listSnapshotDates,
   replaceCurrentSnapshot,
+  setCurrentSnapshot,
+  upsertSnapshotByDate,
 } from "../src/repositories/snapshots";
 import { createTestDb } from "../src/test-utils";
 
@@ -250,6 +254,68 @@ describe("portfolio repositories", () => {
       "Alpha Fund",
       "Beta Fund",
     ]);
+  });
+
+  it("lists, upserts, and fetches snapshots by date", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+    const instrument = await createInstrument(db, { name: "Alpha Fund" });
+
+    await upsertSnapshotByDate(db, {
+      portfolioCode: "ideco",
+      asOfDate: "2026-06-02",
+      lines: [
+        {
+          instrumentId: instrument.id,
+          quantity: 1,
+          marketValueMinor: 1000,
+        },
+      ],
+      setAsCurrent: false,
+    });
+    await upsertSnapshotByDate(db, {
+      portfolioCode: "ideco",
+      asOfDate: "2026-06-07",
+      lines: [
+        {
+          instrumentId: instrument.id,
+          quantity: 1,
+          marketValueMinor: 2000,
+        },
+      ],
+      setAsCurrent: true,
+    });
+
+    const dates = await listSnapshotDates(db, "ideco");
+    expect(dates).toEqual([
+      { asOfDate: "2026-06-07", isCurrent: true },
+      { asOfDate: "2026-06-02", isCurrent: false },
+    ]);
+
+    const older = await getSnapshotByDate(db, "ideco", "2026-06-02");
+    expect(older?.lines[0].marketValueMinor).toBe(1000);
+
+    await upsertSnapshotByDate(db, {
+      portfolioCode: "ideco",
+      asOfDate: "2026-06-02",
+      lines: [
+        {
+          instrumentId: instrument.id,
+          quantity: 2,
+          marketValueMinor: 1500,
+        },
+      ],
+    });
+    const updatedOlder = await getSnapshotByDate(db, "ideco", "2026-06-02");
+    expect(updatedOlder?.lines[0].marketValueMinor).toBe(1500);
+
+    await setCurrentSnapshot(db, "ideco", "2026-06-02");
+    const current = await getCurrentSnapshot(db, "ideco");
+    expect(current?.asOfDate).toBe("2026-06-02");
   });
 
   it("clears classifications when empty list is set", async () => {

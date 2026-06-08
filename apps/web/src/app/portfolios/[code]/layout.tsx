@@ -1,4 +1,4 @@
-import { PortfolioContextBar } from "@/components/PortfolioContextBar";
+import { PortfolioShell } from "@/features/portfolio/PortfolioShell";
 import { generatePortfolioStaticParams } from "@/lib/portfolio-catalog";
 
 type LayoutProps = {
@@ -13,18 +13,16 @@ export function generateStaticParams() {
 
 export default async function PortfolioLayout({ children, params }: LayoutProps) {
   let result = (
-    <>
-      <PortfolioContextBar portfolioCode="" />
+    <PortfolioShell portfolioCode="">
       {children}
-    </>
+    </PortfolioShell>
   );
 
   const { code } = await params;
   result = (
-    <>
-      <PortfolioContextBar portfolioCode={code} />
+    <PortfolioShell portfolioCode={code}>
       {children}
-    </>
+    </PortfolioShell>
   );
   return result;
 }

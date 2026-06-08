@@ -1,9 +1,14 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import HoldingsPage, {
   generateStaticParams,
 } from "@/app/portfolios/[code]/holdings/page";
+import { HoldingsView } from "@/features/portfolio/HoldingsView";
+import {
+  createPortfolioFetchMock,
+  renderWithPortfolioTime,
+} from "../helpers/portfolio-time-test-utils";
 
 describe("HoldingsPage", () => {
   it("exposes static params for ideco", () => {
@@ -13,10 +18,8 @@ describe("HoldingsPage", () => {
   it("renders holdings view for portfolio code", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: async () => ({
+      createPortfolioFetchMock({
+        snapshot: {
           id: "s1",
           portfolioCode: "ideco",
           portfolioName: "iDeCo",
@@ -24,14 +27,16 @@ describe("HoldingsPage", () => {
           analysisSchemes: [],
           metrics: [],
           lines: [],
-        }),
+        },
       }),
     );
 
     const element = await HoldingsPage({
       params: Promise.resolve({ code: "ideco" }),
     });
-    render(element);
+    expect(element).toEqual(<HoldingsView portfolioCode="ideco" />);
+
+    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />);
 
     await waitFor(() => {
       expect(screen.getByText(/保有銘柄がありません/)).toBeInTheDocument();

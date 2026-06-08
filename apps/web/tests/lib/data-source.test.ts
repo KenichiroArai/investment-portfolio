@@ -4,8 +4,11 @@ import {
   getBasePath,
   getDataSource,
   getPortfoliosFetchUrl,
+  getSnapshotByDateFetchUrl,
+  getSnapshotDatesFetchUrl,
   getSnapshotFetchUrl,
   getSnapshotLoadErrorMessage,
+  getSnapshotTrendsFetchUrl,
 } from "@/lib/data-source";
 
 describe("data-source", () => {
@@ -69,6 +72,28 @@ describe("data-source", () => {
     process.env.NEXT_PUBLIC_DATA_SOURCE = "static";
     expect(getSnapshotFetchUrl("ideco")).toBe(
       "/data/portfolios/ideco/current.json",
+    );
+  });
+
+  it("builds history snapshot URLs", () => {
+    expect(getSnapshotDatesFetchUrl("ideco")).toBe(
+      "http://127.0.0.1:3001/portfolios/ideco/snapshots",
+    );
+    expect(getSnapshotByDateFetchUrl("ideco", "2026-06-02")).toBe(
+      "http://127.0.0.1:3001/portfolios/ideco/snapshots/2026-06-02",
+    );
+    expect(getSnapshotTrendsFetchUrl("ideco", "2026-06-01", "2026-06-07")).toBe(
+      "http://127.0.0.1:3001/portfolios/ideco/snapshots/trends?from=2026-06-01&to=2026-06-07",
+    );
+    process.env.NEXT_PUBLIC_DATA_SOURCE = "static";
+    expect(getSnapshotDatesFetchUrl("ideco")).toBe(
+      "/data/portfolios/ideco/snapshots-index.json",
+    );
+    expect(getSnapshotByDateFetchUrl("ideco", "2026-06-02")).toBe(
+      "/data/portfolios/ideco/snapshots/2026-06-02.json",
+    );
+    expect(getSnapshotTrendsFetchUrl("ideco")).toBe(
+      "/data/portfolios/ideco/trends-summary.json",
     );
   });
 

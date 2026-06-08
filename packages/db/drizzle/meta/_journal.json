@@ -29,6 +29,13 @@
       "when": 1780900000000,
       "tag": "0003_portfolio_snapshot_metrics",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1781000000000,
+      "tag": "0004_portfolio_snapshots_date_unique",
+      "breakpoints": true
     }
   ]
 }

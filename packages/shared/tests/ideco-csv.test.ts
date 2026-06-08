@@ -18,7 +18,10 @@ import {
   stripUtf8Bom,
 } from "../src/ideco-csv-utils";
 import { parseIdecoGenericCsv } from "../src/ideco-generic-csv";
-import { parseIdecoHoldingsCsv } from "../src/ideco-holdings-csv";
+import {
+  parseIdecoHoldingsCsv,
+  parseIdecoHoldingsCsvByDate,
+} from "../src/ideco-holdings-csv";
 import { parseIdecoInstrumentsCsv } from "../src/ideco-instruments-csv";
 import { IDECO_PORTFOLIO_METRIC_CODES } from "../src/ideco-portfolio-metrics";
 import { parseIdecoProductTypesCsv } from "../src/ideco-product-types-csv";
@@ -178,6 +181,23 @@ describe("ideco csv parsers", () => {
     expect(() => resolveIdecoAnalysisAxisSchemeCode("未知の軸")).not.toThrow();
   });
 
+  it("parses holdings csv with multiple as-of dates", () => {
+    const parsed = parseIdecoHoldingsCsvByDate(
+      `${HOLDINGS_CSV.trim()}
+3,2026/6/7,eMAXIS Slim 国内株式(TOPIX),"31,418","41,773","131,242","128,324","2,918",0.023
+`,
+    );
+    expect(parsed.snapshots).toHaveLength(2);
+    expect(parsed.snapshots[0].asOfDate).toBe("2026-06-02");
+    expect(parsed.snapshots[1].asOfDate).toBe("2026-06-07");
+    expect(parsed.snapshots[1].rows).toHaveLength(1);
+    expect(() => parseIdecoHoldingsCsv(
+      `${HOLDINGS_CSV.trim()}
+3,2026/6/7,eMAXIS Slim 国内株式(TOPIX),"31,418","41,773","131,242","128,324","2,918",0.023
+`,
+    )).toThrow(/複数の基準日/);
+  });
+
   it("rejects invalid holdings csv", () => {
     expect(() => parseIdecoHoldingsCsv("")).toThrow(IdecoCsvError);
     expect(() => parseIdecoDate("bad")).toThrow(IdecoCsvError);
@@ -225,7 +245,7 @@ describe("ideco csv parsers", () => {
       return;
     }
 
-    const parsed = parseIdecoHoldingsCsv(content);
-    expect(parsed.rows.length).toBeGreaterThan(0);
+    const parsed = parseIdecoHoldingsCsvByDate(content);
+    expect(parsed.snapshots.length).toBeGreaterThan(0);
   });
 });

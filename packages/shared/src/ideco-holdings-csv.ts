@@ -36,6 +36,15 @@ export type ParseIdecoHoldingsCsvResult = {
   rows: IdecoHoldingsCsvRow[];
 };
 
+export type IdecoHoldingsCsvSnapshotGroup = {
+  asOfDate: string;
+  rows: IdecoHoldingsCsvRow[];
+};
+
+export type ParseIdecoHoldingsCsvByDateResult = {
+  snapshots: IdecoHoldingsCsvSnapshotGroup[];
+};
+
 function assertHoldingsHeader(headerRow: string[]): void {
   let result: void = undefined;
 
@@ -127,8 +136,10 @@ function parseHoldingsDataRow(
   return result;
 }
 
-export function parseIdecoHoldingsCsv(content: string): ParseIdecoHoldingsCsvResult {
-  let result: ParseIdecoHoldingsCsvResult = { asOfDate: "", rows: [] };
+export function parseIdecoHoldingsCsvByDate(
+  content: string,
+): ParseIdecoHoldingsCsvByDateResult {
+  let result: ParseIdecoHoldingsCsvByDateResult = { snapshots: [] };
 
   const normalized = stripUtf8Bom(content).trim();
   if (normalized === "") {
@@ -142,26 +153,43 @@ export function parseIdecoHoldingsCsv(content: string): ParseIdecoHoldingsCsvRes
 
   assertHoldingsHeader(records[0]);
 
-  const rows: IdecoHoldingsCsvRow[] = [];
-  let asOfDate = "";
+  const groups = new Map<string, IdecoHoldingsCsvRow[]>();
 
   for (let index = 1; index < records.length; index += 1) {
     const lineNumber = index + 1;
     const row = parseHoldingsDataRow(records[index], lineNumber);
-    if (asOfDate === "") {
-      asOfDate = row.asOfDate;
-    }
-    if (row.asOfDate !== asOfDate) {
-      throw new IdecoCsvError(
-        `${lineNumber} 行目の日付が他行と一致しません（期待: ${asOfDate}、実際: ${row.asOfDate}）`,
-      );
-    }
-    rows.push(row);
+    const existing = groups.get(row.asOfDate) ?? [];
+    existing.push(row);
+    groups.set(row.asOfDate, existing);
+  }
+
+  const snapshots = [...groups.entries()]
+    .sort(([leftDate], [rightDate]) => leftDate.localeCompare(rightDate))
+    .map(([asOfDate, rows]) => {
+      let group: IdecoHoldingsCsvSnapshotGroup = { asOfDate, rows };
+      return group;
+    });
+
+  result = { snapshots };
+  return result;
+}
+
+export function parseIdecoHoldingsCsv(content: string): ParseIdecoHoldingsCsvResult {
+  let result: ParseIdecoHoldingsCsvResult = { asOfDate: "", rows: [] };
+
+  const parsed = parseIdecoHoldingsCsvByDate(content);
+  if (parsed.snapshots.length === 0) {
+    throw new IdecoCsvError("明細 CSV にデータ行がありません");
+  }
+  if (parsed.snapshots.length > 1) {
+    throw new IdecoCsvError(
+      "明細 CSV に複数の基準日が含まれています。日付ごとにファイルを分けるか parseIdecoHoldingsCsvByDate を利用してください",
+    );
   }
 
   result = {
-    asOfDate,
-    rows,
+    asOfDate: parsed.snapshots[0].asOfDate,
+    rows: parsed.snapshots[0].rows,
   };
   return result;
 }

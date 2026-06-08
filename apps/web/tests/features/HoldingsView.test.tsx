@@ -1,10 +1,11 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { HoldingsView } from "@/features/portfolio/HoldingsView";
 import {
-  HoldingsView,
-  noopEffectCleanup,
-} from "@/features/portfolio/HoldingsView";
+  createPortfolioFetchMock,
+  renderWithPortfolioTime,
+} from "../helpers/portfolio-time-test-utils";
 
 describe("HoldingsView", () => {
   afterEach(() => {
@@ -12,22 +13,15 @@ describe("HoldingsView", () => {
     vi.unstubAllGlobals();
   });
 
-  it("noopEffectCleanup is a no-op", () => {
-    expect(noopEffectCleanup()).toBeUndefined();
-  });
-
   it("shows loading state initially", () => {
     vi.stubGlobal("fetch", vi.fn(() => new Promise(() => {})));
-    render(<HoldingsView portfolioCode="ideco" />);
+    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />);
     expect(screen.getByText("読み込み中…")).toBeInTheDocument();
   });
 
   it("shows API connection error when fetch fails", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockRejectedValue(new Error("network")),
-    );
-    render(<HoldingsView portfolioCode="ideco" />);
+    vi.stubGlobal("fetch", createPortfolioFetchMock({ failFetch: true }));
+    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />);
     await waitFor(() => {
       expect(screen.getByText(/API に接続できません/)).toBeInTheDocument();
     });
@@ -36,11 +30,8 @@ describe("HoldingsView", () => {
   it("shows static load error when fetch fails in static mode", async () => {
     const prev = process.env.NEXT_PUBLIC_DATA_SOURCE;
     process.env.NEXT_PUBLIC_DATA_SOURCE = "static";
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockRejectedValue(new Error("network")),
-    );
-    render(<HoldingsView portfolioCode="ideco" />);
+    vi.stubGlobal("fetch", createPortfolioFetchMock({ failFetch: true }));
+    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />);
     await waitFor(() => {
       expect(screen.getByText(/pages:export/)).toBeInTheDocument();
     });
@@ -54,10 +45,8 @@ describe("HoldingsView", () => {
   it("renders snapshot table", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: async () => ({
+      createPortfolioFetchMock({
+        snapshot: {
           id: "s1",
           portfolioCode: "ideco",
           portfolioName: "iDeCo",
@@ -84,10 +73,10 @@ describe("HoldingsView", () => {
               ],
             },
           ],
-        }),
+        },
       }),
     );
-    render(<HoldingsView portfolioCode="ideco" />);
+    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />);
     await waitFor(() => {
       expect(screen.getByText("テストファンド")).toBeInTheDocument();
       expect(screen.getByRole("columnheader", { name: "資産残高" })).toBeInTheDocument();
@@ -100,13 +89,11 @@ describe("HoldingsView", () => {
   it("shows fetch error when response is not ok", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: false,
-        status: 500,
-        json: async () => ({}),
+      createPortfolioFetchMock({
+        snapshotStatus: 500,
       }),
     );
-    render(<HoldingsView portfolioCode="ideco" />);
+    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />);
     await waitFor(() => {
       expect(screen.getByText(/データの取得に失敗しました/)).toBeInTheDocument();
     });
@@ -115,13 +102,12 @@ describe("HoldingsView", () => {
   it("shows messages for 404 and lines without metrics", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: false,
-        status: 404,
-        json: async () => ({}),
+      createPortfolioFetchMock({
+        datesStatus: 404,
+        snapshot: null,
       }),
     );
-    render(<HoldingsView portfolioCode="ideco" />);
+    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />);
     await waitFor(() => {
       expect(screen.getByText(/明細がまだ登録されていません/)).toBeInTheDocument();
     });
@@ -130,10 +116,8 @@ describe("HoldingsView", () => {
 
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: async () => ({
+      createPortfolioFetchMock({
+        snapshot: {
           id: "s1",
           portfolioCode: "ideco",
           portfolioName: "iDeCo",
@@ -153,10 +137,10 @@ describe("HoldingsView", () => {
               tags: [],
             },
           ],
-        }),
+        },
       }),
     );
-    render(<HoldingsView portfolioCode="ideco" />);
+    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />);
     await waitFor(() => {
       expect(screen.getByText("無タグ")).toBeInTheDocument();
       expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(1);
@@ -174,47 +158,25 @@ describe("HoldingsView", () => {
           }),
       ),
     );
-    const { unmount } = render(<HoldingsView portfolioCode="ideco" />);
+    const { unmount } = renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />);
     unmount();
     resolveFetch({
       ok: true,
       status: 200,
       json: async () => ({
-        id: "s1",
         portfolioCode: "ideco",
-        portfolioName: "iDeCo",
-        asOfDate: "2026-06-01",
-        analysisSchemes: [],
-        metrics: [],
-        lines: [],
+        dates: [{ asOfDate: "2026-06-01", isCurrent: true }],
       }),
     });
     await new Promise((r) => setTimeout(r, 10));
     expect(screen.queryByText(/保有銘柄がありません/)).not.toBeInTheDocument();
   });
 
-  it("shows fallback when snapshot is missing without error", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: async () => null,
-      }),
-    );
-    render(<HoldingsView portfolioCode="ideco" />);
-    await waitFor(() => {
-      expect(screen.getByText("明細がありません。")).toBeInTheDocument();
-    });
-  });
-
   it("shows empty holdings message", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: async () => ({
+      createPortfolioFetchMock({
+        snapshot: {
           id: "s1",
           portfolioCode: "ideco",
           portfolioName: "iDeCo",
@@ -222,10 +184,10 @@ describe("HoldingsView", () => {
           analysisSchemes: [],
           metrics: [],
           lines: [],
-        }),
+        },
       }),
     );
-    render(<HoldingsView portfolioCode="ideco" />);
+    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />);
     await waitFor(() => {
       expect(screen.getByText(/保有銘柄がありません/)).toBeInTheDocument();
     });

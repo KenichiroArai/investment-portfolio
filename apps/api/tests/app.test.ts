@@ -103,6 +103,39 @@ describe("API app", () => {
     const body = (await getSnapshot.json()) as { lines: unknown[] };
     expect(body.lines).toHaveLength(1);
 
+    const putOlderSnapshot = await app.request("/portfolios/ideco/snapshot/current", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        asOfDate: "2026-05-01",
+        lines: [
+          {
+            instrumentId: instrument.id,
+            quantity: 5,
+            marketValueMinor: 5000,
+          },
+        ],
+      }),
+    });
+    expect(putOlderSnapshot.status).toBe(200);
+
+    const listSnapshots = await app.request("/portfolios/ideco/snapshots");
+    expect(listSnapshots.status).toBe(200);
+    const snapshotDates = (await listSnapshots.json()) as {
+      dates: Array<{ asOfDate: string }>;
+    };
+    expect(snapshotDates.dates.length).toBeGreaterThanOrEqual(2);
+
+    const byDate = await app.request("/portfolios/ideco/snapshots/2026-05-01");
+    expect(byDate.status).toBe(200);
+
+    const trends = await app.request(
+      "/portfolios/ideco/snapshots/trends?from=2026-05-01&to=2026-06-01",
+    );
+    expect(trends.status).toBe(200);
+    const trendsBody = (await trends.json()) as { points: unknown[] };
+    expect(trendsBody.points.length).toBeGreaterThan(0);
+
     sqlite.close();
   });
 
