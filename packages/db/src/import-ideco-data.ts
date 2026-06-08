@@ -541,7 +541,7 @@ async function importHoldingsFromParsedByDate(
       portfolioCode: IDECO_PORTFOLIO_CODE,
       asOfDate: group.asOfDate,
       lines,
-      metrics: isLatest ? genericParsed.metrics : undefined,
+      metrics: genericParsed.metrics,
       setAsCurrent: isLatest,
     });
     if (!snapshot) {

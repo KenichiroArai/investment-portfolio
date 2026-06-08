@@ -160,6 +160,14 @@ describe("importIdecoData", () => {
     ]);
     const older = await getSnapshotByDate(db, "ideco", "2026-06-02");
     expect(older?.lines).toHaveLength(1);
+    expect(older?.metrics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: IDECO_PORTFOLIO_METRIC_CODES.totalContributions,
+          integerValue: 9_999_999,
+        }),
+      ]),
+    );
   });
 
   it("returns null when holdings reference unknown short name", async () => {
