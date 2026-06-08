@@ -1,12 +1,17 @@
 "use client";
 
 import {
+  aggregateTrendPoints,
   resolveDateRange,
   resolveLatestSnapshotDate,
+  resolveTrendDisplayUnit,
+  TREND_DISPLAY_UNIT_LABELS,
+  type AggregatedTrendPoint,
   type CurrentSnapshotDto,
   type SnapshotDateListDto,
   type SnapshotPeriodPreset,
   type SnapshotTrendsDto,
+  type TrendDisplayUnit,
 } from "@repo/shared";
 import {
   createContext,
@@ -45,6 +50,9 @@ type PortfolioTimeContextValue = {
   rangeDates: string[];
   snapshot: CurrentSnapshotDto | null;
   trends: SnapshotTrendsDto | null;
+  trendDisplayUnit: TrendDisplayUnit;
+  trendDisplayUnitLabel: string;
+  displayTrendPoints: AggregatedTrendPoint[];
   loadingDates: boolean;
   loadingSnapshot: boolean;
   loadingTrends: boolean;
@@ -389,7 +397,17 @@ export function PortfolioTimeProvider({
       cancelled = true;
     };
     return result;
-  }, [portfolioCode, rangeDates, snapshot?.analysisSchemes, snapshot?.portfolioName]);
+  }, [portfolioCode, rangeDates]);
+
+  const trendDisplayUnit = resolveTrendDisplayUnit(periodPreset);
+  const displayTrendPoints = useMemo(() => {
+    let result: AggregatedTrendPoint[] = [];
+    if (!trends || trends.points.length === 0) {
+      return result;
+    }
+    result = aggregateTrendPoints(trends.points, trendDisplayUnit);
+    return result;
+  }, [trends, trendDisplayUnit]);
 
   const value = useMemo(() => {
     let result: PortfolioTimeContextValue = {
@@ -410,6 +428,9 @@ export function PortfolioTimeProvider({
       rangeDates,
       snapshot,
       trends,
+      trendDisplayUnit,
+      trendDisplayUnitLabel: TREND_DISPLAY_UNIT_LABELS[trendDisplayUnit],
+      displayTrendPoints,
       loadingDates,
       loadingSnapshot,
       loadingTrends,
@@ -440,6 +461,8 @@ export function PortfolioTimeProvider({
     rangeDates,
     snapshot,
     trends,
+    trendDisplayUnit,
+    displayTrendPoints,
     loadingDates,
     loadingSnapshot,
     loadingTrends,

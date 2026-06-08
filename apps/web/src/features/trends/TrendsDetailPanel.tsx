@@ -3,12 +3,22 @@
 import { useState, type ReactNode } from "react";
 
 import { getAllocationChartColor } from "@/features/analysis/chart-colors";
-import { TrendLineChart } from "@/features/trends/TrendLineChart";
-import { formatAsOfDateJa, formatPercent, formatYen } from "@/lib/format-yen";
+import { TrendBarChart } from "@/features/trends/TrendBarChart";
+import {
+  formatPercent,
+  formatTrendChartCaption,
+  formatYen,
+  formatYenManAxis,
+} from "@/lib/format-yen";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
 
 export function TrendsDetailPanel() {
-  const { trends, loadingTrends, snapshot } = usePortfolioTime();
+  const {
+    displayTrendPoints,
+    trendDisplayUnitLabel,
+    loadingTrends,
+    snapshot,
+  } = usePortfolioTime();
   const [selectedSchemeCode, setSelectedSchemeCode] = useState("");
 
   let result: ReactNode = null;
@@ -18,7 +28,7 @@ export function TrendsDetailPanel() {
     return result;
   }
 
-  if (!trends || trends.points.length === 0) {
+  if (displayTrendPoints.length === 0) {
     result = (
       <p className="trend-chart__empty">
         選択した期間に推移データがありません。期間を広げてください。
@@ -27,7 +37,8 @@ export function TrendsDetailPanel() {
     return result;
   }
 
-  const labels = trends.points.map((point) => formatAsOfDateJa(point.asOfDate));
+  const labels = displayTrendPoints.map((point) => point.bucketLabel);
+  const sourceDates = displayTrendPoints.map((point) => point.sourceAsOfDate);
   const schemeCodes = snapshot?.analysisSchemes ?? [];
   const activeSchemeCode =
     selectedSchemeCode !== ""
@@ -46,7 +57,7 @@ export function TrendsDetailPanel() {
       formatValue?: (value: number) => string;
     }> = [];
     const valueCodes = new Set<string>();
-    for (const point of trends.points) {
+    for (const point of displayTrendPoints) {
       const slices = point.allocationsByScheme[activeSchemeCode] ?? [];
       for (const slice of slices) {
         valueCodes.add(slice.valueCode);
@@ -54,7 +65,7 @@ export function TrendsDetailPanel() {
     }
     let colorIndex = 0;
     for (const valueCode of valueCodes) {
-      const firstSlice = trends.points
+      const firstSlice = displayTrendPoints
         .flatMap((point) => point.allocationsByScheme[activeSchemeCode] ?? [])
         .find((slice) => slice.valueCode === valueCode);
       if (!firstSlice) {
@@ -64,7 +75,7 @@ export function TrendsDetailPanel() {
         key: valueCode,
         label: firstSlice.valueName,
         color: getAllocationChartColor(colorIndex),
-        values: trends.points.map((point) => {
+        values: displayTrendPoints.map((point) => {
           const slice = (point.allocationsByScheme[activeSchemeCode] ?? []).find(
             (item) => item.valueCode === valueCode,
           );
@@ -77,55 +88,75 @@ export function TrendsDetailPanel() {
     return seriesResult;
   })();
 
+  const gainRateSeries = [
+    {
+      key: "gain-rate-book",
+      label: "簿価ベース利益率",
+      color: "#7c3aed",
+      values: displayTrendPoints.map((point) => point.gainRateOnBook),
+      formatValue: (value: number) => formatPercent(value),
+    },
+    {
+      key: "gain-rate-contributions",
+      label: "拠出金ベース利益率",
+      color: "#ea580c",
+      values: displayTrendPoints.map((point) => point.gainRateOnContributions),
+      formatValue: (value: number) => formatPercent(value),
+    },
+  ].filter((item) =>
+    item.values.some((value) => value !== null && Number.isFinite(value)),
+  );
+
   result = (
     <div className="trends-detail">
+      <p className="trends-detail__unit-label">
+        {formatTrendChartCaption(trendDisplayUnitLabel)}
+      </p>
+      {displayTrendPoints.length === 1 ? (
+        <p className="trends-detail__single-bucket-note">
+          この期間は1か月分のデータです
+        </p>
+      ) : null}
       <section className="trends-detail__section">
         <h2>総資産・損益</h2>
-        <TrendLineChart
+        <TrendBarChart
           labels={labels}
+          sourceDates={sourceDates}
+          mode="grouped"
+          formatYAxis={formatYenManAxis}
           series={[
             {
               key: "market-value",
               label: "評価額",
               color: "#2563eb",
-              values: trends.points.map((point) => point.totalMarketValueMinor),
+              values: displayTrendPoints.map((point) => point.totalMarketValueMinor),
               formatValue: (value) => formatYen(value),
             },
             {
               key: "gain",
               label: "評価損益",
               color: "#16a34a",
-              values: trends.points.map((point) => point.unrealizedGainMinor),
+              values: displayTrendPoints.map((point) => point.unrealizedGainMinor),
               formatValue: (value) => formatYen(value),
             },
           ]}
         />
       </section>
 
-      <section className="trends-detail__section">
-        <h2>利益率</h2>
-        <TrendLineChart
-          labels={labels}
-          series={[
-            {
-              key: "gain-rate-book",
-              label: "簿価ベース利益率",
-              color: "#7c3aed",
-              values: trends.points.map((point) => point.gainRateOnBook),
-              formatValue: (value) => formatPercent(value),
-            },
-            {
-              key: "gain-rate-contributions",
-              label: "拠出金ベース利益率",
-              color: "#ea580c",
-              values: trends.points.map((point) => point.gainRateOnContributions),
-              formatValue: (value) => formatPercent(value),
-            },
-          ]}
-        />
-      </section>
+      {gainRateSeries.length > 0 ? (
+        <section className="trends-detail__section">
+          <h2>利益率</h2>
+          <TrendBarChart
+            labels={labels}
+            sourceDates={sourceDates}
+            mode="grouped"
+            formatYAxis={(value) => formatPercent(value)}
+            series={gainRateSeries}
+          />
+        </section>
+      ) : null}
 
-      {schemeCodes.length > 0 ? (
+      {schemeCodes.length > 0 && allocationSeries.length > 0 ? (
         <section className="trends-detail__section">
           <h2>分析軸別構成比</h2>
           <div className="analysis-axis-tabs" role="tablist" aria-label="分析軸">
@@ -152,7 +183,15 @@ export function TrendsDetailPanel() {
           {activeScheme ? (
             <p className="trends-detail__scheme-label">{activeScheme.schemeName}</p>
           ) : null}
-          <TrendLineChart labels={labels} series={allocationSeries} height={240} />
+          <TrendBarChart
+            labels={labels}
+            sourceDates={sourceDates}
+            mode="stacked"
+            valueDomain={{ min: 0, max: 1 }}
+            formatYAxis={(value) => formatPercent(value)}
+            series={allocationSeries}
+            height={240}
+          />
         </section>
       ) : null}
     </div>
