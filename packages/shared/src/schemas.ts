@@ -99,6 +99,7 @@ export type UpdateInstrumentInput = z.infer<typeof updateInstrumentSchema>;
 export type SetInstrumentClassificationsInput = z.infer<
   typeof setInstrumentClassificationsSchema
 >;
+export type HoldingLineInput = z.infer<typeof holdingLineInputSchema>;
 export type ReplaceCurrentSnapshotInput = z.infer<
   typeof replaceCurrentSnapshotSchema
 >;
