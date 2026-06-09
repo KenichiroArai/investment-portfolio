@@ -130,7 +130,7 @@ export function GlobalAnalysisView() {
   if (error) {
     result = (
       <main>
-        <h1>全体分析</h1>
+        <h1>全口座の資産配分</h1>
         <p className="holdings-error">{error}</p>
       </main>
     );
@@ -140,8 +140,8 @@ export function GlobalAnalysisView() {
   if (snapshots.length === 0) {
     result = (
       <main>
-        <h1>全体分析</h1>
-        <p className="holdings-error">分析対象の明細がありません。</p>
+        <h1>全口座の資産配分</h1>
+        <p className="holdings-error">資産配分の対象となる明細がありません。</p>
       </main>
     );
     return result;
@@ -162,7 +162,7 @@ export function GlobalAnalysisView() {
 
   result = (
     <main className="analysis-page global-analysis">
-      <h1>全体分析</h1>
+      <h1>全口座の資産配分</h1>
       <p className="analysis-page__total">
         総評価額: {formatYen(merged.totalMarketValueMinor)}
       </p>

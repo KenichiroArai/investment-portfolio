@@ -1,13 +1,24 @@
 import { z } from "zod";
 
+const portfolioKindSchema = z.enum(["ideco", "nisa", "taxable", "satellite"]);
+
 export const createPortfolioSchema = z.object({
   code: z.string().min(1).max(64),
   name: z.string().min(1).max(256),
-  kind: z.enum(["ideco", "nisa", "taxable", "satellite"]),
+  kind: portfolioKindSchema,
+});
+
+export const updatePortfolioSchema = z.object({
+  name: z.string().min(1).max(256),
+  kind: portfolioKindSchema,
 });
 
 export const createClassificationSchemeSchema = z.object({
   code: z.string().min(1).max(64),
+  name: z.string().min(1).max(256),
+});
+
+export const updateClassificationSchemeSchema = z.object({
   name: z.string().min(1).max(256),
 });
 
@@ -17,7 +28,19 @@ export const createClassificationValueSchema = z.object({
   sortOrder: z.number().int().optional(),
 });
 
+export const updateClassificationValueSchema = z.object({
+  name: z.string().min(1).max(256),
+  sortOrder: z.number().int(),
+});
+
 export const createInstrumentSchema = z.object({
+  name: z.string().min(1).max(512),
+  instrumentType: z.string().min(1).max(64).optional(),
+  currency: z.string().length(3).optional(),
+  externalId: z.string().max(128).nullable().optional(),
+});
+
+export const updateInstrumentSchema = z.object({
   name: z.string().min(1).max(512),
   instrumentType: z.string().min(1).max(64).optional(),
   currency: z.string().length(3).optional(),
@@ -58,13 +81,21 @@ export const replaceCurrentSnapshotSchema = z.object({
 });
 
 export type CreatePortfolioInput = z.infer<typeof createPortfolioSchema>;
+export type UpdatePortfolioInput = z.infer<typeof updatePortfolioSchema>;
 export type CreateClassificationSchemeInput = z.infer<
   typeof createClassificationSchemeSchema
+>;
+export type UpdateClassificationSchemeInput = z.infer<
+  typeof updateClassificationSchemeSchema
 >;
 export type CreateClassificationValueInput = z.infer<
   typeof createClassificationValueSchema
 >;
+export type UpdateClassificationValueInput = z.infer<
+  typeof updateClassificationValueSchema
+>;
 export type CreateInstrumentInput = z.infer<typeof createInstrumentSchema>;
+export type UpdateInstrumentInput = z.infer<typeof updateInstrumentSchema>;
 export type SetInstrumentClassificationsInput = z.infer<
   typeof setInstrumentClassificationsSchema
 >;

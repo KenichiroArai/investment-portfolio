@@ -42,3 +42,49 @@ export async function createPortfolio(
   await db.insert(portfolios).values(result);
   return result;
 }
+
+export type UpdatePortfolioParams = {
+  name: string;
+  kind: string;
+};
+
+export async function updatePortfolio(
+  db: AppDatabase,
+  code: string,
+  params: UpdatePortfolioParams,
+) {
+  let result: (typeof portfolios.$inferSelect) | null = null;
+
+  const existing = await findPortfolioByCode(db, code);
+  if (!existing) {
+    return result;
+  }
+
+  await db
+    .update(portfolios)
+    .set({
+      name: params.name,
+      kind: params.kind,
+    })
+    .where(eq(portfolios.code, code));
+
+  result = {
+    ...existing,
+    name: params.name,
+    kind: params.kind,
+  };
+  return result;
+}
+
+export async function deletePortfolio(db: AppDatabase, code: string) {
+  let result = false;
+
+  const existing = await findPortfolioByCode(db, code);
+  if (!existing) {
+    return result;
+  }
+
+  await db.delete(portfolios).where(eq(portfolios.code, code));
+  result = true;
+  return result;
+}

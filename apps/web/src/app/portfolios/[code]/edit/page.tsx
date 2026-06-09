@@ -1,3 +1,4 @@
+import { EditView } from "@/features/manage/EditView";
 import { generatePortfolioStaticParams } from "@/lib/portfolio-catalog";
 
 type PageProps = {
@@ -9,20 +10,8 @@ export function generateStaticParams() {
   return result;
 }
 
-export default async function EditPlaceholderPage({ params }: PageProps) {
-  let result = (
-    <main>
-      <h1>更新</h1>
-      <p className="note">準備中です（明細・銘柄の更新・削除を今後実装予定）。</p>
-    </main>
-  );
-
+export default async function EditPage({ params }: PageProps) {
   const { code } = await params;
-  result = (
-    <main>
-      <h1>更新（{code}）</h1>
-      <p className="note">準備中です（明細・銘柄の更新・削除を今後実装予定）。</p>
-    </main>
-  );
+  let result = <EditView portfolioCode={code} />;
   return result;
 }

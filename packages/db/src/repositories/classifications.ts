@@ -83,6 +83,78 @@ export async function findSchemeByPortfolioCodeAndSchemeCode(
   return result;
 }
 
+export async function findClassificationValueById(
+  db: AppDatabase,
+  valueId: string,
+) {
+  let result: (typeof classificationValues.$inferSelect) | null = null;
+
+  const rows = await db
+    .select()
+    .from(classificationValues)
+    .where(eq(classificationValues.id, valueId))
+    .limit(1);
+  result = rows[0] ?? null;
+  return result;
+}
+
+export async function deleteClassificationValueById(
+  db: AppDatabase,
+  valueId: string,
+) {
+  let result = false;
+
+  const existing = await findClassificationValueById(db, valueId);
+  if (!existing) {
+    return result;
+  }
+
+  await db
+    .delete(classificationValues)
+    .where(eq(classificationValues.id, valueId));
+  result = true;
+  return result;
+}
+
+export async function listSchemesWithValuesForPortfolio(
+  db: AppDatabase,
+  portfolioCode: string,
+) {
+  type SchemeWithValues = {
+    id: string;
+    code: string;
+    name: string;
+    values: Array<{
+      id: string;
+      code: string;
+      name: string;
+      sortOrder: number;
+    }>;
+  };
+
+  let result: SchemeWithValues[] = [];
+
+  const schemes = await listClassificationSchemesByPortfolioCode(db, portfolioCode);
+  for (const scheme of schemes) {
+    const values = await listClassificationValuesBySchemeId(db, scheme.id);
+    result.push({
+      id: scheme.id,
+      code: scheme.code,
+      name: scheme.name,
+      values: values
+        .map((value) => ({
+          id: value.id,
+          code: value.code,
+          name: value.name,
+          sortOrder: value.sortOrder,
+        }))
+        .sort((left, right) => left.sortOrder - right.sortOrder),
+    });
+  }
+
+  return result;
+}
+
 export async function findClassificationValueBySchemeAndCode(
   db: AppDatabase,
   schemeId: string,

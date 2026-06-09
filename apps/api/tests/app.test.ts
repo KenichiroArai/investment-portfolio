@@ -255,4 +255,133 @@ describe("API app", () => {
 
     sqlite.close();
   });
+
+  it("supports portfolio, classification, and instrument CRUD", async () => {
+    const { db, sqlite } = createTestDb();
+    const app = createApp({ getDb: () => db });
+
+    const createPortfolioRes = await app.request("/portfolios", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        code: "test",
+        name: "テスト口座",
+        kind: "taxable",
+      }),
+    });
+    expect(createPortfolioRes.status).toBe(201);
+
+    const getPortfolio = await app.request("/portfolios/test");
+    expect(getPortfolio.status).toBe(200);
+
+    const updatePortfolioRes = await app.request("/portfolios/test", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: "更新口座",
+        kind: "nisa",
+      }),
+    });
+    expect(updatePortfolioRes.status).toBe(200);
+    const updatedPortfolio = (await updatePortfolioRes.json()) as { name: string };
+    expect(updatedPortfolio.name).toBe("更新口座");
+
+    const schemeRes = await app.request("/portfolios/test/classification-schemes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: "region", name: "地域" }),
+    });
+    const scheme = (await schemeRes.json()) as { id: string };
+
+    const listSchemes = await app.request("/portfolios/test/classification-schemes");
+    expect(listSchemes.status).toBe(200);
+    const schemes = (await listSchemes.json()) as Array<{ values: unknown[] }>;
+    expect(schemes).toHaveLength(1);
+
+    const updateScheme = await app.request(`/classification-schemes/${scheme.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: "地域区分" }),
+    });
+    expect(updateScheme.status).toBe(200);
+
+    const valueRes = await app.request(`/classification-schemes/${scheme.id}/values`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: "japan", name: "日本", sortOrder: 1 }),
+    });
+    const value = (await valueRes.json()) as { id: string };
+
+    const updateValue = await app.request(`/classification-values/${value.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: "日本株", sortOrder: 2 }),
+    });
+    expect(updateValue.status).toBe(200);
+
+    const instrumentRes = await app.request("/instruments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: "テスト銘柄" }),
+    });
+    const instrument = (await instrumentRes.json()) as { id: string };
+
+    const listInstruments = await app.request("/instruments?q=テスト");
+    expect(listInstruments.status).toBe(200);
+    const instrumentRows = (await listInstruments.json()) as unknown[];
+    expect(instrumentRows).toHaveLength(1);
+
+    const updateInstrumentRes = await app.request(`/instruments/${instrument.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: "更新銘柄" }),
+    });
+    expect(updateInstrumentRes.status).toBe(200);
+
+    await app.request(`/instruments/${instrument.id}/classifications`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ classificationValueIds: [value.id] }),
+    });
+
+    await app.request("/portfolios/test/snapshot/current", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        asOfDate: "2026-06-01",
+        lines: [
+          {
+            instrumentId: instrument.id,
+            quantity: 1,
+            marketValueMinor: 1000,
+          },
+        ],
+      }),
+    });
+
+    const deleteInstrumentInUse = await app.request(`/instruments/${instrument.id}`, {
+      method: "DELETE",
+    });
+    expect(deleteInstrumentInUse.status).toBe(409);
+
+    const deleteValue = await app.request(`/classification-values/${value.id}`, {
+      method: "DELETE",
+    });
+    expect(deleteValue.status).toBe(200);
+
+    const deleteScheme = await app.request(`/classification-schemes/${scheme.id}`, {
+      method: "DELETE",
+    });
+    expect(deleteScheme.status).toBe(200);
+
+    const deletePortfolioRes = await app.request("/portfolios/test", {
+      method: "DELETE",
+    });
+    expect(deletePortfolioRes.status).toBe(200);
+
+    const missingPortfolio = await app.request("/portfolios/test");
+    expect(missingPortfolio.status).toBe(404);
+
+    sqlite.close();
+  });
 });

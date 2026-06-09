@@ -171,7 +171,7 @@ export function PortfolioOverviewView({
             <Link href={`/portfolios/${portfolioCode}/holdings/`}>明細を見る</Link>
           </li>
           <li>
-            <Link href={`/portfolios/${portfolioCode}/analysis/`}>分析を見る</Link>
+            <Link href={`/portfolios/${portfolioCode}/analysis/`}>資産配分を見る</Link>
           </li>
           <li>
             <Link href={`/portfolios/${portfolioCode}/trends/`}>推移を見る</Link>

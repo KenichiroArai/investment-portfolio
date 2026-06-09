@@ -24,6 +24,28 @@ export type PortfolioDto = {
   kind: string;
 };
 
+export type ClassificationValueDto = {
+  id: string;
+  code: string;
+  name: string;
+  sortOrder: number;
+};
+
+export type ClassificationSchemeWithValuesDto = {
+  id: string;
+  code: string;
+  name: string;
+  values: ClassificationValueDto[];
+};
+
+export type InstrumentListItemDto = {
+  id: string;
+  name: string;
+  instrumentType: string;
+  currency: string;
+  externalId: string | null;
+};
+
 export type HoldingLineDto = {
   id: string;
   instrumentId: string;

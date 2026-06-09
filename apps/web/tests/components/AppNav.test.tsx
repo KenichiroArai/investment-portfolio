@@ -7,7 +7,7 @@ describe("AppNav", () => {
   it("renders global navigation links", () => {
     render(<AppNav />);
     expect(screen.getByRole("link", { name: "ホーム" })).toHaveAttribute("href", "/");
-    expect(screen.getByRole("link", { name: "全体分析" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "全口座の資産配分" })).toHaveAttribute(
       "href",
       "/analysis",
     );

@@ -17,6 +17,10 @@ const packageDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(packageDir, "../../..");
 const docsDataRoot = resolve(repoRoot, "docs/data/portfolios");
 const docsPortfoliosIndexPath = resolve(repoRoot, "docs/data/portfolios.json");
+const portfolioCatalogPath = resolve(
+  repoRoot,
+  "apps/web/src/lib/portfolio-catalog.ts",
+);
 const databasePath = resolveDatabasePath();
 
 async function main() {
@@ -41,6 +45,41 @@ async function main() {
     "utf8",
   );
   console.log(`Exported: ${docsPortfoliosIndexPath}`);
+
+  const catalogEntries = portfolios.map((portfolio) => ({
+    id: portfolio.id,
+    code: portfolio.code,
+    name: portfolio.name,
+    kind: portfolio.kind,
+  }));
+  const catalogSource = `import type { PortfolioDto } from "@repo/shared";
+
+export const STATIC_PORTFOLIOS: PortfolioDto[] = ${JSON.stringify(catalogEntries, null, 2)};
+
+export function generatePortfolioStaticParams(): { code: string }[] {
+  let result: { code: string }[] = [];
+
+  for (const portfolio of STATIC_PORTFOLIOS) {
+    result.push({ code: portfolio.code });
+  }
+
+  return result;
+}
+
+export function findPortfolioByCode(code: string): PortfolioDto | null {
+  let result: PortfolioDto | null = null;
+
+  const portfolio = STATIC_PORTFOLIOS.find((item) => item.code === code);
+  if (!portfolio) {
+    return result;
+  }
+
+  result = portfolio;
+  return result;
+}
+`;
+  writeFileSync(portfolioCatalogPath, `${catalogSource}\n`, "utf8");
+  console.log(`Exported: ${portfolioCatalogPath}`);
 
   for (const portfolio of portfolios) {
     const snapshot = await getCurrentSnapshot(db, portfolio.code);

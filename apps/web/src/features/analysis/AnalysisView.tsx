@@ -47,7 +47,7 @@ export function AnalysisView({
   if (error) {
     result = (
       <main>
-        <h1>分析</h1>
+        <h1>資産配分</h1>
         <p className="holdings-error">{error}</p>
       </main>
     );
@@ -57,8 +57,8 @@ export function AnalysisView({
   if (!snapshot) {
     result = (
       <main>
-        <h1>分析</h1>
-        <p className="holdings-error">分析対象の明細がありません。</p>
+        <h1>資産配分</h1>
+        <p className="holdings-error">資産配分の対象となる明細がありません。</p>
       </main>
     );
     return result;
@@ -81,8 +81,8 @@ export function AnalysisView({
   if (schemeConfigs.length === 0) {
     result = (
       <main>
-        <h1>分析</h1>
-        <p className="note">この口座種別の分析軸はまだ定義されていません。</p>
+        <h1>資産配分</h1>
+        <p className="note">この口座種別の資産配分軸はまだ定義されていません。</p>
       </main>
     );
     return result;
@@ -103,7 +103,7 @@ export function AnalysisView({
       <div className="analysis-page__header">
         <div>
           <h1>
-            分析 — {snapshot.portfolioName}（{snapshot.portfolioCode}）
+            資産配分 — {snapshot.portfolioName}（{snapshot.portfolioCode}）
           </h1>
           <p className="holdings-meta">
             基準日: {formatAsOfDateJa(selectedAsOfDate ?? snapshot.asOfDate)}
@@ -115,7 +115,7 @@ export function AnalysisView({
         </div>
         <p className="note">
           <Link href={`/portfolios/${portfolioCode}/analysis/settings/`}>
-            分析設定（準備中）
+            分析設定
           </Link>
         </p>
       </div>

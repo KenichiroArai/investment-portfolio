@@ -4,6 +4,10 @@ import {
   createPortfolioSchema,
   replaceCurrentSnapshotSchema,
   setInstrumentClassificationsSchema,
+  updateClassificationSchemeSchema,
+  updateClassificationValueSchema,
+  updateInstrumentSchema,
+  updatePortfolioSchema,
 } from "../src/schemas";
 
 describe("shared schemas", () => {
@@ -36,5 +40,25 @@ describe("shared schemas", () => {
       classificationValueIds: ["550e8400-e29b-41d4-a716-446655440001"],
     });
     expect(tags.success).toBe(true);
+  });
+
+  it("validates update schemas", () => {
+    const portfolio = updatePortfolioSchema.safeParse({
+      name: "更新口座",
+      kind: "nisa",
+    });
+    expect(portfolio.success).toBe(true);
+
+    const scheme = updateClassificationSchemeSchema.safeParse({ name: "地域" });
+    expect(scheme.success).toBe(true);
+
+    const value = updateClassificationValueSchema.safeParse({
+      name: "日本",
+      sortOrder: 1,
+    });
+    expect(value.success).toBe(true);
+
+    const instrument = updateInstrumentSchema.safeParse({ name: "銘柄A" });
+    expect(instrument.success).toBe(true);
   });
 });

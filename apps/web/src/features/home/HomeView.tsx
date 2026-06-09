@@ -10,6 +10,7 @@ import {
 } from "@repo/shared";
 import { useEffect, useState, type ReactNode } from "react";
 
+import { AccountManagePanel } from "@/features/manage/AccountManagePanel";
 import { formatPercent, formatYen } from "@/lib/format-yen";
 import {
   getPortfoliosFetchUrl,
@@ -30,6 +31,8 @@ type PortfolioCard = {
 
 export function HomeView() {
   const [cards, setCards] = useState<PortfolioCard[]>([]);
+  const [portfolios, setPortfolios] = useState<PortfolioListItem[]>([]);
+  const [reloadKey, setReloadKey] = useState(0);
   const [totalMarketValueMinor, setTotalMarketValueMinor] = useState(0);
   const [totalPortfolioGainMinor, setTotalPortfolioGainMinor] = useState(0);
   const [hasAnySnapshot, setHasAnySnapshot] = useState(false);
@@ -56,14 +59,15 @@ export function HomeView() {
           return result;
         }
 
-        const portfolios =
+        const portfolioRows =
           (await portfolioResponse.json()) as PortfolioListItem[];
+        setPortfolios(portfolioRows);
         const nextCards: PortfolioCard[] = [];
         let total = 0;
         let totalGain = 0;
         let snapshotCount = 0;
 
-        for (const portfolio of portfolios) {
+        for (const portfolio of portfolioRows) {
           const snapshotResponse = await fetch(
             getSnapshotFetchUrl(portfolio.code),
           );
@@ -138,7 +142,7 @@ export function HomeView() {
       cancelled = true;
     };
     return result;
-  }, []);
+  }, [reloadKey]);
 
   let result: ReactNode = null;
 
@@ -179,12 +183,18 @@ export function HomeView() {
           </dl>
         ) : null}
         <p>
-          <Link href="/analysis/">全体分析を見る</Link>
+          <Link href="/analysis/">全口座の資産配分を見る</Link>
         </p>
       </section>
 
       <section className="home-portfolios">
         <h2>口座</h2>
+        <AccountManagePanel
+          portfolios={portfolios}
+          onChanged={() => {
+            setReloadKey((value) => value + 1);
+          }}
+        />
         {cards.length === 0 ? (
           <p className="note">登録済みの口座がありません。</p>
         ) : (
@@ -212,7 +222,7 @@ export function HomeView() {
                   )}
                   <nav className="portfolio-card__links">
                     <Link href={`/portfolios/${card.code}/holdings/`}>明細</Link>
-                    <Link href={`/portfolios/${card.code}/analysis/`}>分析</Link>
+                    <Link href={`/portfolios/${card.code}/analysis/`}>資産配分</Link>
                   </nav>
                 </li>
               );

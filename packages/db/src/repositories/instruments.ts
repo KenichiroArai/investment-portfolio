@@ -1,8 +1,8 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, like } from "drizzle-orm";
 
 import type { AppDatabase } from "../client";
 import { newId, nowIso } from "../id";
-import { instrumentAttributes, instruments } from "../schema/index";
+import { holdingLines, instrumentAttributes, instruments } from "../schema/index";
 
 export type CreateInstrumentParams = {
   name: string;
@@ -48,6 +48,98 @@ export async function upsertInstrument(
   }
 
   result = await createInstrument(db, params);
+  return result;
+}
+
+export async function listInstruments(db: AppDatabase, searchQuery?: string) {
+  let result: (typeof instruments.$inferSelect)[] = [];
+
+  if (searchQuery && searchQuery.trim() !== "") {
+    const pattern = `%${searchQuery.trim()}%`;
+    result = await db
+      .select()
+      .from(instruments)
+      .where(like(instruments.name, pattern))
+      .orderBy(instruments.name);
+    return result;
+  }
+
+  result = await db.select().from(instruments).orderBy(instruments.name);
+  return result;
+}
+
+export type UpdateInstrumentParams = {
+  name: string;
+  instrumentType?: string;
+  currency?: string;
+  externalId?: string | null;
+};
+
+export async function updateInstrument(
+  db: AppDatabase,
+  id: string,
+  params: UpdateInstrumentParams,
+) {
+  let result: (typeof instruments.$inferSelect) | null = null;
+
+  const existing = await findInstrumentById(db, id);
+  if (!existing) {
+    return result;
+  }
+
+  await db
+    .update(instruments)
+    .set({
+      name: params.name,
+      instrumentType: params.instrumentType ?? existing.instrumentType,
+      currency: params.currency ?? existing.currency,
+      externalId:
+        params.externalId !== undefined ? params.externalId : existing.externalId,
+    })
+    .where(eq(instruments.id, id));
+
+  result = {
+    ...existing,
+    name: params.name,
+    instrumentType: params.instrumentType ?? existing.instrumentType,
+    currency: params.currency ?? existing.currency,
+    externalId:
+      params.externalId !== undefined ? params.externalId : existing.externalId,
+  };
+  return result;
+}
+
+export async function isInstrumentUsedInHoldings(
+  db: AppDatabase,
+  instrumentId: string,
+) {
+  let result = false;
+
+  const rows = await db
+    .select({ id: holdingLines.id })
+    .from(holdingLines)
+    .where(eq(holdingLines.instrumentId, instrumentId))
+    .limit(1);
+  result = rows.length > 0;
+  return result;
+}
+
+export async function deleteInstrument(db: AppDatabase, id: string) {
+  let result: "deleted" | "not_found" | "in_use" = "not_found";
+
+  const existing = await findInstrumentById(db, id);
+  if (!existing) {
+    return result;
+  }
+
+  const inUse = await isInstrumentUsedInHoldings(db, id);
+  if (inUse) {
+    result = "in_use";
+    return result;
+  }
+
+  await db.delete(instruments).where(eq(instruments.id, id));
+  result = "deleted";
   return result;
 }
 

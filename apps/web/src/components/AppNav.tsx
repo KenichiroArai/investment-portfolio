@@ -9,7 +9,7 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { href: "/", label: "ホーム", enabled: true },
-  { href: "/analysis/", label: "全体分析", enabled: true },
+  { href: "/analysis/", label: "全口座の資産配分", enabled: true },
 ];
 
 export function AppNav() {

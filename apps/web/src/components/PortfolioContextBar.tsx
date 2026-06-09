@@ -24,7 +24,7 @@ type ContextTab = {
 const CONTEXT_TABS: ContextTab[] = [
   { segment: "", label: "概要", enabled: true },
   { segment: "holdings", label: "明細", enabled: true },
-  { segment: "analysis", label: "分析", enabled: true },
+  { segment: "analysis", label: "資産配分", enabled: true },
   { segment: "trends", label: "推移", enabled: true },
   { segment: "register", label: "登録", enabled: true },
   { segment: "edit", label: "更新", enabled: true },
