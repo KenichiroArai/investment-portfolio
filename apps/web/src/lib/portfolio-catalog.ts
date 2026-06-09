@@ -2,11 +2,11 @@ import type { PortfolioDto } from "@repo/shared";
 
 export const STATIC_PORTFOLIOS: PortfolioDto[] = [
   {
-    id: "static-ideco",
-    code: "ideco",
-    name: "iDeCo",
-    kind: "ideco",
-  },
+    "id": "8bdc1f30-b301-4dfc-a4ab-8cd68a4cd76b",
+    "code": "ideco",
+    "name": "iDeCo",
+    "kind": "ideco"
+  }
 ];
 
 export function generatePortfolioStaticParams(): { code: string }[] {
@@ -30,3 +30,4 @@ export function findPortfolioByCode(code: string): PortfolioDto | null {
   result = portfolio;
   return result;
 }
+
