@@ -2,6 +2,8 @@
 
 import type { ReactNode } from "react";
 
+import { PageContainer } from "@/components/layout/page-container";
+import { PageHeader } from "@/components/layout/page-header";
 import { TrendsDetailPanel } from "@/features/trends/TrendsDetailPanel";
 
 type TrendsViewProps = {
@@ -10,11 +12,13 @@ type TrendsViewProps = {
 
 export function TrendsView({ portfolioCode }: TrendsViewProps) {
   let result: ReactNode = (
-    <main>
-      <h1>推移</h1>
-      <p className="holdings-meta">口座: {portfolioCode}</p>
+    <PageContainer>
+      <PageHeader
+        title="推移"
+        description={`口座: ${portfolioCode}`}
+      />
       <TrendsDetailPanel />
-    </main>
+    </PageContainer>
   );
   return result;
 }

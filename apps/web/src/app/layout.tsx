@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 
-import { AppNav } from "@/components/AppNav";
+import { AppShell } from "@/components/layout/app-shell";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
 let result: Metadata = {
@@ -15,10 +18,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   let result = (
-    <html lang="ja">
+    <html lang="ja" suppressHydrationWarning>
       <body>
-        <AppNav />
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <TooltipProvider>
+            <AppShell>{children}</AppShell>
+            <Toaster richColors position="top-right" />
+          </TooltipProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

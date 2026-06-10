@@ -8,9 +8,22 @@ import {
   sumSnapshotMarketValue,
   type CurrentSnapshotDto,
 } from "@repo/shared";
+import { ArrowRight, BarChart3, List } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 
+import { EmptyState } from "@/components/empty-state";
+import { LoadingSkeleton } from "@/components/loading-skeleton";
+import { StatCard } from "@/components/stat-card";
 import { AccountManagePanel } from "@/features/manage/AccountManagePanel";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { formatPercent, formatYen } from "@/lib/format-yen";
 import {
   getPortfoliosFetchUrl,
@@ -18,6 +31,7 @@ import {
   getSnapshotLoadErrorMessage,
   type PortfolioListItem,
 } from "@/lib/data-source";
+import { cn } from "@/lib/utils";
 
 type PortfolioCard = {
   code: string;
@@ -147,12 +161,16 @@ export function HomeView() {
   let result: ReactNode = null;
 
   if (loading) {
-    result = <p>読み込み中…</p>;
+    result = <LoadingSkeleton variant="cards" />;
     return result;
   }
 
   if (error) {
-    result = <p className="holdings-error">{error}</p>;
+    result = (
+      <Alert variant="destructive">
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    );
     return result;
   }
 
@@ -164,74 +182,135 @@ export function HomeView() {
     totalGainRateOnAssetBalance === null
       ? "—"
       : formatPercent(totalGainRateOnAssetBalance);
+  const gainClassName =
+    totalPortfolioGainMinor >= 0 ? "text-emerald-600" : "text-rose-600";
 
   result = (
-    <>
-      <section className="home-summary">
-        <h2>総資産</h2>
-        <p className="home-summary__value">{formatYen(totalMarketValueMinor)}</p>
-        {hasAnySnapshot ? (
-          <dl className="home-summary__metrics">
-            <div>
-              <dt>損益</dt>
-              <dd>{formatYen(totalPortfolioGainMinor)}</dd>
-            </div>
-            <div>
-              <dt>利益率</dt>
-              <dd>{totalGainRateOnAssetBalanceLabel}</dd>
-            </div>
-          </dl>
-        ) : null}
-        <p>
-          <Link href="/analysis/">全口座の資産配分を見る</Link>
-        </p>
+    <div className="space-y-8">
+      <section className="space-y-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <StatCard
+            label="総資産"
+            value={formatYen(totalMarketValueMinor)}
+            className="sm:col-span-2 lg:col-span-1"
+            valueClassName="text-3xl"
+          />
+          {hasAnySnapshot ? (
+            <>
+              <StatCard
+                label="損益"
+                value={formatYen(totalPortfolioGainMinor)}
+                valueClassName={gainClassName}
+              />
+              <StatCard
+                label="利益率"
+                value={totalGainRateOnAssetBalanceLabel}
+                valueClassName={gainClassName}
+              />
+            </>
+          ) : null}
+        </div>
+        <Button variant="outline" asChild>
+          <Link href="/analysis/">
+            <BarChart3 className="h-4 w-4" />
+            全口座の資産配分を見る
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </Button>
       </section>
 
-      <section className="home-portfolios">
-        <h2>口座</h2>
-        <AccountManagePanel
-          portfolios={portfolios}
-          onChanged={() => {
-            setReloadKey((value) => value + 1);
-          }}
-        />
+      <section className="space-y-4">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-lg font-semibold">口座</h2>
+          <AccountManagePanel
+            portfolios={portfolios}
+            onChanged={() => {
+              setReloadKey((value) => value + 1);
+            }}
+          />
+        </div>
         {cards.length === 0 ? (
-          <p className="note">登録済みの口座がありません。</p>
+          <EmptyState title="登録済みの口座がありません" />
         ) : (
-          <ul className="portfolio-card-list">
+          <div className="grid gap-4 sm:grid-cols-2">
             {cards.map((card) => {
               const gainRateOnAssetBalanceLabel =
                 card.gainRateOnAssetBalance === null
                   ? "—"
                   : formatPercent(card.gainRateOnAssetBalance);
+              const cardGainClass =
+                (card.portfolioGainMinor ?? 0) >= 0
+                  ? "text-emerald-600"
+                  : "text-rose-600";
+
               let item = (
-                <li key={card.code} className="portfolio-card">
-                  <h3>
-                    <Link href={`/portfolios/${card.code}/`}>{card.name}</Link>
-                  </h3>
-                  <p className="portfolio-card__code">{card.code}</p>
-                  {card.hasSnapshot ? (
-                    <>
-                      <p>基準日: {card.asOfDate}</p>
-                      <p>評価額: {formatYen(card.marketValueMinor ?? 0)}</p>
-                      <p>損益: {formatYen(card.portfolioGainMinor ?? 0)}</p>
-                      <p>利益率: {gainRateOnAssetBalanceLabel}</p>
-                    </>
-                  ) : (
-                    <p className="note">明細未登録</p>
-                  )}
-                  <nav className="portfolio-card__links">
-                    <Link href={`/portfolios/${card.code}/holdings/`}>明細</Link>
-                    <Link href={`/portfolios/${card.code}/analysis/`}>資産配分</Link>
-                  </nav>
-                </li>
+                <Card
+                  key={card.code}
+                  className="transition-shadow hover:shadow-md"
+                >
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">
+                      <Link
+                        href={`/portfolios/${card.code}/`}
+                        className="hover:underline"
+                      >
+                        {card.name}
+                      </Link>
+                    </CardTitle>
+                    <CardDescription>{card.code}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {card.hasSnapshot ? (
+                      <dl className="grid grid-cols-2 gap-2 text-sm">
+                        <div>
+                          <dt className="text-muted-foreground">基準日</dt>
+                          <dd className="font-medium">{card.asOfDate}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-muted-foreground">評価額</dt>
+                          <dd className="font-medium">
+                            {formatYen(card.marketValueMinor ?? 0)}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-muted-foreground">損益</dt>
+                          <dd className={cn("font-medium", cardGainClass)}>
+                            {formatYen(card.portfolioGainMinor ?? 0)}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-muted-foreground">利益率</dt>
+                          <dd className={cn("font-medium", cardGainClass)}>
+                            {gainRateOnAssetBalanceLabel}
+                          </dd>
+                        </div>
+                      </dl>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">明細未登録</p>
+                    )}
+                    <div className="flex flex-wrap gap-2">
+                      <Button variant="outline" size="sm" asChild>
+                        <Link href={`/portfolios/${card.code}/holdings/`}>
+                          <List className="h-3.5 w-3.5" />
+                          明細
+                        </Link>
+                      </Button>
+                      <Button variant="outline" size="sm" asChild>
+                        <Link href={`/portfolios/${card.code}/analysis/`}>
+                          <BarChart3 className="h-3.5 w-3.5" />
+                          資産配分
+                        </Link>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
               );
               return item;
             })}
-          </ul>
+          </div>
         )}
       </section>
-    </>
+    </div>
   );
   return result;
 }

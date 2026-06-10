@@ -15,8 +15,10 @@ describe("HoldingsView", () => {
 
   it("shows loading state initially", () => {
     vi.stubGlobal("fetch", vi.fn(() => new Promise(() => {})));
-    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />);
-    expect(screen.getByText("読み込み中…")).toBeInTheDocument();
+    const { container } = renderWithPortfolioTime(
+      <HoldingsView portfolioCode="ideco" />,
+    );
+    expect(container.querySelector(".animate-pulse")).toBeTruthy();
   });
 
   it("shows API connection error when fetch fails", async () => {

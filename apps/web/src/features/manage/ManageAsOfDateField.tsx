@@ -1,5 +1,10 @@
 "use client";
 
+import { Info } from "lucide-react";
+
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { formatAsOfDateJa } from "@/lib/format-yen";
 
 type ManageAsOfDateFieldProps =
@@ -19,28 +24,30 @@ const HELP_TEXT =
 
 export function ManageAsOfDateField(props: ManageAsOfDateFieldProps) {
   let result = (
-    <div className="manage-as-of-date">
-      {props.mode === "editable" ? (
-        <label>
-          操作対象の基準日
-          <input
-            type="date"
-            value={props.value}
-            disabled={props.disabled}
-            onChange={(event) => {
-              props.onChange(event.target.value);
-            }}
-            required
-          />
-        </label>
-      ) : (
-        <p className="manage-as-of-date__value">
-          <span className="manage-as-of-date__label">操作対象の基準日</span>
-          <span>{formatAsOfDateJa(props.value)}</span>
-        </p>
-      )}
-      <p className="manage-as-of-date__help">{HELP_TEXT}</p>
-    </div>
+    <Alert>
+      <Info className="h-4 w-4" />
+      <AlertTitle>操作対象の基準日</AlertTitle>
+      <AlertDescription className="space-y-3">
+        {props.mode === "editable" ? (
+          <div className="grid max-w-xs gap-2">
+            <Label htmlFor="manage-as-of-date">基準日</Label>
+            <Input
+              id="manage-as-of-date"
+              type="date"
+              value={props.value}
+              disabled={props.disabled}
+              onChange={(event) => {
+                props.onChange(event.target.value);
+              }}
+              required
+            />
+          </div>
+        ) : (
+          <p className="font-medium text-foreground">{formatAsOfDateJa(props.value)}</p>
+        )}
+        <p>{HELP_TEXT}</p>
+      </AlertDescription>
+    </Alert>
   );
   return result;
 }

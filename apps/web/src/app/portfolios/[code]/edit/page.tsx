@@ -1,17 +1,11 @@
-import { EditView } from "@/features/manage/EditView";
-import { generatePortfolioStaticParams } from "@/lib/portfolio-catalog";
+import { redirect } from "next/navigation";
 
-type PageProps = {
+type EditPageProps = {
   params: Promise<{ code: string }>;
 };
 
-export function generateStaticParams() {
-  let result = generatePortfolioStaticParams();
-  return result;
-}
-
-export default async function EditPage({ params }: PageProps) {
+export default async function EditPage({ params }: EditPageProps) {
   const { code } = await params;
-  let result = <EditView portfolioCode={code} />;
+  let result: never = redirect(`/portfolios/${code}/settings/data/`) as never;
   return result;
 }

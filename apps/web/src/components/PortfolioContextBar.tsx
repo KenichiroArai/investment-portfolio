@@ -1,9 +1,19 @@
 "use client";
 
+import { Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 import { findPortfolioByCode } from "@/lib/portfolio-catalog";
 import {
   getPortfoliosFetchUrl,
@@ -26,8 +36,6 @@ const CONTEXT_TABS: ContextTab[] = [
   { segment: "holdings", label: "明細", enabled: true },
   { segment: "analysis", label: "資産配分", enabled: true },
   { segment: "trends", label: "推移", enabled: true },
-  { segment: "register", label: "登録", enabled: true },
-  { segment: "edit", label: "更新", enabled: true },
 ];
 
 function buildPortfolioHref(portfolioCode: string, segment: string): string {
@@ -43,6 +51,10 @@ function buildPortfolioHref(portfolioCode: string, segment: string): string {
 function isTabActive(pathname: string, portfolioCode: string, segment: string): boolean {
   let result = false;
   const base = `/portfolios/${portfolioCode}`;
+
+  if (pathname.startsWith(`${base}/settings`)) {
+    return result;
+  }
 
   if (segment === "") {
     result = pathname === base || pathname === `${base}/`;
@@ -63,6 +75,11 @@ function isTabActive(pathname: string, portfolioCode: string, segment: string): 
   return result;
 }
 
+function isSettingsActive(pathname: string, portfolioCode: string): boolean {
+  let result = pathname.startsWith(`/portfolios/${portfolioCode}/settings`);
+  return result;
+}
+
 export function PortfolioContextBar({ portfolioCode }: PortfolioContextBarProps) {
   const pathname = usePathname();
   const [portfolios, setPortfolios] = useState<PortfolioListItem[]>([]);
@@ -70,6 +87,7 @@ export function PortfolioContextBar({ portfolioCode }: PortfolioContextBarProps)
   const [portfolioName, setPortfolioName] = useState(
     catalogPortfolio?.name ?? portfolioCode,
   );
+  const settingsActive = isSettingsActive(pathname, portfolioCode);
 
   useEffect(() => {
     let result: () => void = () => {};
@@ -110,66 +128,86 @@ export function PortfolioContextBar({ portfolioCode }: PortfolioContextBarProps)
   }, [portfolioCode]);
 
   let result = (
-    <div className="portfolio-context">
-      <div className="portfolio-context__header">
-        {portfolios.length > 1 ? (
-          <label className="portfolio-context__selector">
-            <span className="visually-hidden">口座を選択</span>
-            <select
-              className="portfolio-context__select"
-              value={portfolioCode}
-              onChange={(event) => {
-                const nextCode = event.target.value;
-                window.location.assign(buildPortfolioHref(nextCode, ""));
-              }}
-            >
-              {portfolios.map((portfolio) => {
-                let option = (
-                  <option key={portfolio.code} value={portfolio.code}>
-                    {portfolio.name}
-                  </option>
-                );
-                return option;
-              })}
-            </select>
-          </label>
-        ) : (
-          <span className="portfolio-context__title">{portfolioName}</span>
-        )}
-      </div>
-      <nav className="portfolio-context__tabs" aria-label="口座メニュー">
-        <ul>
-          {CONTEXT_TABS.map((tab) => {
-            let tabResult: ReactNode = null;
-            const href = buildPortfolioHref(portfolioCode, tab.segment);
-            const active = isTabActive(pathname, portfolioCode, tab.segment);
+    <div className="border-b bg-background">
+      <div className="mx-auto max-w-6xl px-4 md:px-6">
+        <div className="flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-3">
+            {portfolios.length > 1 ? (
+              <Select
+                value={portfolioCode}
+                onValueChange={(nextCode) => {
+                  window.location.assign(buildPortfolioHref(nextCode, ""));
+                }}
+              >
+                <SelectTrigger className="w-[min(100%,14rem)]" aria-label="口座を選択">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {portfolios.map((portfolio) => {
+                    let item = (
+                      <SelectItem key={portfolio.code} value={portfolio.code}>
+                        {portfolio.name}
+                      </SelectItem>
+                    );
+                    return item;
+                  })}
+                </SelectContent>
+              </Select>
+            ) : (
+              <span className="text-sm font-semibold">{portfolioName}</span>
+            )}
+          </div>
+          <Button
+            variant={settingsActive ? "secondary" : "outline"}
+            size="sm"
+            asChild
+          >
+            <Link href={`/portfolios/${portfolioCode}/settings/data/`}>
+              <Settings className="h-4 w-4" />
+              設定
+            </Link>
+          </Button>
+        </div>
+        {!settingsActive ? (
+          <nav aria-label="口座メニュー" className="-mb-px flex gap-1 overflow-x-auto pb-0">
+            {CONTEXT_TABS.map((tab) => {
+              let tabResult: ReactNode = null;
+              const href = buildPortfolioHref(portfolioCode, tab.segment);
+              const active = isTabActive(pathname, portfolioCode, tab.segment);
 
-            if (!tab.enabled) {
-              tabResult = (
-                <li key={tab.segment}>
-                  <span className="portfolio-context__disabled" title="準備中">
+              if (!tab.enabled) {
+                tabResult = (
+                  <span
+                    key={tab.segment}
+                    className="shrink-0 px-3 py-2 text-sm text-muted-foreground"
+                    title="準備中"
+                  >
                     {tab.label}
                   </span>
-                </li>
-              );
-              return tabResult;
-            }
+                );
+                return tabResult;
+              }
 
-            tabResult = (
-              <li key={tab.segment}>
+              tabResult = (
                 <Link
+                  key={tab.segment}
                   href={href}
                   aria-current={active ? "page" : undefined}
-                  className={active ? "is-active" : undefined}
+                  className={cn(
+                    "shrink-0 border-b-2 px-3 py-2 text-sm font-medium transition-colors",
+                    active
+                      ? "border-primary text-foreground"
+                      : "border-transparent text-muted-foreground hover:border-muted-foreground/30 hover:text-foreground",
+                  )}
                 >
                   {tab.label}
                 </Link>
-              </li>
-            );
-            return tabResult;
-          })}
-        </ul>
-      </nav>
+              );
+              return tabResult;
+            })}
+          </nav>
+        ) : null}
+      </div>
     </div>
   );
   return result;

@@ -5,6 +5,11 @@ export function shouldShowSnapshotTimeBar(
   let result = true;
   const base = `/portfolios/${portfolioCode}`;
 
+  if (pathname.startsWith(`${base}/settings`)) {
+    result = false;
+    return result;
+  }
+
   if (pathname.startsWith(`${base}/register`)) {
     result = false;
     return result;

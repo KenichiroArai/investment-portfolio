@@ -11,6 +11,20 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { AllocationPanel } from "@/features/analysis/AllocationPanel";
 import { AnalysisPanelSummary } from "@/features/analysis/AnalysisPanelSummary";
+import { LoadingSkeleton } from "@/components/loading-skeleton";
+import { PageContainer } from "@/components/layout/page-container";
+import { PageHeader } from "@/components/layout/page-header";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatPercent, formatYen } from "@/lib/format-yen";
 import {
   getPortfoliosFetchUrl,
@@ -82,16 +96,12 @@ export function GlobalAnalysisView() {
           if (cancelled) {
             return result;
           }
-          if (snapshotResponse.status === 404) {
+          if (!snapshotResponse.ok) {
             continue;
           }
-          if (!snapshotResponse.ok) {
-            setError("スナップショットの取得に失敗しました。");
-            return result;
-          }
-          const snapshot =
-            (await snapshotResponse.json()) as CurrentSnapshotDto;
-          loadedSnapshots.push(snapshot);
+          loadedSnapshots.push(
+            (await snapshotResponse.json()) as CurrentSnapshotDto,
+          );
         }
 
         setSnapshots(loadedSnapshots);
@@ -120,29 +130,33 @@ export function GlobalAnalysisView() {
 
   if (loading) {
     result = (
-      <main>
-        <p>読み込み中…</p>
-      </main>
+      <PageContainer>
+        <LoadingSkeleton />
+      </PageContainer>
     );
     return result;
   }
 
   if (error) {
     result = (
-      <main>
-        <h1>全口座の資産配分</h1>
-        <p className="holdings-error">{error}</p>
-      </main>
+      <PageContainer>
+        <PageHeader title="全口座の資産配分" />
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      </PageContainer>
     );
     return result;
   }
 
   if (snapshots.length === 0) {
     result = (
-      <main>
-        <h1>全口座の資産配分</h1>
-        <p className="holdings-error">資産配分の対象となる明細がありません。</p>
-      </main>
+      <PageContainer>
+        <PageHeader title="全口座の資産配分" />
+        <Alert variant="destructive">
+          <AlertDescription>資産配分の対象となる明細がありません。</AlertDescription>
+        </Alert>
+      </PageContainer>
     );
     return result;
   }
@@ -161,84 +175,103 @@ export function GlobalAnalysisView() {
       : null;
 
   result = (
-    <main className="analysis-page global-analysis">
-      <h1>全口座の資産配分</h1>
-      <p className="analysis-page__total">
-        総評価額: {formatYen(merged.totalMarketValueMinor)}
-      </p>
+    <PageContainer>
+      <PageHeader
+        title="全口座の資産配分"
+        description={`総評価額: ${formatYen(merged.totalMarketValueMinor)}`}
+      />
 
-      <section className="global-analysis__portfolios">
-        <h2>口座別内訳</h2>
-        <table className="allocation-table">
-          <thead>
-            <tr>
-              <th>口座</th>
-              <th>基準日</th>
-              <th>評価額</th>
-              <th>構成比</th>
-            </tr>
-          </thead>
-          <tbody>
-            {merged.portfolios.map((portfolio) => {
-              let row = (
-                <tr key={portfolio.portfolioCode}>
-                  <td>
-                    <Link href={`/portfolios/${portfolio.portfolioCode}/analysis/`}>
-                      {portfolio.portfolioName}
-                    </Link>
-                  </td>
-                  <td>{portfolio.asOfDate}</td>
-                  <td>{formatYen(portfolio.marketValueMinor)}</td>
-                  <td>{formatPercent(portfolio.weight)}</td>
-                </tr>
-              );
-              return row;
-            })}
-          </tbody>
-        </table>
-      </section>
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="text-base">口座別内訳</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0 pt-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>口座</TableHead>
+                <TableHead>基準日</TableHead>
+                <TableHead>評価額</TableHead>
+                <TableHead>構成比</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {merged.portfolios.map((portfolio) => {
+                let row = (
+                  <TableRow key={portfolio.portfolioCode}>
+                    <TableCell>
+                      <Link
+                        href={`/portfolios/${portfolio.portfolioCode}/analysis/`}
+                        className="font-medium hover:underline"
+                      >
+                        {portfolio.portfolioName}
+                      </Link>
+                    </TableCell>
+                    <TableCell>{portfolio.asOfDate}</TableCell>
+                    <TableCell>{formatYen(portfolio.marketValueMinor)}</TableCell>
+                    <TableCell>{formatPercent(portfolio.weight)}</TableCell>
+                  </TableRow>
+                );
+                return row;
+              })}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
       {schemeConfigs.length > 0 && allocation ? (
-        <>
-          <div className="analysis-axis-tabs" role="tablist" aria-label="分析軸">
+        <Tabs
+          value={activeSchemeCode}
+          onValueChange={setSelectedSchemeCode}
+          className="space-y-4"
+        >
+          <TabsList className="flex h-auto flex-wrap">
             {schemeConfigs.map((config) => {
               let tab = (
-                <button
-                  key={config.schemeCode}
-                  type="button"
-                  role="tab"
-                  aria-selected={config.schemeCode === activeSchemeCode}
-                  className={
-                    config.schemeCode === activeSchemeCode
-                      ? "is-active"
-                      : undefined
-                  }
-                  onClick={() => {
-                    setSelectedSchemeCode(config.schemeCode);
-                  }}
-                >
+                <TabsTrigger key={config.schemeCode} value={config.schemeCode}>
                   {config.schemeName}
-                </button>
+                </TabsTrigger>
               );
               return tab;
             })}
-          </div>
-          <section className="analysis-panel">
-            <h2>全口座合算 — {activeScheme?.schemeName}</h2>
-            <AnalysisPanelSummary
-              axisTotalMinor={allocation.totalMarketValueMinor}
-              assetTotalMinor={merged.totalMarketValueMinor}
-            />
-            <AllocationPanel
-              slices={allocation.slices}
-              showPortfolioColumn
-            />
-          </section>
-        </>
+          </TabsList>
+          {schemeConfigs.map((config) => {
+            const schemeAllocation = buildAllocationBySchemeWithLinesFromSnapshots(
+              snapshots,
+              config.schemeCode,
+              config.schemeName,
+            );
+
+            let content = (
+              <TabsContent key={config.schemeCode} value={config.schemeCode}>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">
+                      全口座合算 — {config.schemeName}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <AnalysisPanelSummary
+                      axisTotalMinor={schemeAllocation.totalMarketValueMinor}
+                      assetTotalMinor={merged.totalMarketValueMinor}
+                    />
+                    <AllocationPanel
+                      slices={schemeAllocation.slices}
+                      showPortfolioColumn
+                    />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            );
+            return content;
+          })}
+        </Tabs>
       ) : (
-        <p className="note">横断分析に利用できる分類軸がありません。</p>
+        <p className="text-sm text-muted-foreground">
+          横断分析に利用できる分類軸がありません。
+        </p>
       )}
-    </main>
+    </PageContainer>
   );
   return result;
 }

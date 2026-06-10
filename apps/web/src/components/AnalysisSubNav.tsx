@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { cn } from "@/lib/utils";
+
 type AnalysisSubNavProps = {
   portfolioCode: string;
 };
@@ -10,30 +12,40 @@ type AnalysisSubNavProps = {
 export function AnalysisSubNav({ portfolioCode }: AnalysisSubNavProps) {
   const pathname = usePathname();
   const viewHref = `/portfolios/${portfolioCode}/analysis/`;
-  const settingsHref = `/portfolios/${portfolioCode}/analysis/settings/`;
+  const settingsHref = `/portfolios/${portfolioCode}/settings/classification/`;
   const viewActive =
-    pathname === `/portfolios/${portfolioCode}/analysis` ||
-    pathname === viewHref;
+    pathname === `/portfolios/${portfolioCode}/analysis` || pathname === viewHref;
   const settingsActive = pathname.startsWith(settingsHref);
 
   let result = (
-    <nav className="analysis-subnav" aria-label="分析メニュー">
-      <ul>
-        <li>
-          <Link href={viewHref} aria-current={viewActive ? "page" : undefined}>
-            表示
-          </Link>
-        </li>
-        <li>
-          <Link
-            href={settingsHref}
-            aria-current={settingsActive ? "page" : undefined}
-            className={settingsActive ? "is-active" : undefined}
-          >
-            設定
-          </Link>
-        </li>
-      </ul>
+    <nav
+      aria-label="分析メニュー"
+      className="mx-auto flex max-w-6xl gap-1 border-b px-4 md:px-6"
+    >
+      <Link
+        href={viewHref}
+        aria-current={viewActive ? "page" : undefined}
+        className={cn(
+          "border-b-2 px-3 py-2 text-sm font-medium transition-colors",
+          viewActive
+            ? "border-primary text-foreground"
+            : "border-transparent text-muted-foreground hover:text-foreground",
+        )}
+      >
+        表示
+      </Link>
+      <Link
+        href={settingsHref}
+        aria-current={settingsActive ? "page" : undefined}
+        className={cn(
+          "border-b-2 px-3 py-2 text-sm font-medium transition-colors",
+          settingsActive
+            ? "border-primary text-foreground"
+            : "border-transparent text-muted-foreground hover:text-foreground",
+        )}
+      >
+        分類設定
+      </Link>
     </nav>
   );
   return result;

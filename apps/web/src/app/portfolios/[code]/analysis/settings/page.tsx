@@ -1,4 +1,5 @@
-import { AnalysisSettingsView } from "@/features/manage/AnalysisSettingsView";
+import { redirect } from "next/navigation";
+
 import { generatePortfolioStaticParams } from "@/lib/portfolio-catalog";
 
 type PageProps = {
@@ -12,6 +13,6 @@ export function generateStaticParams() {
 
 export default async function AnalysisSettingsPage({ params }: PageProps) {
   const { code } = await params;
-  let result = <AnalysisSettingsView portfolioCode={code} />;
+  let result: never = redirect(`/portfolios/${code}/settings/classification/`) as never;
   return result;
 }

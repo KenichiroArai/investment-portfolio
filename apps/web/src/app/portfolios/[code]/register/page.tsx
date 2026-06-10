@@ -1,17 +1,11 @@
-import { RegisterView } from "@/features/manage/RegisterView";
-import { generatePortfolioStaticParams } from "@/lib/portfolio-catalog";
+import { redirect } from "next/navigation";
 
-type PageProps = {
+type RegisterPageProps = {
   params: Promise<{ code: string }>;
 };
 
-export function generateStaticParams() {
-  let result = generatePortfolioStaticParams();
-  return result;
-}
-
-export default async function RegisterPage({ params }: PageProps) {
+export default async function RegisterPage({ params }: RegisterPageProps) {
   const { code } = await params;
-  let result = <RegisterView portfolioCode={code} />;
+  let result: never = redirect(`/portfolios/${code}/settings/data/`) as never;
   return result;
 }

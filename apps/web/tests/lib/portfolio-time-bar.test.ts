@@ -13,7 +13,10 @@ describe("shouldShowSnapshotTimeBar", () => {
     expect(shouldShowSnapshotTimeBar(`/portfolios/${code}/trends/`, code)).toBe(true);
   });
 
-  it("hides on register, edit, and analysis settings", () => {
+  it("hides on settings, register, edit, and analysis settings", () => {
+    expect(shouldShowSnapshotTimeBar(`/portfolios/${code}/settings/data/`, code)).toBe(
+      false,
+    );
     expect(shouldShowSnapshotTimeBar(`/portfolios/${code}/register/`, code)).toBe(false);
     expect(shouldShowSnapshotTimeBar(`/portfolios/${code}/edit/`, code)).toBe(false);
     expect(

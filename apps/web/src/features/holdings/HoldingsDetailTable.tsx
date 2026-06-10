@@ -12,12 +12,21 @@ import { useMemo } from "react";
 
 import { SortableTableHeader } from "@/components/SortableTableHeader";
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
   formatBookValue,
   formatLineMetric,
   formatMetricLabel,
 } from "@/lib/format-holding-line";
 import { formatYen } from "@/lib/format-yen";
 import { useTableSort } from "@/hooks/useTableSort";
+import { cn } from "@/lib/utils";
 
 type HoldingsDetailSortColumn =
   | "sortOrder"
@@ -48,17 +57,17 @@ export function HoldingsDetailTable({
   }, [lines, sortColumn, sortDirection]);
 
   let result = (
-    <div className="holdings-table-wrapper">
-      <table className="holdings-table">
-        <thead>
-          <tr>
+    <div className="overflow-x-auto px-2">
+      <Table>
+        <TableHeader>
+          <TableRow>
             <SortableTableHeader
               label="銘柄"
               column="instrumentName"
               activeColumn={sortColumn}
               direction={sortDirection}
               onSort={toggleSort}
-              className="holdings-table__instrument-col"
+              className="sticky left-0 z-10 min-w-[10rem] bg-card"
             />
             <SortableTableHeader
               label="口数"
@@ -120,61 +129,61 @@ export function HoldingsDetailTable({
                   activeColumn={sortColumn}
                   direction={sortDirection}
                   onSort={toggleSort}
-                  className="holdings-table__classification-col"
+                  className="min-w-[4.5rem] text-xs"
                 />
               );
               return header;
             })}
-          </tr>
-        </thead>
-        <tbody>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {sortedLines.map((line) => {
             let row = (
-              <tr key={line.id}>
-                <td className="holdings-table__instrument-col">
+              <TableRow key={line.id}>
+                <TableCell className="sticky left-0 z-10 bg-card font-medium">
                   {line.instrumentName}
-                </td>
-                <td>{line.quantity}</td>
-                <td>
+                </TableCell>
+                <TableCell>{line.quantity}</TableCell>
+                <TableCell>
                   {formatLineMetric(
                     line.metrics,
                     IDECO_KAKEIBO_METRIC_CODES.unitPricePerTenThousandLots,
                   )}
-                </td>
-                <td>{formatYen(line.marketValueMinor)}</td>
-                <td>{formatBookValue(line.bookValueMinor)}</td>
-                <td>
+                </TableCell>
+                <TableCell>{formatYen(line.marketValueMinor)}</TableCell>
+                <TableCell>{formatBookValue(line.bookValueMinor)}</TableCell>
+                <TableCell>
                   {formatLineMetric(
                     line.metrics,
                     IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor,
                   )}
-                </td>
-                <td>
+                </TableCell>
+                <TableCell>
                   {formatLineMetric(
                     line.metrics,
                     IDECO_KAKEIBO_METRIC_CODES.unrealizedGainRate,
                   )}
-                </td>
+                </TableCell>
                 {classificationSchemes.map((scheme) => {
                   const value =
                     findClassificationTagValue(line.tags, scheme.schemeCode) ??
                     "—";
                   let cell = (
-                    <td
+                    <TableCell
                       key={scheme.schemeCode}
-                      className="holdings-table__classification-col"
+                      className={cn("whitespace-nowrap text-sm")}
                     >
                       {value}
-                    </td>
+                    </TableCell>
                   );
                   return cell;
                 })}
-              </tr>
+              </TableRow>
             );
             return row;
           })}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
   return result;

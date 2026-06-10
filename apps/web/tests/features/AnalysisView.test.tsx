@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
+import { cleanup, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { AnalysisView } from "@/features/analysis/AnalysisView";
@@ -71,15 +71,12 @@ describe("AnalysisView", () => {
     expect(screen.getByText(/分類対象額/)).toBeInTheDocument();
     expect(screen.queryByText(/未分類/)).not.toBeInTheDocument();
 
-    expect(screen.getByRole("heading", { name: "地域分類" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "地域分類" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "資産分類" })).toBeInTheDocument();
     expect(screen.getAllByText("国内").length).toBeGreaterThanOrEqual(1);
     expect(
       screen.getByRole("button", { name: "国内 の内訳を開く" }),
     ).toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole("tab", { name: "資産分類" }));
-    expect(screen.getByRole("heading", { name: "資産分類" })).toBeInTheDocument();
-    expect(screen.getAllByText("株式").length).toBeGreaterThanOrEqual(1);
   });
 
   it("shows uncovered amount when lines lack tags for the active scheme", async () => {

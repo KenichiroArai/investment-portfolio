@@ -1,13 +1,21 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-import { AppNav } from "@/components/AppNav";
+import { TopBar } from "@/components/layout/top-bar";
 
-describe("AppNav", () => {
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/",
+}));
+
+vi.mock("next-themes", () => ({
+  useTheme: () => ({ theme: "light", setTheme: vi.fn() }),
+}));
+
+describe("TopBar", () => {
   it("renders global navigation links", () => {
-    render(<AppNav />);
+    render(<TopBar />);
     expect(screen.getByRole("link", { name: "ホーム" })).toHaveAttribute("href", "/");
-    expect(screen.getByRole("link", { name: "全口座の資産配分" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "全口座分析" })).toHaveAttribute(
       "href",
       "/analysis",
     );

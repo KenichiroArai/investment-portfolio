@@ -1,4 +1,9 @@
 import type { SortDirection } from "@repo/shared";
+import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { TableHead } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 
 type SortableTableHeaderProps<T extends string> = {
   label: string;
@@ -18,32 +23,35 @@ export function SortableTableHeader<T extends string>({
   className,
 }: SortableTableHeaderProps<T>) {
   const isActive = column === activeColumn;
-  const indicator = !isActive ? "" : direction === "asc" ? " ▲" : " ▼";
 
   let result = (
-    <th
-      className={className}
+    <TableHead
+      className={cn(className)}
       aria-sort={
-        isActive
-          ? direction === "asc"
-            ? "ascending"
-            : "descending"
-          : undefined
+        isActive ? (direction === "asc" ? "ascending" : "descending") : undefined
       }
     >
-      <button
+      <Button
         type="button"
-        className={`sortable-table-header${isActive ? " is-active" : ""}`}
+        variant="ghost"
+        size="sm"
+        className="-ml-2 h-8 font-semibold"
         onClick={() => {
           onSort(column);
         }}
       >
         {label}
-        <span className="sortable-table-header__indicator" aria-hidden="true">
-          {indicator}
-        </span>
-      </button>
-    </th>
+        {isActive ? (
+          direction === "asc" ? (
+            <ArrowUp className="h-3.5 w-3.5" />
+          ) : (
+            <ArrowDown className="h-3.5 w-3.5" />
+          )
+        ) : (
+          <ArrowUpDown className="h-3.5 w-3.5 opacity-40" />
+        )}
+      </Button>
+    </TableHead>
   );
   return result;
 }

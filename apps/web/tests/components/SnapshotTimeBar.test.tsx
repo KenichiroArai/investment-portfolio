@@ -54,12 +54,12 @@ describe("SnapshotTimeBar", () => {
     expect(screen.getByText("推移")).toBeInTheDocument();
   });
 
-  it("hides on register route", () => {
-    usePathname.mockReturnValue("/portfolios/ideco/register/");
+  it("hides on settings route", () => {
+    usePathname.mockReturnValue("/portfolios/ideco/settings/data/");
     mockPortfolioTime();
 
     const { container } = render(<SnapshotTimeBar />);
 
-    expect(container.querySelector(".snapshot-time-bar")).toBeNull();
+    expect(container.firstChild).toBeNull();
   });
 });

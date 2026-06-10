@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { isWritableDataSource } from "@/lib/api-client";
 
 type WritableGuardProps = {
@@ -13,9 +14,12 @@ export function WritableGuard({ children }: WritableGuardProps) {
 
   if (!isWritableDataSource()) {
     result = (
-      <p className="manage-readonly-banner" role="status">
-        編集はローカル開発環境（API 接続時）でのみ可能です。本番サイトは読み取り専用です。
-      </p>
+      <Alert role="status">
+        <AlertTitle>読み取り専用</AlertTitle>
+        <AlertDescription>
+          編集はローカル開発環境（API 接続時）でのみ可能です。本番サイトは読み取り専用です。
+        </AlertDescription>
+      </Alert>
     );
     return result;
   }

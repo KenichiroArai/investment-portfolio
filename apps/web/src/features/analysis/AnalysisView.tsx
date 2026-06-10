@@ -7,11 +7,20 @@ import {
   sumSnapshotMarketValue,
   type AnalysisSchemeConfig,
 } from "@repo/shared";
+import { Settings } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
 import { AllocationPanel } from "@/features/analysis/AllocationPanel";
 import { AnalysisPanelSummary } from "@/features/analysis/AnalysisPanelSummary";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
+import { LoadingSkeleton } from "@/components/loading-skeleton";
+import { PageContainer } from "@/components/layout/page-container";
+import { PageHeader } from "@/components/layout/page-header";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatAsOfDateJa, formatYen } from "@/lib/format-yen";
 
 type AnalysisViewProps = {
@@ -37,29 +46,33 @@ export function AnalysisView({
 
   if (loadingDates || loadingSnapshot) {
     result = (
-      <main>
-        <p>読み込み中…</p>
-      </main>
+      <PageContainer>
+        <LoadingSkeleton />
+      </PageContainer>
     );
     return result;
   }
 
   if (error) {
     result = (
-      <main>
-        <h1>資産配分</h1>
-        <p className="holdings-error">{error}</p>
-      </main>
+      <PageContainer>
+        <PageHeader title="資産配分" />
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      </PageContainer>
     );
     return result;
   }
 
   if (!snapshot) {
     result = (
-      <main>
-        <h1>資産配分</h1>
-        <p className="holdings-error">資産配分の対象となる明細がありません。</p>
-      </main>
+      <PageContainer>
+        <PageHeader title="資産配分" />
+        <Alert variant="destructive">
+          <AlertDescription>資産配分の対象となる明細がありません。</AlertDescription>
+        </Alert>
+      </PageContainer>
     );
     return result;
   }
@@ -80,10 +93,12 @@ export function AnalysisView({
 
   if (schemeConfigs.length === 0) {
     result = (
-      <main>
-        <h1>資産配分</h1>
-        <p className="note">この口座種別の資産配分軸はまだ定義されていません。</p>
-      </main>
+      <PageContainer>
+        <PageHeader title="資産配分" />
+        <p className="text-sm text-muted-foreground">
+          この口座種別の資産配分軸はまだ定義されていません。
+        </p>
+      </PageContainer>
     );
     return result;
   }
@@ -99,56 +114,74 @@ export function AnalysisView({
   const totalValue = sumSnapshotMarketValue(snapshot.lines);
 
   result = (
-    <main className="analysis-page">
-      <div className="analysis-page__header">
-        <div>
-          <h1>
-            資産配分 — {snapshot.portfolioName}（{snapshot.portfolioCode}）
-          </h1>
-          <p className="holdings-meta">
-            基準日: {formatAsOfDateJa(selectedAsOfDate ?? snapshot.asOfDate)}
-            {isHistoricalView ? (
-              <span className="snapshot-time-bar__badge">履歴表示中</span>
-            ) : null}
-          </p>
-          <p className="analysis-page__total">評価額合計: {formatYen(totalValue)}</p>
-        </div>
-        <p className="note">
-          <Link href={`/portfolios/${portfolioCode}/analysis/settings/`}>
-            分析設定
-          </Link>
-        </p>
-      </div>
-      <div className="analysis-axis-tabs" role="tablist" aria-label="分析軸">
+    <PageContainer>
+      <PageHeader
+        title="資産配分"
+        description={`${snapshot.portfolioName}（${snapshot.portfolioCode}）`}
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="outline">
+              {formatAsOfDateJa(selectedAsOfDate ?? snapshot.asOfDate)}
+            </Badge>
+            {isHistoricalView ? <Badge variant="secondary">履歴</Badge> : null}
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`/portfolios/${portfolioCode}/settings/classification/`}>
+                <Settings className="h-4 w-4" />
+                分類設定
+              </Link>
+            </Button>
+          </div>
+        }
+      />
+      <p className="-mt-4 mb-4 text-sm font-medium">
+        評価額合計: {formatYen(totalValue)}
+      </p>
+
+      <Tabs
+        value={activeSchemeCode}
+        onValueChange={setSelectedSchemeCode}
+        className="space-y-4"
+      >
+        <TabsList className="flex h-auto flex-wrap">
+          {schemeConfigs.map((config) => {
+            let tab = (
+              <TabsTrigger key={config.schemeCode} value={config.schemeCode}>
+                {config.schemeName}
+              </TabsTrigger>
+            );
+            return tab;
+          })}
+        </TabsList>
         {schemeConfigs.map((config) => {
-          let tab = (
-            <button
-              key={config.schemeCode}
-              type="button"
-              role="tab"
-              aria-selected={config.schemeCode === activeSchemeCode}
-              className={
-                config.schemeCode === activeSchemeCode ? "is-active" : undefined
-              }
-              onClick={() => {
-                setSelectedSchemeCode(config.schemeCode);
-              }}
-            >
-              {config.schemeName}
-            </button>
+          const schemeAllocation =
+            config.schemeCode === activeSchemeCode
+              ? allocation
+              : buildAllocationBySchemeWithLines(
+                  snapshot.lines,
+                  config.schemeCode,
+                  config.schemeName,
+                );
+
+          let content = (
+            <TabsContent key={config.schemeCode} value={config.schemeCode}>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">{config.schemeName}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <AnalysisPanelSummary
+                    axisTotalMinor={schemeAllocation.totalMarketValueMinor}
+                    assetTotalMinor={totalValue}
+                  />
+                  <AllocationPanel slices={schemeAllocation.slices} />
+                </CardContent>
+              </Card>
+            </TabsContent>
           );
-          return tab;
+          return content;
         })}
-      </div>
-      <section className="analysis-panel">
-        <h2>{activeScheme.schemeName}</h2>
-        <AnalysisPanelSummary
-          axisTotalMinor={allocation.totalMarketValueMinor}
-          assetTotalMinor={totalValue}
-        />
-        <AllocationPanel slices={allocation.slices} />
-      </section>
-    </main>
+      </Tabs>
+    </PageContainer>
   );
   return result;
 }

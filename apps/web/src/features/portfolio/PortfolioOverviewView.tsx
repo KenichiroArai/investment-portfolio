@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import {
   computeSnapshotGainRate,
   computeSnapshotPortfolioGainMinor,
@@ -9,13 +8,21 @@ import {
 } from "@repo/shared";
 import type { ReactNode } from "react";
 
+import { LoadingSkeleton } from "@/components/loading-skeleton";
+import { PageContainer } from "@/components/layout/page-container";
+import { PageHeader } from "@/components/layout/page-header";
+import { StatCard } from "@/components/stat-card";
 import { OverviewTrendChart } from "@/features/trends/OverviewTrendChart";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   formatAsOfDateJa,
   formatPercent,
   formatYen,
 } from "@/lib/format-yen";
+import { cn } from "@/lib/utils";
 
 type PortfolioOverviewViewProps = {
   portfolioCode: string;
@@ -23,35 +30,6 @@ type PortfolioOverviewViewProps = {
 
 const GAIN_RATE_ON_CONTRIBUTIONS_HINT = "損益 ÷ 拠出金累計";
 const GAIN_RATE_ON_ASSET_BALANCE_HINT = "損益 ÷ 資産残高";
-
-type AssetStatusFieldProps = {
-  label: string;
-  value: string;
-  labelHint?: string;
-};
-
-function AssetStatusField({ label, value, labelHint }: AssetStatusFieldProps) {
-  let labelNode: ReactNode = label;
-
-  if (labelHint) {
-    labelNode = (
-      <span className="asset-status__label-hint" tabIndex={0}>
-        {label}
-        <span className="asset-status__hint-popup" role="tooltip">
-          {labelHint}
-        </span>
-      </span>
-    );
-  }
-
-  let result = (
-    <div className="asset-status__field">
-      <div className="asset-status__label">{labelNode}</div>
-      <div className="asset-status__value">{value}</div>
-    </div>
-  );
-  return result;
-}
 
 export function PortfolioOverviewView({
   portfolioCode,
@@ -71,29 +49,33 @@ export function PortfolioOverviewView({
 
   if (loadingDates || loadingSnapshot) {
     result = (
-      <main>
-        <p>読み込み中…</p>
-      </main>
+      <PageContainer>
+        <LoadingSkeleton variant="cards" />
+      </PageContainer>
     );
     return result;
   }
 
   if (error) {
     result = (
-      <main>
-        <h1>{portfolioCode}</h1>
-        <p className="holdings-error">{error}</p>
-      </main>
+      <PageContainer>
+        <PageHeader title={portfolioCode} />
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      </PageContainer>
     );
     return result;
   }
 
   if (!snapshot) {
     result = (
-      <main>
-        <h1>{portfolioCode}</h1>
-        <p className="holdings-error">明細がありません。</p>
-      </main>
+      <PageContainer>
+        <PageHeader title={portfolioCode} />
+        <Alert variant="destructive">
+          <AlertDescription>明細がありません。</AlertDescription>
+        </Alert>
+      </PageContainer>
     );
     return result;
   }
@@ -120,6 +102,7 @@ export function PortfolioOverviewView({
     gainRateOnAssetBalance === null
       ? "—"
       : formatPercent(gainRateOnAssetBalance);
+  const gainClassName = portfolioGain >= 0 ? "text-emerald-600" : "text-rose-600";
 
   const latestPoint =
     trends?.points.find((point) => point.asOfDate === currentAsOfDate) ??
@@ -130,55 +113,53 @@ export function PortfolioOverviewView({
       : null;
 
   result = (
-    <main className="portfolio-overview">
-      <h1 className="asset-status__title">資産状況</h1>
-      <div className="asset-status__banner">
-        資産状況 {formatAsOfDateJa(selectedAsOfDate ?? snapshot.asOfDate)}
-        {isHistoricalView ? "（履歴）" : " 現在"}
+    <PageContainer>
+      <PageHeader
+        title="資産状況"
+        description={`${snapshot.portfolioName}（${snapshot.portfolioCode}）`}
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="secondary">
+              {formatAsOfDateJa(selectedAsOfDate ?? snapshot.asOfDate)}
+              {isHistoricalView ? " · 履歴" : " · 現在"}
+            </Badge>
+          </div>
+        }
+      />
+      {deltaHint ? (
+        <p className="-mt-4 mb-4 text-sm text-muted-foreground">{deltaHint}</p>
+      ) : null}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard label="資産残高" value={formatYen(assetBalance)} />
+        <StatCard label="拠出金累計" value={formatYen(totalContributions)} />
+        <StatCard
+          label="損益"
+          value={formatYen(portfolioGain)}
+          valueClassName={gainClassName}
+        />
+        <StatCard
+          label="損益率"
+          value={gainRateOnContributionsLabel}
+          hint={GAIN_RATE_ON_CONTRIBUTIONS_HINT}
+          valueClassName={gainClassName}
+        />
+        <StatCard
+          label="利益率"
+          value={gainRateOnAssetBalanceLabel}
+          hint={GAIN_RATE_ON_ASSET_BALANCE_HINT}
+          valueClassName={gainClassName}
+          className="sm:col-span-2 lg:col-span-1"
+        />
       </div>
-      {deltaHint ? <p className="overview-delta-hint">{deltaHint}</p> : null}
-      <section className="asset-status__panel" aria-label="資産状況サマリー">
-        <div className="asset-status__row">
-          <AssetStatusField
-            label="資産残高"
-            value={formatYen(assetBalance)}
-          />
-          <AssetStatusField
-            label="拠出金累計"
-            value={formatYen(totalContributions)}
-          />
-        </div>
-        <div className="asset-status__row">
-          <AssetStatusField label="損益" value={formatYen(portfolioGain)} />
-          <AssetStatusField
-            label="損益率"
-            value={gainRateOnContributionsLabel}
-            labelHint={GAIN_RATE_ON_CONTRIBUTIONS_HINT}
-          />
-        </div>
-        <div className="asset-status__row">
-          <AssetStatusField
-            label="利益率"
-            value={gainRateOnAssetBalanceLabel}
-            labelHint={GAIN_RATE_ON_ASSET_BALANCE_HINT}
-          />
-        </div>
-      </section>
-      <OverviewTrendChart />
-      <nav className="overview-links" aria-label="クイックリンク">
-        <ul>
-          <li>
-            <Link href={`/portfolios/${portfolioCode}/holdings/`}>明細を見る</Link>
-          </li>
-          <li>
-            <Link href={`/portfolios/${portfolioCode}/analysis/`}>資産配分を見る</Link>
-          </li>
-          <li>
-            <Link href={`/portfolios/${portfolioCode}/trends/`}>推移を見る</Link>
-          </li>
-        </ul>
-      </nav>
-    </main>
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="text-base">資産推移</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <OverviewTrendChart />
+        </CardContent>
+      </Card>
+    </PageContainer>
   );
   return result;
 }
