@@ -359,7 +359,10 @@ export async function listAnalysisSchemesForPortfolio(
     })
     .from(classificationSchemes)
     .where(eq(classificationSchemes.portfolioId, portfolio.id))
-    .orderBy(asc(classificationSchemes.createdAt));
+    .orderBy(
+      asc(classificationSchemes.createdAt),
+      asc(classificationSchemes.code),
+    );
 
   for (const row of rows) {
     if (portfolio.kind === "ideco" && !isIdecoAnalysisSchemeCode(row.schemeCode)) {

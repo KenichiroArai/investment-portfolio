@@ -1,4 +1,5 @@
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { TrendLineChart } from "@/features/trends/TrendLineChart";
@@ -35,7 +36,8 @@ describe("TrendLineChart", () => {
     expect(screen.getByLabelText("推移折れ線グラフ")).toBeInTheDocument();
   });
 
-  it("shows tooltip on hover with formatted values", () => {
+  it("shows tooltip on hover with formatted values", async () => {
+    const user = userEvent.setup();
     const { container } = render(
       <TrendLineChart
         labels={["2026年6月", "2026年7月"]}
@@ -56,9 +58,37 @@ describe("TrendLineChart", () => {
     const hitAreas = within(container).getAllByRole("button", {
       name: /の詳細$/,
     });
-    fireEvent.mouseEnter(hitAreas[1]);
+    await user.hover(hitAreas[1]);
     const tooltipRow = container.querySelector(".trend-line-chart__tooltip-row");
     expect(tooltipRow?.textContent).toContain(formatYen(441_347));
+  });
+
+  it("shows tooltip on focus via keyboard", async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <TrendLineChart
+        labels={["2026年6月", "2026年7月"]}
+        valueKind="percent"
+        domainMode="fitData"
+        series={[
+          {
+            key: "domestic",
+            label: "国内株式",
+            color: "#2563eb",
+            values: [0.4, 0.45],
+            formatValue: (value) => formatPercent(value),
+          },
+        ]}
+      />,
+    );
+
+    const hitArea = within(container).getByRole("button", {
+      name: "2026年7月 の詳細",
+    });
+    await user.click(hitArea);
+    expect(container.querySelector(".trend-line-chart__tooltip")).toBeTruthy();
+    await user.unhover(hitArea);
+    expect(container.querySelector(".trend-line-chart__tooltip")).toBeNull();
   });
 
   it("renders empty state when no data", () => {

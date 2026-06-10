@@ -1,22 +1,49 @@
 import { afterEach, describe, expect, it } from "vitest";
 
+import { IDECO_SCHEME_CODES } from "@repo/shared";
+
 import {
   createClassificationScheme,
   createClassificationValue,
+  deleteClassificationSchemeById,
+  deleteClassificationValueById,
+  deleteClassificationValuesBySchemeIdNotInCodes,
+  findClassificationValueById,
+  findClassificationValueBySchemeAndCode,
+  findSchemeById,
   findSchemeByPortfolioCodeAndSchemeCode,
   getTagsForInstruments,
   listAnalysisSchemesForPortfolio,
+  listClassificationSchemesByPortfolioCode,
   listInstrumentClassificationValueIds,
+  listSchemesWithValuesForPortfolio,
   setInstrumentClassifications,
+  updateClassificationSchemeName,
+  updateClassificationValue,
 } from "../src/repositories/classifications";
-import { createInstrument } from "../src/repositories/instruments";
+import {
+  createInstrument,
+  deleteInstrument,
+  findInstrumentByAttributeTextValue,
+  findInstrumentById,
+  findInstrumentByName,
+  getAttributesForInstruments,
+  listInstruments,
+  setInstrumentAttributes,
+  updateInstrument,
+  upsertInstrument,
+} from "../src/repositories/instruments";
 import {
   createPortfolio,
+  deletePortfolio,
+  findPortfolioByCode,
   listPortfolios,
+  updatePortfolio,
 } from "../src/repositories/portfolios";
 import {
   getCurrentSnapshot,
   getSnapshotByDate,
+  getSnapshotsInDateRange,
   listSnapshotDates,
   replaceCurrentSnapshot,
   setCurrentSnapshot,
@@ -347,10 +374,13 @@ describe("portfolio repositories", () => {
     });
 
     const analysisSchemes = await listAnalysisSchemesForPortfolio(db, "sample");
-    expect(analysisSchemes).toEqual([
-      { schemeCode: "x1", schemeName: "軸1" },
-      { schemeCode: "metadata_only", schemeName: "メタデータ" },
-    ]);
+    expect(analysisSchemes).toHaveLength(2);
+    expect(analysisSchemes).toEqual(
+      expect.arrayContaining([
+        { schemeCode: "x1", schemeName: "軸1" },
+        { schemeCode: "metadata_only", schemeName: "メタデータ" },
+      ]),
+    );
   });
 
   it("lists classification value ids for an instrument", async () => {
@@ -383,5 +413,297 @@ describe("portfolio repositories", () => {
 
     const valueIds = await listInstrumentClassificationValueIds(db, instrument.id);
     expect(valueIds.sort()).toEqual([valueJapan.id, valueOverseas.id].sort());
+  });
+
+  it("manages classification scheme and value CRUD helpers", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+    const scheme = await createClassificationScheme(db, {
+      portfolioCode: "ideco",
+      code: "region",
+      name: "地域",
+    });
+    expect(scheme).not.toBeNull();
+
+    const foundScheme = await findSchemeById(db, scheme!.id);
+    expect(foundScheme?.code).toBe("region");
+
+    const value = await createClassificationValue(db, {
+      schemeId: scheme!.id,
+      code: "japan",
+      name: "日本",
+      sortOrder: 0,
+    });
+    const foundValue = await findClassificationValueById(db, value.id);
+    expect(foundValue?.name).toBe("日本");
+
+    await updateClassificationValue(db, value.id, {
+      name: "日本（更新）",
+      sortOrder: 1,
+    });
+    const updatedValue = await findClassificationValueById(db, value.id);
+    expect(updatedValue?.name).toBe("日本（更新）");
+
+    await updateClassificationSchemeName(db, scheme!.id, "地域分類");
+    const renamedScheme = await findSchemeById(db, scheme!.id);
+    expect(renamedScheme?.name).toBe("地域分類");
+
+    const schemesWithValues = await listSchemesWithValuesForPortfolio(db, "ideco");
+    expect(schemesWithValues[0]?.values[0]?.code).toBe("japan");
+
+    const missingDelete = await deleteClassificationValueById(db, "missing-value");
+    expect(missingDelete).toBe(false);
+    const deleted = await deleteClassificationValueById(db, value.id);
+    expect(deleted).toBe(true);
+
+    const replacement = await createClassificationValue(db, {
+      schemeId: scheme!.id,
+      code: "overseas",
+      name: "海外",
+    });
+    await createClassificationValue(db, {
+      schemeId: scheme!.id,
+      code: "remove-me",
+      name: "削除対象",
+    });
+    await deleteClassificationValuesBySchemeIdNotInCodes(db, scheme!.id, ["overseas"]);
+    expect(
+      await findClassificationValueBySchemeAndCode(db, scheme!.id, "remove-me"),
+    ).toBeNull();
+    expect(
+      await findClassificationValueBySchemeAndCode(db, scheme!.id, "overseas"),
+    ).not.toBeNull();
+
+    await deleteClassificationValuesBySchemeIdNotInCodes(db, scheme!.id, []);
+    expect(
+      await findClassificationValueBySchemeAndCode(db, scheme!.id, "overseas"),
+    ).toBeNull();
+
+    await deleteClassificationSchemeById(db, scheme!.id);
+    expect(await findSchemeById(db, scheme!.id)).toBeNull();
+    expect(replacement.id).toBeTruthy();
+  });
+
+  it("filters ideco analysis schemes and returns empty for missing portfolio", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+    await createClassificationScheme(db, {
+      portfolioCode: "ideco",
+      code: IDECO_SCHEME_CODES.region,
+      name: "地域分類",
+    });
+    await createClassificationScheme(db, {
+      portfolioCode: "ideco",
+      code: IDECO_SCHEME_CODES.majorCategory,
+      name: "大分類",
+    });
+    await createClassificationScheme(db, {
+      portfolioCode: "ideco",
+      code: "custom_axis",
+      name: "カスタム",
+    });
+
+    const analysisSchemes = await listAnalysisSchemesForPortfolio(db, "ideco");
+    expect(analysisSchemes.map((item) => item.schemeCode)).toEqual([
+      IDECO_SCHEME_CODES.region,
+    ]);
+
+    const missingPortfolio = await listAnalysisSchemesForPortfolio(db, "missing");
+    expect(missingPortfolio).toEqual([]);
+
+    const schemes = await listClassificationSchemesByPortfolioCode(db, "missing");
+    expect(schemes).toEqual([]);
+  });
+
+  it("supports instrument search, upsert, update, attributes, and delete guards", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+
+    const created = await createInstrument(db, { name: "Alpha Fund" });
+    const reused = await upsertInstrument(db, { name: "Alpha Fund" });
+    expect(reused?.id).toBe(created.id);
+
+    const beta = await createInstrument(db, { name: "Beta Fund" });
+    await setInstrumentAttributes(db, beta.id, [
+      { code: "short_name", textValue: "Beta" },
+    ]);
+    const byAttribute = await findInstrumentByAttributeTextValue(
+      db,
+      "short_name",
+      "Beta",
+    );
+    expect(byAttribute?.id).toBe(beta.id);
+
+    const all = await listInstruments(db);
+    expect(all).toHaveLength(2);
+    const searched = await listInstruments(db, "alpha");
+    expect(searched).toHaveLength(1);
+
+    const updated = await updateInstrument(db, created.id, {
+      name: "Alpha Fund Updated",
+    });
+    expect(updated?.name).toBe("Alpha Fund Updated");
+    expect(await updateInstrument(db, "missing", { name: "X" })).toBeNull();
+
+    expect(await findInstrumentById(db, created.id)).not.toBeNull();
+    expect(await findInstrumentByName(db, "missing")).toBeNull();
+    expect(await getAttributesForInstruments(db, [])).toEqual(new Map());
+
+    await replaceCurrentSnapshot(db, {
+      portfolioCode: "ideco",
+      asOfDate: "2026-06-01",
+      lines: [
+        {
+          instrumentId: created.id,
+          quantity: 1,
+          marketValueMinor: 1000,
+        },
+      ],
+    });
+    expect(await deleteInstrument(db, created.id)).toBe("in_use");
+
+    const unused = await createInstrument(db, { name: "Gamma Fund" });
+    expect(await deleteInstrument(db, unused.id)).toBe("deleted");
+    expect(await deleteInstrument(db, "missing")).toBe("not_found");
+
+    const withExternalId = await createInstrument(db, {
+      name: "Delta Fund",
+      externalId: "ext-1",
+    });
+    const updatedExternal = await updateInstrument(db, withExternalId.id, {
+      name: "Delta Fund Updated",
+      externalId: "ext-2",
+    });
+    expect(updatedExternal?.externalId).toBe("ext-2");
+    const keptExternal = await updateInstrument(db, withExternalId.id, {
+      name: "Delta Fund Final",
+    });
+    expect(keptExternal?.externalId).toBe("ext-2");
+
+    await setInstrumentAttributes(db, beta.id, []);
+    expect((await getAttributesForInstruments(db, [beta.id])).get(beta.id)).toBeUndefined();
+
+    await setInstrumentAttributes(db, beta.id, [
+      { code: "metric_code", integerValue: 42, realValue: 0.5 },
+    ]);
+    const metricAttributes = (await getAttributesForInstruments(db, [beta.id])).get(beta.id);
+    expect(metricAttributes?.[0]).toMatchObject({
+      code: "metric_code",
+      integerValue: 42,
+      realValue: 0.5,
+      textValue: null,
+    });
+  });
+
+  it("updates and deletes portfolios", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "sample",
+      name: "サンプル",
+      kind: "taxable",
+    });
+
+    const updated = await updatePortfolio(db, "sample", {
+      name: "更新後",
+      kind: "taxable",
+    });
+    expect(updated?.name).toBe("更新後");
+    expect(await updatePortfolio(db, "missing", { name: "X", kind: "taxable" })).toBeNull();
+
+    expect(await deletePortfolio(db, "sample")).toBe(true);
+    expect(await deletePortfolio(db, "missing")).toBe(false);
+    expect(await findPortfolioByCode(db, "sample")).toBeNull();
+  });
+
+  it("handles snapshot edge cases for unknown portfolios and date ranges", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+    const instrument = await createInstrument(db, { name: "Alpha Fund" });
+
+    expect(await listSnapshotDates(db, "missing")).toEqual([]);
+    expect(await getSnapshotByDate(db, "missing", "2026-06-01")).toBeNull();
+    expect(await getSnapshotByDate(db, "ideco", "2026-06-01")).toBeNull();
+    expect(await getSnapshotsInDateRange(db, "missing", "2026-06-01", "2026-06-07")).toEqual(
+      [],
+    );
+    expect(await setCurrentSnapshot(db, "missing", "2026-06-01")).toBeNull();
+    expect(
+      await upsertSnapshotByDate(db, {
+        portfolioCode: "missing",
+        asOfDate: "2026-06-01",
+        lines: [],
+      }),
+    ).toBeNull();
+
+    await upsertSnapshotByDate(db, {
+      portfolioCode: "ideco",
+      asOfDate: "2026-06-02",
+      lines: [
+        {
+          instrumentId: instrument.id,
+          quantity: 1,
+          marketValueMinor: 1000,
+        },
+      ],
+    });
+    await upsertSnapshotByDate(db, {
+      portfolioCode: "ideco",
+      asOfDate: "2026-06-07",
+      lines: [
+        {
+          instrumentId: instrument.id,
+          quantity: 1,
+          marketValueMinor: 2000,
+        },
+      ],
+    });
+
+    const ranged = await getSnapshotsInDateRange(db, "ideco", "2026-06-02", "2026-06-07");
+    expect(ranged).toHaveLength(2);
+    expect(ranged[0]?.asOfDate).toBe("2026-06-02");
+
+    await upsertSnapshotByDate(db, {
+      portfolioCode: "ideco",
+      asOfDate: "2026-06-08",
+      lines: [
+        {
+          instrumentId: instrument.id,
+          quantity: 1,
+          marketValueMinor: 3000,
+        },
+      ],
+      metrics: [
+        {
+          code: "note",
+          textValue: "snapshot note",
+        },
+      ],
+      setAsCurrent: true,
+    });
+    const withTextMetric = await getSnapshotByDate(db, "ideco", "2026-06-08");
+    expect(withTextMetric?.metrics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "note",
+          textValue: "snapshot note",
+        }),
+      ]),
+    );
   });
 });

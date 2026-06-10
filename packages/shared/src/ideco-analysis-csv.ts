@@ -338,3 +338,11 @@ export function parseIdecoAnalysisCsv(content: string): ParseIdecoAnalysisCsvRes
   result = parseModernAnalysisRows(records);
   return result;
 }
+
+export const __idecoAnalysisCsvTesting = {
+  pushAxis,
+  assertHeader,
+  isLegacyAnalysisHeader,
+  IDECO_ANALYSIS_CSV_HEADERS,
+  IDECO_ANALYSIS_CSV_LEGACY_HEADERS,
+};

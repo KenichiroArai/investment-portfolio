@@ -1,5 +1,6 @@
-import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { SnapshotTimeBar } from "@/components/SnapshotTimeBar";
 
@@ -39,6 +40,10 @@ function mockPortfolioTime(overrides: Record<string, unknown> = {}) {
 }
 
 describe("SnapshotTimeBar", () => {
+  beforeAll(() => {
+    Element.prototype.scrollIntoView = vi.fn();
+  });
+
   afterEach(() => {
     cleanup();
     vi.clearAllMocks();
@@ -61,5 +66,73 @@ describe("SnapshotTimeBar", () => {
     const { container } = render(<SnapshotTimeBar />);
 
     expect(container.firstChild).toBeNull();
+  });
+
+  it("hides while dates are loading or empty", () => {
+    usePathname.mockReturnValue("/portfolios/ideco/holdings/");
+    mockPortfolioTime({ loadingDates: true });
+    const { container: loading } = render(<SnapshotTimeBar />);
+    expect(loading.firstChild).toBeNull();
+
+    mockPortfolioTime({ loadingDates: false, availableDates: [] });
+    const { container: empty } = render(<SnapshotTimeBar />);
+    expect(empty.firstChild).toBeNull();
+  });
+
+  it("navigates dates and period presets", async () => {
+    const user = userEvent.setup();
+    const setSelectedAsOfDate = vi.fn();
+    const jumpToLatest = vi.fn();
+    const setPeriodPreset = vi.fn();
+    const setCustomFrom = vi.fn();
+    const setCustomTo = vi.fn();
+
+    usePathname.mockReturnValue("/portfolios/ideco/trends/");
+    mockPortfolioTime({
+      availableDates: ["2026-05-31", "2026-06-07"],
+      selectedAsOfDate: "2026-06-07",
+      currentAsOfDate: "2026-06-07",
+      isHistoricalView: false,
+      emphasizeAsOf: false,
+      emphasizePeriod: true,
+      setSelectedAsOfDate,
+      jumpToLatest,
+      setPeriodPreset,
+      customFrom: "",
+      customTo: "",
+      setCustomFrom,
+      setCustomTo,
+      calendarMonth: "",
+      setCalendarMonth: vi.fn(),
+    });
+
+    render(<SnapshotTimeBar />);
+
+    await user.click(screen.getByRole("button", { name: "前の基準日" }));
+    expect(setSelectedAsOfDate).toHaveBeenCalledWith("2026-05-31");
+
+    await user.click(screen.getByRole("button", { name: "1か月" }));
+    expect(setPeriodPreset).toHaveBeenCalledWith("1m");
+
+    fireEvent.change(screen.getByLabelText("開始日"), {
+      target: { value: "2026-05-01" },
+    });
+    expect(setCustomFrom).toHaveBeenCalledWith("2026-05-01");
+
+    expect(screen.getByRole("button", { name: "最新" })).toBeDisabled();
+  });
+
+  it("shows historical badge when viewing past snapshot", () => {
+    usePathname.mockReturnValue("/portfolios/ideco/holdings/");
+    mockPortfolioTime({
+      availableDates: ["2026-05-31", "2026-06-07"],
+      selectedAsOfDate: "2026-05-31",
+      currentAsOfDate: "2026-06-07",
+      isHistoricalView: true,
+    });
+
+    render(<SnapshotTimeBar />);
+    expect(screen.getByText("履歴表示中")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "次の基準日" })).not.toBeDisabled();
   });
 });

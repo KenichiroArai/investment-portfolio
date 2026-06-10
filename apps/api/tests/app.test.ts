@@ -398,4 +398,225 @@ describe("API app", () => {
 
     sqlite.close();
   });
+
+  it("covers remaining snapshot and CRUD error branches", async () => {
+    const { db, sqlite } = createTestDb();
+    const app = createApp({ getDb: () => db });
+
+    const missingPortfolioGet = await app.request("/portfolios/unknown");
+    expect(missingPortfolioGet.status).toBe(404);
+
+    const missingPortfolioPut = await app.request("/portfolios/unknown", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: "X", kind: "taxable" }),
+    });
+    expect(missingPortfolioPut.status).toBe(404);
+
+    await app.request("/portfolios", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        code: "bad-update",
+        name: "更新対象",
+        kind: "taxable",
+      }),
+    });
+
+    const badPortfolioUpdate = await app.request("/portfolios/bad-update", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: "", kind: "invalid" }),
+    });
+    expect(badPortfolioUpdate.status).toBe(400);
+
+    const orphanInstrumentRes = await app.request("/instruments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: "削除対象" }),
+    });
+    const orphanInstrument = (await orphanInstrumentRes.json()) as { id: string };
+
+    const deleteOrphanInstrument = await app.request(
+      `/instruments/${orphanInstrument.id}`,
+      { method: "DELETE" },
+    );
+    expect(deleteOrphanInstrument.status).toBe(200);
+    expect(await deleteOrphanInstrument.json()).toEqual({ ok: true });
+
+    const missingPortfolioDelete = await app.request("/portfolios/unknown", {
+      method: "DELETE",
+    });
+    expect(missingPortfolioDelete.status).toBe(404);
+
+    const missingSchemesList = await app.request(
+      "/portfolios/unknown/classification-schemes",
+    );
+    expect(missingSchemesList.status).toBe(404);
+
+    const missingSchemeUpdate = await app.request(
+      "/classification-schemes/00000000-0000-4000-8000-000000000099",
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "X" }),
+      },
+    );
+    expect(missingSchemeUpdate.status).toBe(404);
+
+    const badSchemeUpdate = await app.request(
+      "/classification-schemes/00000000-0000-4000-8000-000000000099",
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "" }),
+      },
+    );
+    expect(badSchemeUpdate.status).toBe(400);
+
+    const missingSchemeDelete = await app.request(
+      "/classification-schemes/00000000-0000-4000-8000-000000000099",
+      { method: "DELETE" },
+    );
+    expect(missingSchemeDelete.status).toBe(404);
+
+    const missingValueUpdate = await app.request(
+      "/classification-values/00000000-0000-4000-8000-000000000099",
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "X", sortOrder: 0 }),
+      },
+    );
+    expect(missingValueUpdate.status).toBe(404);
+
+    const badValueUpdate = await app.request(
+      "/classification-values/00000000-0000-4000-8000-000000000099",
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "", sortOrder: -1 }),
+      },
+    );
+    expect(badValueUpdate.status).toBe(400);
+
+    const missingValueDelete = await app.request(
+      "/classification-values/00000000-0000-4000-8000-000000000099",
+      { method: "DELETE" },
+    );
+    expect(missingValueDelete.status).toBe(404);
+
+    const missingInstrumentUpdate = await app.request(
+      "/instruments/00000000-0000-4000-8000-000000000099",
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "X" }),
+      },
+    );
+    expect(missingInstrumentUpdate.status).toBe(404);
+
+    const badInstrumentUpdate = await app.request(
+      "/instruments/00000000-0000-4000-8000-000000000099",
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "" }),
+      },
+    );
+    expect(badInstrumentUpdate.status).toBe(400);
+
+    const missingInstrumentDelete = await app.request(
+      "/instruments/00000000-0000-4000-8000-000000000099",
+      { method: "DELETE" },
+    );
+    expect(missingInstrumentDelete.status).toBe(404);
+
+    const missingSnapshots = await app.request("/portfolios/unknown/snapshots");
+    expect(missingSnapshots.status).toBe(404);
+
+    const badTrendsQuery = await app.request(
+      "/portfolios/ideco/snapshots/trends?from=bad-date",
+    );
+    expect(badTrendsQuery.status).toBe(400);
+
+    const missingTrends = await app.request(
+      "/portfolios/unknown/snapshots/trends",
+    );
+    expect(missingTrends.status).toBe(404);
+
+    await app.request("/portfolios", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        code: "empty",
+        name: "空口座",
+        kind: "taxable",
+      }),
+    });
+
+    const emptyTrends = await app.request("/portfolios/empty/snapshots/trends");
+    expect(emptyTrends.status).toBe(200);
+    const emptyTrendsBody = (await emptyTrends.json()) as {
+      portfolioCode: string;
+      points: unknown[];
+    };
+    expect(emptyTrendsBody.portfolioCode).toBe("empty");
+    expect(emptyTrendsBody.points).toEqual([]);
+
+    const invalidSnapshotDate = await app.request(
+      "/portfolios/empty/snapshots/not-a-date",
+    );
+    expect(invalidSnapshotDate.status).toBe(400);
+
+    const missingSnapshotByDate = await app.request(
+      "/portfolios/empty/snapshots/2026-06-01",
+    );
+    expect(missingSnapshotByDate.status).toBe(404);
+
+    await app.request("/portfolios", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        code: "trendy",
+        name: "トレンド口座",
+        kind: "taxable",
+      }),
+    });
+
+    const instrumentRes = await app.request("/instruments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: "トレンド銘柄" }),
+    });
+    const trendInstrument = (await instrumentRes.json()) as { id: string };
+
+    await app.request("/portfolios/trendy/snapshot/current", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        asOfDate: "2026-06-01",
+        lines: [
+          {
+            instrumentId: trendInstrument.id,
+            quantity: 1,
+            marketValueMinor: 1000,
+          },
+        ],
+      }),
+    });
+
+    const defaultTrends = await app.request("/portfolios/trendy/snapshots/trends");
+    expect(defaultTrends.status).toBe(200);
+    const defaultTrendsBody = (await defaultTrends.json()) as {
+      from: string;
+      to: string;
+      points: unknown[];
+    };
+    expect(defaultTrendsBody.from).toBe("2026-06-01");
+    expect(defaultTrendsBody.to).toBe("2026-06-01");
+    expect(defaultTrendsBody.points.length).toBeGreaterThan(0);
+
+    sqlite.close();
+  });
 });

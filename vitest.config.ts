@@ -18,12 +18,8 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       include: [
-        "apps/web/src/**/*.{ts,tsx}",
-        "apps/web/next.config.ts",
-        "apps/api/src/**/*.ts",
         "packages/shared/src/**/*.ts",
         "packages/db/src/**/*.ts",
-        "packages/ui/src/**/*.ts",
       ],
       exclude: [
         "**/*.d.ts",

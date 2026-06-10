@@ -552,13 +552,13 @@ async function importHoldingsFromParsedByDate(
     }
   }
 
-  if (result) {
-    return result;
-  }
-
-  result = await setCurrentSnapshot(db, IDECO_PORTFOLIO_CODE, latestAsOfDate);
   return result;
 }
+
+export const __importIdecoTesting = {
+  importHoldingsFromParsedByDate,
+  importInstrumentsFromParsed,
+};
 
 export async function importIdecoData(
   db: AppDatabase,

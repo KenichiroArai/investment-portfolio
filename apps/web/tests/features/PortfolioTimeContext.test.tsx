@@ -1,0 +1,217 @@
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import {
+  PortfolioTimeProvider,
+  usePortfolioTime,
+} from "@/features/portfolio/PortfolioTimeContext";
+import { createPortfolioFetchMock } from "../helpers/portfolio-time-test-utils";
+import { trendsPointsFixture } from "./trends-fixtures";
+
+const usePathname = vi.hoisted(() => vi.fn());
+const searchParamsRef = vi.hoisted(() => ({
+  current: new URLSearchParams() as URLSearchParams,
+}));
+const replace = vi.hoisted(() => vi.fn());
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    replace: (url: string) => {
+      replace(url);
+      const queryIndex = url.indexOf("?");
+      searchParamsRef.current = new URLSearchParams(
+        queryIndex >= 0 ? url.slice(queryIndex + 1) : "",
+      );
+    },
+    push: vi.fn(),
+  }),
+  usePathname: () => usePathname(),
+  useSearchParams: () => searchParamsRef.current,
+}));
+
+function PortfolioTimeConsumer() {
+  const {
+    availableDates,
+    selectedAsOfDate,
+    error,
+    isHistoricalView,
+    loadingDates,
+    snapshot,
+    trends,
+    setSelectedAsOfDate,
+    jumpToLatest,
+    setPeriodPreset,
+  } = usePortfolioTime();
+
+  let result = (
+    <div>
+      <span data-testid="loading">{String(loadingDates)}</span>
+      <span data-testid="dates">{availableDates.join(",")}</span>
+      <span data-testid="selected">{selectedAsOfDate ?? ""}</span>
+      <span data-testid="error">{error ?? ""}</span>
+      <span data-testid="historical">{String(isHistoricalView)}</span>
+      <span data-testid="snapshot">{snapshot?.asOfDate ?? ""}</span>
+      <span data-testid="trends">{trends?.points.length ?? 0}</span>
+      <button type="button" onClick={() => setSelectedAsOfDate("2026-05-31")}>
+        過去日を選択
+      </button>
+      <button type="button" onClick={() => jumpToLatest()}>
+        最新へ
+      </button>
+      <button type="button" onClick={() => setPeriodPreset("1m")}>
+        1か月
+      </button>
+    </div>
+  );
+  return result;
+}
+
+function stubPortfolioFetch(
+  options: Parameters<typeof createPortfolioFetchMock>[0] = {},
+) {
+  const portfolioMock = createPortfolioFetchMock({
+    snapshot: {
+      id: "s1",
+      portfolioCode: "ideco",
+      portfolioName: "iDeCo",
+      asOfDate: "2026-06-07",
+      analysisSchemes: [],
+      metrics: [],
+      lines: [],
+    },
+    dates: [
+      { asOfDate: "2026-05-31", isCurrent: false },
+      { asOfDate: "2026-06-07", isCurrent: true },
+    ],
+    ...options,
+  });
+
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (url: string) => {
+      if (url.includes("trends")) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            portfolioCode: "ideco",
+            from: "2026-05-31",
+            to: "2026-06-07",
+            points: trendsPointsFixture,
+          }),
+        };
+      }
+      return portfolioMock(url);
+    }),
+  );
+}
+
+describe("PortfolioTimeContext", () => {
+  beforeEach(() => {
+    searchParamsRef.current = new URLSearchParams();
+    usePathname.mockReturnValue("/portfolios/ideco/holdings/");
+    replace.mockClear();
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.unstubAllGlobals();
+  });
+
+  it("loads dates, snapshot, and trends", async () => {
+    stubPortfolioFetch();
+
+    render(
+      <PortfolioTimeProvider portfolioCode="ideco">
+        <PortfolioTimeConsumer />
+      </PortfolioTimeProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("dates")).toHaveTextContent("2026-05-31,2026-06-07");
+      expect(screen.getByTestId("selected")).toHaveTextContent("2026-06-07");
+    });
+    await waitFor(() => {
+      expect(screen.getByTestId("snapshot")).toHaveTextContent("2026-06-07");
+    });
+    await waitFor(() => {
+      expect(screen.getByTestId("trends")).toHaveTextContent("2");
+    });
+  });
+
+  it("marks historical view and updates selected date", async () => {
+    const user = userEvent.setup();
+    stubPortfolioFetch();
+
+    render(
+      <PortfolioTimeProvider portfolioCode="ideco">
+        <PortfolioTimeConsumer />
+      </PortfolioTimeProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("selected")).toHaveTextContent("2026-06-07");
+    });
+
+    await user.click(screen.getByRole("button", { name: "過去日を選択" }));
+    await waitFor(() => {
+      expect(screen.getByTestId("selected")).toHaveTextContent("2026-05-31");
+    });
+    expect(screen.getByTestId("historical")).toHaveTextContent("true");
+
+    await user.click(screen.getByRole("button", { name: "最新へ" }));
+    await waitFor(() => {
+      expect(screen.getByTestId("selected")).toHaveTextContent("2026-06-07");
+    });
+  });
+
+  it("shows error when dates fetch fails", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string) => {
+        if (url.includes("snapshots-index") || url.endsWith("/snapshots")) {
+          return {
+            ok: false,
+            status: 500,
+            json: async () => ({}),
+          };
+        }
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({}),
+        };
+      }),
+    );
+
+    render(
+      <PortfolioTimeProvider portfolioCode="ideco">
+        <PortfolioTimeConsumer />
+      </PortfolioTimeProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("error")).toHaveTextContent(
+        "基準日一覧の取得に失敗しました。",
+      );
+    });
+  });
+
+  it("skips loading on settings route", async () => {
+    usePathname.mockReturnValue("/portfolios/ideco/settings/data/");
+    stubPortfolioFetch();
+
+    render(
+      <PortfolioTimeProvider portfolioCode="ideco">
+        <PortfolioTimeConsumer />
+      </PortfolioTimeProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("loading")).toHaveTextContent("false");
+    });
+    expect(screen.getByTestId("dates")).toHaveTextContent("");
+    expect(screen.getByTestId("selected")).toHaveTextContent("");
+  });
+});

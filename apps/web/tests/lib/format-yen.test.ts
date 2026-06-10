@@ -1,20 +1,74 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
+  formatAsOfDateJa,
+  formatPercent,
   formatPercentAxis,
   formatTrendChartCaption,
   formatTrendChartMeta,
+  formatYen,
   formatYenAxis,
   formatYenAxisLabel,
   formatYenMan,
   formatYenManAxis,
 } from "@/lib/format-yen";
 
+describe("formatYen", () => {
+  it("formats yen amounts without decimals", () => {
+    expect(formatYen(12345)).toMatch(/12,345/);
+    expect(formatYen(0)).toMatch(/^[^\d]*0$/);
+  });
+});
+
+describe("formatAsOfDateJa", () => {
+  it("formats ISO dates as yyyy/mm/dd", () => {
+    expect(formatAsOfDateJa("2026-06-01")).toBe("2026/06/01");
+  });
+
+  it("returns input unchanged when not ISO date", () => {
+    expect(formatAsOfDateJa("invalid")).toBe("invalid");
+  });
+});
+
+describe("formatPercent", () => {
+  it("formats finite ratios as percent", () => {
+    expect(formatPercent(0.052)).toBe("5.2%");
+  });
+
+  it("returns dash for non-finite ratios", () => {
+    expect(formatPercent(Number.NaN)).toBe("—");
+    expect(formatPercent(Number.POSITIVE_INFINITY)).toBe("—");
+  });
+});
+
 describe("formatYenMan", () => {
   it("formats values in 万円", () => {
     expect(formatYenMan(3_441_347)).toBe("344万円");
     expect(formatYenMan(459_121)).toBe("45.9万円");
     expect(formatYenMan(0)).toBe("0万円");
+    expect(formatYenMan(10_000_000)).toBe("1000万円");
+  });
+
+  it("returns dash for non-finite values", () => {
+    expect(formatYenMan(Number.NaN)).toBe("—");
+  });
+
+  it("falls back when internal man calculation is non-finite", () => {
+    const originalIsFinite = Number.isFinite;
+    let callCount = 0;
+    const isFiniteSpy = vi.spyOn(Number, "isFinite").mockImplementation((value) => {
+      callCount += 1;
+      if (callCount === 1 && Object.is(value, Number.NaN)) {
+        return true;
+      }
+      return originalIsFinite(value);
+    });
+
+    try {
+      expect(formatYenMan(Number.NaN)).toBe("0万円");
+    } finally {
+      isFiniteSpy.mockRestore();
+    }
   });
 });
 
@@ -24,6 +78,10 @@ describe("formatYenManAxis", () => {
     expect(formatYenManAxis(459_121)).toBe("45.9");
     expect(formatYenManAxis(0)).toBe("0");
   });
+
+  it("returns zero for non-finite values", () => {
+    expect(formatYenManAxis(Number.NaN)).toBe("0");
+  });
 });
 
 describe("formatYenAxis", () => {
@@ -31,6 +89,10 @@ describe("formatYenAxis", () => {
     expect(formatYenAxis(41_347)).toBe("41,347");
     expect(formatYenAxis(-1_000)).toBe("-1,000");
     expect(formatYenAxis(0)).toBe("0");
+  });
+
+  it("returns zero for non-finite values", () => {
+    expect(formatYenAxis(Number.NaN)).toBe("0");
   });
 });
 
@@ -40,6 +102,10 @@ describe("formatYenAxisLabel", () => {
     expect(formatYenAxisLabel(-1_500)).toBe("-1,500円");
     expect(formatYenAxisLabel(0)).toBe("0円");
   });
+
+  it("returns zero yen for non-finite values", () => {
+    expect(formatYenAxisLabel(Number.NaN)).toBe("0円");
+  });
 });
 
 describe("formatPercentAxis", () => {
@@ -48,6 +114,10 @@ describe("formatPercentAxis", () => {
     expect(formatPercentAxis(0.052)).toBe("5.2%");
     expect(formatPercentAxis(0.0013)).toBe("0.13%");
     expect(formatPercentAxis(-0.002)).toBe("-0.20%");
+  });
+
+  it("returns zero percent for non-finite ratios", () => {
+    expect(formatPercentAxis(Number.NaN)).toBe("0%");
   });
 });
 

@@ -1,4 +1,5 @@
 import { cleanup, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { AnalysisView } from "@/features/analysis/AnalysisView";
@@ -114,5 +115,79 @@ describe("AnalysisView", () => {
 
     expect(screen.getByText(/資産全体の 66\.7%/)).toBeInTheDocument();
     expect(screen.getByText(/未分類:.*50,000/)).toBeInTheDocument();
+  });
+
+  it("switches scheme tabs and expands allocation breakdown", async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        snapshot: snapshotFixture,
+      }),
+    );
+
+    renderWithPortfolioTime(
+      <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("tab", { name: "資産分類" })).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole("tab", { name: "資産分類" }));
+    expect(screen.getByRole("tab", { name: "資産分類" })).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+    expect(screen.getAllByText("株式").length).toBeGreaterThanOrEqual(1);
+
+    await user.click(
+      screen.getByRole("button", { name: "株式 の内訳を開く" }),
+    );
+    expect(screen.getByText("テスト銘柄")).toBeInTheDocument();
+  });
+
+  it("shows loading skeleton while snapshot loads", () => {
+    vi.stubGlobal("fetch", vi.fn(() => new Promise(() => {})));
+    const { container } = renderWithPortfolioTime(
+      <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+    );
+    expect(container.querySelector(".animate-pulse")).toBeTruthy();
+  });
+
+  it("shows error when fetch fails", async () => {
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        failFetch: true,
+      }),
+    );
+
+    renderWithPortfolioTime(
+      <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/接続できません/)).toBeInTheDocument();
+    });
+  });
+
+  it("shows empty message when snapshot is missing", async () => {
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        snapshot: null,
+      }),
+    );
+
+    renderWithPortfolioTime(
+      <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("資産配分の対象となる明細がありません。"),
+      ).toBeInTheDocument();
+    });
   });
 });

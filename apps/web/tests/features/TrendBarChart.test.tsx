@@ -1,4 +1,5 @@
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { TrendBarChart } from "@/features/trends/TrendBarChart";
@@ -33,7 +34,8 @@ describe("TrendBarChart", () => {
     expect(screen.getByLabelText("推移棒グラフ")).toBeInTheDocument();
   });
 
-  it("shows tooltip on hover with full yen values", () => {
+  it("shows tooltip on hover with full yen values", async () => {
+    const user = userEvent.setup();
     const { container } = render(
       <TrendBarChart
         labels={["2026年6月"]}
@@ -54,9 +56,44 @@ describe("TrendBarChart", () => {
     const hitAreas = within(container).getAllByRole("button", {
       name: "2026年6月 の詳細",
     });
-    fireEvent.mouseEnter(hitAreas[0]);
+    await user.hover(hitAreas[0]);
     const tooltipRow = container.querySelector(".trend-bar-chart__tooltip-row");
     expect(tooltipRow?.textContent).toContain(formatYen(3_441_347));
+    expect(container.querySelector(".trend-bar-chart__tooltip-date")).toBeTruthy();
+  });
+
+  it("shows tooltip on focus for stacked bars", async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <TrendBarChart
+        labels={["2026年6月"]}
+        sourceDates={["2026-06-07"]}
+        mode="stacked"
+        valueDomain={{ min: 0, max: 1 }}
+        valueKind="percent"
+        series={[
+          {
+            key: "equity",
+            label: "株式",
+            color: "#2563eb",
+            values: [0.6],
+          },
+          {
+            key: "bond",
+            label: "債券",
+            color: "#16a34a",
+            values: [0.4],
+          },
+        ]}
+      />,
+    );
+
+    const hitArea = within(container).getByRole("button", {
+      name: "2026年6月 の詳細",
+    });
+    await user.click(hitArea);
+    expect(container.querySelector(".trend-bar-chart__tooltip")).toBeTruthy();
+    expect(screen.getByText("株式")).toBeInTheDocument();
   });
 
   it("renders empty state when no data", () => {

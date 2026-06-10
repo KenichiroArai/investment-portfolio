@@ -103,5 +103,14 @@ describe("data-source", () => {
     expect(getSnapshotFetchUrl("ideco")).toBe(
       "/investment-portfolio/data/portfolios/ideco/current.json",
     );
+    expect(getPortfoliosFetchUrl()).toBe(
+      "/investment-portfolio/data/portfolios.json",
+    );
+  });
+
+  it("builds API trends URL without query when from and to are omitted", () => {
+    expect(getSnapshotTrendsFetchUrl("ideco")).toBe(
+      "http://127.0.0.1:3001/portfolios/ideco/snapshots/trends",
+    );
   });
 });

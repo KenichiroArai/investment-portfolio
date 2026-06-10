@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { IDECO_PORTFOLIO_METRIC_CODES } from "../src/ideco-portfolio-metrics";
 import { buildSnapshotTrendPoint, buildSnapshotTrends } from "../src/snapshot-trends";
 import type { CurrentSnapshotDto } from "../src/types";
 
@@ -61,5 +62,32 @@ describe("snapshot-trends", () => {
     const trends = buildSnapshotTrends("ideco", [first, second], "2026-06-02", "2026-06-07");
     expect(trends.points).toHaveLength(2);
     expect(trends.points[1].totalMarketValueMinor).toBe(110_000);
+  });
+
+  it("includes contribution-based gain metrics when portfolio metric exists", () => {
+    const snapshot = createSnapshot("2026-06-02", 300_000, 250_000);
+    snapshot.metrics = [
+      {
+        code: IDECO_PORTFOLIO_METRIC_CODES.totalContributions,
+        integerValue: 250_000,
+        realValue: null,
+        textValue: null,
+      },
+    ];
+
+    const point = buildSnapshotTrendPoint(snapshot, {
+      schemeCodes: ["ideco_region", "missing"],
+    });
+    expect(point.totalContributionsMinor).toBe(250_000);
+    expect(point.gainRateOnContributions).toBeCloseTo(50_000 / 250_000);
+    expect(point.allocationsByScheme.missing).toEqual([]);
+  });
+
+  it("filters snapshots outside requested date range", () => {
+    const first = createSnapshot("2026-06-02", 100_000, 90_000);
+    const second = createSnapshot("2026-06-07", 110_000, 90_000);
+    const trends = buildSnapshotTrends("ideco", [first, second], "2026-06-07", "2026-06-07");
+    expect(trends.points).toHaveLength(1);
+    expect(trends.points[0]?.asOfDate).toBe("2026-06-07");
   });
 });

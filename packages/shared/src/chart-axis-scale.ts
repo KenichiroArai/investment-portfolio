@@ -132,6 +132,31 @@ function resolveDefaultMaxTicks(rawMin: number, rawMax: number): number {
   return result;
 }
 
+function coarsenAxisScaleStep(
+  rawMin: number,
+  rawMax: number,
+  step: number,
+  niceMin: number,
+  niceMax: number,
+  maxTicks: number,
+  pickStep: (roughStep: number) => number = pickNiceStep,
+): { step: number; niceMin: number; niceMax: number } {
+  let result = { step, niceMin, niceMax };
+
+  while (countTicks(result.niceMin, result.niceMax, result.step) > maxTicks) {
+    const nextStep = pickStep(result.step * 1.001);
+    if (nextStep <= result.step) {
+      result.step = result.step * 2;
+    } else {
+      result.step = nextStep;
+    }
+    result.niceMin = Math.floor(rawMin / result.step) * result.step;
+    result.niceMax = Math.ceil(rawMax / result.step) * result.step;
+  }
+
+  return result;
+}
+
 export function buildNiceAxisScale(
   rawMin: number,
   rawMax: number,
@@ -158,16 +183,14 @@ export function buildNiceAxisScale(
   let niceMin = Math.floor(rawMin / step) * step;
   let niceMax = Math.ceil(rawMax / step) * step;
 
-  while (countTicks(niceMin, niceMax, step) > maxTicks) {
-    const nextStep = pickNiceStep(step * 1.001);
-    if (nextStep <= step) {
-      step = step * 2;
-    } else {
-      step = nextStep;
-    }
-    niceMin = Math.floor(rawMin / step) * step;
-    niceMax = Math.ceil(rawMax / step) * step;
-  }
+  ({ step, niceMin, niceMax } = coarsenAxisScaleStep(
+    rawMin,
+    rawMax,
+    step,
+    niceMin,
+    niceMax,
+    maxTicks,
+  ));
 
   result = {
     min: niceMin,
@@ -176,3 +199,13 @@ export function buildNiceAxisScale(
   };
   return result;
 }
+
+export const __chartAxisScaleTesting = {
+  pickNiceStep,
+  countTicks,
+  resolveTickPrecision,
+  roundTick,
+  buildTicks,
+  buildSingleValueScale,
+  coarsenAxisScaleStep,
+};

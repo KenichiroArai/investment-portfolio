@@ -63,5 +63,24 @@ describe("snapshot-trend-aggregation", () => {
   it("formats bucket labels", () => {
     expect(formatTrendBucketLabel("2026-06", "month")).toBe("2026年6月");
     expect(formatTrendBucketLabel("2026-06-07", "day")).toBe("2026/6/7");
+    expect(formatTrendBucketLabel("unknown", "month")).toBe("unknown");
+    expect(formatTrendBucketLabel("2026-13", "day")).toBe("2026-13");
+  });
+
+  it("returns empty aggregation for no points", () => {
+    expect(aggregateTrendPoints([], "month")).toEqual([]);
+    expect(aggregateTrendPoints([], "day")).toEqual([]);
+  });
+
+  it("keeps latest point when month bucket key cannot be derived", () => {
+    const points = [
+      {
+        ...createPoint("invalid-date", 100),
+        allocationsByScheme: {},
+      },
+    ];
+    const aggregated = aggregateTrendPoints(points, "month");
+    expect(aggregated).toHaveLength(1);
+    expect(aggregated[0]?.bucketKey).toBe("invalid-date");
   });
 });

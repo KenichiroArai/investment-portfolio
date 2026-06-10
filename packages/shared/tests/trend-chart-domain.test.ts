@@ -35,4 +35,44 @@ describe("resolveTrendSeriesValueDomain", () => {
     expect(domain.min).toBeGreaterThanOrEqual(0);
     expect(domain.max).toBeGreaterThan(0.2);
   });
+
+  it("returns default domain when all values are null", () => {
+    expect(resolveTrendChartValueRange([null, null], "fitData")).toEqual({
+      min: 0,
+      max: 1,
+    });
+  });
+
+  it("includes zero for negative-only delta ranges", () => {
+    const domain = resolveTrendChartValueRange([-0.2, -0.05], "includeZero");
+    expect(domain.min).toBe(-0.2);
+    expect(domain.max).toBe(0);
+  });
+
+  it("allows negative padding for mixed-sign fitData ranges", () => {
+    const domain = resolveTrendChartValueRange([-0.2, 0.3], "fitData");
+    expect(domain.min).toBeLessThan(-0.2);
+    expect(domain.max).toBeGreaterThan(0.3);
+  });
+
+  it("uses minimum padding when fitData range is zero", () => {
+    const domain = resolveTrendChartValueRange([0.15, 0.15, 0.15], "fitData");
+    expect(domain.max).toBeGreaterThan(0.15);
+    expect(domain.min).toBeGreaterThanOrEqual(0);
+  });
+
+  it("extends positive-only includeZero ranges to zero", () => {
+    const domain = resolveTrendChartValueRange([0.05, 0.1, 0.08], "includeZero");
+    expect(domain.min).toBe(0);
+    expect(domain.max).toBe(0.1);
+  });
+
+  it("clamps fitData minimum to zero for non-negative series with small values", () => {
+    const domain = resolveTrendChartValueRange([0.001, 0.002], "fitData");
+    expect(domain.min).toBeGreaterThanOrEqual(0);
+    expect(domain.max).toBeGreaterThan(0.002);
+
+    const clamped = resolveTrendChartValueRange([0, 0.001], "fitData");
+    expect(clamped.min).toBe(0);
+  });
 });

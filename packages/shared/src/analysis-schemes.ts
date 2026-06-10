@@ -68,6 +68,20 @@ export function findClassificationTagValue(
   return result;
 }
 
+function compareHoldingsLinesBySortOrder(
+  left: HoldingLineDto,
+  right: HoldingLineDto,
+): number {
+  let result = 0;
+  const leftOrder = left.sortOrder ?? Number.MAX_SAFE_INTEGER;
+  const rightOrder = right.sortOrder ?? Number.MAX_SAFE_INTEGER;
+  if (leftOrder !== rightOrder) {
+    result = leftOrder - rightOrder;
+    return result;
+  }
+  return result;
+}
+
 export function collectHoldingsClassificationSchemes(
   analysisSchemes: AnalysisSchemeConfig[],
   lines: HoldingLineDto[],
@@ -83,14 +97,7 @@ export function collectHoldingsClassificationSchemes(
     result.push(scheme);
   }
 
-  const sortedLines = [...lines].sort((left, right) => {
-    const leftOrder = left.sortOrder ?? Number.MAX_SAFE_INTEGER;
-    const rightOrder = right.sortOrder ?? Number.MAX_SAFE_INTEGER;
-    if (leftOrder !== rightOrder) {
-      return leftOrder - rightOrder;
-    }
-    return 0;
-  });
+  const sortedLines = [...lines].sort(compareHoldingsLinesBySortOrder);
 
   for (const line of sortedLines) {
     for (const tag of line.tags) {
@@ -107,3 +114,7 @@ export function collectHoldingsClassificationSchemes(
 
   return result;
 }
+
+export const __analysisSchemesTesting = {
+  compareHoldingsLinesBySortOrder,
+};

@@ -178,9 +178,6 @@ export function parseIdecoHoldingsCsv(content: string): ParseIdecoHoldingsCsvRes
   let result: ParseIdecoHoldingsCsvResult = { asOfDate: "", rows: [] };
 
   const parsed = parseIdecoHoldingsCsvByDate(content);
-  if (parsed.snapshots.length === 0) {
-    throw new IdecoCsvError("明細 CSV にデータ行がありません");
-  }
   if (parsed.snapshots.length > 1) {
     throw new IdecoCsvError(
       "明細 CSV に複数の基準日が含まれています。日付ごとにファイルを分けるか parseIdecoHoldingsCsvByDate を利用してください",

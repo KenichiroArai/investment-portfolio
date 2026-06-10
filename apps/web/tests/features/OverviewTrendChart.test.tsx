@@ -1,8 +1,10 @@
-import { cleanup, screen, waitFor } from "@testing-library/react";
+import { cleanup, screen, waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { OverviewTrendChart } from "@/features/trends/OverviewTrendChart";
-import { renderWithPortfolioTime } from "../helpers/portfolio-time-test-utils";
+import { createPortfolioFetchMock, renderWithPortfolioTime } from "../helpers/portfolio-time-test-utils";
+import { trendsPointsFixture } from "./trends-fixtures";
 
 describe("OverviewTrendChart", () => {
   afterEach(() => {
@@ -10,35 +12,7 @@ describe("OverviewTrendChart", () => {
     vi.unstubAllGlobals();
   });
 
-  it("renders delta line chart when multiple buckets exist", async () => {
-    const trendsResponse = {
-      portfolioCode: "ideco",
-      from: "2026-05-31",
-      to: "2026-06-07",
-      points: [
-        {
-          asOfDate: "2026-05-31",
-          totalMarketValueMinor: 3_400_000,
-          totalBookValueMinor: 3_000_000,
-          unrealizedGainMinor: 400_000,
-          gainRateOnBook: 0.13,
-          totalContributionsMinor: null,
-          gainRateOnContributions: null,
-          allocationsByScheme: {},
-        },
-        {
-          asOfDate: "2026-06-07",
-          totalMarketValueMinor: 3_441_347,
-          totalBookValueMinor: 2_982_226,
-          unrealizedGainMinor: 459_121,
-          gainRateOnBook: 0.15,
-          totalContributionsMinor: null,
-          gainRateOnContributions: null,
-          allocationsByScheme: {},
-        },
-      ],
-    };
-
+  function stubTrendsFetch() {
     vi.stubGlobal(
       "fetch",
       vi.fn(async (url: string) => {
@@ -46,45 +20,26 @@ describe("OverviewTrendChart", () => {
           return {
             ok: true,
             status: 200,
-            json: async () => trendsResponse,
-          };
-        }
-        if (url.includes("snapshots-index") || url.endsWith("/snapshots")) {
-          return {
-            ok: true,
-            status: 200,
             json: async () => ({
               portfolioCode: "ideco",
-              dates: [
-                { asOfDate: "2026-05-31", isCurrent: false },
-                { asOfDate: "2026-06-07", isCurrent: true },
-              ],
+              from: "2026-05-31",
+              to: "2026-06-07",
+              points: trendsPointsFixture,
             }),
           };
         }
-        if (url.includes("snapshot/current") || url.includes("snapshots/2026")) {
-          return {
-            ok: true,
-            status: 200,
-            json: async () => ({
-              id: "s1",
-              portfolioCode: "ideco",
-              portfolioName: "iDeCo",
-              asOfDate: "2026-06-07",
-              analysisSchemes: [],
-              metrics: [],
-              lines: [],
-            }),
-          };
-        }
-        return {
-          ok: true,
-          status: 200,
-          json: async () => ({ portfolioCode: "ideco", dates: [] }),
-        };
+        return createPortfolioFetchMock({
+          dates: [
+            { asOfDate: "2026-05-31", isCurrent: false },
+            { asOfDate: "2026-06-07", isCurrent: true },
+          ],
+        })(url);
       }),
     );
+  }
 
+  it("renders delta line chart when multiple buckets exist", async () => {
+    stubTrendsFetch();
     renderWithPortfolioTime(<OverviewTrendChart />);
 
     await waitFor(() => {
@@ -92,6 +47,38 @@ describe("OverviewTrendChart", () => {
       expect(screen.getByRole("heading", { name: "前回比の変化" })).toBeInTheDocument();
       expect(screen.getByLabelText("推移棒グラフ")).toBeInTheDocument();
       expect(screen.getByLabelText("推移折れ線グラフ")).toBeInTheDocument();
+    });
+  });
+
+  it("shows chart tooltip on bar hover", async () => {
+    const user = userEvent.setup();
+    stubTrendsFetch();
+    const { container } = renderWithPortfolioTime(<OverviewTrendChart />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("推移棒グラフ")).toBeInTheDocument();
+    });
+
+    const hitArea = within(container).getAllByRole("button", {
+      name: /の詳細$/,
+    })[0];
+    await user.hover(hitArea);
+    expect(container.querySelector(".trend-bar-chart__tooltip")).toBeTruthy();
+  });
+
+  it("shows empty message when no trend points exist", async () => {
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        dates: [{ asOfDate: "2026-06-07", isCurrent: true }],
+      }),
+    );
+    renderWithPortfolioTime(<OverviewTrendChart />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/選択した期間に推移データがありません/),
+      ).toBeInTheDocument();
     });
   });
 });

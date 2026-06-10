@@ -10,6 +10,7 @@ import {
 } from "../src/portfolio-snapshot-metrics";
 import {
   buildAllocationByScheme,
+  buildAllocationBySchemeWithLines,
   buildAllocationBySchemeWithLinesFromSnapshots,
   computeSnapshotUnrealizedGainRate,
   groupSnapshotLinesByTag,
@@ -171,6 +172,7 @@ describe("snapshot-allocation", () => {
           valueName: "海外",
         },
       ]),
+      makeLine(50_000, []),
     ];
 
     const slices = groupSnapshotLinesByTag(lines, "ideco_region");
@@ -179,6 +181,49 @@ describe("snapshot-allocation", () => {
     expect(slices[0]?.weight).toBeCloseTo(0.75);
     expect(slices[1]?.valueName).toBe("国内");
     expect(slices[1]?.weight).toBeCloseTo(0.25);
+
+    const emptyTagged = groupSnapshotLinesByTag([], "ideco_region");
+    expect(emptyTagged).toEqual([]);
+    const noMatch = groupSnapshotLinesByTag([makeLine(100, [])], "ideco_region");
+    expect(noMatch).toEqual([]);
+
+    const duplicateTagLines = [
+      makeLine(100, [
+        {
+          schemeCode: "ideco_region",
+          schemeName: "地域分類",
+          valueCode: "domestic",
+          valueName: "国内",
+        },
+      ]),
+      makeLine(200, [
+        {
+          schemeCode: "ideco_region",
+          schemeName: "地域分類",
+          valueCode: "domestic",
+          valueName: "国内",
+        },
+      ]),
+    ];
+    const mergedSlice = groupSnapshotLinesByTag(duplicateTagLines, "ideco_region");
+    expect(mergedSlice).toHaveLength(1);
+    expect(mergedSlice[0]?.marketValueMinor).toBe(300);
+    expect(mergedSlice[0]?.weight).toBe(1);
+
+    const zeroTaggedTotal = groupSnapshotLinesByTag(
+      [
+        makeLine(0, [
+          {
+            schemeCode: "ideco_region",
+            schemeName: "地域分類",
+            valueCode: "domestic",
+            valueName: "国内",
+          },
+        ]),
+      ],
+      "ideco_region",
+    );
+    expect(zeroTaggedTotal[0]?.weight).toBe(0);
   });
 
   it("builds allocation by scheme", () => {
@@ -200,6 +245,13 @@ describe("snapshot-allocation", () => {
     );
     expect(allocation.totalMarketValueMinor).toBe(50_000);
     expect(allocation.slices[0]?.valueName).toBe("株式");
+
+    const withLines = buildAllocationBySchemeWithLines(
+      lines,
+      "ideco_asset_class",
+      "資産分類",
+    );
+    expect(withLines.slices[0]?.lines).toHaveLength(1);
   });
 
   it("groups lines with holding details and weightInSlice", () => {
@@ -236,6 +288,29 @@ describe("snapshot-allocation", () => {
     expect(slices[0]?.lines[0]?.line.instrumentName).toBe("銘柄B");
     expect(slices[0]?.lines[0]?.weightInSlice).toBeCloseTo(0.75);
     expect(slices[0]?.lines[1]?.weightInSlice).toBeCloseTo(0.25);
+
+    const untagged = groupSnapshotLinesByTagWithLines(
+      [makeLine(100, [])],
+      "ideco_region",
+    );
+    expect(untagged).toEqual([]);
+
+    const zeroSliceLines = [
+      makeLine(
+        0,
+        [
+          {
+            schemeCode: "ideco_region",
+            schemeName: "地域分類",
+            valueCode: "domestic",
+            valueName: "国内",
+          },
+        ],
+        { id: "zero-line" },
+      ),
+    ];
+    const zeroSlice = groupSnapshotLinesByTagWithLines(zeroSliceLines, "ideco_region");
+    expect(zeroSlice[0]?.lines[0]?.weightInSlice).toBe(0);
   });
 
   it("builds allocation with lines from multiple snapshots", () => {
@@ -329,5 +404,23 @@ describe("snapshot-allocation", () => {
     expect(merged.totalMarketValueMinor).toBe(100_000);
     expect(merged.portfolios[0]?.portfolioCode).toBe("ideco");
     expect(merged.allocations[0]?.slices[0]?.valueName).toBe("国内");
+  });
+
+  it("handles zero total market value in global analysis weights", () => {
+    const snapshots: CurrentSnapshotDto[] = [
+      {
+        id: "snap-empty",
+        portfolioCode: "empty",
+        portfolioName: "空",
+        asOfDate: "2026-06-01",
+        analysisSchemes: [],
+        metrics: [],
+        lines: [],
+      },
+    ];
+
+    const merged = mergeSnapshotsForGlobalAnalysis(snapshots, []);
+    expect(merged.totalMarketValueMinor).toBe(0);
+    expect(merged.portfolios[0]?.weight).toBe(0);
   });
 });

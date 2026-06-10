@@ -214,3 +214,9 @@ export function listCalendarMonthOptions(availableDates: string[]): string[] {
   result = [...months].sort((left, right) => left.localeCompare(right));
   return result;
 }
+
+export const __snapshotTimeRangeTesting = {
+  parseIsoDate,
+  resolvePresetBounds,
+  resolveCalendarMonthRange,
+};
