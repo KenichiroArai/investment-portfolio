@@ -4,7 +4,7 @@ const repoBase = "/investment-portfolio";
 const isProd = process.env.NODE_ENV === "production";
 
 let result: NextConfig = {
-  output: "export",
+  ...(isProd ? { output: "export" as const } : {}),
   basePath: isProd ? repoBase : "",
   assetPrefix: isProd ? repoBase : "",
   trailingSlash: true,

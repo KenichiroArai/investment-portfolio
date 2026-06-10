@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import { PageContainer } from "@/components/layout/page-container";
 import { SettingsSidebar } from "@/components/layout/settings-sidebar";
+import { resolvePortfolioCodeParam } from "@/lib/portfolio-path";
 
 type SettingsLayoutProps = {
   children: ReactNode;
@@ -9,7 +10,7 @@ type SettingsLayoutProps = {
 };
 
 export default async function SettingsLayout({ children, params }: SettingsLayoutProps) {
-  const { code } = await params;
+  const code = await resolvePortfolioCodeParam(params);
 
   let result = (
     <PageContainer>

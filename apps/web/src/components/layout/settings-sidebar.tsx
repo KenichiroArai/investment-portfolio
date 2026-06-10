@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { buildPortfolioPath } from "@/lib/portfolio-path";
 import { cn } from "@/lib/utils";
 
 type SettingsSidebarProps = {
@@ -39,7 +40,7 @@ function SettingsNavLinks({
   let result = (
     <nav className="grid gap-1" aria-label="設定メニュー">
       {SETTINGS_ITEMS.map((item) => {
-        const href = `/portfolios/${portfolioCode}/settings/${item.segment}/`;
+        const href = buildPortfolioPath(portfolioCode, "settings", item.segment);
         const active = pathname.startsWith(href);
         const Icon = item.icon;
 

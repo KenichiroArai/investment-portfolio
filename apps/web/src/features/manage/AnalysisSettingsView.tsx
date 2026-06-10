@@ -52,6 +52,7 @@ import {
   updateClassificationScheme,
   updateClassificationValue,
 } from "@/lib/api-client";
+import { buildPortfolioPath } from "@/lib/portfolio-path";
 
 type AnalysisSettingsViewProps = {
   portfolioCode: string;
@@ -281,7 +282,7 @@ export function AnalysisSettingsView({ portfolioCode }: AnalysisSettingsViewProp
         description={`${portfolioCode} の分析軸・カテゴリ値・銘柄タグを管理します。`}
         actions={
           <Button variant="outline" size="sm" asChild>
-            <Link href={`/portfolios/${portfolioCode}/analysis/`}>資産配分へ</Link>
+            <Link href={buildPortfolioPath(portfolioCode, "analysis")}>資産配分へ</Link>
           </Button>
         }
       />

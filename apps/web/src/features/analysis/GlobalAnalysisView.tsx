@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatPercent, formatYen } from "@/lib/format-yen";
+import { buildPortfolioPath } from "@/lib/portfolio-path";
 import {
   getPortfoliosFetchUrl,
   getSnapshotFetchUrl,
@@ -201,7 +202,7 @@ export function GlobalAnalysisView() {
                   <TableRow key={portfolio.portfolioCode}>
                     <TableCell>
                       <Link
-                        href={`/portfolios/${portfolio.portfolioCode}/analysis/`}
+                        href={buildPortfolioPath(portfolio.portfolioCode, "analysis")}
                         className="font-medium hover:underline"
                       >
                         {portfolio.portfolioName}

@@ -1,5 +1,6 @@
 import { PortfolioShell } from "@/features/portfolio/PortfolioShell";
 import { generatePortfolioStaticParams } from "@/lib/portfolio-catalog";
+import { resolvePortfolioCodeParam } from "@/lib/portfolio-path";
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -18,7 +19,7 @@ export default async function PortfolioLayout({ children, params }: LayoutProps)
     </PortfolioShell>
   );
 
-  const { code } = await params;
+  const code = await resolvePortfolioCodeParam(params);
   result = (
     <PortfolioShell portfolioCode={code}>
       {children}

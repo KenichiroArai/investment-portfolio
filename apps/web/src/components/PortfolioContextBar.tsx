@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { findPortfolioByCode } from "@/lib/portfolio-catalog";
+import { buildPortfolioPath } from "@/lib/portfolio-path";
 import {
   getPortfoliosFetchUrl,
   getSnapshotLoadErrorMessage,
@@ -39,12 +40,7 @@ const CONTEXT_TABS: ContextTab[] = [
 ];
 
 function buildPortfolioHref(portfolioCode: string, segment: string): string {
-  let result = `/portfolios/${portfolioCode}/`;
-
-  if (segment !== "") {
-    result = `${result}${segment}/`;
-  }
-
+  let result = buildPortfolioPath(portfolioCode, segment);
   return result;
 }
 
@@ -162,7 +158,7 @@ export function PortfolioContextBar({ portfolioCode }: PortfolioContextBarProps)
             size="sm"
             asChild
           >
-            <Link href={`/portfolios/${portfolioCode}/settings/data/`}>
+            <Link href={buildPortfolioPath(portfolioCode, "settings", "data")}>
               <Settings className="h-4 w-4" />
               設定
             </Link>

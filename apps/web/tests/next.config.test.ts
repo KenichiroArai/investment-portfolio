@@ -9,7 +9,7 @@ describe("next.config", () => {
   it("uses no basePath in development", async () => {
     vi.stubEnv("NODE_ENV", "development");
     const config = (await import("../next.config")).default;
-    expect(config.output).toBe("export");
+    expect(config.output).toBeUndefined();
     expect(config.basePath).toBe("");
     expect(config.assetPrefix).toBe("");
     expect(config.trailingSlash).toBe(true);
@@ -19,6 +19,7 @@ describe("next.config", () => {
   it("uses GitHub Pages basePath in production", async () => {
     vi.stubEnv("NODE_ENV", "production");
     const config = (await import("../next.config")).default;
+    expect(config.output).toBe("export");
     expect(config.basePath).toBe("/investment-portfolio");
     expect(config.assetPrefix).toBe("/investment-portfolio");
     expect(config.env).toEqual({

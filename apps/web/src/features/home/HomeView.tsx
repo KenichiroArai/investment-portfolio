@@ -25,6 +25,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { formatPercent, formatYen } from "@/lib/format-yen";
+import { buildPortfolioPath } from "@/lib/portfolio-path";
 import {
   getPortfoliosFetchUrl,
   getSnapshotFetchUrl,
@@ -251,7 +252,7 @@ export function HomeView() {
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base">
                       <Link
-                        href={`/portfolios/${card.code}/`}
+                        href={buildPortfolioPath(card.code)}
                         className="hover:underline"
                       >
                         {card.name}
@@ -290,13 +291,13 @@ export function HomeView() {
                     )}
                     <div className="flex flex-wrap gap-2">
                       <Button variant="outline" size="sm" asChild>
-                        <Link href={`/portfolios/${card.code}/holdings/`}>
+                        <Link href={buildPortfolioPath(card.code, "holdings")}>
                           <List className="h-3.5 w-3.5" />
                           明細
                         </Link>
                       </Button>
                       <Button variant="outline" size="sm" asChild>
-                        <Link href={`/portfolios/${card.code}/analysis/`}>
+                        <Link href={buildPortfolioPath(card.code, "analysis")}>
                           <BarChart3 className="h-3.5 w-3.5" />
                           資産配分
                         </Link>

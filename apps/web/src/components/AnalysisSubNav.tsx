@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { buildPortfolioPath } from "@/lib/portfolio-path";
 import { cn } from "@/lib/utils";
 
 type AnalysisSubNavProps = {
@@ -11,10 +12,10 @@ type AnalysisSubNavProps = {
 
 export function AnalysisSubNav({ portfolioCode }: AnalysisSubNavProps) {
   const pathname = usePathname();
-  const viewHref = `/portfolios/${portfolioCode}/analysis/`;
-  const settingsHref = `/portfolios/${portfolioCode}/settings/classification/`;
-  const viewActive =
-    pathname === `/portfolios/${portfolioCode}/analysis` || pathname === viewHref;
+  const viewHref = buildPortfolioPath(portfolioCode, "analysis");
+  const settingsHref = buildPortfolioPath(portfolioCode, "settings", "classification");
+  const analysisBase = buildPortfolioPath(portfolioCode, "analysis").replace(/\/$/, "");
+  const viewActive = pathname === analysisBase || pathname === viewHref;
   const settingsActive = pathname.startsWith(settingsHref);
 
   let result = (

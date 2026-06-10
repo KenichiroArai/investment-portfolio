@@ -17,6 +17,7 @@ import type {
 
 import { getApiBaseUrl } from "@/lib/api-base";
 import { getDataSource } from "@/lib/data-source";
+import { encodePortfolioCodeForPath } from "@/lib/portfolio-path";
 
 export type ApiErrorBody = {
   error: string | { fieldErrors?: Record<string, string[]> };
@@ -99,7 +100,9 @@ async function requestJson<T>(
 }
 
 export async function fetchPortfolio(code: string) {
-  let result = await requestJson<PortfolioDto>(`/portfolios/${code}`);
+  let result = await requestJson<PortfolioDto>(
+    `/portfolios/${encodePortfolioCodeForPath(code)}`,
+  );
   return result;
 }
 
@@ -112,23 +115,29 @@ export async function createPortfolio(input: CreatePortfolioInput) {
 }
 
 export async function updatePortfolio(code: string, input: UpdatePortfolioInput) {
-  let result = await requestJson<PortfolioDto>(`/portfolios/${code}`, {
-    method: "PUT",
-    body: JSON.stringify(input),
-  });
+  let result = await requestJson<PortfolioDto>(
+    `/portfolios/${encodePortfolioCodeForPath(code)}`,
+    {
+      method: "PUT",
+      body: JSON.stringify(input),
+    },
+  );
   return result;
 }
 
 export async function deletePortfolio(code: string) {
-  let result = await requestJson<{ ok: boolean }>(`/portfolios/${code}`, {
-    method: "DELETE",
-  });
+  let result = await requestJson<{ ok: boolean }>(
+    `/portfolios/${encodePortfolioCodeForPath(code)}`,
+    {
+      method: "DELETE",
+    },
+  );
   return result;
 }
 
 export async function fetchClassificationSchemes(portfolioCode: string) {
   let result = await requestJson<ClassificationSchemeWithValuesDto[]>(
-    `/portfolios/${portfolioCode}/classification-schemes`,
+    `/portfolios/${encodePortfolioCodeForPath(portfolioCode)}/classification-schemes`,
   );
   return result;
 }
@@ -138,7 +147,7 @@ export async function createClassificationScheme(
   input: CreateClassificationSchemeInput,
 ) {
   let result = await requestJson<{ id: string; code: string; name: string }>(
-    `/portfolios/${portfolioCode}/classification-schemes`,
+    `/portfolios/${encodePortfolioCodeForPath(portfolioCode)}/classification-schemes`,
     {
       method: "POST",
       body: JSON.stringify(input),
@@ -264,7 +273,7 @@ export async function setInstrumentClassifications(
 
 export async function fetchCurrentSnapshot(portfolioCode: string) {
   let result = await requestJson<CurrentSnapshotDto>(
-    `/portfolios/${portfolioCode}/snapshot/current`,
+    `/portfolios/${encodePortfolioCodeForPath(portfolioCode)}/snapshot/current`,
   );
   return result;
 }
@@ -274,7 +283,7 @@ export async function replaceCurrentSnapshot(
   input: ReplaceCurrentSnapshotInput,
 ) {
   let result = await requestJson<CurrentSnapshotDto>(
-    `/portfolios/${portfolioCode}/snapshot/current`,
+    `/portfolios/${encodePortfolioCodeForPath(portfolioCode)}/snapshot/current`,
     {
       method: "PUT",
       body: JSON.stringify(input),

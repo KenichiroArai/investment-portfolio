@@ -1,4 +1,5 @@
 import { AnalysisSubNav } from "@/components/AnalysisSubNav";
+import { resolvePortfolioCodeParam } from "@/lib/portfolio-path";
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -16,7 +17,7 @@ export default async function PortfolioAnalysisLayout({
     </>
   );
 
-  const { code } = await params;
+  const code = await resolvePortfolioCodeParam(params);
   result = (
     <>
       <AnalysisSubNav portfolioCode={code} />

@@ -40,6 +40,7 @@ import {
   updatePortfolio,
 } from "@/lib/api-client";
 import type { PortfolioListItem } from "@/lib/data-source";
+import { buildPortfolioPath } from "@/lib/portfolio-path";
 
 type AccountManagePanelProps = {
   portfolios: PortfolioListItem[];
@@ -88,7 +89,7 @@ export function AccountManagePanel({
     setCreateKind("ideco");
     toast.success("口座を登録しました。");
     onChanged();
-    router.push(`/portfolios/${response.data.code}/`);
+    router.push(buildPortfolioPath(response.data.code));
     return result;
   }
 

@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatAsOfDateJa, formatYen } from "@/lib/format-yen";
+import { buildPortfolioPath } from "@/lib/portfolio-path";
 
 type AnalysisViewProps = {
   portfolioCode: string;
@@ -125,7 +126,7 @@ export function AnalysisView({
             </Badge>
             {isHistoricalView ? <Badge variant="secondary">履歴</Badge> : null}
             <Button variant="outline" size="sm" asChild>
-              <Link href={`/portfolios/${portfolioCode}/settings/classification/`}>
+              <Link href={buildPortfolioPath(portfolioCode, "settings", "classification")}>
                 <Settings className="h-4 w-4" />
                 分類設定
               </Link>
