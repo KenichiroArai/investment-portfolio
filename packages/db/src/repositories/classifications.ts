@@ -296,6 +296,23 @@ export async function deleteClassificationSchemeById(
   return result;
 }
 
+export async function listInstrumentClassificationValueIds(
+  db: AppDatabase,
+  instrumentId: string,
+) {
+  let result: string[] = [];
+
+  const rows = await db
+    .select({
+      classificationValueId: instrumentClassifications.classificationValueId,
+    })
+    .from(instrumentClassifications)
+    .where(eq(instrumentClassifications.instrumentId, instrumentId));
+  result = rows.map((row) => row.classificationValueId);
+
+  return result;
+}
+
 export async function setInstrumentClassifications(
   db: AppDatabase,
   instrumentId: string,
@@ -345,7 +362,7 @@ export async function listAnalysisSchemesForPortfolio(
     .orderBy(asc(classificationSchemes.createdAt));
 
   for (const row of rows) {
-    if (!isIdecoAnalysisSchemeCode(row.schemeCode)) {
+    if (portfolio.kind === "ideco" && !isIdecoAnalysisSchemeCode(row.schemeCode)) {
       continue;
     }
     result.push({

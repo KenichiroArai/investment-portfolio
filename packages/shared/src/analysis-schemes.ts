@@ -20,17 +20,17 @@ export function listAnalysisSchemesForPortfolio(
 }
 
 export function resolveAnalysisSchemes(
-  snapshot: Pick<CurrentSnapshotDto, "analysisSchemes">,
+  snapshot: Pick<CurrentSnapshotDto, "analysisSchemes" | "lines">,
   portfolioKind: string,
 ): AnalysisSchemeConfig[] {
   let result: AnalysisSchemeConfig[] = [];
 
-  if (snapshot.analysisSchemes.length > 0) {
-    result = snapshot.analysisSchemes;
-    return result;
-  }
+  const configuredSchemes =
+    snapshot.analysisSchemes.length > 0
+      ? snapshot.analysisSchemes
+      : listAnalysisSchemesForPortfolio(portfolioKind);
 
-  result = listAnalysisSchemesForPortfolio(portfolioKind);
+  result = collectHoldingsClassificationSchemes(configuredSchemes, snapshot.lines);
   return result;
 }
 

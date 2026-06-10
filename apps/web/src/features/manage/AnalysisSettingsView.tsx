@@ -47,6 +47,7 @@ import {
   deleteClassificationScheme,
   deleteClassificationValue,
   fetchClassificationSchemes,
+  fetchInstrumentClassifications,
   fetchInstruments,
   setInstrumentClassifications,
   updateClassificationScheme,
@@ -90,20 +91,45 @@ export function AnalysisSettingsView({ portfolioCode }: AnalysisSettingsViewProp
     }
 
     setSchemes(schemeResponse.data);
-    if (!valueSchemeId && schemeResponse.data.length > 0) {
-      setValueSchemeId(schemeResponse.data[0].id);
-    }
+    setValueSchemeId((current) => {
+      if (current) {
+        return current;
+      }
+      return schemeResponse.data[0]?.id ?? "";
+    });
 
     if (instrumentResponse.ok) {
       setInstruments(instrumentResponse.data);
-      if (!tagInstrumentId && instrumentResponse.data.length > 0) {
-        setTagInstrumentId(instrumentResponse.data[0].id);
-      }
+      setTagInstrumentId((current) => {
+        if (current) {
+          return current;
+        }
+        return instrumentResponse.data[0]?.id ?? "";
+      });
     }
 
     setLoading(false);
     return result;
-  }, [portfolioCode, tagInstrumentId, valueSchemeId]);
+  }, [portfolioCode]);
+
+  const loadInstrumentTags = useCallback(async (instrumentId: string) => {
+    let result: void = undefined;
+
+    if (!instrumentId) {
+      setTagValueIds([]);
+      return result;
+    }
+
+    const response = await fetchInstrumentClassifications(instrumentId);
+    if (!response.ok) {
+      toast.error(response.message);
+      setTagValueIds([]);
+      return result;
+    }
+
+    setTagValueIds(response.data.classificationValueIds);
+    return result;
+  }, []);
 
   useEffect(() => {
     let result: () => void = () => {};
@@ -124,6 +150,43 @@ export function AnalysisSettingsView({ portfolioCode }: AnalysisSettingsViewProp
     };
     return result;
   }, [load]);
+
+  useEffect(() => {
+    let result: () => void = () => {};
+    let cancelled = false;
+
+    async function run() {
+      let result: void = undefined;
+      if (cancelled) {
+        return result;
+      }
+
+      if (!tagInstrumentId) {
+        setTagValueIds([]);
+        return result;
+      }
+
+      const response = await fetchInstrumentClassifications(tagInstrumentId);
+      if (cancelled) {
+        return result;
+      }
+
+      if (!response.ok) {
+        toast.error(response.message);
+        setTagValueIds([]);
+        return result;
+      }
+
+      setTagValueIds(response.data.classificationValueIds);
+      return result;
+    }
+
+    void run();
+    result = () => {
+      cancelled = true;
+    };
+    return result;
+  }, [tagInstrumentId]);
 
   async function handleCreateScheme(event: React.FormEvent) {
     let result: void = undefined;
@@ -271,7 +334,7 @@ export function AnalysisSettingsView({ portfolioCode }: AnalysisSettingsViewProp
     }
 
     toast.success("銘柄タグを保存しました。");
-    await load();
+    await loadInstrumentTags(tagInstrumentId);
     return result;
   }
 
@@ -469,13 +532,7 @@ export function AnalysisSettingsView({ portfolioCode }: AnalysisSettingsViewProp
               <CardContent>
                 <form className="grid max-w-lg gap-4" onSubmit={handleSetTags}>
                   <FormField label="銘柄" htmlFor="tag-instrument">
-                    <Select
-                      value={tagInstrumentId}
-                      onValueChange={(value) => {
-                        setTagInstrumentId(value);
-                        setTagValueIds([]);
-                      }}
-                    >
+                    <Select value={tagInstrumentId} onValueChange={setTagInstrumentId}>
                       <SelectTrigger id="tag-instrument">
                         <SelectValue placeholder="銘柄を選択" />
                       </SelectTrigger>

@@ -14,6 +14,7 @@ import {
   getCurrentSnapshot,
   getSnapshotByDate,
   getSnapshotsInDateRange,
+  listInstrumentClassificationValueIds,
   listInstruments,
   listPortfolios,
   listSchemesWithValuesForPortfolio,
@@ -387,6 +388,25 @@ export function createApp(options?: CreateAppOptions) {
     }
 
     result = c.json({ ok: true });
+    return result;
+  });
+
+  app.get("/instruments/:id/classifications", async (c) => {
+    let result!: Response;
+
+    const instrumentId = c.req.param("id");
+    const db = resolveDb();
+    const instrument = await findInstrumentById(db, instrumentId);
+    if (!instrument) {
+      result = c.json({ error: "Instrument not found" }, 404);
+      return result;
+    }
+
+    const classificationValueIds = await listInstrumentClassificationValueIds(
+      db,
+      instrumentId,
+    );
+    result = c.json({ classificationValueIds });
     return result;
   });
 

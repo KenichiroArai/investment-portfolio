@@ -46,6 +46,10 @@ export type InstrumentListItemDto = {
   externalId: string | null;
 };
 
+export type InstrumentClassificationsDto = {
+  classificationValueIds: string[];
+};
+
 export type HoldingLineDto = {
   id: string;
   instrumentId: string;

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   collectHoldingsClassificationSchemes,
   findClassificationTagValue,
+  resolveAnalysisSchemes,
 } from "../src/analysis-schemes";
 import type { AnalysisSchemeConfig, HoldingLineDto } from "../src/types";
 
@@ -39,6 +40,19 @@ describe("findClassificationTagValue", () => {
 
   it("returns null when tag is missing", () => {
     expect(findClassificationTagValue([], "region")).toBeNull();
+  });
+});
+
+describe("resolveAnalysisSchemes", () => {
+  it("returns configured schemes for non-ideco snapshots", () => {
+    const snapshot = {
+      analysisSchemes: [{ schemeCode: "x1", schemeName: "軸1" }],
+      lines: [makeLine({ tags: [] })],
+    };
+
+    expect(resolveAnalysisSchemes(snapshot, "taxable")).toEqual([
+      { schemeCode: "x1", schemeName: "軸1" },
+    ]);
   });
 });
 

@@ -5,6 +5,8 @@ import {
   createClassificationValue,
   findSchemeByPortfolioCodeAndSchemeCode,
   getTagsForInstruments,
+  listAnalysisSchemesForPortfolio,
+  listInstrumentClassificationValueIds,
   setInstrumentClassifications,
 } from "../src/repositories/classifications";
 import { createInstrument } from "../src/repositories/instruments";
@@ -324,5 +326,62 @@ describe("portfolio repositories", () => {
     await setInstrumentClassifications(db, instrument.id, []);
     const tags = await getTagsForInstruments(db, [instrument.id]);
     expect(tags.get(instrument.id)).toBeUndefined();
+  });
+
+  it("includes custom schemes for non-ideco portfolios", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "sample",
+      name: "サンプル口座",
+      kind: "taxable",
+    });
+    await createClassificationScheme(db, {
+      portfolioCode: "sample",
+      code: "x1",
+      name: "軸1",
+    });
+    await createClassificationScheme(db, {
+      portfolioCode: "sample",
+      code: "metadata_only",
+      name: "メタデータ",
+    });
+
+    const analysisSchemes = await listAnalysisSchemesForPortfolio(db, "sample");
+    expect(analysisSchemes).toEqual([
+      { schemeCode: "x1", schemeName: "軸1" },
+      { schemeCode: "metadata_only", schemeName: "メタデータ" },
+    ]);
+  });
+
+  it("lists classification value ids for an instrument", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+    const scheme = await createClassificationScheme(db, {
+      portfolioCode: "ideco",
+      code: "region",
+      name: "地域",
+    });
+    const valueJapan = await createClassificationValue(db, {
+      schemeId: scheme!.id,
+      code: "japan",
+      name: "日本",
+    });
+    const valueOverseas = await createClassificationValue(db, {
+      schemeId: scheme!.id,
+      code: "overseas",
+      name: "海外",
+    });
+    const instrument = await createInstrument(db, { name: "Tagged fund" });
+    await setInstrumentClassifications(db, instrument.id, [
+      valueJapan.id,
+      valueOverseas.id,
+    ]);
+
+    const valueIds = await listInstrumentClassificationValueIds(db, instrument.id);
+    expect(valueIds.sort()).toEqual([valueJapan.id, valueOverseas.id].sort());
   });
 });

@@ -231,6 +231,11 @@ describe("API app", () => {
     );
     expect(missingPortfolioSnapshot.status).toBe(404);
 
+    const missingInstrumentGet = await app.request(
+      "/instruments/00000000-0000-4000-8000-000000000099/classifications",
+    );
+    expect(missingInstrumentGet.status).toBe(404);
+
     const missingInstrument = await app.request(
       "/instruments/00000000-0000-4000-8000-000000000099/classifications",
       {
@@ -343,6 +348,15 @@ describe("API app", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ classificationValueIds: [value.id] }),
     });
+
+    const getClassifications = await app.request(
+      `/instruments/${instrument.id}/classifications`,
+    );
+    expect(getClassifications.status).toBe(200);
+    const classifications = (await getClassifications.json()) as {
+      classificationValueIds: string[];
+    };
+    expect(classifications.classificationValueIds).toEqual([value.id]);
 
     await app.request("/portfolios/test/snapshot/current", {
       method: "PUT",

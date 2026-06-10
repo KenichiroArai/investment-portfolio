@@ -5,6 +5,7 @@ import type {
   CreateInstrumentInput,
   CreatePortfolioInput,
   CurrentSnapshotDto,
+  InstrumentClassificationsDto,
   InstrumentListItemDto,
   PortfolioDto,
   ReplaceCurrentSnapshotInput,
@@ -253,6 +254,13 @@ export async function deleteInstrument(instrumentId: string) {
   let result = await requestJson<{ ok: boolean }>(
     `/instruments/${instrumentId}`,
     { method: "DELETE" },
+  );
+  return result;
+}
+
+export async function fetchInstrumentClassifications(instrumentId: string) {
+  let result = await requestJson<InstrumentClassificationsDto>(
+    `/instruments/${instrumentId}/classifications`,
   );
   return result;
 }
