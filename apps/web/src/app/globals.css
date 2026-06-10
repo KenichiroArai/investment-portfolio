@@ -1255,6 +1255,47 @@ main,
   gap: 1rem;
 }
 
+.manage-as-of-date {
+  max-width: 32rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #f8f8f8;
+}
+
+.manage-as-of-date label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.manage-as-of-date input[type="date"] {
+  padding: 0.375rem 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.manage-as-of-date__value {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: baseline;
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.manage-as-of-date__label {
+  font-weight: 600;
+}
+
+.manage-as-of-date__help {
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  color: #555;
+}
+
 .manage-actions {
   margin-bottom: 0.5rem;
 }

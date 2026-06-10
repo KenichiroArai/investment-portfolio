@@ -6,9 +6,11 @@ import {
   SNAPSHOT_PERIOD_PRESET_LABELS,
   type SnapshotPeriodPreset,
 } from "@repo/shared";
+import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { formatAsOfDateJa } from "@/lib/format-yen";
+import { shouldShowSnapshotTimeBar } from "@/lib/portfolio-time-bar";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
 
 const PERIOD_PRESETS: SnapshotPeriodPreset[] = [
@@ -30,7 +32,9 @@ function formatCalendarMonthLabel(value: string): string {
 }
 
 export function SnapshotTimeBar() {
+  const pathname = usePathname();
   const {
+    portfolioCode,
     availableDates,
     selectedAsOfDate,
     setSelectedAsOfDate,
@@ -51,6 +55,10 @@ export function SnapshotTimeBar() {
   } = usePortfolioTime();
 
   let result: ReactNode = null;
+
+  if (!shouldShowSnapshotTimeBar(pathname, portfolioCode)) {
+    return result;
+  }
 
   if (loadingDates || availableDates.length === 0) {
     result = null;

@@ -4,6 +4,7 @@ import type { InstrumentListItemDto } from "@repo/shared";
 import { useCallback, useEffect, useState } from "react";
 
 import { FormSection } from "@/features/manage/FormSection";
+import { ManageAsOfDateField } from "@/features/manage/ManageAsOfDateField";
 import {
   listGenericMetricOptions,
   resolveGenericMetricLabel,
@@ -174,7 +175,7 @@ export function RegisterView({ portfolioCode }: RegisterViewProps) {
       (snapshotResponse.ok ? snapshotResponse.data.asOfDate : "");
     if (!/^\d{4}-\d{2}-\d{2}$/.test(asOfDate)) {
       setSubmitting(false);
-      setError("基準日を YYYY-MM-DD 形式で入力してください。");
+      setError("操作対象の基準日を YYYY-MM-DD 形式で入力してください。");
       return result;
     }
 
@@ -233,7 +234,7 @@ export function RegisterView({ portfolioCode }: RegisterViewProps) {
       : holdingAsOfDate.trim();
     if (!/^\d{4}-\d{2}-\d{2}$/.test(asOfDate)) {
       setSubmitting(false);
-      setError("先に保有明細を登録するか、基準日を設定してください。");
+      setError("先に保有明細を登録するか、操作対象の基準日を設定してください。");
       return result;
     }
 
@@ -272,6 +273,12 @@ export function RegisterView({ portfolioCode }: RegisterViewProps) {
   let result = (
     <main className="manage-page">
       <h1>登録（{portfolioCode}）</h1>
+      <ManageAsOfDateField
+        mode="editable"
+        value={holdingAsOfDate}
+        disabled={loading || submitting}
+        onChange={setHoldingAsOfDate}
+      />
       <ManageSubNav
         sections={SECTIONS}
         activeId={activeSection}
@@ -338,17 +345,6 @@ export function RegisterView({ portfolioCode }: RegisterViewProps) {
         {activeSection === "holding" ? (
           <FormSection title="保有明細登録">
             <form className="manage-form" onSubmit={handleAddHolding}>
-              <label>
-                基準日
-                <input
-                  type="date"
-                  value={holdingAsOfDate}
-                  onChange={(event) => {
-                    setHoldingAsOfDate(event.target.value);
-                  }}
-                  required
-                />
-              </label>
               <label>
                 銘柄
                 <select

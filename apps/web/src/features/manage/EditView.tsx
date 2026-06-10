@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { ConfirmDialog } from "@/features/manage/ConfirmDialog";
 import { FormSection } from "@/features/manage/FormSection";
+import { ManageAsOfDateField } from "@/features/manage/ManageAsOfDateField";
 import { resolveGenericMetricLabel } from "@/features/manage/generic-metric-options";
 import { ManageSubNav } from "@/features/manage/ManageSubNav";
 import {
@@ -213,6 +214,9 @@ export function EditView({ portfolioCode }: EditViewProps) {
   let result = (
     <main className="manage-page">
       <h1>更新（{portfolioCode}）</h1>
+      {snapshot ? (
+        <ManageAsOfDateField mode="readonly" value={snapshot.asOfDate} />
+      ) : null}
       <ManageSubNav
         sections={SECTIONS}
         activeId={activeSection}

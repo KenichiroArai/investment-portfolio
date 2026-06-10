@@ -31,6 +31,7 @@ import {
   getSnapshotLoadErrorMessage,
   getSnapshotTrendsFetchUrl,
 } from "@/lib/data-source";
+import { shouldShowSnapshotTimeBar } from "@/lib/portfolio-time-bar";
 
 type PortfolioTimeContextValue = {
   portfolioCode: string;
@@ -209,6 +210,14 @@ export function PortfolioTimeProvider({
 
     async function loadDates() {
       let loadResult: void = undefined;
+
+      if (!shouldShowSnapshotTimeBar(pathname, portfolioCode)) {
+        setAvailableDates([]);
+        setCurrentAsOfDate(null);
+        setLoadingDates(false);
+        return loadResult;
+      }
+
       setLoadingDates(true);
       setError(null);
 
@@ -251,10 +260,15 @@ export function PortfolioTimeProvider({
       cancelled = true;
     };
     return result;
-  }, [portfolioCode]);
+  }, [portfolioCode, pathname]);
 
   useEffect(() => {
     let result: void = undefined;
+
+    if (!shouldShowSnapshotTimeBar(pathname, portfolioCode)) {
+      setSelectedAsOfDateState(null);
+      return result;
+    }
 
     if (availableDates.length === 0) {
       setSelectedAsOfDateState(null);
@@ -279,7 +293,15 @@ export function PortfolioTimeProvider({
     }
 
     return result;
-  }, [availableDates, customTo, searchParams, selectedAsOfDate, updateSearchParams]);
+  }, [
+    availableDates,
+    customTo,
+    pathname,
+    portfolioCode,
+    searchParams,
+    selectedAsOfDate,
+    updateSearchParams,
+  ]);
 
   useEffect(() => {
     let result: () => void = () => {};
@@ -287,6 +309,13 @@ export function PortfolioTimeProvider({
 
     async function loadSnapshot() {
       let loadResult: void = undefined;
+
+      if (!shouldShowSnapshotTimeBar(pathname, portfolioCode)) {
+        setSnapshot(null);
+        setLoadingSnapshot(false);
+        return loadResult;
+      }
+
       if (!selectedAsOfDate) {
         setSnapshot(null);
         setLoadingSnapshot(false);
@@ -331,7 +360,7 @@ export function PortfolioTimeProvider({
       cancelled = true;
     };
     return result;
-  }, [portfolioCode, selectedAsOfDate, currentAsOfDate]);
+  }, [portfolioCode, pathname, selectedAsOfDate, currentAsOfDate]);
 
   const rangeDates = useMemo(() => {
     let result = resolveDateRange({
@@ -344,12 +373,21 @@ export function PortfolioTimeProvider({
     return result;
   }, [availableDates, periodPreset, customFrom, customTo, calendarMonth]);
 
+  const rangeDatesKey = rangeDates.join(",");
+
   useEffect(() => {
     let result: () => void = () => {};
     let cancelled = false;
 
     async function loadTrends() {
       let loadResult: void = undefined;
+
+      if (!shouldShowSnapshotTimeBar(pathname, portfolioCode)) {
+        setTrends(null);
+        setLoadingTrends(false);
+        return loadResult;
+      }
+
       if (rangeDates.length === 0) {
         setTrends(null);
         setLoadingTrends(false);
@@ -397,7 +435,7 @@ export function PortfolioTimeProvider({
       cancelled = true;
     };
     return result;
-  }, [portfolioCode, rangeDates]);
+  }, [portfolioCode, pathname, rangeDatesKey]);
 
   const trendDisplayUnit = resolveTrendDisplayUnit(periodPreset);
   const displayTrendPoints = useMemo(() => {

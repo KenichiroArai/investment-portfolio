@@ -47,24 +47,60 @@ describe("manage pages", () => {
     });
   });
 
-  it("renders register page", async () => {
+  it("renders register page with manage as-of date field", async () => {
     const page = await RegisterPage({
       params: Promise.resolve({ code: "ideco" }),
     });
     render(page);
     expect(screen.getByRole("heading", { name: "登録（ideco）" })).toBeInTheDocument();
+    expect(screen.getByText("操作対象の基準日")).toBeInTheDocument();
+    expect(
+      screen.getByText(/閲覧画面の基準日切り替えとは別です/),
+    ).toBeInTheDocument();
+    expect(document.querySelector(".snapshot-time-bar")).toBeNull();
     await waitFor(() => {
       expect(screen.getByRole("status")).toHaveTextContent(/読み取り専用/);
     });
   });
 
-  it("renders edit page", async () => {
+  it("renders edit page with readonly manage as-of date when snapshot exists", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes("/classification-schemes")) {
+          return new Response(JSON.stringify([]), { status: 200 });
+        }
+        if (url.includes("/instruments")) {
+          return new Response(JSON.stringify([]), { status: 200 });
+        }
+        if (url.includes("/snapshot/current")) {
+          return new Response(
+            JSON.stringify({
+              id: "s1",
+              portfolioCode: "ideco",
+              portfolioName: "iDeCo",
+              asOfDate: "2026-06-01",
+              analysisSchemes: [],
+              metrics: [],
+              lines: [],
+            }),
+            { status: 200 },
+          );
+        }
+        return new Response(JSON.stringify([]), { status: 200 });
+      }),
+    );
+
     const page = await EditPage({
       params: Promise.resolve({ code: "ideco" }),
     });
     render(page);
     expect(screen.getByRole("heading", { name: "更新（ideco）" })).toBeInTheDocument();
+    expect(document.querySelector(".snapshot-time-bar")).toBeNull();
     await waitFor(() => {
+      expect(screen.getByText("操作対象の基準日")).toBeInTheDocument();
+      expect(screen.getByText("2026/06/01")).toBeInTheDocument();
       expect(screen.getByRole("status")).toHaveTextContent(/読み取り専用/);
     });
   });
