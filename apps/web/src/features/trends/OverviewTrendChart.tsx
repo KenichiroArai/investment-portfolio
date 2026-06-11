@@ -55,8 +55,14 @@ export function OverviewTrendChart() {
     },
   });
 
-  const { labels, sourceDates, hasTrendLines, singleBucketNote, baselineSummary } =
-    chartBuckets;
+  const {
+    labels,
+    sourceDates,
+    sourceDateLabels,
+    hasTrendLines,
+    singleBucketNote,
+    baselineSummary,
+  } = chartBuckets;
 
   const marketValueLevelValues = mapTrendChartLevelValues(
     chartBuckets.chartPoints,
@@ -115,6 +121,7 @@ export function OverviewTrendChart() {
         height={180}
         labels={labels}
         sourceDates={sourceDates}
+        sourceDateLabels={sourceDateLabels}
         mode="grouped"
         series={[
           {
@@ -143,6 +150,7 @@ export function OverviewTrendChart() {
             height={180}
             labels={labels}
             sourceDates={sourceDates}
+        sourceDateLabels={sourceDateLabels}
             series={deltaSeries}
           />
         </div>

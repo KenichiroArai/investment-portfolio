@@ -4,18 +4,24 @@ import {
   buildTrendDisplayPoints,
   detectMatchingPreset,
   getCalendarMonthDateRange,
+  readTrendBucketPick,
   readTrendDisplayUnit,
+  readTrendMinMaxField,
   resolveDateRange,
   resolveLatestSnapshotDate,
   resolvePeriodBounds,
   resolvePeriodBoundsForPreset,
+  TREND_BUCKET_PICK_LABELS,
   TREND_DISPLAY_UNIT_LABELS,
+  TREND_MIN_MAX_FIELD_LABELS,
   type AggregatedTrendPoint,
   type CurrentSnapshotDto,
   type SnapshotDateListDto,
   type SnapshotPeriodPreset,
   type SnapshotTrendsDto,
+  type TrendBucketPick,
   type TrendDisplayUnit,
+  type TrendMinMaxField,
 } from "@repo/shared";
 import {
   createContext,
@@ -58,6 +64,12 @@ type PortfolioTimeContextValue = {
   trendDisplayUnit: TrendDisplayUnit;
   setTrendDisplayUnit: (unit: TrendDisplayUnit) => void;
   trendDisplayUnitLabel: string;
+  trendBucketPick: TrendBucketPick;
+  setTrendBucketPick: (pick: TrendBucketPick) => void;
+  trendBucketPickLabel: string;
+  trendMinMaxField: TrendMinMaxField;
+  setTrendMinMaxField: (field: TrendMinMaxField) => void;
+  trendMinMaxFieldLabel: string;
   displayTrendPoints: AggregatedTrendPoint[];
   baselinePoint: AggregatedTrendPoint | null;
   loadingDates: boolean;
@@ -114,6 +126,8 @@ export function PortfolioTimeProvider({
   const customTo = searchParams.get("to") ?? "";
   const calendarMonth = searchParams.get("month") ?? "";
   const trendDisplayUnit = readTrendDisplayUnit(searchParams.get("unit"));
+  const trendBucketPick = readTrendBucketPick(searchParams.get("pick"));
+  const trendMinMaxField = readTrendMinMaxField(searchParams.get("minMaxBy"));
 
   const periodPreset = useMemo(() => {
     let result: SnapshotPeriodPreset | null = detectMatchingPreset(
@@ -239,6 +253,32 @@ export function PortfolioTimeProvider({
       let result: void = undefined;
       updateSearchParams({
         unit: unit === "day" ? null : unit,
+      });
+      return result;
+    },
+    [updateSearchParams],
+  );
+
+  const setTrendBucketPick = useCallback(
+    (pick: TrendBucketPick) => {
+      let result: void = undefined;
+      const updates: Record<string, string | null> = {
+        pick: pick === "last" ? null : pick,
+      };
+      if (pick !== "min" && pick !== "max") {
+        updates.minMaxBy = null;
+      }
+      updateSearchParams(updates);
+      return result;
+    },
+    [updateSearchParams],
+  );
+
+  const setTrendMinMaxField = useCallback(
+    (field: TrendMinMaxField) => {
+      let result: void = undefined;
+      updateSearchParams({
+        minMaxBy: field === "marketValue" ? null : field,
       });
       return result;
     },
@@ -512,13 +552,17 @@ export function PortfolioTimeProvider({
       trendDisplayUnit,
       trends.from,
       trends.to,
+      {
+        pick: trendBucketPick,
+        minMaxField: trendMinMaxField,
+      },
     );
     result = {
       displayTrendPoints: built.displayPoints,
       baselinePoint: built.baselinePoint,
     };
     return result;
-  }, [trends, trendDisplayUnit]);
+  }, [trends, trendDisplayUnit, trendBucketPick, trendMinMaxField]);
 
   const value = useMemo(() => {
     let result: PortfolioTimeContextValue = {
@@ -542,6 +586,12 @@ export function PortfolioTimeProvider({
       trendDisplayUnit,
       setTrendDisplayUnit,
       trendDisplayUnitLabel: TREND_DISPLAY_UNIT_LABELS[trendDisplayUnit],
+      trendBucketPick,
+      setTrendBucketPick,
+      trendBucketPickLabel: TREND_BUCKET_PICK_LABELS[trendBucketPick],
+      trendMinMaxField,
+      setTrendMinMaxField,
+      trendMinMaxFieldLabel: TREND_MIN_MAX_FIELD_LABELS[trendMinMaxField],
       displayTrendPoints,
       baselinePoint,
       loadingDates,
@@ -576,6 +626,10 @@ export function PortfolioTimeProvider({
     trends,
     trendDisplayUnit,
     setTrendDisplayUnit,
+    trendBucketPick,
+    setTrendBucketPick,
+    trendMinMaxField,
+    setTrendMinMaxField,
     displayTrendPoints,
     baselinePoint,
     loadingDates,

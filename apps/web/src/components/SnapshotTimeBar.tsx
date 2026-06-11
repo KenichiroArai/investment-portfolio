@@ -4,10 +4,16 @@ import {
   findAdjacentSnapshotDate,
   listCalendarMonthOptions,
   SNAPSHOT_PERIOD_PRESET_LABELS,
+  TREND_BUCKET_PICK_LABELS,
+  TREND_BUCKET_PICKS,
   TREND_DISPLAY_UNIT_LABELS,
   TREND_DISPLAY_UNITS,
+  TREND_MIN_MAX_FIELD_LABELS,
+  TREND_MIN_MAX_FIELDS,
   type SnapshotPeriodPreset,
+  type TrendBucketPick,
   type TrendDisplayUnit,
+  type TrendMinMaxField,
 } from "@repo/shared";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -65,6 +71,10 @@ export function SnapshotTimeBar() {
     setCalendarMonth,
     trendDisplayUnit,
     setTrendDisplayUnit,
+    trendBucketPick,
+    setTrendBucketPick,
+    trendMinMaxField,
+    setTrendMinMaxField,
     loadingDates,
     isHistoricalView,
     emphasizeAsOf,
@@ -260,6 +270,54 @@ export function SnapshotTimeBar() {
                 })}
               </SelectContent>
             </Select>
+            <span className="min-w-12 text-xs font-semibold text-muted-foreground">代表値</span>
+            <Select
+              value={trendBucketPick}
+              onValueChange={(value) => {
+                setTrendBucketPick(value as TrendBucketPick);
+              }}
+            >
+              <SelectTrigger className="w-[9rem]" aria-label="代表値を選択">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {TREND_BUCKET_PICKS.map((pick) => {
+                  let item = (
+                    <SelectItem key={pick} value={pick}>
+                      {TREND_BUCKET_PICK_LABELS[pick]}
+                    </SelectItem>
+                  );
+                  return item;
+                })}
+              </SelectContent>
+            </Select>
+            {trendBucketPick === "min" || trendBucketPick === "max" ? (
+              <>
+                <span className="min-w-12 text-xs font-semibold text-muted-foreground">
+                  比較項目
+                </span>
+                <Select
+                  value={trendMinMaxField}
+                  onValueChange={(value) => {
+                    setTrendMinMaxField(value as TrendMinMaxField);
+                  }}
+                >
+                  <SelectTrigger className="w-[9rem]" aria-label="比較項目を選択">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TREND_MIN_MAX_FIELDS.map((field) => {
+                      let item = (
+                        <SelectItem key={field} value={field}>
+                          {TREND_MIN_MAX_FIELD_LABELS[field]}
+                        </SelectItem>
+                      );
+                      return item;
+                    })}
+                  </SelectContent>
+                </Select>
+              </>
+            ) : null}
           </div>
         </div>
       </div>

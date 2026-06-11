@@ -63,8 +63,15 @@ export function TrendsDetailPanel() {
     },
   });
 
-  const { chartPoints, labels, sourceDates, hasTrendLines, singleBucketNote, baselineSummary } =
-    chartBuckets;
+  const {
+    chartPoints,
+    labels,
+    sourceDates,
+    sourceDateLabels,
+    hasTrendLines,
+    singleBucketNote,
+    baselineSummary,
+  } = chartBuckets;
 
   const sparseDataNote = (() => {
     let note: string | null = null;
@@ -260,6 +267,7 @@ export function TrendsDetailPanel() {
           valueKind="yen"
           labels={labels}
           sourceDates={sourceDates}
+          sourceDateLabels={sourceDateLabels}
           mode="grouped"
           series={[
             {
@@ -279,6 +287,7 @@ export function TrendsDetailPanel() {
               valueKind="yen"
               labels={labels}
               sourceDates={sourceDates}
+          sourceDateLabels={sourceDateLabels}
               series={marketValueDeltaSeries}
             />
           </div>
@@ -292,6 +301,7 @@ export function TrendsDetailPanel() {
           valueKind="yen"
           labels={labels}
           sourceDates={sourceDates}
+          sourceDateLabels={sourceDateLabels}
           mode="grouped"
           series={[
             {
@@ -311,6 +321,7 @@ export function TrendsDetailPanel() {
               valueKind="yen"
               labels={labels}
               sourceDates={sourceDates}
+          sourceDateLabels={sourceDateLabels}
               series={gainDeltaSeries}
             />
           </div>
@@ -325,6 +336,7 @@ export function TrendsDetailPanel() {
             valueKind="percent"
             labels={labels}
             sourceDates={sourceDates}
+          sourceDateLabels={sourceDateLabels}
             mode="grouped"
             series={gainRateSeries}
           />
@@ -336,6 +348,7 @@ export function TrendsDetailPanel() {
                 valueKind="percentPoint"
                 labels={labels}
                 sourceDates={sourceDates}
+          sourceDateLabels={sourceDateLabels}
                 series={gainRateDeltaSeries}
               />
             </div>
@@ -375,6 +388,7 @@ export function TrendsDetailPanel() {
             valueKind="percent"
             labels={labels}
             sourceDates={sourceDates}
+          sourceDateLabels={sourceDateLabels}
             mode="stacked"
             valueDomain={{ min: 0, max: 1 }}
             series={allocationSeries}
@@ -389,6 +403,7 @@ export function TrendsDetailPanel() {
                   valueKind="percent"
                   labels={labels}
                   sourceDates={sourceDates}
+          sourceDateLabels={sourceDateLabels}
                   domainMode="fitData"
                   series={allocationSeries}
                   height={240}
@@ -401,6 +416,7 @@ export function TrendsDetailPanel() {
                   valueKind="percentPoint"
                   labels={labels}
                   sourceDates={sourceDates}
+          sourceDateLabels={sourceDateLabels}
                   series={allocationDeltaSeries}
                   height={240}
                 />

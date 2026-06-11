@@ -1,4 +1,7 @@
-import type { SnapshotTrendPointDto } from "./snapshot-trends";
+import type {
+  SnapshotTrendAllocationSlice,
+  SnapshotTrendPointDto,
+} from "./snapshot-trends";
 
 export type TrendDisplayUnit = "day" | "week" | "1m" | "3m" | "6m" | "12m";
 
@@ -11,10 +14,60 @@ export const TREND_DISPLAY_UNITS: TrendDisplayUnit[] = [
   "12m",
 ];
 
+export type TrendBucketPick = "first" | "last" | "min" | "max" | "average";
+
+export const TREND_BUCKET_PICKS: TrendBucketPick[] = [
+  "first",
+  "last",
+  "min",
+  "max",
+  "average",
+];
+
+export type TrendMinMaxField =
+  | "marketValue"
+  | "bookValue"
+  | "unrealizedGain"
+  | "gainRateOnBook"
+  | "contributions"
+  | "gainRateOnContributions";
+
+export const TREND_MIN_MAX_FIELDS: TrendMinMaxField[] = [
+  "marketValue",
+  "bookValue",
+  "unrealizedGain",
+  "gainRateOnBook",
+  "contributions",
+  "gainRateOnContributions",
+];
+
+export const TREND_BUCKET_PICK_LABELS: Record<TrendBucketPick, string> = {
+  first: "期初",
+  last: "期末",
+  min: "最小",
+  max: "最大",
+  average: "平均",
+};
+
+export const TREND_MIN_MAX_FIELD_LABELS: Record<TrendMinMaxField, string> = {
+  marketValue: "総時価",
+  bookValue: "簿価",
+  unrealizedGain: "評価損益",
+  gainRateOnBook: "簿価比利益率",
+  contributions: "拠出額",
+  gainRateOnContributions: "拠出比利益率",
+};
+
+export type TrendAggregationOptions = {
+  pick?: TrendBucketPick;
+  minMaxField?: TrendMinMaxField;
+};
+
 export type AggregatedTrendPoint = SnapshotTrendPointDto & {
   bucketKey: string;
   bucketLabel: string;
   sourceAsOfDate: string;
+  isAveraged?: boolean;
 };
 
 export type TrendDisplayPointsResult = {
@@ -119,6 +172,22 @@ export function readTrendDisplayUnit(value: string | null): TrendDisplayUnit {
   let result: TrendDisplayUnit = "day";
   if (value && TREND_DISPLAY_UNITS.includes(value as TrendDisplayUnit)) {
     result = value as TrendDisplayUnit;
+  }
+  return result;
+}
+
+export function readTrendBucketPick(value: string | null): TrendBucketPick {
+  let result: TrendBucketPick = "last";
+  if (value && TREND_BUCKET_PICKS.includes(value as TrendBucketPick)) {
+    result = value as TrendBucketPick;
+  }
+  return result;
+}
+
+export function readTrendMinMaxField(value: string | null): TrendMinMaxField {
+  let result: TrendMinMaxField = "marketValue";
+  if (value && TREND_MIN_MAX_FIELDS.includes(value as TrendMinMaxField)) {
+    result = value as TrendMinMaxField;
   }
   return result;
 }
@@ -272,21 +341,272 @@ function resolveRollingBucketKey(
   return result;
 }
 
+function averageNullableNumbers(values: Array<number | null>): number | null {
+  let result: number | null = null;
+  const valid = values.filter(
+    (value): value is number => value !== null && Number.isFinite(value),
+  );
+  if (valid.length === 0) {
+    return result;
+  }
+  result = valid.reduce((sum, value) => sum + value, 0) / valid.length;
+  return result;
+}
+
+function resolveMinMaxComparableValue(
+  point: SnapshotTrendPointDto,
+  field: TrendMinMaxField,
+): number | null {
+  let result: number | null = null;
+
+  if (field === "marketValue") {
+    result = Number.isFinite(point.totalMarketValueMinor)
+      ? point.totalMarketValueMinor
+      : null;
+    return result;
+  }
+
+  if (field === "bookValue") {
+    result = Number.isFinite(point.totalBookValueMinor)
+      ? point.totalBookValueMinor
+      : null;
+    return result;
+  }
+
+  if (field === "unrealizedGain") {
+    result = Number.isFinite(point.unrealizedGainMinor)
+      ? point.unrealizedGainMinor
+      : null;
+    return result;
+  }
+
+  if (field === "gainRateOnBook") {
+    result =
+      point.gainRateOnBook !== null && Number.isFinite(point.gainRateOnBook)
+        ? point.gainRateOnBook
+        : null;
+    return result;
+  }
+
+  if (field === "contributions") {
+    result =
+      point.totalContributionsMinor !== null &&
+      Number.isFinite(point.totalContributionsMinor)
+        ? point.totalContributionsMinor
+        : null;
+    return result;
+  }
+
+  result =
+    point.gainRateOnContributions !== null &&
+    Number.isFinite(point.gainRateOnContributions)
+      ? point.gainRateOnContributions
+      : null;
+  return result;
+}
+
+function averageAllocationsByScheme(
+  points: SnapshotTrendPointDto[],
+): Record<string, SnapshotTrendAllocationSlice[]> {
+  let result: Record<string, SnapshotTrendAllocationSlice[]> = {};
+  const schemeCodes = new Set<string>();
+
+  for (const point of points) {
+    for (const schemeCode of Object.keys(point.allocationsByScheme)) {
+      schemeCodes.add(schemeCode);
+    }
+  }
+
+  for (const schemeCode of schemeCodes) {
+    const valueCodes = new Set<string>();
+    for (const point of points) {
+      for (const slice of point.allocationsByScheme[schemeCode] ?? []) {
+        valueCodes.add(slice.valueCode);
+      }
+    }
+
+    const slices: SnapshotTrendAllocationSlice[] = [];
+    for (const valueCode of valueCodes) {
+      const ratios: number[] = [];
+      const marketValues: number[] = [];
+      let valueName = valueCode;
+
+      for (const point of points) {
+        const slice = (point.allocationsByScheme[schemeCode] ?? []).find(
+          (item) => item.valueCode === valueCode,
+        );
+        if (!slice) {
+          continue;
+        }
+        valueName = slice.valueName;
+        ratios.push(slice.ratio);
+        marketValues.push(slice.marketValueMinor);
+      }
+
+      if (ratios.length === 0) {
+        continue;
+      }
+
+      const avgMarketValue =
+        marketValues.reduce((sum, value) => sum + value, 0) / marketValues.length;
+      const avgRatio = ratios.reduce((sum, value) => sum + value, 0) / ratios.length;
+      slices.push({
+        valueCode,
+        valueName,
+        marketValueMinor: avgMarketValue,
+        ratio: avgRatio,
+      });
+    }
+
+    const ratioSum = slices.reduce((sum, slice) => sum + slice.ratio, 0);
+    if (ratioSum > 0) {
+      for (const slice of slices) {
+        slice.ratio = slice.ratio / ratioSum;
+      }
+    }
+
+    result[schemeCode] = slices;
+  }
+
+  return result;
+}
+
+function averageBucketPoints(
+  points: SnapshotTrendPointDto[],
+  bucketKey: string,
+): SnapshotTrendPointDto | null {
+  let result: SnapshotTrendPointDto | null = null;
+
+  if (points.length === 0) {
+    return result;
+  }
+
+  result = {
+    asOfDate: bucketKey,
+    totalMarketValueMinor: averageNullableNumbers(
+      points.map((point) => point.totalMarketValueMinor),
+    ) ?? 0,
+    totalBookValueMinor: averageNullableNumbers(
+      points.map((point) => point.totalBookValueMinor),
+    ) ?? 0,
+    unrealizedGainMinor: averageNullableNumbers(
+      points.map((point) => point.unrealizedGainMinor),
+    ) ?? 0,
+    gainRateOnBook: averageNullableNumbers(
+      points.map((point) => point.gainRateOnBook),
+    ),
+    totalContributionsMinor: averageNullableNumbers(
+      points.map((point) => point.totalContributionsMinor),
+    ),
+    gainRateOnContributions: averageNullableNumbers(
+      points.map((point) => point.gainRateOnContributions),
+    ),
+    allocationsByScheme: averageAllocationsByScheme(points),
+  };
+  return result;
+}
+
+type ResolvedBucketPoint = {
+  point: SnapshotTrendPointDto;
+  isAveraged: boolean;
+};
+
+function resolveBucketPoint(
+  points: SnapshotTrendPointDto[],
+  pick: TrendBucketPick,
+  minMaxField: TrendMinMaxField,
+  bucketKey: string,
+): ResolvedBucketPoint | null {
+  let result: ResolvedBucketPoint | null = null;
+
+  if (points.length === 0) {
+    return result;
+  }
+
+  const sorted = [...points].sort((left, right) =>
+    left.asOfDate.localeCompare(right.asOfDate),
+  );
+
+  if (pick === "first") {
+    result = { point: sorted[0], isAveraged: false };
+    return result;
+  }
+
+  if (pick === "last") {
+    result = { point: sorted[sorted.length - 1], isAveraged: false };
+    return result;
+  }
+
+  if (pick === "average") {
+    const averaged = averageBucketPoints(sorted, bucketKey);
+    if (!averaged) {
+      return result;
+    }
+    result = { point: averaged, isAveraged: true };
+    return result;
+  }
+
+  const preferMin = pick === "min";
+  let best: SnapshotTrendPointDto | null = null;
+  let bestValue: number | null = null;
+
+  for (const point of sorted) {
+    const value = resolveMinMaxComparableValue(point, minMaxField);
+    if (value === null) {
+      continue;
+    }
+
+    if (best === null || bestValue === null) {
+      best = point;
+      bestValue = value;
+      continue;
+    }
+
+    const isBetter = preferMin ? value < bestValue : value > bestValue;
+    const isTieNewer = value === bestValue && point.asOfDate > best.asOfDate;
+    if (isBetter || isTieNewer) {
+      best = point;
+      bestValue = value;
+    }
+  }
+
+  if (best) {
+    result = { point: best, isAveraged: false };
+    return result;
+  }
+
+  result = { point: sorted[sorted.length - 1], isAveraged: false };
+  return result;
+}
+
 function toAggregatedTrendPoint(
   point: SnapshotTrendPointDto,
   bucketKey: string,
   unit: TrendDisplayUnit,
   bucketStart: string | null,
+  isAveraged = false,
 ): AggregatedTrendPoint {
   let result: AggregatedTrendPoint = {
     ...point,
+    asOfDate: isAveraged ? bucketKey : point.asOfDate,
     bucketKey,
     bucketLabel: formatTrendBucketLabel(
       bucketKey,
       unit,
       bucketStart ?? undefined,
     ),
-    sourceAsOfDate: point.asOfDate,
+    sourceAsOfDate: isAveraged ? bucketKey : point.asOfDate,
+    isAveraged: isAveraged || undefined,
+  };
+  return result;
+}
+
+function resolveAggregationOptions(
+  options?: TrendAggregationOptions,
+): { pick: TrendBucketPick; minMaxField: TrendMinMaxField } {
+  let result = {
+    pick: options?.pick ?? ("last" as TrendBucketPick),
+    minMaxField: options?.minMaxField ?? ("marketValue" as TrendMinMaxField),
   };
   return result;
 }
@@ -296,6 +616,7 @@ export function aggregateTrendPoints(
   unit: TrendDisplayUnit,
   rangeFrom: string,
   rangeTo: string,
+  options?: TrendAggregationOptions,
 ): AggregatedTrendPoint[] {
   let result: AggregatedTrendPoint[] = [];
 
@@ -303,11 +624,22 @@ export function aggregateTrendPoints(
     return result;
   }
 
+  const { pick, minMaxField } = resolveAggregationOptions(options);
+
   if (unit === "day") {
     result = [...points]
       .sort((left, right) => left.asOfDate.localeCompare(right.asOfDate))
       .map((point) => {
-        let aggregated = toAggregatedTrendPoint(point, point.asOfDate, "day", point.asOfDate);
+        const resolved = resolveBucketPoint([point], pick, minMaxField, point.asOfDate);
+        const resolvedPoint = resolved?.point ?? point;
+        const isAveraged = resolved?.isAveraged ?? false;
+        let aggregated = toAggregatedTrendPoint(
+          resolvedPoint,
+          point.asOfDate,
+          "day",
+          point.asOfDate,
+          isAveraged,
+        );
         return aggregated;
       });
     return result;
@@ -315,7 +647,7 @@ export function aggregateTrendPoints(
 
   const buckets = new Map<
     string,
-    { point: SnapshotTrendPointDto; bucketStart: string | null }
+    { points: SnapshotTrendPointDto[]; bucketStart: string | null }
   >();
   for (const point of points) {
     const bucketIndex = resolveRollingBucketIndex(point.asOfDate, unit, rangeFrom);
@@ -333,21 +665,33 @@ export function aggregateTrendPoints(
     }
     const bucketStart = resolveRollingBucketStartDate(bucketIndex, unit, rangeFrom);
     const existing = buckets.get(bucketKey);
-    if (!existing || point.asOfDate > existing.point.asOfDate) {
-      buckets.set(bucketKey, { point, bucketStart });
+    if (existing) {
+      existing.points.push(point);
+    } else {
+      buckets.set(bucketKey, { points: [point], bucketStart });
     }
   }
 
   result = [...buckets.entries()]
     .sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey))
-    .map(([bucketKey, entry]) => {
+    .flatMap(([bucketKey, entry]) => {
+      const resolved = resolveBucketPoint(
+        entry.points,
+        pick,
+        minMaxField,
+        bucketKey,
+      );
+      if (!resolved) {
+        return [];
+      }
       let aggregated = toAggregatedTrendPoint(
-        entry.point,
+        resolved.point,
         bucketKey,
         unit,
         entry.bucketStart,
+        resolved.isAveraged,
       );
-      return aggregated;
+      return [aggregated];
     });
 
   return result;
@@ -365,6 +709,7 @@ export function buildTrendDisplayPoints(
   unit: TrendDisplayUnit,
   rangeFrom: string,
   rangeTo: string,
+  options?: TrendAggregationOptions,
 ): TrendDisplayPointsResult {
   let result: TrendDisplayPointsResult = {
     displayPoints: [],
@@ -375,23 +720,24 @@ export function buildTrendDisplayPoints(
     return result;
   }
 
-  const allAggregated = aggregateTrendPoints(points, unit, rangeFrom, rangeTo);
+  const allAggregated = aggregateTrendPoints(
+    points,
+    unit,
+    rangeFrom,
+    rangeTo,
+    options,
+  );
 
   result.displayPoints = allAggregated.filter(
     (point) => point.sourceAsOfDate >= rangeFrom && point.sourceAsOfDate <= rangeTo,
   );
 
-  const priorPoints = allAggregated.filter((point) => point.sourceAsOfDate < rangeFrom);
-  if (priorPoints.length > 0) {
-    result.baselinePoint = priorPoints[priorPoints.length - 1] ?? null;
-  } else {
-    const priorRawPoints = [...points]
-      .filter((point) => point.asOfDate < rangeFrom)
-      .sort((left, right) => left.asOfDate.localeCompare(right.asOfDate));
-    const latestPrior = priorRawPoints.at(-1);
-    if (latestPrior) {
-      result.baselinePoint = buildBaselinePointFromRaw(latestPrior);
-    }
+  const priorRawPoints = [...points]
+    .filter((point) => point.asOfDate < rangeFrom)
+    .sort((left, right) => left.asOfDate.localeCompare(right.asOfDate));
+  const latestPrior = priorRawPoints.at(-1);
+  if (latestPrior) {
+    result.baselinePoint = buildBaselinePointFromRaw(latestPrior);
   }
 
   return result;

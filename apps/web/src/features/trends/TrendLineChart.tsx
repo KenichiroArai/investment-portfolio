@@ -17,9 +17,23 @@ import {
 import { useTrendYAxis } from "@/features/trends/use-trend-y-axis";
 import { formatAsOfDateJa, formatPercentDeltaTooltip } from "@/lib/format-yen";
 
+function formatSourceDateTooltip(label: string | undefined): string | null {
+  let result: string | null = null;
+  if (!label) {
+    return result;
+  }
+  if (label === "期間平均") {
+    result = label;
+    return result;
+  }
+  result = `基準日: ${formatAsOfDateJa(label)}`;
+  return result;
+}
+
 type TrendLineChartProps = {
   labels: string[];
   sourceDates?: string[];
+  sourceDateLabels?: string[];
   series: TrendChartSeries[];
   height?: number;
   className?: string;
@@ -68,6 +82,7 @@ function buildLineSegments(
 export function TrendLineChart({
   labels,
   sourceDates = [],
+  sourceDateLabels,
   series,
   height = CHART_HEIGHT,
   className,
@@ -272,9 +287,13 @@ export function TrendLineChart({
             }}
           >
             <div className="trend-line-chart__tooltip-title">{labels[hoveredIndex]}</div>
-            {sourceDates[hoveredIndex] ? (
+            {formatSourceDateTooltip(
+              sourceDateLabels?.[hoveredIndex] ?? sourceDates[hoveredIndex],
+            ) ? (
               <div className="trend-line-chart__tooltip-date">
-                基準日: {formatAsOfDateJa(sourceDates[hoveredIndex])}
+                {formatSourceDateTooltip(
+                  sourceDateLabels?.[hoveredIndex] ?? sourceDates[hoveredIndex],
+                )}
               </div>
             ) : null}
             {activeSeries.map((item) => {

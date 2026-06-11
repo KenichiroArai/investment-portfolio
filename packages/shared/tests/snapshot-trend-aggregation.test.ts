@@ -5,11 +5,17 @@ import {
   buildTrendDisplayPoints,
   formatTrendBucketLabel,
   formatTrendSparseDataNote,
+  readTrendBucketPick,
   readTrendDisplayUnit,
+  readTrendMinMaxField,
 } from "../src/snapshot-trend-aggregation";
 import type { SnapshotTrendPointDto } from "../src/snapshot-trends";
 
-function createPoint(asOfDate: string, marketValue: number): SnapshotTrendPointDto {
+function createPoint(
+  asOfDate: string,
+  marketValue: number,
+  overrides: Partial<SnapshotTrendPointDto> = {},
+): SnapshotTrendPointDto {
   let result: SnapshotTrendPointDto = {
     asOfDate,
     totalMarketValueMinor: marketValue,
@@ -19,6 +25,7 @@ function createPoint(asOfDate: string, marketValue: number): SnapshotTrendPointD
     totalContributionsMinor: null,
     gainRateOnContributions: null,
     allocationsByScheme: {},
+    ...overrides,
   };
   return result;
 }
@@ -176,5 +183,174 @@ describe("snapshot-trend-aggregation", () => {
   it("returns empty aggregation for no points", () => {
     expect(aggregateTrendPoints([], "1m", "2026-06-01", "2026-06-30")).toEqual([]);
     expect(aggregateTrendPoints([], "day", "2026-06-01", "2026-06-30")).toEqual([]);
+  });
+
+  it("reads bucket pick and min/max field from query value", () => {
+    expect(readTrendBucketPick(null)).toBe("last");
+    expect(readTrendBucketPick("first")).toBe("first");
+    expect(readTrendBucketPick("average")).toBe("average");
+    expect(readTrendBucketPick("invalid")).toBe("last");
+    expect(readTrendMinMaxField(null)).toBe("marketValue");
+    expect(readTrendMinMaxField("unrealizedGain")).toBe("unrealizedGain");
+    expect(readTrendMinMaxField("invalid")).toBe("marketValue");
+  });
+
+  it("aggregates by rolling week using first as-of date in each week", () => {
+    const points = [
+      createPoint("2026-06-02", 100),
+      createPoint("2026-06-05", 150),
+      createPoint("2026-06-09", 200),
+    ];
+    const aggregated = aggregateTrendPoints(
+      points,
+      "week",
+      "2026-06-01",
+      "2026-06-30",
+      { pick: "first" },
+    );
+    expect(aggregated[0]).toMatchObject({
+      sourceAsOfDate: "2026-06-02",
+      totalMarketValueMinor: 100,
+    });
+    expect(aggregated[1]).toMatchObject({
+      sourceAsOfDate: "2026-06-09",
+      totalMarketValueMinor: 200,
+    });
+  });
+
+  it("aggregates by min market value in each bucket", () => {
+    const points = [
+      createPoint("2026-06-02", 300),
+      createPoint("2026-06-05", 150),
+      createPoint("2026-06-09", 200),
+    ];
+    const aggregated = aggregateTrendPoints(
+      points,
+      "week",
+      "2026-06-01",
+      "2026-06-30",
+      { pick: "min", minMaxField: "marketValue" },
+    );
+    expect(aggregated[0]).toMatchObject({
+      sourceAsOfDate: "2026-06-05",
+      totalMarketValueMinor: 150,
+    });
+  });
+
+  it("aggregates by max unrealized gain in each bucket", () => {
+    const points = [
+      createPoint("2026-06-02", 300, { unrealizedGainMinor: 500 }),
+      createPoint("2026-06-05", 150, { unrealizedGainMinor: 2000 }),
+      createPoint("2026-06-09", 200, { unrealizedGainMinor: 800 }),
+    ];
+    const aggregated = aggregateTrendPoints(
+      points,
+      "week",
+      "2026-06-01",
+      "2026-06-30",
+      { pick: "max", minMaxField: "unrealizedGain" },
+    );
+    expect(aggregated[0]).toMatchObject({
+      sourceAsOfDate: "2026-06-05",
+      unrealizedGainMinor: 2000,
+    });
+  });
+
+  it("falls back to last when min comparison values are all null", () => {
+    const points = [
+      createPoint("2026-06-02", 100, { totalContributionsMinor: null }),
+      createPoint("2026-06-05", 150, { totalContributionsMinor: null }),
+    ];
+    const aggregated = aggregateTrendPoints(
+      points,
+      "week",
+      "2026-06-01",
+      "2026-06-30",
+      { pick: "min", minMaxField: "contributions" },
+    );
+    expect(aggregated[0]).toMatchObject({
+      sourceAsOfDate: "2026-06-05",
+      totalMarketValueMinor: 150,
+    });
+  });
+
+  it("aggregates by average in each bucket", () => {
+    const points = [
+      createPoint("2026-06-02", 100),
+      createPoint("2026-06-05", 200),
+      createPoint("2026-06-09", 300),
+    ];
+    const aggregated = aggregateTrendPoints(
+      points,
+      "week",
+      "2026-06-01",
+      "2026-06-30",
+      { pick: "average" },
+    );
+    expect(aggregated[0]).toMatchObject({
+      bucketKey: "2026-06-07",
+      sourceAsOfDate: "2026-06-07",
+      totalMarketValueMinor: 150,
+      isAveraged: true,
+    });
+    expect(aggregated[1]).toMatchObject({
+      sourceAsOfDate: "2026-06-14",
+      totalMarketValueMinor: 300,
+      isAveraged: true,
+    });
+  });
+
+  it("averages allocations by scheme in each bucket", () => {
+    const points = [
+      createPoint("2026-06-02", 100, {
+        allocationsByScheme: {
+          asset: [
+            {
+              valueCode: "stock",
+              valueName: "株式",
+              marketValueMinor: 6000,
+              ratio: 0.6,
+            },
+            {
+              valueCode: "bond",
+              valueName: "債券",
+              marketValueMinor: 4000,
+              ratio: 0.4,
+            },
+          ],
+        },
+      }),
+      createPoint("2026-06-05", 200, {
+        allocationsByScheme: {
+          asset: [
+            {
+              valueCode: "stock",
+              valueName: "株式",
+              marketValueMinor: 8000,
+              ratio: 0.8,
+            },
+            {
+              valueCode: "bond",
+              valueName: "債券",
+              marketValueMinor: 2000,
+              ratio: 0.2,
+            },
+          ],
+        },
+      }),
+    ];
+    const aggregated = aggregateTrendPoints(
+      points,
+      "week",
+      "2026-06-01",
+      "2026-06-30",
+      { pick: "average" },
+    );
+    const slices = aggregated[0]?.allocationsByScheme.asset ?? [];
+    expect(slices).toHaveLength(2);
+    const stock = slices.find((slice) => slice.valueCode === "stock");
+    const bond = slices.find((slice) => slice.valueCode === "bond");
+    expect(stock?.ratio).toBeCloseTo(0.7);
+    expect(bond?.ratio).toBeCloseTo(0.3);
   });
 });

@@ -39,9 +39,11 @@ function PortfolioTimeConsumer() {
     loadingDates,
     snapshot,
     trends,
+    displayTrendPoints,
     setSelectedAsOfDate,
     jumpToLatest,
     setPeriodPreset,
+    setTrendBucketPick,
   } = usePortfolioTime();
 
   let result = (
@@ -53,6 +55,9 @@ function PortfolioTimeConsumer() {
       <span data-testid="historical">{String(isHistoricalView)}</span>
       <span data-testid="snapshot">{snapshot?.asOfDate ?? ""}</span>
       <span data-testid="trends">{trends?.points.length ?? 0}</span>
+      <span data-testid="display-points">
+        {displayTrendPoints.map((point) => point.sourceAsOfDate).join(",")}
+      </span>
       <button type="button" onClick={() => setSelectedAsOfDate("2026-05-31")}>
         過去日を選択
       </button>
@@ -61,6 +66,9 @@ function PortfolioTimeConsumer() {
       </button>
       <button type="button" onClick={() => setPeriodPreset("1m")}>
         1か月
+      </button>
+      <button type="button" onClick={() => setTrendBucketPick("first")}>
+        期初代表
       </button>
     </div>
   );
@@ -220,6 +228,31 @@ describe("PortfolioTimeContext", () => {
       expect(screen.getByTestId("error")).toHaveTextContent(
         "基準日一覧の取得に失敗しました。",
       );
+    });
+  });
+
+  it("applies bucket pick to display trend points", async () => {
+    const user = userEvent.setup();
+    usePathname.mockReturnValue("/portfolios/ideco/trends/");
+    searchParamsRef.current = new URLSearchParams("unit=week");
+    stubPortfolioFetch();
+
+    render(
+      <PortfolioTimeProvider portfolioCode="ideco">
+        <PortfolioTimeConsumer />
+      </PortfolioTimeProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("display-points")).toHaveTextContent("2026-06-07");
+    });
+
+    await user.click(screen.getByRole("button", { name: "期初代表" }));
+    await waitFor(() => {
+      expect(replace).toHaveBeenCalledWith(expect.stringContaining("pick=first"));
+    });
+    await waitFor(() => {
+      expect(screen.getByTestId("display-points")).toHaveTextContent("2026-05-31");
     });
   });
 

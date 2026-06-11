@@ -19,9 +19,23 @@ export type TrendBarSeries = TrendChartSeries;
 
 type TrendBarChartMode = "grouped" | "stacked";
 
+function formatSourceDateTooltip(label: string | undefined): string | null {
+  let result: string | null = null;
+  if (!label) {
+    return result;
+  }
+  if (label === "期間平均") {
+    result = label;
+    return result;
+  }
+  result = `基準日: ${formatAsOfDateJa(label)}`;
+  return result;
+}
+
 type TrendBarChartProps = {
   labels: string[];
   sourceDates?: string[];
+  sourceDateLabels?: string[];
   series: TrendBarSeries[];
   mode?: TrendBarChartMode;
   height?: number;
@@ -40,6 +54,7 @@ const PADDING = { top: 16, right: 16, bottom: 48, left: 88 };
 export function TrendBarChart({
   labels,
   sourceDates = [],
+  sourceDateLabels,
   series,
   mode = "grouped",
   height = CHART_HEIGHT,
@@ -339,9 +354,13 @@ export function TrendBarChart({
             }}
           >
             <div className="trend-bar-chart__tooltip-title">{labels[hoveredIndex]}</div>
-            {sourceDates[hoveredIndex] ? (
+            {formatSourceDateTooltip(
+              sourceDateLabels?.[hoveredIndex] ?? sourceDates[hoveredIndex],
+            ) ? (
               <div className="trend-bar-chart__tooltip-date">
-                基準日: {formatAsOfDateJa(sourceDates[hoveredIndex])}
+                {formatSourceDateTooltip(
+                  sourceDateLabels?.[hoveredIndex] ?? sourceDates[hoveredIndex],
+                )}
               </div>
             ) : null}
             {activeSeries.map((item) => {

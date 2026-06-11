@@ -9,6 +9,7 @@ export type TrendChartBuckets = {
   chartPoints: AggregatedTrendPoint[];
   labels: string[];
   sourceDates: string[];
+  sourceDateLabels: string[];
   hasTrendLines: boolean;
   singleBucketNote: string | null;
   baselineSummary: string | null;
@@ -28,6 +29,7 @@ export function buildTrendChartBuckets(
     chartPoints: [],
     labels: [],
     sourceDates: [],
+    sourceDateLabels: [],
     hasTrendLines: false,
     singleBucketNote: null,
     baselineSummary: null,
@@ -47,6 +49,9 @@ export function buildTrendChartBuckets(
 
   result.labels = result.chartPoints.map((point) => point.bucketLabel);
   result.sourceDates = result.chartPoints.map((point) => point.sourceAsOfDate);
+  result.sourceDateLabels = result.chartPoints.map((point) =>
+    point.isAveraged ? "期間平均" : point.sourceAsOfDate,
+  );
   result.hasTrendLines = displayPoints.length >= 2 || baselinePoint !== null;
 
   if (displayPoints.length === 1) {
