@@ -1,23 +1,24 @@
 "use client";
 
+import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { TrendBarChart } from "@/features/trends/TrendBarChart";
 import { TrendLineChart } from "@/features/trends/TrendLineChart";
 import {
   buildTrendChartBuckets,
-  computeTrendChartDeltas,
   mapTrendChartLevelValues,
 } from "@/features/trends/trend-chart-buckets";
-import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
 import {
+  formatAsOfDateJa,
   formatMarketValueBaselineSummary,
+  formatSignedYenDelta,
   formatYen,
 } from "@/lib/format-yen";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
 
 export function OverviewTrendChart() {
   const {
+    portfolioCode,
     displayTrendPoints,
     baselinePoint,
     trendDisplayUnit,
@@ -56,73 +57,65 @@ export function OverviewTrendChart() {
   });
 
   const {
+    chartPoints,
     labels,
     sourceDates,
     sourceDateLabels,
-    hasTrendLines,
     singleBucketNote,
     baselineSummary,
   } = chartBuckets;
 
   const marketValueLevelValues = mapTrendChartLevelValues(
-    chartBuckets.chartPoints,
+    chartPoints,
     displayTrendPoints,
     baselinePoint,
     (point) => point.totalMarketValueMinor,
   );
 
-  const gainLevelValues = mapTrendChartLevelValues(
-    chartBuckets.chartPoints,
-    displayTrendPoints,
-    baselinePoint,
-    (point) => point.unrealizedGainMinor,
+  const startValue =
+    chartPoints[0]?.totalMarketValueMinor ?? displayTrendPoints[0].totalMarketValueMinor;
+  const endValue =
+    chartPoints[chartPoints.length - 1]?.totalMarketValueMinor ??
+    displayTrendPoints[displayTrendPoints.length - 1].totalMarketValueMinor;
+  const periodDelta = endValue - startValue;
+  const startLabel = formatAsOfDateJa(
+    chartPoints[0]?.sourceAsOfDate ?? displayTrendPoints[0].sourceAsOfDate,
   );
-
-  const deltaSeries: TrendChartSeries[] = [
-    {
-      key: "market-value-delta",
-      label: "評価額の変化",
-      color: "#2563eb",
-      values: computeTrendChartDeltas(
-        marketValueLevelValues,
-        displayTrendPoints,
-        baselinePoint,
-        baselinePoint?.totalMarketValueMinor ?? null,
-      ),
-      formatValue: (value) => formatYen(value),
-    },
-    {
-      key: "gain-delta",
-      label: "評価損益の変化",
-      color: "#16a34a",
-      values: computeTrendChartDeltas(
-        gainLevelValues,
-        displayTrendPoints,
-        baselinePoint,
-        baselinePoint?.unrealizedGainMinor ?? null,
-      ),
-      formatValue: (value) => formatYen(value),
-    },
-  ];
+  const endLabel = formatAsOfDateJa(
+    chartPoints[chartPoints.length - 1]?.sourceAsOfDate ??
+      displayTrendPoints[displayTrendPoints.length - 1].sourceAsOfDate,
+  );
 
   result = (
     <section className="overview-trend">
+      <p className="overview-trend__kpi">
+        {startLabel} {formatYen(startValue)} → {endLabel} {formatYen(endValue)}
+        <span
+          className={
+            periodDelta >= 0
+              ? "overview-trend__delta overview-trend__delta--positive"
+              : "overview-trend__delta overview-trend__delta--negative"
+          }
+        >
+          {" "}
+          ({formatSignedYenDelta(periodDelta)})
+        </span>
+      </p>
       {singleBucketNote ? (
         <p className="trends-detail__single-bucket-note">{singleBucketNote}</p>
       ) : null}
       {baselineSummary ? (
         <p className="trends-detail__baseline-summary">{baselineSummary}</p>
       ) : null}
-      <TrendBarChart
+      <TrendLineChart
         className="overview-trend__chart"
-        title="資産推移"
+        title="評価額"
         caption={trendDisplayUnitLabel}
         valueKind="yen"
-        height={180}
+        height={150}
         labels={labels}
         sourceDates={sourceDates}
         sourceDateLabels={sourceDateLabels}
-        mode="grouped"
         series={[
           {
             key: "market-value",
@@ -131,30 +124,13 @@ export function OverviewTrendChart() {
             values: marketValueLevelValues,
             formatValue: (value) => formatYen(value),
           },
-          {
-            key: "gain",
-            label: "評価損益",
-            color: "#16a34a",
-            values: gainLevelValues,
-            formatValue: (value) => formatYen(value),
-          },
         ]}
       />
-      {hasTrendLines ? (
-        <div className="trends-detail__subsection">
-          <TrendLineChart
-            className="overview-trend__chart"
-            title="前回比の変化"
-            caption={trendDisplayUnitLabel}
-            valueKind="yen"
-            height={180}
-            labels={labels}
-            sourceDates={sourceDates}
-        sourceDateLabels={sourceDateLabels}
-            series={deltaSeries}
-          />
-        </div>
-      ) : null}
+      <p className="overview-trend__link">
+        <Link href={`/portfolios/${portfolioCode}/trends`}>
+          構成比の推移を見る →
+        </Link>
+      </p>
     </section>
   );
   return result;

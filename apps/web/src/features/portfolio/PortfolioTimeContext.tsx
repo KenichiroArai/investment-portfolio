@@ -8,6 +8,7 @@ import {
   readTrendDisplayUnit,
   readTrendMinMaxField,
   resolveDateRange,
+  resolveDefaultTrendDisplayUnit,
   resolveLatestSnapshotDate,
   resolvePeriodBounds,
   resolvePeriodBoundsForPreset,
@@ -104,6 +105,35 @@ function readPeriodPreset(value: string | null): SnapshotPeriodPreset {
   return result;
 }
 
+function countInclusiveDays(from: string, to: string): number | null {
+  let result: number | null = null;
+  const fromMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(from);
+  const toMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(to);
+  if (!fromMatch || !toMatch) {
+    return result;
+  }
+  const fromTime = Date.UTC(
+    Number(fromMatch[1]),
+    Number(fromMatch[2]) - 1,
+    Number(fromMatch[3]),
+  );
+  const toTime = Date.UTC(
+    Number(toMatch[1]),
+    Number(toMatch[2]) - 1,
+    Number(toMatch[3]),
+  );
+  if (toTime < fromTime) {
+    return result;
+  }
+  result = Math.round((toTime - fromTime) / 86_400_000) + 1;
+  return result;
+}
+
+function serializeTrendDisplayUnit(unit: TrendDisplayUnit): string | null {
+  let result: string | null = unit === "day" ? null : unit;
+  return result;
+}
+
 export function PortfolioTimeProvider({
   portfolioCode,
   children,
@@ -125,7 +155,7 @@ export function PortfolioTimeProvider({
   const customFrom = searchParams.get("from") ?? "";
   const customTo = searchParams.get("to") ?? "";
   const calendarMonth = searchParams.get("month") ?? "";
-  const trendDisplayUnit = readTrendDisplayUnit(searchParams.get("unit"));
+  const unitFromUrl = searchParams.get("unit");
   const trendBucketPick = readTrendBucketPick(searchParams.get("pick"));
   const trendMinMaxField = readTrendMinMaxField(searchParams.get("minMaxBy"));
 
@@ -193,11 +223,13 @@ export function PortfolioTimeProvider({
       if (!bounds) {
         return result;
       }
+      const defaultUnit = resolveDefaultTrendDisplayUnit(preset);
       updateSearchParams({
         from: bounds.from,
         to: bounds.to,
         period: null,
         month: null,
+        unit: serializeTrendDisplayUnit(defaultUnit),
       });
       return result;
     },
@@ -237,11 +269,13 @@ export function PortfolioTimeProvider({
       if (!range) {
         return result;
       }
+      const defaultUnit = resolveDefaultTrendDisplayUnit("1m");
       updateSearchParams({
         month: value || null,
         from: range.from,
         to: range.to,
         period: null,
+        unit: serializeTrendDisplayUnit(defaultUnit),
       });
       return result;
     },
@@ -453,6 +487,20 @@ export function PortfolioTimeProvider({
     });
     return result;
   }, [availableDates, periodPreset, customFrom, customTo, calendarMonth]);
+
+  const trendDisplayUnit = useMemo(() => {
+    let result: TrendDisplayUnit = "day";
+    if (unitFromUrl) {
+      result = readTrendDisplayUnit(unitFromUrl);
+      return result;
+    }
+    const rangeDayCount =
+      periodBounds !== null
+        ? countInclusiveDays(periodBounds.from, periodBounds.to)
+        : null;
+    result = resolveDefaultTrendDisplayUnit(periodPreset, rangeDayCount);
+    return result;
+  }, [unitFromUrl, periodBounds, periodPreset]);
 
   const rangeDates = useMemo(() => {
     let result: string[] = [];

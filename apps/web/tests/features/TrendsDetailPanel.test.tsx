@@ -59,32 +59,27 @@ describe("TrendsDetailPanel", () => {
     );
   }
 
-  it("renders monthly aggregated bar chart labels", async () => {
+  it("renders allocation hero charts and period summary", async () => {
     stubTrendsFetch();
     renderWithPortfolioTime(<TrendsDetailPanel />, {
       initialSearchParams: "from=2026-05-01&to=2026-07-31&unit=1m",
     });
 
     await waitFor(() => {
-      expect(
-        screen.getAllByText("1か月単位").length,
-      ).toBeGreaterThan(0);
-      expect(
-        document.querySelectorAll(".trend-bar-chart__y-label, .trend-line-chart__y-label").length,
-      ).toBeGreaterThan(0);
+      expect(screen.getByText("期首（2026/05/31）")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "構成比の推移" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "シェア変化ランキング" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "総資産の推移" })).toBeInTheDocument();
+      expect(screen.getByLabelText("構成比積み上げエリアグラフ")).toBeInTheDocument();
+      expect(screen.getAllByText("1か月単位").length).toBeGreaterThan(0);
       expect(screen.getAllByText("2026/5/1～6/1").length).toBeGreaterThan(0);
-      expect(screen.getAllByText("2026/6/2～7/1").length).toBeGreaterThan(0);
-      expect(screen.getByRole("heading", { name: "総資産" })).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: "損益" })).toBeInTheDocument();
-      expect(screen.getAllByRole("heading", { name: "前回比の変化" }).length).toBeGreaterThan(0);
-      expect(screen.getAllByLabelText("推移折れ線グラフ").length).toBeGreaterThan(0);
     });
   });
 
   it("renders daily labels when a calendar month is selected", async () => {
     stubTrendsFetch([trendsPointsFixture[1]]);
     renderWithPortfolioTime(<TrendsDetailPanel />, {
-      initialSearchParams: "month=2026-06",
+      initialSearchParams: "month=2026-06&unit=day",
     });
 
     await waitFor(() => {
@@ -99,7 +94,7 @@ describe("TrendsDetailPanel", () => {
     const { container } = renderWithPortfolioTime(<TrendsDetailPanel />);
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "分析軸別構成比" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "構成比の推移" })).toBeInTheDocument();
     });
 
     await user.click(screen.getByRole("tab", { name: "資産分類" }));
@@ -109,7 +104,7 @@ describe("TrendsDetailPanel", () => {
       name: /の詳細$/,
     });
     await user.hover(hitAreas[0]);
-    expect(container.querySelector(".trend-bar-chart__tooltip")).toBeTruthy();
+    expect(container.querySelector(".trend-stacked-area-chart__tooltip")).toBeTruthy();
   });
 
   it("shows empty message when trends have no points", async () => {
@@ -183,10 +178,10 @@ describe("TrendsDetailPanel", () => {
     });
   });
 
-  it("shows baseline summary and line charts for a single in-range snapshot", async () => {
+  it("shows baseline summary for a single in-range snapshot", async () => {
     stubTrendsFetch([trendsPointsFixture[0], trendsPointsFixture[1]]);
     renderWithPortfolioTime(<TrendsDetailPanel />, {
-      initialSearchParams: "month=2026-06",
+      initialSearchParams: "month=2026-06&unit=day",
     });
 
     await waitFor(() => {
@@ -196,8 +191,24 @@ describe("TrendsDetailPanel", () => {
       expect(
         screen.getByText(/前回（2026\/05\/31）比 評価額/),
       ).toBeInTheDocument();
-      expect(screen.getAllByRole("heading", { name: "前回比の変化" }).length).toBeGreaterThan(0);
-      expect(screen.getAllByLabelText("推移折れ線グラフ").length).toBeGreaterThan(0);
+    });
+  });
+
+  it("expands detailed metrics section on click", async () => {
+    const user = userEvent.setup();
+    stubTrendsFetch();
+    renderWithPortfolioTime(<TrendsDetailPanel />, {
+      initialSearchParams: "from=2026-05-01&to=2026-07-31&unit=1m",
+    });
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "詳細指標を表示" })).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole("button", { name: "詳細指標を表示" }));
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "評価額の増減" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "評価損益の増減" })).toBeInTheDocument();
     });
   });
 });

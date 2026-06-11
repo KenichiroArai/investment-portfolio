@@ -17,7 +17,7 @@ import {
 } from "@repo/shared";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -54,6 +54,7 @@ function formatCalendarMonthLabel(value: string): string {
 
 export function SnapshotTimeBar() {
   const pathname = usePathname();
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const {
     portfolioCode,
     availableDates,
@@ -248,75 +249,95 @@ export function SnapshotTimeBar() {
               </Select>
             ) : null}
           </div>
-          <div className="flex flex-wrap items-center gap-2 pl-0 sm:pl-14">
-            <span className="min-w-12 text-xs font-semibold text-muted-foreground">表示単位</span>
-            <Select
-              value={trendDisplayUnit}
-              onValueChange={(value) => {
-                setTrendDisplayUnit(value as TrendDisplayUnit);
+          <div className="pl-0 sm:pl-14">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="snapshot-time-bar__advanced-toggle h-8 px-2 text-xs text-muted-foreground"
+              aria-expanded={advancedOpen}
+              onClick={() => {
+                setAdvancedOpen((open) => !open);
               }}
             >
-              <SelectTrigger className="w-[9rem]" aria-label="表示単位を選択">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {TREND_DISPLAY_UNITS.map((unit) => {
-                  let item = (
-                    <SelectItem key={unit} value={unit}>
-                      {TREND_DISPLAY_UNIT_LABELS[unit]}
-                    </SelectItem>
-                  );
-                  return item;
-                })}
-              </SelectContent>
-            </Select>
-            <span className="min-w-12 text-xs font-semibold text-muted-foreground">代表値</span>
-            <Select
-              value={trendBucketPick}
-              onValueChange={(value) => {
-                setTrendBucketPick(value as TrendBucketPick);
-              }}
-            >
-              <SelectTrigger className="w-[9rem]" aria-label="代表値を選択">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {TREND_BUCKET_PICKS.map((pick) => {
-                  let item = (
-                    <SelectItem key={pick} value={pick}>
-                      {TREND_BUCKET_PICK_LABELS[pick]}
-                    </SelectItem>
-                  );
-                  return item;
-                })}
-              </SelectContent>
-            </Select>
-            {trendBucketPick === "min" || trendBucketPick === "max" ? (
-              <>
+              表示の詳細設定{advancedOpen ? " ▲" : " ▼"}
+            </Button>
+            {advancedOpen ? (
+              <div className="mt-2 flex flex-wrap items-center gap-2">
                 <span className="min-w-12 text-xs font-semibold text-muted-foreground">
-                  比較項目
+                  表示単位
                 </span>
                 <Select
-                  value={trendMinMaxField}
+                  value={trendDisplayUnit}
                   onValueChange={(value) => {
-                    setTrendMinMaxField(value as TrendMinMaxField);
+                    setTrendDisplayUnit(value as TrendDisplayUnit);
                   }}
                 >
-                  <SelectTrigger className="w-[9rem]" aria-label="比較項目を選択">
+                  <SelectTrigger className="w-[9rem]" aria-label="表示単位を選択">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {TREND_MIN_MAX_FIELDS.map((field) => {
+                    {TREND_DISPLAY_UNITS.map((unit) => {
                       let item = (
-                        <SelectItem key={field} value={field}>
-                          {TREND_MIN_MAX_FIELD_LABELS[field]}
+                        <SelectItem key={unit} value={unit}>
+                          {TREND_DISPLAY_UNIT_LABELS[unit]}
                         </SelectItem>
                       );
                       return item;
                     })}
                   </SelectContent>
                 </Select>
-              </>
+                <span className="min-w-12 text-xs font-semibold text-muted-foreground">
+                  代表値
+                </span>
+                <Select
+                  value={trendBucketPick}
+                  onValueChange={(value) => {
+                    setTrendBucketPick(value as TrendBucketPick);
+                  }}
+                >
+                  <SelectTrigger className="w-[9rem]" aria-label="代表値を選択">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TREND_BUCKET_PICKS.map((pick) => {
+                      let item = (
+                        <SelectItem key={pick} value={pick}>
+                          {TREND_BUCKET_PICK_LABELS[pick]}
+                        </SelectItem>
+                      );
+                      return item;
+                    })}
+                  </SelectContent>
+                </Select>
+                {trendBucketPick === "min" || trendBucketPick === "max" ? (
+                  <>
+                    <span className="min-w-12 text-xs font-semibold text-muted-foreground">
+                      比較項目
+                    </span>
+                    <Select
+                      value={trendMinMaxField}
+                      onValueChange={(value) => {
+                        setTrendMinMaxField(value as TrendMinMaxField);
+                      }}
+                    >
+                      <SelectTrigger className="w-[9rem]" aria-label="比較項目を選択">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {TREND_MIN_MAX_FIELDS.map((field) => {
+                          let item = (
+                            <SelectItem key={field} value={field}>
+                              {TREND_MIN_MAX_FIELD_LABELS[field]}
+                            </SelectItem>
+                          );
+                          return item;
+                        })}
+                      </SelectContent>
+                    </Select>
+                  </>
+                ) : null}
+              </div>
             ) : null}
           </div>
         </div>

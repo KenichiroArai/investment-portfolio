@@ -48,32 +48,34 @@ describe("OverviewTrendChart", () => {
     );
   }
 
-  it("renders delta line chart when multiple buckets exist", async () => {
+  it("renders market value line chart and trends link", async () => {
     stubTrendsFetch();
     renderWithPortfolioTime(<OverviewTrendChart />);
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "資産推移" })).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: "前回比の変化" })).toBeInTheDocument();
-      expect(screen.getByLabelText("推移棒グラフ")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "評価額" })).toBeInTheDocument();
       expect(screen.getByLabelText("推移折れ線グラフ")).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "構成比の推移を見る →" })).toHaveAttribute(
+        "href",
+        "/portfolios/ideco/trends",
+      );
     });
   });
 
-  it("shows chart tooltip on bar hover", async () => {
+  it("shows chart tooltip on line hover", async () => {
     const user = userEvent.setup();
     stubTrendsFetch();
     const { container } = renderWithPortfolioTime(<OverviewTrendChart />);
 
     await waitFor(() => {
-      expect(screen.getByLabelText("推移棒グラフ")).toBeInTheDocument();
+      expect(screen.getByLabelText("推移折れ線グラフ")).toBeInTheDocument();
     });
 
     const hitArea = within(container).getAllByRole("button", {
       name: /の詳細$/,
     })[0];
     await user.hover(hitArea);
-    expect(container.querySelector(".trend-bar-chart__tooltip")).toBeTruthy();
+    expect(container.querySelector(".trend-line-chart__tooltip")).toBeTruthy();
   });
 
   it("shows empty message when no trend points exist", async () => {

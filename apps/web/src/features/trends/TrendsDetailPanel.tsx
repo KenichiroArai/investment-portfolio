@@ -1,25 +1,75 @@
 "use client";
 
+import {
+  computeAllocationShareChanges,
+  findLargestAllocationShareChange,
+  formatTrendSparseDataNote,
+  type AggregatedTrendPoint,
+} from "@repo/shared";
 import { useState, type ReactNode } from "react";
 
-import { getAllocationChartColor } from "@/features/analysis/chart-colors";
+import { AllocationShareChangeChart } from "@/features/trends/AllocationShareChangeChart";
+import { buildAllocationChartSeries } from "@/features/trends/build-allocation-chart-series";
 import { TrendBarChart } from "@/features/trends/TrendBarChart";
 import { TrendLineChart } from "@/features/trends/TrendLineChart";
+import { TrendPeriodSummary } from "@/features/trends/TrendPeriodSummary";
+import { TrendStackedAreaChart } from "@/features/trends/TrendStackedAreaChart";
 import {
   buildTrendChartBuckets,
   computeTrendChartDeltas,
   mapTrendChartLevelValues,
 } from "@/features/trends/trend-chart-buckets";
 import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
-import { formatTrendSparseDataNote } from "@repo/shared";
 import {
+  formatAsOfDateJa,
   formatMarketValueBaselineSummary,
   formatPercent,
-  formatPercentPoint,
   formatTrendChartMeta,
   formatYen,
 } from "@/lib/format-yen";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
+
+function resolvePeriodEndpoints(
+  displayPoints: AggregatedTrendPoint[],
+  baselinePoint: AggregatedTrendPoint | null,
+): { start: AggregatedTrendPoint; end: AggregatedTrendPoint } | null {
+  let result: { start: AggregatedTrendPoint; end: AggregatedTrendPoint } | null = null;
+
+  if (displayPoints.length === 0) {
+    return result;
+  }
+
+  if (displayPoints.length === 1) {
+    if (!baselinePoint) {
+      return result;
+    }
+    result = {
+      start: baselinePoint,
+      end: displayPoints[0],
+    };
+    return result;
+  }
+
+  result = {
+    start: displayPoints[0],
+    end: displayPoints[displayPoints.length - 1],
+  };
+  return result;
+}
+
+function buildSchemeRatios(
+  point: AggregatedTrendPoint,
+  schemeCode: string,
+): Array<{ key: string; label: string; ratio: number | null }> {
+  let result: Array<{ key: string; label: string; ratio: number | null }> = [];
+  const slices = point.allocationsByScheme[schemeCode] ?? [];
+  result = slices.map((slice) => ({
+    key: slice.valueCode,
+    label: slice.valueName,
+    ratio: slice.ratio,
+  }));
+  return result;
+}
 
 export function TrendsDetailPanel() {
   const {
@@ -32,6 +82,7 @@ export function TrendsDetailPanel() {
     trends,
   } = usePortfolioTime();
   const [selectedSchemeCode, setSelectedSchemeCode] = useState("");
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   let result: ReactNode = null;
 
@@ -68,7 +119,6 @@ export function TrendsDetailPanel() {
     labels,
     sourceDates,
     sourceDateLabels,
-    hasTrendLines,
     singleBucketNote,
     baselineSummary,
   } = chartBuckets;
@@ -94,64 +144,66 @@ export function TrendsDetailPanel() {
     (scheme) => scheme.schemeCode === activeSchemeCode,
   );
 
-  const baselineMarketValue = baselinePoint?.totalMarketValueMinor ?? null;
+  const periodEndpoints = resolvePeriodEndpoints(displayTrendPoints, baselinePoint);
 
-  const allocationSeries = (() => {
-    let seriesResult: TrendChartSeries[] = [];
-    const valueCodes = new Set<string>();
-    for (const point of chartPoints) {
-      const slices = point.allocationsByScheme[activeSchemeCode] ?? [];
-      for (const slice of slices) {
-        valueCodes.add(slice.valueCode);
-      }
-    }
-    let colorIndex = 0;
-    for (const valueCode of valueCodes) {
-      const firstSlice = chartPoints
-        .flatMap((point) => point.allocationsByScheme[activeSchemeCode] ?? [])
-        .find((slice) => slice.valueCode === valueCode);
-      if (!firstSlice) {
-        continue;
-      }
-      seriesResult.push({
-        key: valueCode,
-        label: firstSlice.valueName,
-        color: getAllocationChartColor(colorIndex),
-        values: chartPoints.map((point) => {
-          const slice = (point.allocationsByScheme[activeSchemeCode] ?? []).find(
-            (item) => item.valueCode === valueCode,
-          );
-          return slice ? slice.ratio : null;
-        }),
-        formatValue: (value) => formatPercent(value),
-      });
-      colorIndex += 1;
-    }
-    return seriesResult;
-  })();
+  const allocationSeries =
+    activeSchemeCode !== ""
+      ? buildAllocationChartSeries(chartPoints, activeSchemeCode)
+      : [];
 
-  const allocationDeltaSeries: TrendChartSeries[] = allocationSeries.map((item) => {
-    let baselineRatio: number | null = null;
-    if (baselinePoint) {
-      const slice = (baselinePoint.allocationsByScheme[activeSchemeCode] ?? []).find(
-        (allocation) => allocation.valueCode === item.key,
-      );
-      baselineRatio = slice ? slice.ratio : null;
-    }
-    let mapped: TrendChartSeries = {
-      ...item,
-      levelValues: item.values,
+  const shareChanges =
+    periodEndpoints && activeSchemeCode !== ""
+      ? computeAllocationShareChanges(
+          buildSchemeRatios(periodEndpoints.start, activeSchemeCode),
+          buildSchemeRatios(periodEndpoints.end, activeSchemeCode),
+        )
+      : [];
+
+  const largestShareChange = findLargestAllocationShareChange(shareChanges);
+
+  const marketValueLevelValues = mapTrendChartLevelValues(
+    chartPoints,
+    displayTrendPoints,
+    baselinePoint,
+    (point) => point.totalMarketValueMinor,
+  );
+
+  const marketValueDeltaSeries: TrendChartSeries[] = [
+    {
+      key: "market-value-delta",
+      label: "評価額の変化",
+      color: "#2563eb",
       values: computeTrendChartDeltas(
-        item.values,
+        marketValueLevelValues,
         displayTrendPoints,
         baselinePoint,
-        baselineRatio,
+        baselinePoint?.totalMarketValueMinor ?? null,
       ),
-      formatValue: (value: number) => formatPercentPoint(value),
-      tooltipMode: "percentDelta",
-    };
-    return mapped;
-  });
+      formatValue: (value) => formatYen(value),
+    },
+  ];
+
+  const gainLevelValues = mapTrendChartLevelValues(
+    chartPoints,
+    displayTrendPoints,
+    baselinePoint,
+    (point) => point.unrealizedGainMinor,
+  );
+
+  const gainDeltaSeries: TrendChartSeries[] = [
+    {
+      key: "gain-delta",
+      label: "評価損益の変化",
+      color: "#16a34a",
+      values: computeTrendChartDeltas(
+        gainLevelValues,
+        displayTrendPoints,
+        baselinePoint,
+        baselinePoint?.unrealizedGainMinor ?? null,
+      ),
+      formatValue: (value) => formatYen(value),
+    },
+  ];
 
   const gainRateSeries: TrendChartSeries[] = [
     {
@@ -182,182 +234,35 @@ export function TrendsDetailPanel() {
     item.values.some((value) => value !== null && Number.isFinite(value)),
   );
 
-  const gainRateDeltaSeries: TrendChartSeries[] = gainRateSeries.map((item) => {
-    let baselineValue: number | null = null;
-    if (baselinePoint) {
-      baselineValue =
-        item.key === "gain-rate-book"
-          ? baselinePoint.gainRateOnBook
-          : baselinePoint.gainRateOnContributions;
-    }
-    let mapped: TrendChartSeries = {
-      ...item,
-      levelValues: item.values,
-      values: computeTrendChartDeltas(
-        item.values,
-        displayTrendPoints,
-        baselinePoint,
-        baselineValue,
-      ),
-      formatValue: (value: number) => formatPercentPoint(value),
-      tooltipMode: "percentDelta",
-    };
-    return mapped;
-  });
-
-  const marketValueLevelValues = mapTrendChartLevelValues(
-    chartPoints,
-    displayTrendPoints,
-    baselinePoint,
-    (point) => point.totalMarketValueMinor,
+  const startMarketValue =
+    periodEndpoints?.start.totalMarketValueMinor ??
+    displayTrendPoints[0].totalMarketValueMinor;
+  const endMarketValue =
+    periodEndpoints?.end.totalMarketValueMinor ??
+    displayTrendPoints[displayTrendPoints.length - 1].totalMarketValueMinor;
+  const startDateLabel = formatAsOfDateJa(
+    periodEndpoints?.start.sourceAsOfDate ?? displayTrendPoints[0].sourceAsOfDate,
   );
-
-  const marketValueDeltaSeries: TrendChartSeries[] = [
-    {
-      key: "market-value-delta",
-      label: "評価額の変化",
-      color: "#2563eb",
-      values: computeTrendChartDeltas(
-        marketValueLevelValues,
-        displayTrendPoints,
-        baselinePoint,
-        baselineMarketValue,
-      ),
-      formatValue: (value) => formatYen(value),
-    },
-  ];
-
-  const gainLevelValues = mapTrendChartLevelValues(
-    chartPoints,
-    displayTrendPoints,
-    baselinePoint,
-    (point) => point.unrealizedGainMinor,
+  const endDateLabel = formatAsOfDateJa(
+    periodEndpoints?.end.sourceAsOfDate ??
+      displayTrendPoints[displayTrendPoints.length - 1].sourceAsOfDate,
   );
-
-  const gainDeltaSeries: TrendChartSeries[] = [
-    {
-      key: "gain-delta",
-      label: "評価損益の変化",
-      color: "#16a34a",
-      values: computeTrendChartDeltas(
-        gainLevelValues,
-        displayTrendPoints,
-        baselinePoint,
-        baselinePoint?.unrealizedGainMinor ?? null,
-      ),
-      formatValue: (value) => formatYen(value),
-    },
-  ];
 
   result = (
     <div className="trends-detail">
-      {sparseDataNote ? (
-        <p className="trends-detail__sparse-data-note">{sparseDataNote}</p>
-      ) : null}
-      {singleBucketNote ? (
-        <p className="trends-detail__single-bucket-note">{singleBucketNote}</p>
-      ) : null}
-      {baselineSummary ? (
-        <p className="trends-detail__baseline-summary">{baselineSummary}</p>
-      ) : null}
-      <section className="trends-detail__section">
-        <TrendBarChart
-          title="総資産"
-          caption={trendDisplayUnitLabel}
-          valueKind="yen"
-          labels={labels}
-          sourceDates={sourceDates}
-          sourceDateLabels={sourceDateLabels}
-          mode="grouped"
-          series={[
-            {
-              key: "market-value",
-              label: "評価額",
-              color: "#2563eb",
-              values: marketValueLevelValues,
-              formatValue: (value) => formatYen(value),
-            },
-          ]}
-        />
-        {hasTrendLines ? (
-          <div className="trends-detail__subsection">
-            <TrendLineChart
-              title="前回比の変化"
-              caption={trendDisplayUnitLabel}
-              valueKind="yen"
-              labels={labels}
-              sourceDates={sourceDates}
-          sourceDateLabels={sourceDateLabels}
-              series={marketValueDeltaSeries}
-            />
-          </div>
-        ) : null}
-      </section>
-
-      <section className="trends-detail__section">
-        <TrendBarChart
-          title="損益"
-          caption={trendDisplayUnitLabel}
-          valueKind="yen"
-          labels={labels}
-          sourceDates={sourceDates}
-          sourceDateLabels={sourceDateLabels}
-          mode="grouped"
-          series={[
-            {
-              key: "gain",
-              label: "評価損益",
-              color: "#16a34a",
-              values: gainLevelValues,
-              formatValue: (value) => formatYen(value),
-            },
-          ]}
-        />
-        {hasTrendLines ? (
-          <div className="trends-detail__subsection">
-            <TrendLineChart
-              title="前回比の変化"
-              caption={trendDisplayUnitLabel}
-              valueKind="yen"
-              labels={labels}
-              sourceDates={sourceDates}
-          sourceDateLabels={sourceDateLabels}
-              series={gainDeltaSeries}
-            />
-          </div>
-        ) : null}
-      </section>
-
-      {gainRateSeries.length > 0 ? (
-        <section className="trends-detail__section">
-          <TrendBarChart
-            title="利益率"
-            caption={trendDisplayUnitLabel}
-            valueKind="percent"
-            labels={labels}
-            sourceDates={sourceDates}
-          sourceDateLabels={sourceDateLabels}
-            mode="grouped"
-            series={gainRateSeries}
-          />
-          {hasTrendLines && gainRateDeltaSeries.length > 0 ? (
-            <div className="trends-detail__subsection">
-              <TrendLineChart
-                title="前回比の変化"
-                caption={formatTrendChartMeta(trendDisplayUnitLabel, "percentPoint")}
-                valueKind="percentPoint"
-                labels={labels}
-                sourceDates={sourceDates}
-          sourceDateLabels={sourceDateLabels}
-                series={gainRateDeltaSeries}
-              />
-            </div>
-          ) : null}
-        </section>
-      ) : null}
+      <TrendPeriodSummary
+        startDateLabel={startDateLabel}
+        endDateLabel={endDateLabel}
+        startMarketValueMinor={startMarketValue}
+        endMarketValueMinor={endMarketValue}
+        largestShareChange={largestShareChange}
+        sparseDataNote={sparseDataNote}
+        singleBucketNote={singleBucketNote}
+        baselineSummary={baselineSummary}
+      />
 
       {schemeCodes.length > 0 && allocationSeries.length > 0 ? (
-        <section className="trends-detail__section">
+        <section className="trends-detail__section trends-detail__section--hero">
           <div className="analysis-axis-tabs" role="tablist" aria-label="分析軸">
             {schemeCodes.map((scheme) => {
               let tab = (
@@ -382,49 +287,106 @@ export function TrendsDetailPanel() {
           {activeScheme ? (
             <p className="trends-detail__scheme-label">{activeScheme.schemeName}</p>
           ) : null}
-          <TrendBarChart
-            title="分析軸別構成比"
+          <TrendStackedAreaChart
+            title="構成比の推移"
             caption={trendDisplayUnitLabel}
-            valueKind="percent"
             labels={labels}
             sourceDates={sourceDates}
-          sourceDateLabels={sourceDateLabels}
-            mode="stacked"
-            valueDomain={{ min: 0, max: 1 }}
-            series={allocationSeries}
-            height={240}
+            sourceDateLabels={sourceDateLabels}
+            series={allocationSeries.map((item) => ({
+              ...item,
+              formatValue: (value) => formatPercent(value),
+            }))}
+            height={300}
           />
-          {hasTrendLines ? (
-            <>
-              <div className="trends-detail__subsection">
-                <TrendLineChart
-                  title="構成比の推移"
-                  caption={trendDisplayUnitLabel}
-                  valueKind="percent"
-                  labels={labels}
-                  sourceDates={sourceDates}
-          sourceDateLabels={sourceDateLabels}
-                  domainMode="fitData"
-                  series={allocationSeries}
-                  height={240}
-                />
-              </div>
-              <div className="trends-detail__subsection">
-                <TrendLineChart
-                  title="前回比の変化"
-                  caption={formatTrendChartMeta(trendDisplayUnitLabel, "percentPoint")}
-                  valueKind="percentPoint"
-                  labels={labels}
-                  sourceDates={sourceDates}
-          sourceDateLabels={sourceDateLabels}
-                  series={allocationDeltaSeries}
-                  height={240}
-                />
-              </div>
-            </>
-          ) : null}
         </section>
       ) : null}
+
+      {shareChanges.length > 0 ? (
+        <section className="trends-detail__section">
+          <AllocationShareChangeChart
+            changes={shareChanges}
+            caption={`${startDateLabel} → ${endDateLabel}`}
+          />
+        </section>
+      ) : null}
+
+      <section className="trends-detail__section">
+        <TrendLineChart
+          title="総資産の推移"
+          caption={trendDisplayUnitLabel}
+          valueKind="yen"
+          height={180}
+          labels={labels}
+          sourceDates={sourceDates}
+          sourceDateLabels={sourceDateLabels}
+          series={[
+            {
+              key: "market-value",
+              label: "評価額",
+              color: "#2563eb",
+              values: marketValueLevelValues,
+              formatValue: (value) => formatYen(value),
+            },
+          ]}
+        />
+      </section>
+
+      <section className="trends-detail__section trends-detail__details">
+        <button
+          type="button"
+          className="trends-detail__details-toggle"
+          aria-expanded={detailsOpen}
+          onClick={() => {
+            setDetailsOpen((open) => !open);
+          }}
+        >
+          詳細指標を{detailsOpen ? "閉じる" : "表示"}
+        </button>
+        {detailsOpen ? (
+          <div className="trends-detail__details-panel">
+            <TrendBarChart
+              title="評価額の増減"
+              caption={trendDisplayUnitLabel}
+              valueKind="yen"
+              height={180}
+              labels={labels}
+              sourceDates={sourceDates}
+              sourceDateLabels={sourceDateLabels}
+              mode="grouped"
+              series={marketValueDeltaSeries}
+            />
+            <div className="trends-detail__subsection">
+              <TrendBarChart
+                title="評価損益の増減"
+                caption={trendDisplayUnitLabel}
+                valueKind="yen"
+                height={180}
+                labels={labels}
+                sourceDates={sourceDates}
+                sourceDateLabels={sourceDateLabels}
+                mode="grouped"
+                series={gainDeltaSeries}
+              />
+            </div>
+            {gainRateSeries.length > 0 ? (
+              <div className="trends-detail__subsection">
+                <TrendLineChart
+                  title="利益率の推移"
+                  caption={formatTrendChartMeta(trendDisplayUnitLabel, "percent")}
+                  valueKind="percent"
+                  height={180}
+                  labels={labels}
+                  sourceDates={sourceDates}
+                  sourceDateLabels={sourceDateLabels}
+                  domainMode="fitData"
+                  series={gainRateSeries}
+                />
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+      </section>
     </div>
   );
   return result;

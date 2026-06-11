@@ -116,6 +116,9 @@ describe("SnapshotTimeBar", () => {
 
     render(<SnapshotTimeBar />);
 
+    expect(screen.getByRole("button", { name: /表示の詳細設定/ })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /表示の詳細設定/ }));
     expect(screen.getByLabelText("表示単位を選択")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "前の基準日" }));
@@ -132,25 +135,19 @@ describe("SnapshotTimeBar", () => {
     expect(screen.getByRole("button", { name: "最新" })).toBeDisabled();
   });
 
-  it("renders bucket pick selector and shows min/max field when needed", () => {
+  it("renders bucket pick selector and shows min/max field when needed", async () => {
+    const user = userEvent.setup();
     usePathname.mockReturnValue("/portfolios/ideco/trends/");
-    mockPortfolioTime({
-      availableDates: ["2026-05-31", "2026-06-07"],
-      trendBucketPick: "last",
-      trendMinMaxField: "marketValue",
-    });
-
-    const { rerender } = render(<SnapshotTimeBar />);
-
-    expect(screen.getByLabelText("代表値を選択")).toBeInTheDocument();
-    expect(screen.queryByLabelText("比較項目を選択")).not.toBeInTheDocument();
-
     mockPortfolioTime({
       availableDates: ["2026-05-31", "2026-06-07"],
       trendBucketPick: "min",
       trendMinMaxField: "marketValue",
     });
-    rerender(<SnapshotTimeBar />);
+
+    render(<SnapshotTimeBar />);
+
+    await user.click(screen.getByRole("button", { name: /表示の詳細設定/ }));
+    expect(screen.getByLabelText("代表値を選択")).toBeInTheDocument();
     expect(screen.getByLabelText("比較項目を選択")).toBeInTheDocument();
   });
 
