@@ -10,6 +10,10 @@ import { useMemo, useState, type ReactNode } from "react";
 
 import { TrendChartHeader } from "@/features/trends/TrendChartHeader";
 import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
+import {
+  resolveTrendChartSlotWidth,
+  resolveXLabelAnchor,
+} from "@/features/trends/resolve-trend-chart-slot-width";
 import { useTrendYAxis } from "@/features/trends/use-trend-y-axis";
 import { formatAsOfDateJa, formatPercentDeltaTooltip } from "@/lib/format-yen";
 
@@ -30,25 +34,7 @@ type TrendLineChartProps = {
 
 const CHART_HEIGHT = 220;
 const PADDING = { top: 16, right: 16, bottom: 48, left: 88 };
-const MIN_POINT_SLOT_WIDTH = 56;
-const MAX_POINT_SLOT_WIDTH = 96;
 const POINT_RADIUS = 4;
-
-function resolveXLabelAnchor(
-  index: number,
-  total: number,
-): "start" | "middle" | "end" {
-  let result: "start" | "middle" | "end" = "middle";
-  if (index === 0) {
-    result = "start";
-    return result;
-  }
-  if (index === total - 1) {
-    result = "end";
-    return result;
-  }
-  return result;
-}
 
 function buildLineSegments(
   values: Array<number | null>,
@@ -96,10 +82,7 @@ export function TrendLineChart({
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const plotHeight = height - PADDING.top - PADDING.bottom;
-  const pointSlotWidth = Math.min(
-    MAX_POINT_SLOT_WIDTH,
-    Math.max(MIN_POINT_SLOT_WIDTH, 640 / Math.max(labels.length, 1)),
-  );
+  const pointSlotWidth = resolveTrendChartSlotWidth(labels);
   const plotWidth = Math.max(320, pointSlotWidth * labels.length);
   const chartWidth = plotWidth + PADDING.left + PADDING.right;
 

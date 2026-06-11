@@ -8,6 +8,10 @@ import { useMemo, useState, type ReactNode } from "react";
 
 import { TrendChartHeader } from "@/features/trends/TrendChartHeader";
 import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
+import {
+  resolveTrendChartSlotWidth,
+  resolveXLabelAnchor,
+} from "@/features/trends/resolve-trend-chart-slot-width";
 import { useTrendYAxis } from "@/features/trends/use-trend-y-axis";
 import { formatAsOfDateJa } from "@/lib/format-yen";
 
@@ -32,24 +36,6 @@ type TrendBarChartProps = {
 
 const CHART_HEIGHT = 220;
 const PADDING = { top: 16, right: 16, bottom: 48, left: 88 };
-const MIN_BAR_SLOT_WIDTH = 56;
-const MAX_BAR_SLOT_WIDTH = 96;
-
-function resolveXLabelAnchor(
-  index: number,
-  total: number,
-): "start" | "middle" | "end" {
-  let result: "start" | "middle" | "end" = "middle";
-  if (index === 0) {
-    result = "start";
-    return result;
-  }
-  if (index === total - 1) {
-    result = "end";
-    return result;
-  }
-  return result;
-}
 
 export function TrendBarChart({
   labels,
@@ -68,10 +54,7 @@ export function TrendBarChart({
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const plotHeight = height - PADDING.top - PADDING.bottom;
-  const barSlotWidth = Math.min(
-    MAX_BAR_SLOT_WIDTH,
-    Math.max(MIN_BAR_SLOT_WIDTH, 640 / Math.max(labels.length, 1)),
-  );
+  const barSlotWidth = resolveTrendChartSlotWidth(labels);
   const plotWidth = Math.max(320, barSlotWidth * labels.length);
   const chartWidth = plotWidth + PADDING.left + PADDING.right;
 
