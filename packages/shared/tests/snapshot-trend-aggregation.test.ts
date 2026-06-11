@@ -4,6 +4,7 @@ import {
   aggregateTrendPoints,
   buildTrendDisplayPoints,
   formatTrendBucketLabel,
+  formatTrendSparseDataNote,
   readTrendDisplayUnit,
 } from "../src/snapshot-trend-aggregation";
 import type { SnapshotTrendPointDto } from "../src/snapshot-trends";
@@ -67,18 +68,20 @@ describe("snapshot-trend-aggregation", () => {
     const points = [
       createPoint("2026-06-02", 100),
       createPoint("2026-06-07", 200),
-      createPoint("2026-07-01", 300),
+      createPoint("2026-07-15", 300),
     ];
     const aggregated = aggregateTrendPoints(points, "1m", "2026-06-01", "2026-07-31");
     expect(aggregated).toHaveLength(2);
     expect(aggregated[0]).toMatchObject({
-      bucketKey: "2026-06-30",
+      bucketKey: "2026-07-01",
+      bucketLabel: "2026/6/1～7/1",
       sourceAsOfDate: "2026-06-07",
       totalMarketValueMinor: 200,
     });
     expect(aggregated[1]).toMatchObject({
       bucketKey: "2026-07-31",
-      sourceAsOfDate: "2026-07-01",
+      bucketLabel: "2026/7/2～7/31",
+      sourceAsOfDate: "2026-07-15",
       totalMarketValueMinor: 300,
     });
   });
@@ -92,11 +95,33 @@ describe("snapshot-trend-aggregation", () => {
     const aggregated = aggregateTrendPoints(points, "3m", "2026-01-15", "2026-06-30");
     expect(aggregated).toHaveLength(2);
     expect(aggregated[0]).toMatchObject({
+      bucketKey: "2026-04-15",
+      bucketLabel: "2026/1/15～4/15",
       sourceAsOfDate: "2026-02-10",
       totalMarketValueMinor: 100,
     });
     expect(aggregated[1]).toMatchObject({
+      bucketKey: "2026-06-30",
+      bucketLabel: "2026/4/16～6/30",
       sourceAsOfDate: "2026-06-07",
+      totalMarketValueMinor: 300,
+    });
+  });
+
+  it("produces one bucket when 3-month period matches 3-month display unit", () => {
+    const points = [
+      createPoint("2026-06-02", 100),
+      createPoint("2026-06-07", 200),
+      createPoint("2026-06-09", 250),
+      createPoint("2026-06-10", 280),
+      createPoint("2026-06-11", 300),
+    ];
+    const built = buildTrendDisplayPoints(points, "3m", "2026-03-11", "2026-06-11");
+    expect(built.displayPoints).toHaveLength(1);
+    expect(built.displayPoints[0]).toMatchObject({
+      bucketKey: "2026-06-11",
+      bucketLabel: "2026/3/11～6/11",
+      sourceAsOfDate: "2026-06-11",
       totalMarketValueMinor: 300,
     });
   });
@@ -117,10 +142,35 @@ describe("snapshot-trend-aggregation", () => {
     expect(built.displayPoints[1]?.sourceAsOfDate).toBe("2026-06-07");
   });
 
+  it("uses raw prior snapshot as baseline for non-day units", () => {
+    const points = [
+      createPoint("2026-05-31", 100),
+      createPoint("2026-06-07", 200),
+    ];
+    const built = buildTrendDisplayPoints(points, "1m", "2026-06-01", "2026-06-30");
+    expect(built.baselinePoint).toMatchObject({
+      sourceAsOfDate: "2026-05-31",
+      totalMarketValueMinor: 100,
+    });
+    expect(built.displayPoints).toHaveLength(1);
+  });
+
   it("formats bucket labels", () => {
     expect(formatTrendBucketLabel("2026-06-07", "day")).toBe("2026/6/7");
     expect(formatTrendBucketLabel("2026-06-07", "week")).toBe("2026/6/7");
+    expect(formatTrendBucketLabel("2026-07-01", "1m", "2026-06-01")).toBe("2026/6/1～7/1");
     expect(formatTrendBucketLabel("unknown", "1m")).toBe("unknown");
+  });
+
+  it("formats sparse data note when range starts before first snapshot", () => {
+    const points = [
+      createPoint("2026-06-02", 100),
+      createPoint("2026-06-07", 200),
+    ];
+    expect(formatTrendSparseDataNote("2026-03-11", points)).toBe(
+      "選択期間のうち 2026/6/2 以降にデータがあります",
+    );
+    expect(formatTrendSparseDataNote("2026-06-02", points)).toBeNull();
   });
 
   it("returns empty aggregation for no points", () => {

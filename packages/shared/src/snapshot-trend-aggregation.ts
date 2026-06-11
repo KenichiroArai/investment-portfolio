@@ -105,6 +105,16 @@ function minIsoDate(left: string, right: string): string {
   return result;
 }
 
+function formatIsoDateJaShort(isoDate: string): string {
+  let result = isoDate;
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(isoDate);
+  if (!match) {
+    return result;
+  }
+  result = `${Number(match[1])}/${Number(match[2])}/${Number(match[3])}`;
+  return result;
+}
+
 export function readTrendDisplayUnit(value: string | null): TrendDisplayUnit {
   let result: TrendDisplayUnit = "day";
   if (value && TREND_DISPLAY_UNITS.includes(value as TrendDisplayUnit)) {
@@ -113,19 +123,32 @@ export function readTrendDisplayUnit(value: string | null): TrendDisplayUnit {
   return result;
 }
 
-export function formatTrendBucketLabel(bucketKey: string, unit: TrendDisplayUnit): string {
+export function formatTrendBucketLabel(
+  bucketKey: string,
+  unit: TrendDisplayUnit,
+  bucketStart?: string,
+): string {
   let result = bucketKey;
 
-  const dayMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(bucketKey);
-  if (dayMatch) {
-    result = `${Number(dayMatch[1])}/${Number(dayMatch[2])}/${Number(dayMatch[3])}`;
+  if (unit === "day" || unit === "week") {
+    result = formatIsoDateJaShort(bucketKey);
     return result;
   }
 
-  if (unit !== "day" && unit !== "week") {
+  if (bucketStart && bucketStart !== bucketKey) {
+    const startLabel = formatIsoDateJaShort(bucketStart);
+    const endLabel = formatIsoDateJaShort(bucketKey);
+    const startMatch = /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/.exec(startLabel);
+    const endMatch = /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/.exec(endLabel);
+    if (startMatch && endMatch && startMatch[1] === endMatch[1]) {
+      result = `${startLabel}～${endMatch[2]}/${endMatch[3]}`;
+      return result;
+    }
+    result = `${startLabel}～${endLabel}`;
     return result;
   }
 
+  result = formatIsoDateJaShort(bucketKey);
   return result;
 }
 
@@ -158,18 +181,51 @@ function resolveRollingBucketIndex(
   const monthSpan = MONTH_UNIT_MONTHS[unit];
   let index = 0;
   while (index < 10_000) {
-    const bucketStart = addMonths(anchor, index * monthSpan);
-    const bucketEnd = addDays(addMonths(anchor, (index + 1) * monthSpan), -1);
-    if (date >= bucketStart && date <= bucketEnd) {
+    const bucketStartDate =
+      index === 0 ? anchor : addDays(addMonths(anchor, index * monthSpan), 1);
+    const bucketEndDate = addMonths(anchor, (index + 1) * monthSpan);
+    if (date >= bucketStartDate && date <= bucketEndDate) {
       result = index;
       return result;
     }
-    if (date < bucketStart) {
+    if (date < bucketStartDate) {
       return result;
     }
     index += 1;
   }
 
+  return result;
+}
+
+function resolveRollingBucketStartDate(
+  bucketIndex: number,
+  unit: TrendDisplayUnit,
+  rangeFrom: string,
+): string | null {
+  let result: string | null = null;
+  const anchor = parseIsoDate(rangeFrom);
+  if (!anchor) {
+    return result;
+  }
+
+  if (unit === "week") {
+    const bucketStart = addDays(anchor, bucketIndex * 7);
+    result = formatIsoDate(bucketStart);
+    return result;
+  }
+
+  if (unit === "day") {
+    return result;
+  }
+
+  if (bucketIndex === 0) {
+    result = rangeFrom;
+    return result;
+  }
+
+  const monthSpan = MONTH_UNIT_MONTHS[unit];
+  const bucketStart = addDays(addMonths(anchor, bucketIndex * monthSpan), 1);
+  result = formatIsoDate(bucketStart);
   return result;
 }
 
@@ -196,7 +252,7 @@ function resolveRollingBucketEndDate(
   }
 
   const monthSpan = MONTH_UNIT_MONTHS[unit];
-  const bucketEnd = addDays(addMonths(anchor, (bucketIndex + 1) * monthSpan), -1);
+  const bucketEnd = addMonths(anchor, (bucketIndex + 1) * monthSpan);
   result = minIsoDate(formatIsoDate(bucketEnd), rangeTo);
   return result;
 }
@@ -216,6 +272,25 @@ function resolveRollingBucketKey(
   return result;
 }
 
+function toAggregatedTrendPoint(
+  point: SnapshotTrendPointDto,
+  bucketKey: string,
+  unit: TrendDisplayUnit,
+  bucketStart: string | null,
+): AggregatedTrendPoint {
+  let result: AggregatedTrendPoint = {
+    ...point,
+    bucketKey,
+    bucketLabel: formatTrendBucketLabel(
+      bucketKey,
+      unit,
+      bucketStart ?? undefined,
+    ),
+    sourceAsOfDate: point.asOfDate,
+  };
+  return result;
+}
+
 export function aggregateTrendPoints(
   points: SnapshotTrendPointDto[],
   unit: TrendDisplayUnit,
@@ -232,41 +307,56 @@ export function aggregateTrendPoints(
     result = [...points]
       .sort((left, right) => left.asOfDate.localeCompare(right.asOfDate))
       .map((point) => {
-        let aggregated: AggregatedTrendPoint = {
-          ...point,
-          bucketKey: point.asOfDate,
-          bucketLabel: formatTrendBucketLabel(point.asOfDate, "day"),
-          sourceAsOfDate: point.asOfDate,
-        };
+        let aggregated = toAggregatedTrendPoint(point, point.asOfDate, "day", point.asOfDate);
         return aggregated;
       });
     return result;
   }
 
-  const buckets = new Map<string, SnapshotTrendPointDto>();
+  const buckets = new Map<
+    string,
+    { point: SnapshotTrendPointDto; bucketStart: string | null }
+  >();
   for (const point of points) {
-    const bucketKey = resolveRollingBucketKey(point.asOfDate, unit, rangeFrom, rangeTo);
+    const bucketIndex = resolveRollingBucketIndex(point.asOfDate, unit, rangeFrom);
+    if (bucketIndex === null) {
+      continue;
+    }
+    const bucketKey = resolveRollingBucketEndDate(
+      bucketIndex,
+      unit,
+      rangeFrom,
+      rangeTo,
+    );
     if (!bucketKey) {
       continue;
     }
+    const bucketStart = resolveRollingBucketStartDate(bucketIndex, unit, rangeFrom);
     const existing = buckets.get(bucketKey);
-    if (!existing || point.asOfDate > existing.asOfDate) {
-      buckets.set(bucketKey, point);
+    if (!existing || point.asOfDate > existing.point.asOfDate) {
+      buckets.set(bucketKey, { point, bucketStart });
     }
   }
 
   result = [...buckets.entries()]
     .sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey))
-    .map(([bucketKey, point]) => {
-      let aggregated: AggregatedTrendPoint = {
-        ...point,
+    .map(([bucketKey, entry]) => {
+      let aggregated = toAggregatedTrendPoint(
+        entry.point,
         bucketKey,
-        bucketLabel: formatTrendBucketLabel(bucketKey, unit),
-        sourceAsOfDate: point.asOfDate,
-      };
+        unit,
+        entry.bucketStart,
+      );
       return aggregated;
     });
 
+  return result;
+}
+
+function buildBaselinePointFromRaw(
+  point: SnapshotTrendPointDto,
+): AggregatedTrendPoint {
+  let result = toAggregatedTrendPoint(point, point.asOfDate, "day", point.asOfDate);
   return result;
 }
 
@@ -294,8 +384,38 @@ export function buildTrendDisplayPoints(
   const priorPoints = allAggregated.filter((point) => point.sourceAsOfDate < rangeFrom);
   if (priorPoints.length > 0) {
     result.baselinePoint = priorPoints[priorPoints.length - 1] ?? null;
+  } else {
+    const priorRawPoints = [...points]
+      .filter((point) => point.asOfDate < rangeFrom)
+      .sort((left, right) => left.asOfDate.localeCompare(right.asOfDate));
+    const latestPrior = priorRawPoints.at(-1);
+    if (latestPrior) {
+      result.baselinePoint = buildBaselinePointFromRaw(latestPrior);
+    }
   }
 
+  return result;
+}
+
+export function formatTrendSparseDataNote(
+  rangeFrom: string,
+  inRangePoints: SnapshotTrendPointDto[],
+): string | null {
+  let result: string | null = null;
+
+  if (inRangePoints.length === 0) {
+    return result;
+  }
+
+  const sorted = [...inRangePoints].sort((left, right) =>
+    left.asOfDate.localeCompare(right.asOfDate),
+  );
+  const firstDate = sorted[0]?.asOfDate;
+  if (!firstDate || firstDate <= rangeFrom) {
+    return result;
+  }
+
+  result = `選択期間のうち ${formatIsoDateJaShort(firstDate)} 以降にデータがあります`;
   return result;
 }
 

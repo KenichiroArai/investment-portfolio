@@ -72,8 +72,8 @@ describe("TrendsDetailPanel", () => {
       expect(
         document.querySelectorAll(".trend-bar-chart__y-label, .trend-line-chart__y-label").length,
       ).toBeGreaterThan(0);
-      expect(screen.getAllByText("2026/5/31").length).toBeGreaterThan(0);
-      expect(screen.getAllByText("2026/6/30").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("2026/5/1～6/1").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("2026/6/2～7/1").length).toBeGreaterThan(0);
       expect(screen.getByRole("heading", { name: "総資産" })).toBeInTheDocument();
       expect(screen.getByRole("heading", { name: "損益" })).toBeInTheDocument();
       expect(screen.getAllByRole("heading", { name: "前回比の変化" }).length).toBeGreaterThan(0);
@@ -160,6 +160,26 @@ describe("TrendsDetailPanel", () => {
       expect(
         screen.getByText("この期間は1か月分のデータです"),
       ).toBeInTheDocument();
+    });
+  });
+
+  it("shows sparse data note when snapshots start after the selected range", async () => {
+    stubTrendsFetch([
+      {
+        ...trendsPointsFixture[1],
+        asOfDate: "2026-06-02",
+      },
+      trendsPointsFixture[1],
+    ]);
+    renderWithPortfolioTime(<TrendsDetailPanel />, {
+      initialSearchParams: "from=2026-03-11&to=2026-06-11&unit=3m",
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("選択期間のうち 2026/6/2 以降にデータがあります"),
+      ).toBeInTheDocument();
+      expect(screen.getAllByText("2026/3/11～6/11").length).toBeGreaterThan(0);
     });
   });
 

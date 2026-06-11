@@ -11,6 +11,7 @@ import {
   mapTrendChartLevelValues,
 } from "@/features/trends/trend-chart-buckets";
 import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
+import { formatTrendSparseDataNote } from "@repo/shared";
 import {
   formatMarketValueBaselineSummary,
   formatPercent,
@@ -28,6 +29,7 @@ export function TrendsDetailPanel() {
     trendDisplayUnitLabel,
     loadingTrends,
     snapshot,
+    trends,
   } = usePortfolioTime();
   const [selectedSchemeCode, setSelectedSchemeCode] = useState("");
 
@@ -63,6 +65,18 @@ export function TrendsDetailPanel() {
 
   const { chartPoints, labels, sourceDates, hasTrendLines, singleBucketNote, baselineSummary } =
     chartBuckets;
+
+  const sparseDataNote = (() => {
+    let note: string | null = null;
+    if (!trends) {
+      return note;
+    }
+    const inRangePoints = trends.points.filter(
+      (point) => point.asOfDate >= trends.from && point.asOfDate <= trends.to,
+    );
+    note = formatTrendSparseDataNote(trends.from, inRangePoints);
+    return note;
+  })();
 
   const schemeCodes = snapshot?.analysisSchemes ?? [];
   const activeSchemeCode =
@@ -230,6 +244,9 @@ export function TrendsDetailPanel() {
 
   result = (
     <div className="trends-detail">
+      {sparseDataNote ? (
+        <p className="trends-detail__sparse-data-note">{sparseDataNote}</p>
+      ) : null}
       {singleBucketNote ? (
         <p className="trends-detail__single-bucket-note">{singleBucketNote}</p>
       ) : null}
