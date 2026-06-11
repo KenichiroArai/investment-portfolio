@@ -12,7 +12,7 @@ docs/data/portfolios/<口座コード>/current.json
 
 ## 更新手順（ローカルのみ）
 
-1. ローカル API で SQLite にマスタ・明細を登録・更新する（README の手動投入例を参照）。
+1. [README の iDeCo データ投入](../README.md#ideco-データ投入)（`npm run db:import:ideco`）で SQLite にデータを投入する。
 2. リポジトリルートで次を実行する。
 
 ```bash
