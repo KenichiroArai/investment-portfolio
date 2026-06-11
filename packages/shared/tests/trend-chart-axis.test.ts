@@ -25,6 +25,10 @@ describe("resolveTrendYAxisUnit", () => {
     expect(resolveTrendYAxisUnit([3_400_000], "yen")).toBe("yenMan");
     expect(resolveTrendYAxisUnit([12_000], "yen")).toBe("yen");
   });
+
+  it("returns percentPoint for percentPoint value kind", () => {
+    expect(resolveTrendYAxisUnit([0.003, -0.021], "percentPoint")).toBe("percentPoint");
+  });
 });
 
 describe("getTrendYAxisUnitLabel", () => {
@@ -32,5 +36,6 @@ describe("getTrendYAxisUnitLabel", () => {
     expect(getTrendYAxisUnitLabel("yenMan")).toBe("万円");
     expect(getTrendYAxisUnitLabel("yen")).toBe("円");
     expect(getTrendYAxisUnitLabel("percent")).toBe("%");
+    expect(getTrendYAxisUnitLabel("percentPoint")).toBe("pt");
   });
 });

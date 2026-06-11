@@ -11,7 +11,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import { TrendChartHeader } from "@/features/trends/TrendChartHeader";
 import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
 import { useTrendYAxis } from "@/features/trends/use-trend-y-axis";
-import { formatAsOfDateJa } from "@/lib/format-yen";
+import { formatAsOfDateJa, formatPercentDeltaTooltip } from "@/lib/format-yen";
 
 type TrendLineChartProps = {
   labels: string[];
@@ -299,9 +299,21 @@ export function TrendLineChart({
               if (value === null || !Number.isFinite(value)) {
                 return null;
               }
-              const formatted = item.formatValue
+
+              let formatted = item.formatValue
                 ? item.formatValue(value)
                 : String(value);
+
+              if (
+                item.tooltipMode === "percentDelta" &&
+                item.levelValues &&
+                hoveredIndex > 0
+              ) {
+                const previous = item.levelValues[hoveredIndex - 1];
+                const current = item.levelValues[hoveredIndex];
+                formatted = formatPercentDeltaTooltip(previous, current);
+              }
+
               let row = (
                 <div key={item.key} className="trend-line-chart__tooltip-row">
                   <span

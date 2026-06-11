@@ -3,5 +3,7 @@ export type TrendChartSeries = {
   label: string;
   color: string;
   values: Array<number | null>;
+  levelValues?: Array<number | null>;
+  tooltipMode?: "percentDelta";
   formatValue?: (value: number) => string;
 };

@@ -8,6 +8,8 @@ import { useMemo } from "react";
 import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
 import {
   formatPercentAxis,
+  formatPercentPointAxis,
+  formatPercentDeltaTooltip,
   formatYenAxisLabel,
   formatYenMan,
 } from "@/lib/format-yen";
@@ -27,6 +29,11 @@ function createDefaultTickFormatter(unit: TrendYAxisUnit): (value: number) => st
 
   if (unit === "percent") {
     result = formatPercentAxis;
+    return result;
+  }
+
+  if (unit === "percentPoint") {
+    result = formatPercentPointAxis;
     return result;
   }
 

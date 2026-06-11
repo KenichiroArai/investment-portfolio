@@ -53,6 +53,91 @@ export function formatPercentAxis(ratio: number): string {
   return result;
 }
 
+function formatSignedPointValue(points: number, decimals: number): string {
+  let result = points.toFixed(decimals);
+
+  if (points > 0) {
+    result = `+${result}`;
+  }
+
+  return result;
+}
+
+export function formatPercentPoint(ratioDelta: number): string {
+  let result = "—";
+
+  if (!Number.isFinite(ratioDelta)) {
+    return result;
+  }
+
+  const points = ratioDelta * 100;
+  const abs = Math.abs(points);
+  const decimals = abs >= 1 ? 1 : 2;
+  result = `${formatSignedPointValue(points, decimals)} pt`;
+  return result;
+}
+
+export function formatPercentPointAxis(ratioDelta: number): string {
+  let result = "0 pt";
+
+  if (!Number.isFinite(ratioDelta)) {
+    return result;
+  }
+
+  const points = ratioDelta * 100;
+  const abs = Math.abs(points);
+  const decimals = abs >= 1 ? 1 : 2;
+  result = `${points.toFixed(decimals)} pt`;
+  return result;
+}
+
+export function formatPercentRelativeChange(ratio: number): string {
+  let result = "—";
+
+  if (!Number.isFinite(ratio)) {
+    return result;
+  }
+
+  const percent = ratio * 100;
+  const abs = Math.abs(percent);
+  let decimals = 2;
+
+  if (abs >= 10) {
+    decimals = 1;
+  } else if (abs >= 1) {
+    decimals = 1;
+  }
+
+  result = `${formatSignedPointValue(percent, decimals)}%`;
+  return result;
+}
+
+export function formatPercentDeltaTooltip(
+  previous: number | null,
+  current: number | null,
+): string {
+  let result = "—";
+
+  if (
+    previous === null ||
+    current === null ||
+    !Number.isFinite(previous) ||
+    !Number.isFinite(current)
+  ) {
+    return result;
+  }
+
+  const ratioDelta = current - previous;
+  let relativeText = "—";
+
+  if (previous !== 0) {
+    relativeText = formatPercentRelativeChange(ratioDelta / Math.abs(previous));
+  }
+
+  result = `${formatPercent(previous)} → ${formatPercent(current)} (${formatPercentPoint(ratioDelta)} / ${relativeText})`;
+  return result;
+}
+
 function formatManNumber(man: number): string {
   let result = "0";
   const abs = Math.abs(man);
@@ -121,7 +206,7 @@ export function formatYenAxisLabel(minor: number): string {
   return result;
 }
 
-export type TrendChartValueUnit = "yenMan" | "yen" | "percent";
+export type TrendChartValueUnit = "yenMan" | "yen" | "percent" | "percentPoint";
 
 export function formatTrendChartMeta(
   displayUnitLabel: string,
@@ -136,6 +221,11 @@ export function formatTrendChartMeta(
 
   if (valueUnit === "yen") {
     result = `${displayUnitLabel}・金額単位: 円`;
+    return result;
+  }
+
+  if (valueUnit === "percentPoint") {
+    result = `${displayUnitLabel}・単位: ポイント`;
     return result;
   }
 

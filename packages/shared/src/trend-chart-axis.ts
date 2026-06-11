@@ -1,6 +1,6 @@
-export type TrendYAxisUnit = "yenMan" | "yen" | "percent";
+export type TrendYAxisUnit = "yenMan" | "yen" | "percent" | "percentPoint";
 
-export type TrendChartValueKind = "yen" | "percent";
+export type TrendChartValueKind = "yen" | "percent" | "percentPoint";
 
 const YEN_MAN_THRESHOLD_MINOR = 100_000;
 
@@ -36,6 +36,11 @@ export function resolveTrendYAxisUnit(
     return result;
   }
 
+  if (valueKind === "percentPoint") {
+    result = "percentPoint";
+    return result;
+  }
+
   result = resolveTrendYenAxisUnit(values);
   return result;
 }
@@ -50,6 +55,11 @@ export function getTrendYAxisUnitLabel(unit: TrendYAxisUnit): string {
 
   if (unit === "percent") {
     result = "%";
+    return result;
+  }
+
+  if (unit === "percentPoint") {
+    result = "pt";
     return result;
   }
 

@@ -4,6 +4,10 @@ import {
   formatAsOfDateJa,
   formatPercent,
   formatPercentAxis,
+  formatPercentDeltaTooltip,
+  formatPercentPoint,
+  formatPercentPointAxis,
+  formatPercentRelativeChange,
   formatTrendChartCaption,
   formatTrendChartMeta,
   formatYen,
@@ -121,11 +125,52 @@ describe("formatPercentAxis", () => {
   });
 });
 
+describe("formatPercentPoint", () => {
+  it("formats ratio deltas as signed points", () => {
+    expect(formatPercentPoint(0.003)).toBe("+0.30 pt");
+    expect(formatPercentPoint(-0.021)).toBe("-2.1 pt");
+    expect(formatPercentPoint(-0.0004)).toBe("-0.04 pt");
+  });
+
+  it("returns dash for non-finite ratios", () => {
+    expect(formatPercentPoint(Number.NaN)).toBe("—");
+  });
+});
+
+describe("formatPercentPointAxis", () => {
+  it("formats axis ticks without explicit sign", () => {
+    expect(formatPercentPointAxis(0.003)).toBe("0.30 pt");
+    expect(formatPercentPointAxis(-0.021)).toBe("-2.1 pt");
+  });
+});
+
+describe("formatPercentRelativeChange", () => {
+  it("formats relative change with sign", () => {
+    expect(formatPercentRelativeChange(0.01)).toBe("+1.0%");
+    expect(formatPercentRelativeChange(-0.14)).toBe("-14.0%");
+  });
+});
+
+describe("formatPercentDeltaTooltip", () => {
+  it("combines level transition, points, and relative change", () => {
+    expect(formatPercentDeltaTooltip(0.288, 0.291)).toBe(
+      "28.8% → 29.1% (+0.30 pt / +1.0%)",
+    );
+  });
+
+  it("returns dash when values are missing", () => {
+    expect(formatPercentDeltaTooltip(null, 0.291)).toBe("—");
+  });
+});
+
 describe("formatTrendChartMeta", () => {
   it("formats captions for each value unit", () => {
     expect(formatTrendChartMeta("日次表示", "yenMan")).toBe("日次表示・金額単位: 万円");
     expect(formatTrendChartMeta("日次表示", "yen")).toBe("日次表示・金額単位: 円");
     expect(formatTrendChartMeta("日次表示", "percent")).toBe("日次表示・単位: %");
+    expect(formatTrendChartMeta("日次表示", "percentPoint")).toBe(
+      "日次表示・単位: ポイント",
+    );
   });
 });
 

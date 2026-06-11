@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { TrendLineChart } from "@/features/trends/TrendLineChart";
-import { formatPercent, formatYen } from "@/lib/format-yen";
+import { formatPercent, formatPercentDeltaTooltip, formatYen } from "@/lib/format-yen";
 
 describe("TrendLineChart", () => {
   afterEach(() => {
@@ -124,5 +124,35 @@ describe("TrendLineChart", () => {
     expect(screen.getByText("国内株式")).toBeInTheDocument();
     expect(screen.getByText("外国株式")).toBeInTheDocument();
     expect(container.querySelector(".trend-chart__y-unit")).toBeNull();
+  });
+
+  it("shows percent delta tooltip with level transition and relative change", async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <TrendLineChart
+        labels={["2026年6月", "2026年7月"]}
+        valueKind="percentPoint"
+        domainMode="fitData"
+        series={[
+          {
+            key: "domestic",
+            label: "国内株式",
+            color: "#2563eb",
+            levelValues: [0.288, 0.291],
+            values: [null, 0.003],
+            tooltipMode: "percentDelta",
+          },
+        ]}
+      />,
+    );
+
+    const hitAreas = within(container).getAllByRole("button", {
+      name: /の詳細$/,
+    });
+    await user.hover(hitAreas[1]);
+    const tooltipRow = container.querySelector(".trend-line-chart__tooltip-row");
+    expect(tooltipRow?.textContent).toContain(
+      formatPercentDeltaTooltip(0.288, 0.291),
+    );
   });
 });

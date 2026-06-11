@@ -7,14 +7,17 @@ import { getAllocationChartColor } from "@/features/analysis/chart-colors";
 import { TrendBarChart } from "@/features/trends/TrendBarChart";
 import { TrendLineChart } from "@/features/trends/TrendLineChart";
 import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
-import { formatPercent, formatYen } from "@/lib/format-yen";
+import { formatPercent, formatPercentPoint, formatTrendChartMeta, formatYen } from "@/lib/format-yen";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
 
-function mapSeriesToDeltas(series: TrendChartSeries[]): TrendChartSeries[] {
+function mapSeriesToPercentDeltaSeries(series: TrendChartSeries[]): TrendChartSeries[] {
   let result: TrendChartSeries[] = [];
   result = series.map((item) => ({
     ...item,
+    levelValues: item.values,
     values: computeTrendPeriodDeltas(item.values),
+    formatValue: (value: number) => formatPercentPoint(value),
+    tooltipMode: "percentDelta" as const,
   }));
   return result;
 }
@@ -91,7 +94,7 @@ export function TrendsDetailPanel() {
     return seriesResult;
   })();
 
-  const allocationDeltaSeries = mapSeriesToDeltas(allocationSeries);
+  const allocationDeltaSeries = mapSeriesToPercentDeltaSeries(allocationSeries);
 
   const gainRateSeries: TrendChartSeries[] = [
     {
@@ -112,7 +115,7 @@ export function TrendsDetailPanel() {
     item.values.some((value) => value !== null && Number.isFinite(value)),
   );
 
-  const gainRateDeltaSeries = mapSeriesToDeltas(gainRateSeries);
+  const gainRateDeltaSeries = mapSeriesToPercentDeltaSeries(gainRateSeries);
 
   const marketValueDeltaSeries: TrendChartSeries[] = [
     {
@@ -224,8 +227,8 @@ export function TrendsDetailPanel() {
             <div className="trends-detail__subsection">
               <TrendLineChart
                 title="前回比の変化"
-                caption={trendDisplayUnitLabel}
-                valueKind="percent"
+                caption={formatTrendChartMeta(trendDisplayUnitLabel, "percentPoint")}
+                valueKind="percentPoint"
                 labels={labels}
                 sourceDates={sourceDates}
                 series={gainRateDeltaSeries}
@@ -289,8 +292,8 @@ export function TrendsDetailPanel() {
               <div className="trends-detail__subsection">
                 <TrendLineChart
                   title="前回比の変化"
-                  caption={trendDisplayUnitLabel}
-                  valueKind="percent"
+                  caption={formatTrendChartMeta(trendDisplayUnitLabel, "percentPoint")}
+                  valueKind="percentPoint"
                   labels={labels}
                   sourceDates={sourceDates}
                   series={allocationDeltaSeries}
