@@ -1,15 +1,18 @@
 "use client";
 
 import {
-  computeAllocationShareChanges,
+  buildAllocationPeriodChangeRows,
+  buildAllocationRatioSeries,
   findLargestAllocationShareChange,
   formatTrendSparseDataNote,
+  sortAllocationPeriodChangeRows,
   type AggregatedTrendPoint,
 } from "@repo/shared";
-import { useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 
-import { AllocationShareChangeChart } from "@/features/trends/AllocationShareChangeChart";
+import { AllocationPeriodChangeTable } from "@/features/trends/AllocationPeriodChangeTable";
 import { buildAllocationChartSeries } from "@/features/trends/build-allocation-chart-series";
+import { CompositionRatioLineChart } from "@/features/trends/CompositionRatioLineChart";
 import { TrendBarChart } from "@/features/trends/TrendBarChart";
 import { TrendLineChart } from "@/features/trends/TrendLineChart";
 import { TrendPeriodSummary } from "@/features/trends/TrendPeriodSummary";
@@ -28,6 +31,9 @@ import {
   formatYen,
 } from "@/lib/format-yen";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
+
+const MAX_SELECTED_COMPOSITIONS = 5;
+const AUTO_SELECT_COMPOSITION_COUNT = 3;
 
 function resolvePeriodEndpoints(
   displayPoints: AggregatedTrendPoint[],
@@ -57,17 +63,32 @@ function resolvePeriodEndpoints(
   return result;
 }
 
-function buildSchemeRatios(
-  point: AggregatedTrendPoint,
-  schemeCode: string,
-): Array<{ key: string; label: string; ratio: number | null }> {
-  let result: Array<{ key: string; label: string; ratio: number | null }> = [];
-  const slices = point.allocationsByScheme[schemeCode] ?? [];
-  result = slices.map((slice) => ({
-    key: slice.valueCode,
-    label: slice.valueName,
-    ratio: slice.ratio,
-  }));
+function resolveAutoSelectedCompositionKeys(
+  periodChangeRows: ReturnType<typeof buildAllocationPeriodChangeRows>,
+): string[] {
+  let result = sortAllocationPeriodChangeRows(periodChangeRows, "deltaRatio", "desc", true)
+    .slice(0, AUTO_SELECT_COMPOSITION_COUNT)
+    .map((row) => row.key);
+  return result;
+}
+
+function toggleCompositionKey(
+  explicitKeys: string[],
+  key: string,
+  autoKeys: string[],
+): string[] {
+  let effectiveKeys = explicitKeys.length > 0 ? explicitKeys : autoKeys;
+  let result: string[] = [];
+
+  if (effectiveKeys.includes(key)) {
+    result = effectiveKeys.filter((item) => item !== key);
+    return result;
+  }
+
+  result = [...effectiveKeys, key];
+  if (result.length > MAX_SELECTED_COMPOSITIONS) {
+    result = result.slice(result.length - MAX_SELECTED_COMPOSITIONS);
+  }
   return result;
 }
 
@@ -82,7 +103,68 @@ export function TrendsDetailPanel() {
     trends,
   } = usePortfolioTime();
   const [selectedSchemeCode, setSelectedSchemeCode] = useState("");
+  const [selectedCompositionKeys, setSelectedCompositionKeys] = useState<string[]>([]);
   const [detailsOpen, setDetailsOpen] = useState(false);
+
+  const schemeCodes = snapshot?.analysisSchemes ?? [];
+  const activeSchemeCode =
+    selectedSchemeCode !== ""
+      ? selectedSchemeCode
+      : (schemeCodes[0]?.schemeCode ?? "");
+
+  const periodChangeRowsForHooks = useMemo(() => {
+    let result: ReturnType<typeof buildAllocationPeriodChangeRows> = [];
+
+    if (displayTrendPoints.length === 0 || activeSchemeCode === "") {
+      return result;
+    }
+
+    const chartBuckets = buildTrendChartBuckets({
+      displayPoints: displayTrendPoints,
+      baselinePoint,
+      trendDisplayUnit,
+      formatBaselineSummary: () => null,
+    });
+    const periodEndpoints = resolvePeriodEndpoints(displayTrendPoints, baselinePoint);
+
+    if (!periodEndpoints) {
+      return result;
+    }
+
+    result = buildAllocationPeriodChangeRows(
+      periodEndpoints.start,
+      periodEndpoints.end,
+      chartBuckets.chartPoints,
+      activeSchemeCode,
+    );
+    return result;
+  }, [
+    activeSchemeCode,
+    baselinePoint,
+    displayTrendPoints,
+    trendDisplayUnit,
+  ]);
+
+  const autoSelectedCompositionKeys = useMemo(() => {
+    let keys = resolveAutoSelectedCompositionKeys(periodChangeRowsForHooks);
+    return keys;
+  }, [periodChangeRowsForHooks]);
+
+  const effectiveSelectedCompositionKeys = useMemo(() => {
+    let keys: string[] = [];
+    if (selectedCompositionKeys.length > 0) {
+      keys = selectedCompositionKeys;
+      return keys;
+    }
+    keys = autoSelectedCompositionKeys;
+    return keys;
+  }, [selectedCompositionKeys, autoSelectedCompositionKeys]);
+
+  const handleCompositionToggle = (key: string): void => {
+    setSelectedCompositionKeys((current) =>
+      toggleCompositionKey(current, key, autoSelectedCompositionKeys),
+    );
+  };
 
   let result: ReactNode = null;
 
@@ -135,11 +217,6 @@ export function TrendsDetailPanel() {
     return note;
   })();
 
-  const schemeCodes = snapshot?.analysisSchemes ?? [];
-  const activeSchemeCode =
-    selectedSchemeCode !== ""
-      ? selectedSchemeCode
-      : (schemeCodes[0]?.schemeCode ?? "");
   const activeScheme = schemeCodes.find(
     (scheme) => scheme.schemeCode === activeSchemeCode,
   );
@@ -151,15 +228,30 @@ export function TrendsDetailPanel() {
       ? buildAllocationChartSeries(chartPoints, activeSchemeCode)
       : [];
 
-  const shareChanges =
+  const ratioSeries =
+    activeSchemeCode !== ""
+      ? buildAllocationRatioSeries(chartPoints, activeSchemeCode)
+      : [];
+
+  const periodChangeRows =
     periodEndpoints && activeSchemeCode !== ""
-      ? computeAllocationShareChanges(
-          buildSchemeRatios(periodEndpoints.start, activeSchemeCode),
-          buildSchemeRatios(periodEndpoints.end, activeSchemeCode),
+      ? buildAllocationPeriodChangeRows(
+          periodEndpoints.start,
+          periodEndpoints.end,
+          chartPoints,
+          activeSchemeCode,
         )
       : [];
 
-  const largestShareChange = findLargestAllocationShareChange(shareChanges);
+  const largestShareChange = findLargestAllocationShareChange(
+    periodChangeRows.map((row) => ({
+      key: row.key,
+      label: row.label,
+      startRatio: row.startRatio,
+      endRatio: row.endRatio,
+      deltaRatio: row.deltaRatio,
+    })),
+  );
 
   const marketValueLevelValues = mapTrendChartLevelValues(
     chartPoints,
@@ -276,6 +368,7 @@ export function TrendsDetailPanel() {
                   }
                   onClick={() => {
                     setSelectedSchemeCode(scheme.schemeCode);
+                    setSelectedCompositionKeys([]);
                   }}
                 >
                   {scheme.schemeName}
@@ -298,15 +391,33 @@ export function TrendsDetailPanel() {
               formatValue: (value) => formatPercent(value),
             }))}
             height={300}
+            selectedSeriesKeys={effectiveSelectedCompositionKeys}
+            onSeriesToggle={handleCompositionToggle}
           />
         </section>
       ) : null}
 
-      {shareChanges.length > 0 ? (
+      {ratioSeries.length > 0 ? (
         <section className="trends-detail__section">
-          <AllocationShareChangeChart
-            changes={shareChanges}
-            caption={`${startDateLabel} → ${endDateLabel}`}
+          <CompositionRatioLineChart
+            labels={labels}
+            sourceDates={sourceDates}
+            sourceDateLabels={sourceDateLabels}
+            ratioSeries={ratioSeries}
+            selectedKeys={effectiveSelectedCompositionKeys}
+            caption={trendDisplayUnitLabel}
+          />
+        </section>
+      ) : null}
+
+      {periodChangeRows.length > 0 ? (
+        <section className="trends-detail__section">
+          <AllocationPeriodChangeTable
+            rows={periodChangeRows}
+            selectedKeys={effectiveSelectedCompositionKeys}
+            startDateLabel={startDateLabel}
+            endDateLabel={endDateLabel}
+            onToggleRow={handleCompositionToggle}
           />
         </section>
       ) : null}

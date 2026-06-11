@@ -37,6 +37,8 @@ type TrendStackedAreaChartProps = {
   title?: string;
   titleLevel?: "h2" | "h3";
   caption?: string;
+  selectedSeriesKeys?: string[];
+  onSeriesToggle?: (key: string) => void;
 };
 
 const CHART_HEIGHT = 280;
@@ -107,6 +109,8 @@ export function TrendStackedAreaChart({
   title,
   titleLevel = "h2",
   caption,
+  selectedSeriesKeys = [],
+  onSeriesToggle,
 }: TrendStackedAreaChartProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
@@ -320,14 +324,38 @@ export function TrendStackedAreaChart({
       </div>
       <div className="trend-stacked-area-chart__legend">
         {activeSeries.map((item) => {
+          const isSelected = selectedSeriesKeys.includes(item.key);
+          const otherTitle =
+            item.otherMembers && item.otherMembers.length > 0
+              ? item.otherMembers.join("、")
+              : undefined;
           let legend = (
-            <span key={item.key} className="trend-stacked-area-chart__legend-item">
+            <button
+              key={item.key}
+              type="button"
+              className={
+                isSelected
+                  ? "trend-stacked-area-chart__legend-item trend-stacked-area-chart__legend-item--selected"
+                  : "trend-stacked-area-chart__legend-item"
+              }
+              title={otherTitle}
+              aria-pressed={isSelected}
+              onClick={() => {
+                if (onSeriesToggle) {
+                  onSeriesToggle(item.key);
+                }
+              }}
+              disabled={!onSeriesToggle}
+            >
               <span
                 className="trend-stacked-area-chart__legend-swatch"
                 style={{ backgroundColor: item.color }}
               />
               {item.label}
-            </span>
+              {item.otherMembers && item.otherMembers.length > 0
+                ? `（${item.otherMembers.length}件）`
+                : null}
+            </button>
           );
           return legend;
         })}

@@ -68,7 +68,8 @@ describe("TrendsDetailPanel", () => {
     await waitFor(() => {
       expect(screen.getByText("期首（2026/05/31）")).toBeInTheDocument();
       expect(screen.getByRole("heading", { name: "構成比の推移" })).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: "シェア変化ランキング" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "期間内の構成変化" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "構成ごとの構成比推移" })).toBeInTheDocument();
       expect(screen.getByRole("heading", { name: "総資産の推移" })).toBeInTheDocument();
       expect(screen.getByLabelText("構成比積み上げエリアグラフ")).toBeInTheDocument();
       expect(screen.getAllByText("1か月単位").length).toBeGreaterThan(0);
@@ -86,6 +87,22 @@ describe("TrendsDetailPanel", () => {
       expect(screen.getAllByText("1日単位").length).toBeGreaterThan(0);
       expect(screen.getAllByText("2026/6/7").length).toBeGreaterThan(0);
     });
+  });
+
+  it("toggles composition selection from table row click", async () => {
+    const user = userEvent.setup();
+    stubTrendsFetch();
+    renderWithPortfolioTime(<TrendsDetailPanel />, {
+      initialSearchParams: "from=2026-05-01&to=2026-07-31&unit=1m",
+    });
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "期間内の構成変化" })).toBeInTheDocument();
+    });
+
+    const rowButton = screen.getByRole("button", { name: "海外 の推移を非表示" });
+    await user.click(rowButton);
+    expect(screen.getByRole("button", { name: "海外 の推移を表示" })).toBeInTheDocument();
   });
 
   it("switches allocation scheme tabs and shows chart tooltip on hover", async () => {

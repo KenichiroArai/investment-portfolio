@@ -6,6 +6,7 @@ export * from "./snapshot-time-range";
 export * from "./snapshot-trends";
 export * from "./snapshot-trend-aggregation";
 export * from "./allocation-series";
+export * from "./allocation-period-change";
 export * from "./chart-axis-scale";
 export * from "./trend-period-deltas";
 export * from "./trend-chart-domain";
