@@ -2,9 +2,19 @@ import { cleanup, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { OverviewTrendChart } from "@/features/trends/OverviewTrendChart";
 import { createPortfolioFetchMock, renderWithPortfolioTime } from "../helpers/portfolio-time-test-utils";
+import { portfolioTimeNavigationState } from "../helpers/portfolio-time-navigation-state";
+import { OverviewTrendChart } from "@/features/trends/OverviewTrendChart";
 import { trendsPointsFixture } from "./trends-fixtures";
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    replace: vi.fn(),
+    push: vi.fn(),
+  }),
+  usePathname: () => portfolioTimeNavigationState.pathname,
+  useSearchParams: () => portfolioTimeNavigationState.searchParams,
+}));
 
 describe("OverviewTrendChart", () => {
   afterEach(() => {

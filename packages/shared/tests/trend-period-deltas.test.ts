@@ -20,6 +20,14 @@ describe("computeTrendPeriodDeltas", () => {
 
     expect(deltas).toEqual([]);
   });
+
+  it("uses baseline for the first bucket when provided", () => {
+    const deltas = computeTrendPeriodDeltas([1_100_000, 1_150_000], {
+      baseline: 1_000_000,
+    });
+
+    expect(deltas).toEqual([100_000, 50_000]);
+  });
 });
 
 describe("computeTrendPeriodRelativeDeltas", () => {

@@ -237,3 +237,25 @@ export function formatTrendChartCaption(displayUnitLabel: string): string {
   let result = formatTrendChartMeta(displayUnitLabel, "yenMan");
   return result;
 }
+
+export function formatSignedYenDelta(minor: number): string {
+  let result = formatYen(minor);
+
+  if (!Number.isFinite(minor)) {
+    return result;
+  }
+
+  if (minor > 0) {
+    result = `+${result}`;
+  }
+
+  return result;
+}
+
+export function formatMarketValueBaselineSummary(
+  baselineDate: string,
+  deltaMinor: number,
+): string {
+  let result = `前回（${formatAsOfDateJa(baselineDate)}）比 評価額 ${formatSignedYenDelta(deltaMinor)}`;
+  return result;
+}

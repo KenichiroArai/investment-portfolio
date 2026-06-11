@@ -2,9 +2,22 @@ import { cleanup, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import {
+  createPortfolioFetchMock,
+  renderWithPortfolioTime,
+} from "../helpers/portfolio-time-test-utils";
+import { portfolioTimeNavigationState } from "../helpers/portfolio-time-navigation-state";
 import { TrendsDetailPanel } from "@/features/trends/TrendsDetailPanel";
-import { createPortfolioFetchMock, renderWithPortfolioTime } from "../helpers/portfolio-time-test-utils";
 import { snapshotWithSchemesFixture, trendsPointsFixture } from "./trends-fixtures";
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    replace: vi.fn(),
+    push: vi.fn(),
+  }),
+  usePathname: () => portfolioTimeNavigationState.pathname,
+  useSearchParams: () => portfolioTimeNavigationState.searchParams,
+}));
 
 describe("TrendsDetailPanel", () => {
   afterEach(() => {
@@ -12,19 +25,26 @@ describe("TrendsDetailPanel", () => {
     vi.unstubAllGlobals();
   });
 
-  function stubTrendsFetch() {
+  function stubTrendsFetch(points = trendsPointsFixture) {
     vi.stubGlobal(
       "fetch",
       vi.fn(async (url: string) => {
         if (url.includes("trends")) {
+          const fromMatch = /from=([^&]+)/.exec(url);
+          const toMatch = /to=([^&]+)/.exec(url);
+          const from = fromMatch?.[1] ?? "2026-05-31";
+          const to = toMatch?.[1] ?? "2026-06-07";
+          const filtered = points.filter(
+            (point) => point.asOfDate >= from && point.asOfDate <= to,
+          );
           return {
             ok: true,
             status: 200,
             json: async () => ({
               portfolioCode: "ideco",
-              from: "2026-05-31",
-              to: "2026-06-07",
-              points: trendsPointsFixture,
+              from,
+              to,
+              points: filtered,
             }),
           };
         }
@@ -56,6 +76,18 @@ describe("TrendsDetailPanel", () => {
       expect(screen.getByRole("heading", { name: "損益" })).toBeInTheDocument();
       expect(screen.getAllByRole("heading", { name: "前回比の変化" }).length).toBeGreaterThan(0);
       expect(screen.getAllByLabelText("推移折れ線グラフ").length).toBeGreaterThan(0);
+    });
+  });
+
+  it("renders daily labels when a calendar month is selected", async () => {
+    stubTrendsFetch([trendsPointsFixture[1]]);
+    renderWithPortfolioTime(<TrendsDetailPanel />, {
+      initialSearchParams: "month=2026-06",
+    });
+
+    await waitFor(() => {
+      expect(screen.getAllByText("日次表示").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("2026/6/7").length).toBeGreaterThan(0);
     });
   });
 
@@ -124,6 +156,24 @@ describe("TrendsDetailPanel", () => {
       expect(
         screen.getByText("この期間は1か月分のデータです"),
       ).toBeInTheDocument();
+    });
+  });
+
+  it("shows baseline summary and line charts for a single in-range snapshot", async () => {
+    stubTrendsFetch([trendsPointsFixture[0], trendsPointsFixture[1]]);
+    renderWithPortfolioTime(<TrendsDetailPanel />, {
+      initialSearchParams: "month=2026-06",
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("この期間は1日分のデータです"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/前回（2026\/05\/31）比 評価額/),
+      ).toBeInTheDocument();
+      expect(screen.getAllByRole("heading", { name: "前回比の変化" }).length).toBeGreaterThan(0);
+      expect(screen.getAllByLabelText("推移折れ線グラフ").length).toBeGreaterThan(0);
     });
   });
 });

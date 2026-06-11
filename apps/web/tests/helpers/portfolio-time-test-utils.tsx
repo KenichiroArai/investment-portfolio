@@ -3,6 +3,7 @@ import type { ReactElement, ReactNode } from "react";
 import { vi } from "vitest";
 
 import { PortfolioTimeProvider } from "@/features/portfolio/PortfolioTimeContext";
+import { portfolioTimeNavigationState } from "./portfolio-time-navigation-state";
 
 type SnapshotFixture = {
   id: string;
@@ -125,6 +126,11 @@ export function createPortfolioFetchMock(options: PortfolioFetchMockOptions = {}
   return result;
 }
 
+type RenderWithPortfolioTimeOptions = Omit<RenderOptions, "wrapper"> & {
+  initialSearchParams?: string | URLSearchParams;
+  pathname?: string;
+};
+
 function PortfolioTimeTestWrapper({ children }: { children: ReactNode }) {
   let result = (
     <PortfolioTimeProvider portfolioCode="ideco">{children}</PortfolioTimeProvider>
@@ -134,8 +140,23 @@ function PortfolioTimeTestWrapper({ children }: { children: ReactNode }) {
 
 export function renderWithPortfolioTime(
   ui: ReactElement,
-  options?: Omit<RenderOptions, "wrapper">,
+  options?: RenderWithPortfolioTimeOptions,
 ) {
+  if (options?.pathname) {
+    portfolioTimeNavigationState.pathname = options.pathname;
+  } else {
+    portfolioTimeNavigationState.pathname = "/portfolios/ideco/trends";
+  }
+
+  if (options?.initialSearchParams) {
+    portfolioTimeNavigationState.searchParams =
+      typeof options.initialSearchParams === "string"
+        ? new URLSearchParams(options.initialSearchParams)
+        : options.initialSearchParams;
+  } else {
+    portfolioTimeNavigationState.searchParams = new URLSearchParams();
+  }
+
   let result = render(ui, {
     wrapper: PortfolioTimeTestWrapper,
     ...options,

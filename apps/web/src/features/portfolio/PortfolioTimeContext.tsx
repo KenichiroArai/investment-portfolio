@@ -1,10 +1,10 @@
 "use client";
 
 import {
-  aggregateTrendPoints,
+  buildTrendDisplayPoints,
   resolveDateRange,
   resolveLatestSnapshotDate,
-  resolveTrendDisplayUnit,
+  resolveTrendDisplayUnitWithFallback,
   TREND_DISPLAY_UNIT_LABELS,
   type AggregatedTrendPoint,
   type CurrentSnapshotDto,
@@ -54,6 +54,7 @@ type PortfolioTimeContextValue = {
   trendDisplayUnit: TrendDisplayUnit;
   trendDisplayUnitLabel: string;
   displayTrendPoints: AggregatedTrendPoint[];
+  baselinePoint: AggregatedTrendPoint | null;
   loadingDates: boolean;
   loadingSnapshot: boolean;
   loadingTrends: boolean;
@@ -374,6 +375,7 @@ export function PortfolioTimeProvider({
   }, [availableDates, periodPreset, customFrom, customTo, calendarMonth]);
 
   const rangeDatesKey = rangeDates.join(",");
+  const availableDatesKey = availableDates.join(",");
 
   useEffect(() => {
     let result: () => void = () => {};
@@ -395,11 +397,16 @@ export function PortfolioTimeProvider({
       }
 
       setLoadingTrends(true);
-      const from = rangeDates[0];
-      const to = rangeDates[rangeDates.length - 1];
+      const rangeFrom = rangeDates[0];
+      const rangeTo = rangeDates[rangeDates.length - 1];
+      const priorDates = availableDates.filter((date) => date < rangeFrom);
+      const baselineDate = priorDates.at(-1) ?? null;
+      const fetchFrom = baselineDate ?? rangeFrom;
 
       try {
-        const response = await fetch(getSnapshotTrendsFetchUrl(portfolioCode, from, to));
+        const response = await fetch(
+          getSnapshotTrendsFetchUrl(portfolioCode, fetchFrom, rangeTo),
+        );
         if (cancelled) {
           return loadResult;
         }
@@ -409,12 +416,12 @@ export function PortfolioTimeProvider({
         }
         const data = (await response.json()) as SnapshotTrendsDto;
         const filteredPoints = data.points.filter(
-          (point) => point.asOfDate >= from && point.asOfDate <= to,
+          (point) => point.asOfDate >= fetchFrom && point.asOfDate <= rangeTo,
         );
         setTrends({
           portfolioCode: data.portfolioCode,
-          from,
-          to,
+          from: rangeFrom,
+          to: rangeTo,
           points: filteredPoints,
         });
       } catch {
@@ -435,15 +442,45 @@ export function PortfolioTimeProvider({
       cancelled = true;
     };
     return result;
-  }, [portfolioCode, pathname, rangeDatesKey]);
+  }, [portfolioCode, pathname, rangeDatesKey, availableDatesKey]);
 
-  const trendDisplayUnit = resolveTrendDisplayUnit(periodPreset);
-  const displayTrendPoints = useMemo(() => {
-    let result: AggregatedTrendPoint[] = [];
+  const trendDisplayParams = useMemo(
+    () => ({
+      preset: periodPreset,
+      calendarMonth: calendarMonth || null,
+      customFrom: customFrom || null,
+      customTo: customTo || null,
+    }),
+    [periodPreset, calendarMonth, customFrom, customTo],
+  );
+
+  const trendDisplayUnit = useMemo(() => {
+    let result: TrendDisplayUnit = "month";
     if (!trends || trends.points.length === 0) {
       return result;
     }
-    result = aggregateTrendPoints(trends.points, trendDisplayUnit);
+    result = resolveTrendDisplayUnitWithFallback(trends.points, trendDisplayParams);
+    return result;
+  }, [trends, trendDisplayParams]);
+
+  const { displayTrendPoints, baselinePoint } = useMemo(() => {
+    let result = {
+      displayTrendPoints: [] as AggregatedTrendPoint[],
+      baselinePoint: null as AggregatedTrendPoint | null,
+    };
+    if (!trends || trends.points.length === 0) {
+      return result;
+    }
+    const built = buildTrendDisplayPoints(
+      trends.points,
+      trendDisplayUnit,
+      trends.from,
+      trends.to,
+    );
+    result = {
+      displayTrendPoints: built.displayPoints,
+      baselinePoint: built.baselinePoint,
+    };
     return result;
   }, [trends, trendDisplayUnit]);
 
@@ -469,6 +506,7 @@ export function PortfolioTimeProvider({
       trendDisplayUnit,
       trendDisplayUnitLabel: TREND_DISPLAY_UNIT_LABELS[trendDisplayUnit],
       displayTrendPoints,
+      baselinePoint,
       loadingDates,
       loadingSnapshot,
       loadingTrends,
@@ -501,6 +539,7 @@ export function PortfolioTimeProvider({
     trends,
     trendDisplayUnit,
     displayTrendPoints,
+    baselinePoint,
     loadingDates,
     loadingSnapshot,
     loadingTrends,

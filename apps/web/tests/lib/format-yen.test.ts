@@ -8,8 +8,10 @@ import {
   formatPercentPoint,
   formatPercentPointAxis,
   formatPercentRelativeChange,
+  formatMarketValueBaselineSummary,
   formatTrendChartCaption,
   formatTrendChartMeta,
+  formatSignedYenDelta,
   formatYen,
   formatYenAxis,
   formatYenAxisLabel,
@@ -178,6 +180,21 @@ describe("formatTrendChartCaption", () => {
   it("combines display unit label with 万円 unit note", () => {
     expect(formatTrendChartCaption("月次表示（各月の最終基準日）")).toBe(
       "月次表示（各月の最終基準日）・金額単位: 万円",
+    );
+  });
+});
+
+describe("formatSignedYenDelta", () => {
+  it("prefixes positive deltas with a plus sign", () => {
+    expect(formatSignedYenDelta(41_347)).toMatch(/^\+/);
+    expect(formatSignedYenDelta(-1_000)).not.toMatch(/^\+/);
+  });
+});
+
+describe("formatMarketValueBaselineSummary", () => {
+  it("formats baseline comparison summary", () => {
+    expect(formatMarketValueBaselineSummary("2026-05-31", 41_347)).toBe(
+      "前回（2026/05/31）比 評価額 +￥41,347",
     );
   });
 });

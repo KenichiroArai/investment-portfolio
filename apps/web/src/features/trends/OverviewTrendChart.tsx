@@ -1,17 +1,29 @@
 "use client";
 
-import { computeTrendPeriodDeltas } from "@repo/shared";
 import type { ReactNode } from "react";
 
 import { TrendBarChart } from "@/features/trends/TrendBarChart";
 import { TrendLineChart } from "@/features/trends/TrendLineChart";
+import {
+  buildTrendChartBuckets,
+  computeTrendChartDeltas,
+  mapTrendChartLevelValues,
+} from "@/features/trends/trend-chart-buckets";
 import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
-import { formatYen } from "@/lib/format-yen";
+import {
+  formatMarketValueBaselineSummary,
+  formatYen,
+} from "@/lib/format-yen";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
 
 export function OverviewTrendChart() {
-  const { displayTrendPoints, trendDisplayUnitLabel, loadingTrends } =
-    usePortfolioTime();
+  const {
+    displayTrendPoints,
+    baselinePoint,
+    trendDisplayUnit,
+    trendDisplayUnitLabel,
+    loadingTrends,
+  } = usePortfolioTime();
 
   let result: ReactNode = null;
 
@@ -29,17 +41,47 @@ export function OverviewTrendChart() {
     return result;
   }
 
-  const labels = displayTrendPoints.map((point) => point.bucketLabel);
-  const sourceDates = displayTrendPoints.map((point) => point.sourceAsOfDate);
-  const hasMultipleBuckets = displayTrendPoints.length >= 2;
+  const chartBuckets = buildTrendChartBuckets({
+    displayPoints: displayTrendPoints,
+    baselinePoint,
+    trendDisplayUnit,
+    formatBaselineSummary: (baseline, current) => {
+      let summary: string | null = null;
+      const delta = current.totalMarketValueMinor - baseline.totalMarketValueMinor;
+      if (Number.isFinite(delta)) {
+        summary = formatMarketValueBaselineSummary(baseline.sourceAsOfDate, delta);
+      }
+      return summary;
+    },
+  });
+
+  const { labels, sourceDates, hasTrendLines, singleBucketNote, baselineSummary } =
+    chartBuckets;
+
+  const marketValueLevelValues = mapTrendChartLevelValues(
+    chartBuckets.chartPoints,
+    displayTrendPoints,
+    baselinePoint,
+    (point) => point.totalMarketValueMinor,
+  );
+
+  const gainLevelValues = mapTrendChartLevelValues(
+    chartBuckets.chartPoints,
+    displayTrendPoints,
+    baselinePoint,
+    (point) => point.unrealizedGainMinor,
+  );
 
   const deltaSeries: TrendChartSeries[] = [
     {
       key: "market-value-delta",
       label: "評価額の変化",
       color: "#2563eb",
-      values: computeTrendPeriodDeltas(
-        displayTrendPoints.map((point) => point.totalMarketValueMinor),
+      values: computeTrendChartDeltas(
+        marketValueLevelValues,
+        displayTrendPoints,
+        baselinePoint,
+        baselinePoint?.totalMarketValueMinor ?? null,
       ),
       formatValue: (value) => formatYen(value),
     },
@@ -47,8 +89,11 @@ export function OverviewTrendChart() {
       key: "gain-delta",
       label: "評価損益の変化",
       color: "#16a34a",
-      values: computeTrendPeriodDeltas(
-        displayTrendPoints.map((point) => point.unrealizedGainMinor),
+      values: computeTrendChartDeltas(
+        gainLevelValues,
+        displayTrendPoints,
+        baselinePoint,
+        baselinePoint?.unrealizedGainMinor ?? null,
       ),
       formatValue: (value) => formatYen(value),
     },
@@ -56,10 +101,11 @@ export function OverviewTrendChart() {
 
   result = (
     <section className="overview-trend">
-      {displayTrendPoints.length === 1 ? (
-        <p className="trends-detail__single-bucket-note">
-          この期間は1か月分のデータです
-        </p>
+      {singleBucketNote ? (
+        <p className="trends-detail__single-bucket-note">{singleBucketNote}</p>
+      ) : null}
+      {baselineSummary ? (
+        <p className="trends-detail__baseline-summary">{baselineSummary}</p>
       ) : null}
       <TrendBarChart
         className="overview-trend__chart"
@@ -75,19 +121,19 @@ export function OverviewTrendChart() {
             key: "market-value",
             label: "評価額",
             color: "#2563eb",
-            values: displayTrendPoints.map((point) => point.totalMarketValueMinor),
+            values: marketValueLevelValues,
             formatValue: (value) => formatYen(value),
           },
           {
             key: "gain",
             label: "評価損益",
             color: "#16a34a",
-            values: displayTrendPoints.map((point) => point.unrealizedGainMinor),
+            values: gainLevelValues,
             formatValue: (value) => formatYen(value),
           },
         ]}
       />
-      {hasMultipleBuckets ? (
+      {hasTrendLines ? (
         <div className="trends-detail__subsection">
           <TrendLineChart
             className="overview-trend__chart"

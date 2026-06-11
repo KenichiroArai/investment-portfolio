@@ -1,30 +1,30 @@
 "use client";
 
-import { computeTrendPeriodDeltas } from "@repo/shared";
 import { useState, type ReactNode } from "react";
 
 import { getAllocationChartColor } from "@/features/analysis/chart-colors";
 import { TrendBarChart } from "@/features/trends/TrendBarChart";
 import { TrendLineChart } from "@/features/trends/TrendLineChart";
+import {
+  buildTrendChartBuckets,
+  computeTrendChartDeltas,
+  mapTrendChartLevelValues,
+} from "@/features/trends/trend-chart-buckets";
 import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
-import { formatPercent, formatPercentPoint, formatTrendChartMeta, formatYen } from "@/lib/format-yen";
+import {
+  formatMarketValueBaselineSummary,
+  formatPercent,
+  formatPercentPoint,
+  formatTrendChartMeta,
+  formatYen,
+} from "@/lib/format-yen";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
-
-function mapSeriesToPercentDeltaSeries(series: TrendChartSeries[]): TrendChartSeries[] {
-  let result: TrendChartSeries[] = [];
-  result = series.map((item) => ({
-    ...item,
-    levelValues: item.values,
-    values: computeTrendPeriodDeltas(item.values),
-    formatValue: (value: number) => formatPercentPoint(value),
-    tooltipMode: "percentDelta" as const,
-  }));
-  return result;
-}
 
 export function TrendsDetailPanel() {
   const {
     displayTrendPoints,
+    baselinePoint,
+    trendDisplayUnit,
     trendDisplayUnitLabel,
     loadingTrends,
     snapshot,
@@ -47,8 +47,23 @@ export function TrendsDetailPanel() {
     return result;
   }
 
-  const labels = displayTrendPoints.map((point) => point.bucketLabel);
-  const sourceDates = displayTrendPoints.map((point) => point.sourceAsOfDate);
+  const chartBuckets = buildTrendChartBuckets({
+    displayPoints: displayTrendPoints,
+    baselinePoint,
+    trendDisplayUnit,
+    formatBaselineSummary: (baseline, current) => {
+      let summary: string | null = null;
+      const delta = current.totalMarketValueMinor - baseline.totalMarketValueMinor;
+      if (Number.isFinite(delta)) {
+        summary = formatMarketValueBaselineSummary(baseline.sourceAsOfDate, delta);
+      }
+      return summary;
+    },
+  });
+
+  const { chartPoints, labels, sourceDates, hasTrendLines, singleBucketNote, baselineSummary } =
+    chartBuckets;
+
   const schemeCodes = snapshot?.analysisSchemes ?? [];
   const activeSchemeCode =
     selectedSchemeCode !== ""
@@ -58,12 +73,12 @@ export function TrendsDetailPanel() {
     (scheme) => scheme.schemeCode === activeSchemeCode,
   );
 
-  const hasMultipleBuckets = displayTrendPoints.length >= 2;
+  const baselineMarketValue = baselinePoint?.totalMarketValueMinor ?? null;
 
   const allocationSeries = (() => {
     let seriesResult: TrendChartSeries[] = [];
     const valueCodes = new Set<string>();
-    for (const point of displayTrendPoints) {
+    for (const point of chartPoints) {
       const slices = point.allocationsByScheme[activeSchemeCode] ?? [];
       for (const slice of slices) {
         valueCodes.add(slice.valueCode);
@@ -71,7 +86,7 @@ export function TrendsDetailPanel() {
     }
     let colorIndex = 0;
     for (const valueCode of valueCodes) {
-      const firstSlice = displayTrendPoints
+      const firstSlice = chartPoints
         .flatMap((point) => point.allocationsByScheme[activeSchemeCode] ?? [])
         .find((slice) => slice.valueCode === valueCode);
       if (!firstSlice) {
@@ -81,7 +96,7 @@ export function TrendsDetailPanel() {
         key: valueCode,
         label: firstSlice.valueName,
         color: getAllocationChartColor(colorIndex),
-        values: displayTrendPoints.map((point) => {
+        values: chartPoints.map((point) => {
           const slice = (point.allocationsByScheme[activeSchemeCode] ?? []).find(
             (item) => item.valueCode === valueCode,
           );
@@ -94,48 +109,120 @@ export function TrendsDetailPanel() {
     return seriesResult;
   })();
 
-  const allocationDeltaSeries = mapSeriesToPercentDeltaSeries(allocationSeries);
+  const allocationDeltaSeries: TrendChartSeries[] = allocationSeries.map((item) => {
+    let baselineRatio: number | null = null;
+    if (baselinePoint) {
+      const slice = (baselinePoint.allocationsByScheme[activeSchemeCode] ?? []).find(
+        (allocation) => allocation.valueCode === item.key,
+      );
+      baselineRatio = slice ? slice.ratio : null;
+    }
+    let mapped: TrendChartSeries = {
+      ...item,
+      levelValues: item.values,
+      values: computeTrendChartDeltas(
+        item.values,
+        displayTrendPoints,
+        baselinePoint,
+        baselineRatio,
+      ),
+      formatValue: (value: number) => formatPercentPoint(value),
+      tooltipMode: "percentDelta",
+    };
+    return mapped;
+  });
 
   const gainRateSeries: TrendChartSeries[] = [
     {
       key: "gain-rate-book",
       label: "簿価ベース利益率",
       color: "#7c3aed",
-      values: displayTrendPoints.map((point) => point.gainRateOnBook),
+      values: mapTrendChartLevelValues(
+        chartPoints,
+        displayTrendPoints,
+        baselinePoint,
+        (point) => point.gainRateOnBook,
+      ),
       formatValue: (value: number) => formatPercent(value),
     },
     {
       key: "gain-rate-contributions",
       label: "拠出金ベース利益率",
       color: "#ea580c",
-      values: displayTrendPoints.map((point) => point.gainRateOnContributions),
+      values: mapTrendChartLevelValues(
+        chartPoints,
+        displayTrendPoints,
+        baselinePoint,
+        (point) => point.gainRateOnContributions,
+      ),
       formatValue: (value: number) => formatPercent(value),
     },
   ].filter((item) =>
     item.values.some((value) => value !== null && Number.isFinite(value)),
   );
 
-  const gainRateDeltaSeries = mapSeriesToPercentDeltaSeries(gainRateSeries);
+  const gainRateDeltaSeries: TrendChartSeries[] = gainRateSeries.map((item) => {
+    let baselineValue: number | null = null;
+    if (baselinePoint) {
+      baselineValue =
+        item.key === "gain-rate-book"
+          ? baselinePoint.gainRateOnBook
+          : baselinePoint.gainRateOnContributions;
+    }
+    let mapped: TrendChartSeries = {
+      ...item,
+      levelValues: item.values,
+      values: computeTrendChartDeltas(
+        item.values,
+        displayTrendPoints,
+        baselinePoint,
+        baselineValue,
+      ),
+      formatValue: (value: number) => formatPercentPoint(value),
+      tooltipMode: "percentDelta",
+    };
+    return mapped;
+  });
+
+  const marketValueLevelValues = mapTrendChartLevelValues(
+    chartPoints,
+    displayTrendPoints,
+    baselinePoint,
+    (point) => point.totalMarketValueMinor,
+  );
 
   const marketValueDeltaSeries: TrendChartSeries[] = [
     {
       key: "market-value-delta",
       label: "評価額の変化",
       color: "#2563eb",
-      values: computeTrendPeriodDeltas(
-        displayTrendPoints.map((point) => point.totalMarketValueMinor),
+      values: computeTrendChartDeltas(
+        marketValueLevelValues,
+        displayTrendPoints,
+        baselinePoint,
+        baselineMarketValue,
       ),
       formatValue: (value) => formatYen(value),
     },
   ];
+
+  const gainLevelValues = mapTrendChartLevelValues(
+    chartPoints,
+    displayTrendPoints,
+    baselinePoint,
+    (point) => point.unrealizedGainMinor,
+  );
 
   const gainDeltaSeries: TrendChartSeries[] = [
     {
       key: "gain-delta",
       label: "評価損益の変化",
       color: "#16a34a",
-      values: computeTrendPeriodDeltas(
-        displayTrendPoints.map((point) => point.unrealizedGainMinor),
+      values: computeTrendChartDeltas(
+        gainLevelValues,
+        displayTrendPoints,
+        baselinePoint,
+        baselinePoint?.unrealizedGainMinor ?? null,
       ),
       formatValue: (value) => formatYen(value),
     },
@@ -143,10 +230,11 @@ export function TrendsDetailPanel() {
 
   result = (
     <div className="trends-detail">
-      {displayTrendPoints.length === 1 ? (
-        <p className="trends-detail__single-bucket-note">
-          この期間は1か月分のデータです
-        </p>
+      {singleBucketNote ? (
+        <p className="trends-detail__single-bucket-note">{singleBucketNote}</p>
+      ) : null}
+      {baselineSummary ? (
+        <p className="trends-detail__baseline-summary">{baselineSummary}</p>
       ) : null}
       <section className="trends-detail__section">
         <TrendBarChart
@@ -161,12 +249,12 @@ export function TrendsDetailPanel() {
               key: "market-value",
               label: "評価額",
               color: "#2563eb",
-              values: displayTrendPoints.map((point) => point.totalMarketValueMinor),
+              values: marketValueLevelValues,
               formatValue: (value) => formatYen(value),
             },
           ]}
         />
-        {hasMultipleBuckets ? (
+        {hasTrendLines ? (
           <div className="trends-detail__subsection">
             <TrendLineChart
               title="前回比の変化"
@@ -193,12 +281,12 @@ export function TrendsDetailPanel() {
               key: "gain",
               label: "評価損益",
               color: "#16a34a",
-              values: displayTrendPoints.map((point) => point.unrealizedGainMinor),
+              values: gainLevelValues,
               formatValue: (value) => formatYen(value),
             },
           ]}
         />
-        {hasMultipleBuckets ? (
+        {hasTrendLines ? (
           <div className="trends-detail__subsection">
             <TrendLineChart
               title="前回比の変化"
@@ -223,7 +311,7 @@ export function TrendsDetailPanel() {
             mode="grouped"
             series={gainRateSeries}
           />
-          {hasMultipleBuckets && gainRateDeltaSeries.length > 0 ? (
+          {hasTrendLines && gainRateDeltaSeries.length > 0 ? (
             <div className="trends-detail__subsection">
               <TrendLineChart
                 title="前回比の変化"
@@ -275,7 +363,7 @@ export function TrendsDetailPanel() {
             series={allocationSeries}
             height={240}
           />
-          {hasMultipleBuckets ? (
+          {hasTrendLines ? (
             <>
               <div className="trends-detail__subsection">
                 <TrendLineChart
