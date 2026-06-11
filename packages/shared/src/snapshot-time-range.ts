@@ -122,6 +122,55 @@ function resolvePresetBounds(
   return result;
 }
 
+export function resolvePeriodBoundsForPreset(
+  preset: SnapshotPeriodPreset,
+  availableDates: string[],
+): { from: string; to: string } | null {
+  let result: { from: string; to: string } | null = null;
+  const sorted = [...availableDates].sort((left, right) => left.localeCompare(right));
+  if (sorted.length === 0) {
+    return result;
+  }
+  const latestDate = sorted[sorted.length - 1];
+  if (!latestDate) {
+    return result;
+  }
+  if (preset === "all") {
+    result = {
+      from: sorted[0],
+      to: latestDate,
+    };
+    return result;
+  }
+  result = resolvePresetBounds(preset, latestDate);
+  return result;
+}
+
+export function detectMatchingPreset(
+  availableDates: string[],
+  customFrom: string | null | undefined,
+  customTo: string | null | undefined,
+): SnapshotPeriodPreset | null {
+  let result: SnapshotPeriodPreset | null = null;
+  if (!customFrom || !customTo) {
+    return result;
+  }
+  const presets: SnapshotPeriodPreset[] = ["1w", "1m", "3m", "6m", "12m", "all"];
+  for (const preset of presets) {
+    const bounds = resolvePeriodBoundsForPreset(preset, availableDates);
+    if (bounds && bounds.from === customFrom && bounds.to === customTo) {
+      result = preset;
+      return result;
+    }
+  }
+  return result;
+}
+
+export function getCalendarMonthDateRange(calendarMonth: string): { from: string; to: string } | null {
+  let result = resolveCalendarMonthRange(calendarMonth);
+  return result;
+}
+
 export function filterDatesInRange(
   availableDates: string[],
   from: string,
@@ -130,6 +179,49 @@ export function filterDatesInRange(
   let result: string[] = [];
   const sorted = [...availableDates].sort((left, right) => left.localeCompare(right));
   result = sorted.filter((date) => date >= from && date <= to);
+  return result;
+}
+
+export function resolvePeriodBounds(
+  params: ResolveDateRangeParams,
+): { from: string; to: string } | null {
+  let result: { from: string; to: string } | null = null;
+  const sorted = [...params.availableDates].sort((left, right) =>
+    left.localeCompare(right),
+  );
+  if (sorted.length === 0) {
+    return result;
+  }
+  const latestDate = sorted[sorted.length - 1];
+  if (!latestDate) {
+    return result;
+  }
+
+  if (params.calendarMonth) {
+    const monthRange = resolveCalendarMonthRange(params.calendarMonth);
+    if (monthRange) {
+      result = monthRange;
+      return result;
+    }
+  }
+
+  if (params.customFrom || params.customTo) {
+    result = {
+      from: params.customFrom ?? sorted[0],
+      to: params.customTo ?? latestDate,
+    };
+    return result;
+  }
+
+  if (params.preset === "all") {
+    result = {
+      from: sorted[0],
+      to: latestDate,
+    };
+    return result;
+  }
+
+  result = resolvePresetBounds(params.preset, latestDate);
   return result;
 }
 

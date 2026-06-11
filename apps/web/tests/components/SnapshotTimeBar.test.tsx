@@ -31,6 +31,8 @@ function mockPortfolioTime(overrides: Record<string, unknown> = {}) {
     setCustomTo: vi.fn(),
     calendarMonth: "",
     setCalendarMonth: vi.fn(),
+    trendDisplayUnit: "day",
+    setTrendDisplayUnit: vi.fn(),
     loadingDates: false,
     isHistoricalView: false,
     emphasizeAsOf: true,
@@ -86,6 +88,7 @@ describe("SnapshotTimeBar", () => {
     const setPeriodPreset = vi.fn();
     const setCustomFrom = vi.fn();
     const setCustomTo = vi.fn();
+    const setTrendDisplayUnit = vi.fn();
 
     usePathname.mockReturnValue("/portfolios/ideco/trends/");
     mockPortfolioTime({
@@ -104,9 +107,12 @@ describe("SnapshotTimeBar", () => {
       setCustomTo,
       calendarMonth: "",
       setCalendarMonth: vi.fn(),
+      setTrendDisplayUnit,
     });
 
     render(<SnapshotTimeBar />);
+
+    expect(screen.getByLabelText("表示単位を選択")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "前の基準日" }));
     expect(setSelectedAsOfDate).toHaveBeenCalledWith("2026-05-31");

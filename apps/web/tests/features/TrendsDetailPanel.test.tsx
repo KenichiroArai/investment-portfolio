@@ -61,17 +61,19 @@ describe("TrendsDetailPanel", () => {
 
   it("renders monthly aggregated bar chart labels", async () => {
     stubTrendsFetch();
-    renderWithPortfolioTime(<TrendsDetailPanel />);
+    renderWithPortfolioTime(<TrendsDetailPanel />, {
+      initialSearchParams: "from=2026-05-01&to=2026-07-31&unit=1m",
+    });
 
     await waitFor(() => {
       expect(
-        screen.getAllByText("月次表示（各月の最終基準日）").length,
+        screen.getAllByText("1か月単位").length,
       ).toBeGreaterThan(0);
       expect(
         document.querySelectorAll(".trend-bar-chart__y-label, .trend-line-chart__y-label").length,
       ).toBeGreaterThan(0);
-      expect(screen.getAllByText("2026年5月").length).toBeGreaterThan(0);
-      expect(screen.getAllByText("2026年6月").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("2026/5/31").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("2026/6/30").length).toBeGreaterThan(0);
       expect(screen.getByRole("heading", { name: "総資産" })).toBeInTheDocument();
       expect(screen.getByRole("heading", { name: "損益" })).toBeInTheDocument();
       expect(screen.getAllByRole("heading", { name: "前回比の変化" }).length).toBeGreaterThan(0);
@@ -86,7 +88,7 @@ describe("TrendsDetailPanel", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getAllByText("日次表示").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("1日単位").length).toBeGreaterThan(0);
       expect(screen.getAllByText("2026/6/7").length).toBeGreaterThan(0);
     });
   });
@@ -150,7 +152,9 @@ describe("TrendsDetailPanel", () => {
       }),
     );
 
-    renderWithPortfolioTime(<TrendsDetailPanel />);
+    renderWithPortfolioTime(<TrendsDetailPanel />, {
+      initialSearchParams: "unit=1m",
+    });
 
     await waitFor(() => {
       expect(

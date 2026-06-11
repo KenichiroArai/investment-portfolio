@@ -1,19 +1,20 @@
-import type { SnapshotPeriodPreset } from "./snapshot-time-range";
 import type { SnapshotTrendPointDto } from "./snapshot-trends";
 
-export type TrendDisplayUnit = "day" | "month";
+export type TrendDisplayUnit = "day" | "week" | "1m" | "3m" | "6m" | "12m";
+
+export const TREND_DISPLAY_UNITS: TrendDisplayUnit[] = [
+  "day",
+  "week",
+  "1m",
+  "3m",
+  "6m",
+  "12m",
+];
 
 export type AggregatedTrendPoint = SnapshotTrendPointDto & {
   bucketKey: string;
   bucketLabel: string;
   sourceAsOfDate: string;
-};
-
-export type ResolveTrendDisplayUnitParams = {
-  preset: SnapshotPeriodPreset;
-  calendarMonth?: string | null;
-  customFrom?: string | null;
-  customTo?: string | null;
 };
 
 export type TrendDisplayPointsResult = {
@@ -22,11 +23,22 @@ export type TrendDisplayPointsResult = {
 };
 
 export const TREND_DISPLAY_UNIT_LABELS: Record<TrendDisplayUnit, string> = {
-  day: "日次表示",
-  month: "月次表示（各月の最終基準日）",
+  day: "1日単位",
+  week: "1週間単位",
+  "1m": "1か月単位",
+  "3m": "3か月単位",
+  "6m": "6か月単位",
+  "12m": "12か月単位",
 };
 
-const CUSTOM_RANGE_DAY_THRESHOLD = 31;
+const MONTH_UNIT_MONTHS: Record<Exclude<TrendDisplayUnit, "day" | "week">, number> = {
+  "1m": 1,
+  "3m": 3,
+  "6m": 6,
+  "12m": 12,
+};
+
+const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 
 function parseIsoDate(value: string): Date | null {
   let result: Date | null = null;
@@ -49,78 +61,60 @@ function parseIsoDate(value: string): Date | null {
   return result;
 }
 
-function computeCustomRangeSpanDays(from: string, to: string): number | null {
+function formatIsoDate(date: Date): string {
+  let result = "";
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  result = `${year}-${month}-${day}`;
+  return result;
+}
+
+function addDays(date: Date, days: number): Date {
+  let result = new Date(date.getTime());
+  result.setUTCDate(result.getUTCDate() + days);
+  return result;
+}
+
+function addMonths(date: Date, months: number): Date {
+  let result = new Date(date.getTime());
+  result.setUTCMonth(result.getUTCMonth() + months);
+  return result;
+}
+
+function daysBetween(from: string, to: string): number | null {
   let result: number | null = null;
   const fromDate = parseIsoDate(from);
   const toDate = parseIsoDate(to);
   if (!fromDate || !toDate) {
     return result;
   }
-  const left = fromDate.getTime();
-  const right = toDate.getTime();
-  if (left > right) {
+  const delta = toDate.getTime() - fromDate.getTime();
+  if (delta < 0) {
     return result;
   }
-  const millisecondsPerDay = 24 * 60 * 60 * 1000;
-  result = Math.floor((right - left) / millisecondsPerDay) + 1;
+  result = Math.floor(delta / MILLISECONDS_PER_DAY);
   return result;
 }
 
-export function resolveTrendDisplayUnit(
-  params: ResolveTrendDisplayUnitParams,
-): TrendDisplayUnit {
-  let result: TrendDisplayUnit = "month";
-
-  if (params.preset === "1w") {
-    result = "day";
-    return result;
+function minIsoDate(left: string, right: string): string {
+  let result = left;
+  if (right < left) {
+    result = right;
   }
-
-  if (params.calendarMonth) {
-    result = "day";
-    return result;
-  }
-
-  if (params.customFrom || params.customTo) {
-    const from = params.customFrom ?? params.customTo ?? "";
-    const to = params.customTo ?? params.customFrom ?? "";
-    const spanDays = computeCustomRangeSpanDays(from, to);
-    if (spanDays !== null && spanDays <= CUSTOM_RANGE_DAY_THRESHOLD) {
-      result = "day";
-      return result;
-    }
-    return result;
-  }
-
   return result;
 }
 
-export function resolveTrendDisplayUnitWithFallback(
-  points: SnapshotTrendPointDto[],
-  params: ResolveTrendDisplayUnitParams,
-): TrendDisplayUnit {
-  let result = resolveTrendDisplayUnit(params);
-
-  if (result === "month" && points.length >= 2) {
-    const monthlyBuckets = aggregateTrendPoints(points, "month");
-    if (monthlyBuckets.length < 2) {
-      result = "day";
-    }
+export function readTrendDisplayUnit(value: string | null): TrendDisplayUnit {
+  let result: TrendDisplayUnit = "day";
+  if (value && TREND_DISPLAY_UNITS.includes(value as TrendDisplayUnit)) {
+    result = value as TrendDisplayUnit;
   }
-
   return result;
 }
 
 export function formatTrendBucketLabel(bucketKey: string, unit: TrendDisplayUnit): string {
   let result = bucketKey;
-
-  if (unit === "month") {
-    const match = /^(\d{4})-(\d{2})$/.exec(bucketKey);
-    if (match) {
-      result = `${Number(match[1])}年${Number(match[2])}月`;
-      return result;
-    }
-  }
 
   const dayMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(bucketKey);
   if (dayMatch) {
@@ -128,24 +122,105 @@ export function formatTrendBucketLabel(bucketKey: string, unit: TrendDisplayUnit
     return result;
   }
 
+  if (unit !== "day" && unit !== "week") {
+    return result;
+  }
+
   return result;
 }
 
-function resolveBucketKey(asOfDate: string, unit: TrendDisplayUnit): string {
-  let result = asOfDate;
-  if (unit === "month") {
-    const match = /^(\d{4})-(\d{2})-\d{2}$/.exec(asOfDate);
-    if (match) {
-      result = `${match[1]}-${match[2]}`;
+function resolveRollingBucketIndex(
+  asOfDate: string,
+  unit: TrendDisplayUnit,
+  rangeFrom: string,
+): number | null {
+  let result: number | null = null;
+
+  if (unit === "day") {
+    return result;
+  }
+
+  const date = parseIsoDate(asOfDate);
+  const anchor = parseIsoDate(rangeFrom);
+  if (!date || !anchor) {
+    return result;
+  }
+
+  if (unit === "week") {
+    const elapsedDays = daysBetween(rangeFrom, asOfDate);
+    if (elapsedDays === null) {
       return result;
     }
+    result = Math.floor(elapsedDays / 7);
+    return result;
   }
+
+  const monthSpan = MONTH_UNIT_MONTHS[unit];
+  let index = 0;
+  while (index < 10_000) {
+    const bucketStart = addMonths(anchor, index * monthSpan);
+    const bucketEnd = addDays(addMonths(anchor, (index + 1) * monthSpan), -1);
+    if (date >= bucketStart && date <= bucketEnd) {
+      result = index;
+      return result;
+    }
+    if (date < bucketStart) {
+      return result;
+    }
+    index += 1;
+  }
+
+  return result;
+}
+
+function resolveRollingBucketEndDate(
+  bucketIndex: number,
+  unit: TrendDisplayUnit,
+  rangeFrom: string,
+  rangeTo: string,
+): string | null {
+  let result: string | null = null;
+  const anchor = parseIsoDate(rangeFrom);
+  if (!anchor) {
+    return result;
+  }
+
+  if (unit === "week") {
+    const bucketEnd = addDays(anchor, bucketIndex * 7 + 6);
+    result = minIsoDate(formatIsoDate(bucketEnd), rangeTo);
+    return result;
+  }
+
+  if (unit === "day") {
+    return result;
+  }
+
+  const monthSpan = MONTH_UNIT_MONTHS[unit];
+  const bucketEnd = addDays(addMonths(anchor, (bucketIndex + 1) * monthSpan), -1);
+  result = minIsoDate(formatIsoDate(bucketEnd), rangeTo);
+  return result;
+}
+
+function resolveRollingBucketKey(
+  asOfDate: string,
+  unit: TrendDisplayUnit,
+  rangeFrom: string,
+  rangeTo: string,
+): string | null {
+  let result: string | null = null;
+  const bucketIndex = resolveRollingBucketIndex(asOfDate, unit, rangeFrom);
+  if (bucketIndex === null) {
+    return result;
+  }
+  result = resolveRollingBucketEndDate(bucketIndex, unit, rangeFrom, rangeTo);
   return result;
 }
 
 export function aggregateTrendPoints(
   points: SnapshotTrendPointDto[],
   unit: TrendDisplayUnit,
+  rangeFrom: string,
+  rangeTo: string,
 ): AggregatedTrendPoint[] {
   let result: AggregatedTrendPoint[] = [];
 
@@ -170,7 +245,10 @@ export function aggregateTrendPoints(
 
   const buckets = new Map<string, SnapshotTrendPointDto>();
   for (const point of points) {
-    const bucketKey = resolveBucketKey(point.asOfDate, unit);
+    const bucketKey = resolveRollingBucketKey(point.asOfDate, unit, rangeFrom, rangeTo);
+    if (!bucketKey) {
+      continue;
+    }
     const existing = buckets.get(bucketKey);
     if (!existing || point.asOfDate > existing.asOfDate) {
       buckets.set(bucketKey, point);
@@ -207,7 +285,7 @@ export function buildTrendDisplayPoints(
     return result;
   }
 
-  const allAggregated = aggregateTrendPoints(points, unit);
+  const allAggregated = aggregateTrendPoints(points, unit, rangeFrom, rangeTo);
 
   result.displayPoints = allAggregated.filter(
     (point) => point.sourceAsOfDate >= rangeFrom && point.sourceAsOfDate <= rangeTo,
@@ -220,3 +298,12 @@ export function buildTrendDisplayPoints(
 
   return result;
 }
+
+export const TREND_DISPLAY_UNIT_SINGLE_BUCKET_NOTES: Record<TrendDisplayUnit, string> = {
+  day: "この期間は1日分のデータです",
+  week: "この期間は1週間分のデータです",
+  "1m": "この期間は1か月分のデータです",
+  "3m": "この期間は3か月分のデータです",
+  "6m": "この期間は6か月分のデータです",
+  "12m": "この期間は12か月分のデータです",
+};

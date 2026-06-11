@@ -1,4 +1,9 @@
-import { computeTrendPeriodDeltas, type AggregatedTrendPoint } from "@repo/shared";
+import {
+  computeTrendPeriodDeltas,
+  TREND_DISPLAY_UNIT_SINGLE_BUCKET_NOTES,
+  type AggregatedTrendPoint,
+  type TrendDisplayUnit,
+} from "@repo/shared";
 
 export type TrendChartBuckets = {
   chartPoints: AggregatedTrendPoint[];
@@ -12,7 +17,7 @@ export type TrendChartBuckets = {
 type BuildTrendChartBucketsParams = {
   displayPoints: AggregatedTrendPoint[];
   baselinePoint: AggregatedTrendPoint | null;
-  trendDisplayUnit: "day" | "month";
+  trendDisplayUnit: TrendDisplayUnit;
   formatBaselineSummary?: (baseline: AggregatedTrendPoint, current: AggregatedTrendPoint) => string | null;
 };
 
@@ -45,10 +50,7 @@ export function buildTrendChartBuckets(
   result.hasTrendLines = displayPoints.length >= 2 || baselinePoint !== null;
 
   if (displayPoints.length === 1) {
-    result.singleBucketNote =
-      trendDisplayUnit === "day"
-        ? "この期間は1日分のデータです"
-        : "この期間は1か月分のデータです";
+    result.singleBucketNote = TREND_DISPLAY_UNIT_SINGLE_BUCKET_NOTES[trendDisplayUnit];
     if (baselinePoint && params.formatBaselineSummary) {
       result.baselineSummary = params.formatBaselineSummary(
         baselinePoint,

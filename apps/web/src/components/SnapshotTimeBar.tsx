@@ -4,7 +4,10 @@ import {
   findAdjacentSnapshotDate,
   listCalendarMonthOptions,
   SNAPSHOT_PERIOD_PRESET_LABELS,
+  TREND_DISPLAY_UNIT_LABELS,
+  TREND_DISPLAY_UNITS,
   type SnapshotPeriodPreset,
+  type TrendDisplayUnit,
 } from "@repo/shared";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -60,6 +63,8 @@ export function SnapshotTimeBar() {
     setCustomTo,
     calendarMonth,
     setCalendarMonth,
+    trendDisplayUnit,
+    setTrendDisplayUnit,
     loadingDates,
     isHistoricalView,
     emphasizeAsOf,
@@ -232,6 +237,29 @@ export function SnapshotTimeBar() {
                 </SelectContent>
               </Select>
             ) : null}
+          </div>
+          <div className="flex flex-wrap items-center gap-2 pl-0 sm:pl-14">
+            <span className="min-w-12 text-xs font-semibold text-muted-foreground">表示単位</span>
+            <Select
+              value={trendDisplayUnit}
+              onValueChange={(value) => {
+                setTrendDisplayUnit(value as TrendDisplayUnit);
+              }}
+            >
+              <SelectTrigger className="w-[9rem]" aria-label="表示単位を選択">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {TREND_DISPLAY_UNITS.map((unit) => {
+                  let item = (
+                    <SelectItem key={unit} value={unit}>
+                      {TREND_DISPLAY_UNIT_LABELS[unit]}
+                    </SelectItem>
+                  );
+                  return item;
+                })}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>

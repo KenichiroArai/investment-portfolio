@@ -2,9 +2,13 @@
 
 import {
   buildTrendDisplayPoints,
+  detectMatchingPreset,
+  getCalendarMonthDateRange,
+  readTrendDisplayUnit,
   resolveDateRange,
   resolveLatestSnapshotDate,
-  resolveTrendDisplayUnitWithFallback,
+  resolvePeriodBounds,
+  resolvePeriodBoundsForPreset,
   TREND_DISPLAY_UNIT_LABELS,
   type AggregatedTrendPoint,
   type CurrentSnapshotDto,
@@ -40,7 +44,7 @@ type PortfolioTimeContextValue = {
   selectedAsOfDate: string | null;
   setSelectedAsOfDate: (asOfDate: string) => void;
   jumpToLatest: () => void;
-  periodPreset: SnapshotPeriodPreset;
+  periodPreset: SnapshotPeriodPreset | null;
   setPeriodPreset: (preset: SnapshotPeriodPreset) => void;
   customFrom: string;
   customTo: string;
@@ -52,6 +56,7 @@ type PortfolioTimeContextValue = {
   snapshot: CurrentSnapshotDto | null;
   trends: SnapshotTrendsDto | null;
   trendDisplayUnit: TrendDisplayUnit;
+  setTrendDisplayUnit: (unit: TrendDisplayUnit) => void;
   trendDisplayUnitLabel: string;
   displayTrendPoints: AggregatedTrendPoint[];
   baselinePoint: AggregatedTrendPoint | null;
@@ -105,10 +110,26 @@ export function PortfolioTimeProvider({
   const [loadingTrends, setLoadingTrends] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const periodPreset = readPeriodPreset(searchParams.get("period"));
   const customFrom = searchParams.get("from") ?? "";
   const customTo = searchParams.get("to") ?? "";
   const calendarMonth = searchParams.get("month") ?? "";
+  const trendDisplayUnit = readTrendDisplayUnit(searchParams.get("unit"));
+
+  const periodPreset = useMemo(() => {
+    let result: SnapshotPeriodPreset | null = detectMatchingPreset(
+      availableDates,
+      customFrom || null,
+      customTo || null,
+    );
+    if (result !== null) {
+      return result;
+    }
+    if (!customFrom && !customTo) {
+      result = readPeriodPreset(searchParams.get("period"));
+      return result;
+    }
+    return null;
+  }, [availableDates, customFrom, customTo, searchParams]);
 
   const emphasizeAsOf = !pathname.includes("/trends");
   const emphasizePeriod = pathname.includes("/trends") || pathname.endsWith(`/portfolios/${portfolioCode}/`) || pathname.endsWith(`/portfolios/${portfolioCode}`);
@@ -154,15 +175,19 @@ export function PortfolioTimeProvider({
   const setPeriodPreset = useCallback(
     (preset: SnapshotPeriodPreset) => {
       let result: void = undefined;
+      const bounds = resolvePeriodBoundsForPreset(preset, availableDates);
+      if (!bounds) {
+        return result;
+      }
       updateSearchParams({
-        period: preset === "all" ? null : preset,
-        from: null,
-        to: null,
+        from: bounds.from,
+        to: bounds.to,
+        period: null,
         month: null,
       });
       return result;
     },
-    [updateSearchParams],
+    [availableDates, updateSearchParams],
   );
 
   const setCustomFrom = useCallback(
@@ -194,11 +219,26 @@ export function PortfolioTimeProvider({
   const setCalendarMonth = useCallback(
     (value: string) => {
       let result: void = undefined;
+      const range = getCalendarMonthDateRange(value);
+      if (!range) {
+        return result;
+      }
       updateSearchParams({
         month: value || null,
+        from: range.from,
+        to: range.to,
         period: null,
-        from: null,
-        to: null,
+      });
+      return result;
+    },
+    [updateSearchParams],
+  );
+
+  const setTrendDisplayUnit = useCallback(
+    (unit: TrendDisplayUnit) => {
+      let result: void = undefined;
+      updateSearchParams({
+        unit: unit === "day" ? null : unit,
       });
       return result;
     },
@@ -363,16 +403,31 @@ export function PortfolioTimeProvider({
     return result;
   }, [portfolioCode, pathname, selectedAsOfDate, currentAsOfDate]);
 
-  const rangeDates = useMemo(() => {
-    let result = resolveDateRange({
+  const periodBounds = useMemo(() => {
+    let result = resolvePeriodBounds({
       availableDates,
-      preset: periodPreset,
+      preset: periodPreset ?? "all",
       customFrom: customFrom || null,
       customTo: customTo || null,
       calendarMonth: calendarMonth || null,
     });
     return result;
   }, [availableDates, periodPreset, customFrom, customTo, calendarMonth]);
+
+  const rangeDates = useMemo(() => {
+    let result: string[] = [];
+    if (!periodBounds) {
+      return result;
+    }
+    result = resolveDateRange({
+      availableDates,
+      preset: periodPreset ?? "all",
+      customFrom: customFrom || null,
+      customTo: customTo || null,
+      calendarMonth: calendarMonth || null,
+    });
+    return result;
+  }, [availableDates, periodPreset, customFrom, customTo, calendarMonth, periodBounds]);
 
   const rangeDatesKey = rangeDates.join(",");
   const availableDatesKey = availableDates.join(",");
@@ -390,15 +445,15 @@ export function PortfolioTimeProvider({
         return loadResult;
       }
 
-      if (rangeDates.length === 0) {
+      if (rangeDates.length === 0 || !periodBounds) {
         setTrends(null);
         setLoadingTrends(false);
         return loadResult;
       }
 
       setLoadingTrends(true);
-      const rangeFrom = rangeDates[0];
-      const rangeTo = rangeDates[rangeDates.length - 1];
+      const rangeFrom = periodBounds.from;
+      const rangeTo = periodBounds.to;
       const priorDates = availableDates.filter((date) => date < rangeFrom);
       const baselineDate = priorDates.at(-1) ?? null;
       const fetchFrom = baselineDate ?? rangeFrom;
@@ -442,26 +497,7 @@ export function PortfolioTimeProvider({
       cancelled = true;
     };
     return result;
-  }, [portfolioCode, pathname, rangeDatesKey, availableDatesKey]);
-
-  const trendDisplayParams = useMemo(
-    () => ({
-      preset: periodPreset,
-      calendarMonth: calendarMonth || null,
-      customFrom: customFrom || null,
-      customTo: customTo || null,
-    }),
-    [periodPreset, calendarMonth, customFrom, customTo],
-  );
-
-  const trendDisplayUnit = useMemo(() => {
-    let result: TrendDisplayUnit = "month";
-    if (!trends || trends.points.length === 0) {
-      return result;
-    }
-    result = resolveTrendDisplayUnitWithFallback(trends.points, trendDisplayParams);
-    return result;
-  }, [trends, trendDisplayParams]);
+  }, [portfolioCode, pathname, rangeDatesKey, availableDatesKey, periodBounds]);
 
   const { displayTrendPoints, baselinePoint } = useMemo(() => {
     let result = {
@@ -504,6 +540,7 @@ export function PortfolioTimeProvider({
       snapshot,
       trends,
       trendDisplayUnit,
+      setTrendDisplayUnit,
       trendDisplayUnitLabel: TREND_DISPLAY_UNIT_LABELS[trendDisplayUnit],
       displayTrendPoints,
       baselinePoint,
@@ -538,6 +575,7 @@ export function PortfolioTimeProvider({
     snapshot,
     trends,
     trendDisplayUnit,
+    setTrendDisplayUnit,
     displayTrendPoints,
     baselinePoint,
     loadingDates,

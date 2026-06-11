@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  detectMatchingPreset,
   filterDatesInRange,
   findAdjacentSnapshotDate,
   listCalendarMonthOptions,
   resolveDateRange,
   resolveLatestSnapshotDate,
+  resolvePeriodBoundsForPreset,
   __snapshotTimeRangeTesting,
 } from "../src/snapshot-time-range";
 
@@ -106,6 +108,21 @@ describe("snapshot-time-range", () => {
         calendarMonth: "2026-13",
       }),
     ).toEqual(dates);
+  });
+
+  it("resolves period bounds and detects matching preset from custom range", () => {
+    expect(resolvePeriodBoundsForPreset("1w", dates)).toEqual({
+      from: "2026-06-01",
+      to: "2026-06-07",
+    });
+    expect(resolvePeriodBoundsForPreset("all", dates)).toEqual({
+      from: "2026-01-15",
+      to: "2026-06-07",
+    });
+    expect(
+      detectMatchingPreset(dates, "2026-06-01", "2026-06-07"),
+    ).toBe("1w");
+    expect(detectMatchingPreset(dates, "2026-01-01", "2026-06-07")).toBeNull();
   });
 
   it("covers internal date parsing and preset bounds", () => {

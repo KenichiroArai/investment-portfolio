@@ -166,6 +166,31 @@ describe("PortfolioTimeContext", () => {
     });
   });
 
+  it("writes from and to when a period preset is selected", async () => {
+    const user = userEvent.setup();
+    stubPortfolioFetch();
+
+    render(
+      <PortfolioTimeProvider portfolioCode="ideco">
+        <PortfolioTimeConsumer />
+      </PortfolioTimeProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("dates")).toHaveTextContent("2026-05-31,2026-06-07");
+    });
+
+    await user.click(screen.getByRole("button", { name: "1か月" }));
+    await waitFor(() => {
+      expect(replace).toHaveBeenCalledWith(
+        expect.stringContaining("from=2026-05-07"),
+      );
+      expect(replace).toHaveBeenCalledWith(
+        expect.stringContaining("to=2026-06-07"),
+      );
+    });
+  });
+
   it("shows error when dates fetch fails", async () => {
     vi.stubGlobal(
       "fetch",
