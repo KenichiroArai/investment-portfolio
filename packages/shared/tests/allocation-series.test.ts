@@ -75,6 +75,26 @@ describe("allocation-series", () => {
     expect(largest?.key).toBe("b");
   });
 
+  it("keeps the current largest when a later change is smaller", () => {
+    const largest = findLargestAllocationShareChange([
+      {
+        key: "b",
+        label: "B",
+        startRatio: 0.5,
+        endRatio: 0.4,
+        deltaRatio: -0.1,
+      },
+      {
+        key: "a",
+        label: "A",
+        startRatio: 0.1,
+        endRatio: 0.12,
+        deltaRatio: 0.02,
+      },
+    ]);
+    expect(largest?.key).toBe("b");
+  });
+
   it("resolves default display unit from period preset", () => {
     expect(resolveDefaultTrendDisplayUnit("1w")).toBe("day");
     expect(resolveDefaultTrendDisplayUnit("1m")).toBe("day");
@@ -85,6 +105,8 @@ describe("allocation-series", () => {
     expect(resolveDefaultTrendDisplayUnit("all", 11)).toBe("day");
     expect(resolveDefaultTrendDisplayUnit("all", 60)).toBe("week");
     expect(resolveDefaultTrendDisplayUnit("12m", 20)).toBe("day");
+    expect(resolveDefaultTrendDisplayUnit("12m", 60)).toBe("week");
+    expect(resolveDefaultTrendDisplayUnit("12m", 400)).toBe("1m");
   });
 
   it("resolves default display unit from range day count when preset is null", () => {

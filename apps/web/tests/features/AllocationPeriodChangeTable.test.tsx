@@ -48,7 +48,9 @@ describe("AllocationPeriodChangeTable", () => {
     expect(screen.getByRole("heading", { name: "期間内の構成変化" })).toBeInTheDocument();
     expect(screen.getByText("国内")).toBeInTheDocument();
     expect(screen.getByText("海外")).toBeInTheDocument();
-    expect(screen.getByText(/行をクリックすると下の折れ線グラフに追加されます/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/行をクリックすると下の折れ線グラフの表示を切り替えられます/),
+    ).toBeInTheDocument();
   });
 
   it("toggles row selection on click", async () => {

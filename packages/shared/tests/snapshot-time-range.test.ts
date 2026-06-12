@@ -113,6 +113,7 @@ describe("snapshot-time-range", () => {
   });
 
   it("resolves period bounds and detects matching preset from custom range", () => {
+    expect(resolvePeriodBoundsForPreset("1w", [])).toBeNull();
     expect(resolvePeriodBoundsForPreset("1w", dates)).toEqual({
       from: "2026-06-01",
       to: "2026-06-07",
@@ -176,6 +177,10 @@ describe("snapshot-time-range", () => {
     });
     expect(getCalendarMonthDateRange("invalid")).toBeNull();
     expect(resolvePeriodBounds({ availableDates: [], preset: "all" })).toBeNull();
+    expect(resolvePeriodBounds({ availableDates: dates, preset: "all" })).toEqual({
+      from: "2026-01-15",
+      to: "2026-06-07",
+    });
     expect(resolvePeriodBounds({ availableDates: dates, preset: "1w" })).toEqual({
       from: "2026-06-01",
       to: "2026-06-07",

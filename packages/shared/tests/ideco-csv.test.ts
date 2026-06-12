@@ -38,6 +38,14 @@ import {
   IDECO_INSTRUMENTS_CSV_HEADERS,
   parseIdecoInstrumentsCsv,
 } from "../src/ideco-instruments-csv";
+import {
+  buildIdecoInstrumentAttributes,
+  IDECO_INSTRUMENT_ATTRIBUTE_CODES,
+} from "../src/ideco-instrument-attributes";
+import {
+  buildIdecoKakeiboMetrics,
+  IDECO_KAKEIBO_METRIC_CODES,
+} from "../src/holding-line-metrics";
 import { IDECO_PORTFOLIO_METRIC_CODES } from "../src/ideco-portfolio-metrics";
 import { parseIdecoProductTypesCsv } from "../src/ideco-product-types-csv";
 
@@ -62,6 +70,54 @@ describe("ideco csv parsers", () => {
     expect(resolveIdecoAnalysisTags("principal_protected")).toBeNull();
   });
 
+  it("builds ideco instrument attributes and holding metrics", () => {
+    expect(
+      buildIdecoInstrumentAttributes({
+        shortName: "eMAXIS Slim",
+        provider: "三菱UFJ",
+        trustFeeText: "0.143以内",
+        trustReserveText: "0",
+      }),
+    ).toEqual([
+      {
+        code: IDECO_INSTRUMENT_ATTRIBUTE_CODES.shortName,
+        textValue: "eMAXIS Slim",
+      },
+      {
+        code: IDECO_INSTRUMENT_ATTRIBUTE_CODES.provider,
+        textValue: "三菱UFJ",
+      },
+      {
+        code: IDECO_INSTRUMENT_ATTRIBUTE_CODES.trustFeeText,
+        textValue: "0.143以内",
+      },
+      {
+        code: IDECO_INSTRUMENT_ATTRIBUTE_CODES.trustReserveText,
+        textValue: "0",
+      },
+    ]);
+    expect(
+      buildIdecoKakeiboMetrics({
+        unitPricePerTenThousandLots: 31351,
+        unrealizedGainMinor: 2638,
+        unrealizedGainRate: 0.021,
+      }),
+    ).toEqual([
+      {
+        code: IDECO_KAKEIBO_METRIC_CODES.unitPricePerTenThousandLots,
+        integerValue: 31351,
+      },
+      {
+        code: IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor,
+        integerValue: 2638,
+      },
+      {
+        code: IDECO_KAKEIBO_METRIC_CODES.unrealizedGainRate,
+        realValue: 0.021,
+      },
+    ]);
+  });
+
   it("parses product types, instruments, holdings, and analysis csv", () => {
     const productTypes = parseIdecoProductTypesCsv(`商品タイプ\n国内株式\n海外株式\n`);
     expect(productTypes.rows).toHaveLength(2);
@@ -74,6 +130,20 @@ describe("ideco csv parsers", () => {
     expect(instruments.rows[0]).toMatchObject({
       shortName: "eMAXIS Slim 国内株式(TOPIX)",
       productTypeCode: "domestic_equity",
+      productStyleName: "パッシブ",
+      statusName: null,
+    });
+
+    const instrumentsWithoutStyle = parseIdecoInstrumentsCsv(
+      `No.,大分類,商品タイプ,商品タイプ(スタイル),ステータス,運用商品名,運用商品名(略称),提供・委託会社,信託報酬（％）（税込）,信託財産保留額（％）
+2,投資信託,国内株式,,,フルネーム2,eMAXIS Slim 海外株式,三菱UFJアセットマネジメント,0.143以内,0
+`,
+    );
+    expect(instrumentsWithoutStyle.rows[0]).toMatchObject({
+      productStyleName: null,
+      productStyleCode: null,
+      statusName: null,
+      statusCode: null,
     });
 
     const holdings = parseIdecoHoldingsCsv(HOLDINGS_CSV);
