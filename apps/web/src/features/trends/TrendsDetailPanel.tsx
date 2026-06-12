@@ -10,13 +10,9 @@ import {
 } from "@repo/shared";
 import { useMemo, useState, type ReactNode } from "react";
 
-import { AllocationPeriodChangeTable } from "@/features/trends/AllocationPeriodChangeTable";
 import { buildAllocationChartSeries } from "@/features/trends/build-allocation-chart-series";
-import { CompositionRatioLineChart } from "@/features/trends/CompositionRatioLineChart";
-import { TrendBarChart } from "@/features/trends/TrendBarChart";
-import { TrendLineChart } from "@/features/trends/TrendLineChart";
+import { TrendMetricTabs } from "@/features/trends/TrendMetricTabs";
 import { TrendPeriodSummary } from "@/features/trends/TrendPeriodSummary";
-import { TrendStackedAreaChart } from "@/features/trends/TrendStackedAreaChart";
 import {
   buildTrendChartBuckets,
   computeTrendChartDeltas,
@@ -27,7 +23,6 @@ import {
   formatAsOfDateJa,
   formatMarketValueBaselineSummary,
   formatPercent,
-  formatTrendChartMeta,
   formatYen,
 } from "@/lib/format-yen";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
@@ -104,7 +99,6 @@ export function TrendsDetailPanel() {
   } = usePortfolioTime();
   const [selectedSchemeCode, setSelectedSchemeCode] = useState("");
   const [selectedCompositionKeys, setSelectedCompositionKeys] = useState<string[]>([]);
-  const [detailsOpen, setDetailsOpen] = useState(false);
 
   const schemeCodes = snapshot?.analysisSchemes ?? [];
   const activeSchemeCode =
@@ -353,151 +347,37 @@ export function TrendsDetailPanel() {
         baselineSummary={baselineSummary}
       />
 
-      {schemeCodes.length > 0 && allocationSeries.length > 0 ? (
-        <section className="trends-detail__section trends-detail__section--hero">
-          <div className="analysis-axis-tabs" role="tablist" aria-label="分析軸">
-            {schemeCodes.map((scheme) => {
-              let tab = (
-                <button
-                  key={scheme.schemeCode}
-                  type="button"
-                  role="tab"
-                  aria-selected={scheme.schemeCode === activeSchemeCode}
-                  className={
-                    scheme.schemeCode === activeSchemeCode ? "is-active" : undefined
-                  }
-                  onClick={() => {
-                    setSelectedSchemeCode(scheme.schemeCode);
-                    setSelectedCompositionKeys([]);
-                  }}
-                >
-                  {scheme.schemeName}
-                </button>
-              );
-              return tab;
-            })}
-          </div>
-          {activeScheme ? (
-            <p className="trends-detail__scheme-label">{activeScheme.schemeName}</p>
-          ) : null}
-          <TrendStackedAreaChart
-            title="構成比の推移"
-            caption={trendDisplayUnitLabel}
-            labels={labels}
-            sourceDates={sourceDates}
-            sourceDateLabels={sourceDateLabels}
-            series={allocationSeries.map((item) => ({
-              ...item,
-              formatValue: (value) => formatPercent(value),
-            }))}
-            height={300}
-            selectedSeriesKeys={effectiveSelectedCompositionKeys}
-            onSeriesToggle={handleCompositionToggle}
-          />
-        </section>
-      ) : null}
-
-      {ratioSeries.length > 0 ? (
-        <section className="trends-detail__section">
-          <CompositionRatioLineChart
-            labels={labels}
-            sourceDates={sourceDates}
-            sourceDateLabels={sourceDateLabels}
-            ratioSeries={ratioSeries}
-            selectedKeys={effectiveSelectedCompositionKeys}
-            caption={trendDisplayUnitLabel}
-          />
-        </section>
-      ) : null}
-
-      {periodChangeRows.length > 0 ? (
-        <section className="trends-detail__section">
-          <AllocationPeriodChangeTable
-            rows={periodChangeRows}
-            selectedKeys={effectiveSelectedCompositionKeys}
-            startDateLabel={startDateLabel}
-            endDateLabel={endDateLabel}
-            onToggleRow={handleCompositionToggle}
-          />
-        </section>
-      ) : null}
-
-      <section className="trends-detail__section">
-        <TrendLineChart
-          title="総資産の推移"
-          caption={trendDisplayUnitLabel}
-          valueKind="yen"
-          height={180}
-          labels={labels}
-          sourceDates={sourceDates}
-          sourceDateLabels={sourceDateLabels}
-          series={[
-            {
-              key: "market-value",
-              label: "評価額",
-              color: "#2563eb",
-              values: marketValueLevelValues,
-              formatValue: (value) => formatYen(value),
-            },
-          ]}
-        />
-      </section>
-
-      <section className="trends-detail__section trends-detail__details">
-        <button
-          type="button"
-          className="trends-detail__details-toggle"
-          aria-expanded={detailsOpen}
-          onClick={() => {
-            setDetailsOpen((open) => !open);
-          }}
-        >
-          詳細指標を{detailsOpen ? "閉じる" : "表示"}
-        </button>
-        {detailsOpen ? (
-          <div className="trends-detail__details-panel">
-            <TrendBarChart
-              title="評価額の増減"
-              caption={trendDisplayUnitLabel}
-              valueKind="yen"
-              height={180}
-              labels={labels}
-              sourceDates={sourceDates}
-              sourceDateLabels={sourceDateLabels}
-              mode="grouped"
-              series={marketValueDeltaSeries}
-            />
-            <div className="trends-detail__subsection">
-              <TrendBarChart
-                title="評価損益の増減"
-                caption={trendDisplayUnitLabel}
-                valueKind="yen"
-                height={180}
-                labels={labels}
-                sourceDates={sourceDates}
-                sourceDateLabels={sourceDateLabels}
-                mode="grouped"
-                series={gainDeltaSeries}
-              />
-            </div>
-            {gainRateSeries.length > 0 ? (
-              <div className="trends-detail__subsection">
-                <TrendLineChart
-                  title="利益率の推移"
-                  caption={formatTrendChartMeta(trendDisplayUnitLabel, "percent")}
-                  valueKind="percent"
-                  height={180}
-                  labels={labels}
-                  sourceDates={sourceDates}
-                  sourceDateLabels={sourceDateLabels}
-                  domainMode="fitData"
-                  series={gainRateSeries}
-                />
-              </div>
-            ) : null}
-          </div>
-        ) : null}
-      </section>
+      <TrendMetricTabs
+        key={snapshot?.asOfDate ?? "pending"}
+        labels={labels}
+        sourceDates={sourceDates}
+        sourceDateLabels={sourceDateLabels}
+        trendDisplayUnitLabel={trendDisplayUnitLabel}
+        marketValueLevelValues={marketValueLevelValues}
+        marketValueDeltaSeries={marketValueDeltaSeries}
+        gainDeltaSeries={gainDeltaSeries}
+        gainRateSeries={gainRateSeries}
+        allocation={
+          schemeCodes.length > 0 && allocationSeries.length > 0
+            ? {
+                schemeCodes,
+                activeSchemeCode,
+                onSchemeChange: (schemeCode) => {
+                  setSelectedSchemeCode(schemeCode);
+                  setSelectedCompositionKeys([]);
+                },
+                activeSchemeName: activeScheme?.schemeName ?? null,
+                allocationSeries,
+                ratioSeries,
+                periodChangeRows,
+                selectedCompositionKeys: effectiveSelectedCompositionKeys,
+                onCompositionToggle: handleCompositionToggle,
+                startDateLabel,
+                endDateLabel,
+              }
+            : null
+        }
+      />
     </div>
   );
   return result;
