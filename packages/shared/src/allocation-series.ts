@@ -183,6 +183,16 @@ export function resolveDefaultTrendDisplayUnit(
   }
 
   if (preset === "12m" || preset === "all") {
+    if (rangeDayCount !== null && rangeDayCount !== undefined) {
+      if (rangeDayCount <= 31) {
+        result = "day";
+        return result;
+      }
+      if (rangeDayCount <= 186) {
+        result = "week";
+        return result;
+      }
+    }
     result = "1m";
     return result;
   }

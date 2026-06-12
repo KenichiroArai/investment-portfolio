@@ -188,6 +188,34 @@ export function TrendStackedAreaChart({
               return gridLine;
             })}
             {activeSeries.map((item, seriesIndex) => {
+              if (labels.length === 1) {
+                const bounds = resolveStackBounds(activeSeries, seriesIndex, 0);
+                if (!bounds) {
+                  return null;
+                }
+
+                const barWidth = Math.min(pointSlotWidth * 0.5, 56);
+                const barX = pointSlotWidth / 2 - barWidth / 2;
+                const yTop = valueToY(bounds.top);
+                const yBottom = valueToY(bounds.bottom);
+
+                let singleBar = (
+                  <rect
+                    key={item.key}
+                    x={barX}
+                    y={yTop}
+                    width={barWidth}
+                    height={Math.max(0, yBottom - yTop)}
+                    fill={item.color}
+                    fillOpacity={0.85}
+                    stroke={item.color}
+                    strokeWidth={0.5}
+                    className="trend-stacked-area-chart__area"
+                  />
+                );
+                return singleBar;
+              }
+
               const paths: string[] = [];
               for (let bucketIndex = 0; bucketIndex < labels.length - 1; bucketIndex += 1) {
                 const path = buildAreaPath(

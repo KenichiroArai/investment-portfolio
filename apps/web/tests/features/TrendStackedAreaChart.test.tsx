@@ -36,4 +36,32 @@ describe("TrendStackedAreaChart", () => {
     expect(screen.getByText("株式")).toBeInTheDocument();
     expect(screen.getByText("債券")).toBeInTheDocument();
   });
+
+  it("renders a stacked bar when only one bucket is available", () => {
+    const { container } = render(
+      <TrendStackedAreaChart
+        title="構成比の推移"
+        labels={["2026/6/1"]}
+        sourceDates={["2026-06-12"]}
+        series={[
+          {
+            key: "equity",
+            label: "株式",
+            color: "#2563eb",
+            values: [0.6],
+          },
+          {
+            key: "bond",
+            label: "債券",
+            color: "#16a34a",
+            values: [0.4],
+          },
+        ]}
+      />,
+    );
+
+    expect(container.querySelectorAll(".trend-stacked-area-chart__area")).toHaveLength(2);
+    expect(screen.getByText("株式")).toBeInTheDocument();
+    expect(screen.getByText("債券")).toBeInTheDocument();
+  });
 });

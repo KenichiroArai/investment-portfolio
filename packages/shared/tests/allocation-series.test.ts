@@ -82,6 +82,9 @@ describe("allocation-series", () => {
     expect(resolveDefaultTrendDisplayUnit("6m")).toBe("week");
     expect(resolveDefaultTrendDisplayUnit("12m")).toBe("1m");
     expect(resolveDefaultTrendDisplayUnit("all")).toBe("1m");
+    expect(resolveDefaultTrendDisplayUnit("all", 11)).toBe("day");
+    expect(resolveDefaultTrendDisplayUnit("all", 60)).toBe("week");
+    expect(resolveDefaultTrendDisplayUnit("12m", 20)).toBe("day");
   });
 
   it("resolves default display unit from range day count when preset is null", () => {
