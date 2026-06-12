@@ -6,12 +6,6 @@ export const STATIC_PORTFOLIOS: PortfolioDto[] = [
     "code": "ideco",
     "name": "iDeCo",
     "kind": "ideco"
-  },
-  {
-    "id": "74750b49-e56d-443f-a38b-06b831d6fafb",
-    "code": "サンプル３コード",
-    "name": "サンプル３名",
-    "kind": "satellite"
   }
 ];
 
