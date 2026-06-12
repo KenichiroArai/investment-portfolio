@@ -295,7 +295,7 @@ export function TrendBarChart({
                     const barTop = valueToY(Math.max(value, 0));
                     const barBottom = valueToY(Math.min(value, 0));
                     const barHeight = Math.max(1, Math.abs(barBottom - barTop));
-                    const barY = value >= 0 ? barTop : barBottom;
+                    const barY = Math.min(barTop, barBottom);
                     let rect = (
                       <rect
                         key={`${label}-${item.key}`}

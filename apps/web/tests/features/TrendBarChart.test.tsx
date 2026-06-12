@@ -101,6 +101,35 @@ describe("TrendBarChart", () => {
     expect(screen.getByText("表示できるデータがありません。")).toBeInTheDocument();
   });
 
+  it("anchors grouped negative bars to the zero baseline", () => {
+    const { container } = render(
+      <TrendBarChart
+        labels={["6/9", "6/10"]}
+        height={180}
+        formatYAxis={(value) => `${value}`}
+        series={[
+          {
+            key: "gain-delta",
+            label: "評価損益の変化",
+            color: "#16a34a",
+            values: [-75_000, 5_000],
+          },
+        ]}
+      />,
+    );
+
+    const zeroY = container
+      .querySelector(".trend-bar-chart__axis")
+      ?.getAttribute("y1");
+    const bars = container.querySelectorAll(".trend-bar-chart__bar");
+    expect(bars).toHaveLength(2);
+    expect(bars[0].getAttribute("y")).toBe(zeroY);
+
+    const positiveBarY = Number(bars[1].getAttribute("y"));
+    const positiveBarHeight = Number(bars[1].getAttribute("height"));
+    expect(positiveBarY + positiveBarHeight).toBeCloseTo(Number(zeroY), 0);
+  });
+
   it("uses nice yen axis ticks for grouped bars", () => {
     const { container } = render(
       <TrendBarChart
