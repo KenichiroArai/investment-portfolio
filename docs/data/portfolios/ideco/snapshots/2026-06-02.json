@@ -31,6 +31,10 @@
     {
       "schemeCode": "ideco_axis_40470d15",
       "schemeName": "主要資産：資産分類"
+    },
+    {
+      "schemeCode": "ideco_axis_4381cf4c",
+      "schemeName": "その他"
     }
   ],
   "metrics": [
@@ -43,7 +47,7 @@
   ],
   "lines": [
     {
-      "id": "f40c6937-f505-4601-85aa-cd53c9cd7309",
+      "id": "531e5128-4fef-476d-96a0-20d4ccfabd53",
       "instrumentId": "13462933-8a0b-48f4-912a-3bfd25762509",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 国内株式（ＴＯＰＩＸ）",
       "sortOrder": 1,
@@ -154,7 +158,7 @@
       ]
     },
     {
-      "id": "db94267e-649f-4402-9ead-9bc6b2cdc343",
+      "id": "a3725d67-c686-4d14-a505-45ccdd07059d",
       "instrumentId": "31275e89-c5aa-46ec-8108-bc56f6ea17b2",
       "instrumentName": "ＳＢＩ・全世界株式インデックス・ファンド",
       "sortOrder": 2,
@@ -265,7 +269,7 @@
       ]
     },
     {
-      "id": "69b02fc4-32a0-4995-a30d-61777312a814",
+      "id": "09591959-05e3-4764-bf6c-f8a37d5cc315",
       "instrumentId": "362250ad-b3df-44b8-a221-a599b923e754",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 全世界株式（除く日本）",
       "sortOrder": 3,
@@ -376,7 +380,7 @@
       ]
     },
     {
-      "id": "7efb42a0-4d95-40f0-b588-421555bbc208",
+      "id": "de9b2893-a3e8-4b78-b510-09fa21a75683",
       "instrumentId": "e251ef8b-9dc7-443f-9a76-8ae44ba08faa",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 先進国株式インデックス",
       "sortOrder": 4,
@@ -487,7 +491,7 @@
       ]
     },
     {
-      "id": "90ae3637-fb69-459a-9234-2de7fe7b5beb",
+      "id": "89157868-c67e-4d87-8236-7cdcabe21b4d",
       "instrumentId": "e6dc9d16-d6b0-4a65-ab00-e5c4d338df88",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 米国株式（Ｓ＆Ｐ５００）",
       "sortOrder": 5,
@@ -598,7 +602,7 @@
       ]
     },
     {
-      "id": "3428325d-ba1d-4a2f-8896-6c0e71a16ac1",
+      "id": "7c82935b-4e91-4565-99f5-06b7e1ea1ec9",
       "instrumentId": "a3028224-f890-4258-b8f9-417133d7cf6a",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 新興国株式インデックス",
       "sortOrder": 6,
@@ -709,7 +713,7 @@
       ]
     },
     {
-      "id": "b9fcf20b-94b5-4631-a755-49f126a37577",
+      "id": "981087d0-0fc5-4a89-9dca-64c6b1c098ed",
       "instrumentId": "bb25c6ee-a8d6-402d-b971-67f1e582c69a",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 国内債券インデックス",
       "sortOrder": 7,
@@ -826,7 +830,7 @@
       ]
     },
     {
-      "id": "896a37e3-8158-453b-a468-6fd9dc538da6",
+      "id": "529525e3-cf7e-48c1-acf1-543466e2fb4a",
       "instrumentId": "f74a084e-8eee-45c3-abef-a9337b908b01",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 先進国債券インデックス",
       "sortOrder": 8,
@@ -937,7 +941,7 @@
       ]
     },
     {
-      "id": "f850d34d-0c7c-47d2-9c76-10911932a187",
+      "id": "b86ff70d-6079-4daa-8690-b0e00d4b3f5e",
       "instrumentId": "d642675f-5dd0-42df-8feb-63429b27ca60",
       "instrumentName": "ｉＦｒｅｅ 新興国債券インデックス",
       "sortOrder": 9,
@@ -1048,7 +1052,7 @@
       ]
     },
     {
-      "id": "c3140187-6b81-4887-be76-46ca6a79fa7a",
+      "id": "c46d008d-304d-476e-a688-6998aa779042",
       "instrumentId": "37996eea-0305-4a45-8400-996f1962292c",
       "instrumentName": "ニッセイＪリートインデックスファンド（購入・換金手数料なし）",
       "sortOrder": 10,
@@ -1159,7 +1163,7 @@
       ]
     },
     {
-      "id": "1c39519e-8717-4e73-9a4a-c646a4a2a8a2",
+      "id": "6b281866-ef52-4461-869b-47a34ad070ca",
       "instrumentId": "c991d741-dcd5-479f-abd9-7da4a97e7547",
       "instrumentName": "三井住友・ＤＣ外国リートインデックスファンド",
       "sortOrder": 11,
@@ -1270,7 +1274,7 @@
       ]
     },
     {
-      "id": "eb55c16a-e33d-452c-8dc1-dbe42b16b762",
+      "id": "bc92057b-f5e0-47b8-bc06-7e7ba8718d07",
       "instrumentId": "ba158649-918a-42c7-824b-021765191743",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ バランス（８資産均等型）",
       "sortOrder": 12,
@@ -1331,6 +1335,12 @@
           "valueName": "複合"
         },
         {
+          "schemeCode": "ideco_axis_4381cf4c",
+          "schemeName": "その他",
+          "valueCode": "balanced",
+          "valueName": "内外資産複合"
+        },
+        {
           "schemeCode": "ideco_major_category",
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
@@ -1363,7 +1373,7 @@
       ]
     },
     {
-      "id": "aa1e3eec-a126-4743-bf19-a547dc11b1e2",
+      "id": "dc2b4e31-b45a-40ff-91c7-40260332cc9c",
       "instrumentId": "47ccafe2-9d8f-49a7-b922-cf2e484a7860",
       "instrumentName": "ｉＦｒｅｅ 年金バランス",
       "sortOrder": 13,
@@ -1424,6 +1434,12 @@
           "valueName": "複合"
         },
         {
+          "schemeCode": "ideco_axis_4381cf4c",
+          "schemeName": "その他",
+          "valueCode": "balanced",
+          "valueName": "内外資産複合"
+        },
+        {
           "schemeCode": "ideco_major_category",
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
@@ -1456,7 +1472,7 @@
       ]
     },
     {
-      "id": "8bd0bb13-1b8a-4573-9d40-7810ea9846f8",
+      "id": "f8d3cad4-fdd8-4d3b-94fc-7b7b6f6b482c",
       "instrumentId": "68b9b628-c237-4397-8530-c099d33c6658",
       "instrumentName": "三菱ＵＦＪ 純金ファンド（愛称：ファインゴールド）",
       "sortOrder": 14,
@@ -1517,6 +1533,12 @@
           "valueName": "その他"
         },
         {
+          "schemeCode": "ideco_axis_4381cf4c",
+          "schemeName": "その他",
+          "valueCode": "domestic_other",
+          "valueName": "国内その他資産"
+        },
+        {
           "schemeCode": "ideco_major_category",
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
@@ -1549,7 +1571,7 @@
       ]
     },
     {
-      "id": "b68c0189-cbf9-4845-988e-ad9fc3927f33",
+      "id": "1068c0a2-a2bb-4052-b1e2-c9d6b2f5e15d",
       "instrumentId": "53bdddb7-cab9-48eb-9f3e-9bf731df27b7",
       "instrumentName": "セレブライフ・ストーリー2045",
       "sortOrder": 15,
@@ -1608,6 +1630,12 @@
           "schemeName": "資産分類",
           "valueCode": "balanced",
           "valueName": "複合"
+        },
+        {
+          "schemeCode": "ideco_axis_4381cf4c",
+          "schemeName": "その他",
+          "valueCode": "balanced",
+          "valueName": "内外資産複合"
         },
         {
           "schemeCode": "ideco_major_category",

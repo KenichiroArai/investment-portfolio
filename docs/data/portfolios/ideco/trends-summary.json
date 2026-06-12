@@ -205,6 +205,20 @@
             "marketValueMinor": 105453,
             "ratio": 0.061428419141354745
           }
+        ],
+        "ideco_axis_4381cf4c": [
+          {
+            "valueCode": "domestic_other",
+            "valueName": "国内その他資産",
+            "marketValueMinor": 992331,
+            "ratio": 0.5753757539140912
+          },
+          {
+            "valueCode": "balanced",
+            "valueName": "内外資産複合",
+            "marketValueMinor": 732335,
+            "ratio": 0.4246242460859088
+          }
         ]
       }
     },
@@ -409,6 +423,20 @@
             "valueName": "不動産",
             "marketValueMinor": 104470,
             "ratio": 0.06064500698923982
+          }
+        ],
+        "ideco_axis_4381cf4c": [
+          {
+            "valueCode": "domestic_other",
+            "valueName": "国内その他資産",
+            "marketValueMinor": 984854,
+            "ratio": 0.5734937878794937
+          },
+          {
+            "valueCode": "balanced",
+            "valueName": "内外資産複合",
+            "marketValueMinor": 732434,
+            "ratio": 0.42650621212050627
           }
         ]
       }
@@ -615,6 +643,20 @@
             "marketValueMinor": 105288,
             "ratio": 0.06240028447816037
           }
+        ],
+        "ideco_axis_4381cf4c": [
+          {
+            "valueCode": "domestic_other",
+            "valueName": "国内その他資産",
+            "marketValueMinor": 953920,
+            "ratio": 0.5681402626052547
+          },
+          {
+            "valueCode": "balanced",
+            "valueName": "内外資産複合",
+            "marketValueMinor": 725102,
+            "ratio": 0.43185973739474526
+          }
         ]
       }
     },
@@ -819,6 +861,20 @@
             "valueName": "不動産",
             "marketValueMinor": 104523,
             "ratio": 0.061876890307830466
+          }
+        ],
+        "ideco_axis_4381cf4c": [
+          {
+            "valueCode": "domestic_other",
+            "valueName": "国内その他資産",
+            "marketValueMinor": 955991,
+            "ratio": 0.5689911204409603
+          },
+          {
+            "valueCode": "balanced",
+            "valueName": "内外資産複合",
+            "marketValueMinor": 724160,
+            "ratio": 0.43100887955903966
           }
         ]
       }
@@ -1025,6 +1081,20 @@
             "marketValueMinor": 106303,
             "ratio": 0.06284198553788384
           }
+        ],
+        "ideco_axis_4381cf4c": [
+          {
+            "valueCode": "domestic_other",
+            "valueName": "国内その他資産",
+            "marketValueMinor": 931306,
+            "ratio": 0.5619749433080578
+          },
+          {
+            "valueCode": "balanced",
+            "valueName": "内外資産複合",
+            "marketValueMinor": 725896,
+            "ratio": 0.4380250566919422
+          }
         ]
       }
     },
@@ -1229,6 +1299,20 @@
             "valueName": "不動産",
             "marketValueMinor": 106415,
             "ratio": 0.06356166314558408
+          }
+        ],
+        "ideco_axis_4381cf4c": [
+          {
+            "valueCode": "domestic_other",
+            "valueName": "国内その他資産",
+            "marketValueMinor": 901729,
+            "ratio": 0.5551732205414258
+          },
+          {
+            "valueCode": "balanced",
+            "valueName": "内外資産複合",
+            "marketValueMinor": 722501,
+            "ratio": 0.44482677945857424
           }
         ]
       }
