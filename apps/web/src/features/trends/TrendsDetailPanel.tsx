@@ -369,7 +369,7 @@ export function TrendsDetailPanel() {
   const gainRateBookBaseline = baselinePoint?.gainRateOnBook ?? null;
   const gainRateContributionsBaseline = baselinePoint?.gainRateOnContributions ?? null;
 
-  const gainRateSeries: TrendChartSeries[] = [
+  let gainRateSeries: TrendChartSeries[] = [
     {
       key: "gain-rate-book",
       label: "簿価ベース利益率",
@@ -392,11 +392,12 @@ export function TrendsDetailPanel() {
       tooltipUnit: "percentPoint",
       formatValue: (value: number) => formatPercent(value),
     },
-  ].filter((item) =>
+  ];
+  gainRateSeries = gainRateSeries.filter((item) =>
     item.values.some((value) => value !== null && Number.isFinite(value)),
   );
 
-  const gainRateDeltaSeries: TrendChartSeries[] = [
+  let gainRateDeltaSeries: TrendChartSeries[] = [
     {
       key: "gain-rate-book-delta",
       label: "簿価ベース利益率",
@@ -417,11 +418,12 @@ export function TrendsDetailPanel() {
       tooltipMode: "percentDelta",
       formatValue: (value: number) => formatPercentPoint(value),
     },
-  ].filter((item) =>
+  ];
+  gainRateDeltaSeries = gainRateDeltaSeries.filter((item) =>
     item.values.some((value) => value !== null && Number.isFinite(value)),
   );
 
-  const gainRateRelativeRateSeries: TrendChartSeries[] = [
+  let gainRateRelativeRateSeries: TrendChartSeries[] = [
     {
       key: "gain-rate-book-relative",
       label: "簿価ベース利益率",
@@ -454,7 +456,8 @@ export function TrendsDetailPanel() {
       tooltipUnit: "percentPoint",
       formatValue: (value: number) => formatPercentRelativeChange(value),
     },
-  ].filter((item) =>
+  ];
+  gainRateRelativeRateSeries = gainRateRelativeRateSeries.filter((item) =>
     item.values.some((value) => value !== null && Number.isFinite(value)),
   );
 
