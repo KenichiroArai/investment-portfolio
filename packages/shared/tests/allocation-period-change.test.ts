@@ -212,6 +212,8 @@ describe("allocation-period-change", () => {
     expect(sortAllocationPeriodChangeRows(rows, "startRatio", "asc")[0].key).toBe("a");
     expect(sortAllocationPeriodChangeRows(rows, "endRatio", "desc")[0].key).toBe("b");
     expect(sortAllocationPeriodChangeRows(rows, "deltaRatio", "asc", false)[0].key).toBe("b");
+    expect(sortAllocationPeriodChangeRows(rows, "relativeRate", "asc")[0].key).toBe("b");
+    expect(sortAllocationPeriodChangeRows(rows, "relativeRate", "desc")[0].key).toBe("a");
     expect(sortAllocationPeriodChangeRows(rows, "startMarketValueMinor", "desc")[0].key).toBe(
       "b",
     );
