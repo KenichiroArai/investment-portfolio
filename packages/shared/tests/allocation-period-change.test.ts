@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  __allocationPeriodChangeTesting,
   buildAllocationPeriodChangeRows,
   buildAllocationRatioSeries,
   sortAllocationPeriodChangeRows,
@@ -134,5 +135,181 @@ describe("allocation-period-change", () => {
     const rows = buildAllocationPeriodChangeRows(start, end, chartPoints, schemeCode);
     const sorted = sortAllocationPeriodChangeRows(rows, "label", "asc");
     expect(sorted.map((item) => item.label)).toEqual(["海外", "国内"]);
+  });
+
+  it("fills null ratios in series and skips rows with both ratios null", () => {
+    const sparseStart = makePoint("2026-05-31", schemeCode, [
+      {
+        valueCode: "domestic",
+        valueName: "国内",
+        marketValueMinor: 2_000_000,
+        ratio: 0.6,
+      },
+    ]);
+    const sparseEnd = makePoint("2026-06-07", schemeCode, [
+      {
+        valueCode: "foreign",
+        valueName: "海外",
+        marketValueMinor: 1_341_347,
+        ratio: 0.39,
+      },
+    ]);
+    const sparseMiddle = makePoint("2026-06-03", schemeCode, [
+      {
+        valueCode: "cash",
+        valueName: "現金",
+        marketValueMinor: 100_000,
+        ratio: 0.01,
+      },
+    ]);
+    const sparseChart = [sparseStart, sparseMiddle, sparseEnd];
+
+    const series = buildAllocationRatioSeries(sparseChart, schemeCode);
+    const cash = series.find((item) => item.key === "cash");
+    expect(cash?.values).toEqual([null, 0.01, null]);
+
+    const rows = buildAllocationPeriodChangeRows(
+      sparseStart,
+      sparseEnd,
+      sparseChart,
+      schemeCode,
+    );
+    expect(rows.map((row) => row.key).sort()).toEqual(["domestic", "foreign"]);
+    expect(rows.find((row) => row.key === "domestic")?.endRatio).toBe(0);
+  });
+
+  it("sorts rows by each numeric column in both directions", () => {
+    const rows: AllocationPeriodChangeRow[] = [
+      {
+        key: "a",
+        label: "B",
+        startRatio: 0.2,
+        endRatio: 0.3,
+        deltaRatio: 0.1,
+        startMarketValueMinor: 200,
+        endMarketValueMinor: 300,
+        deltaMarketValueMinor: 100,
+        ratioSeries: [0.2, 0.3],
+      },
+      {
+        key: "b",
+        label: "A",
+        startRatio: 0.5,
+        endRatio: 0.4,
+        deltaRatio: -0.1,
+        startMarketValueMinor: 500,
+        endMarketValueMinor: 400,
+        deltaMarketValueMinor: -100,
+        ratioSeries: [0.5, 0.4],
+      },
+    ];
+
+    expect(sortAllocationPeriodChangeRows(rows, "startRatio", "asc")[0].key).toBe("a");
+    expect(sortAllocationPeriodChangeRows(rows, "endRatio", "desc")[0].key).toBe("b");
+    expect(sortAllocationPeriodChangeRows(rows, "deltaRatio", "asc", false)[0].key).toBe("b");
+    expect(sortAllocationPeriodChangeRows(rows, "startMarketValueMinor", "desc")[0].key).toBe(
+      "b",
+    );
+    expect(sortAllocationPeriodChangeRows(rows, "endMarketValueMinor", "asc")[0].key).toBe("a");
+    expect(sortAllocationPeriodChangeRows(rows, "deltaMarketValueMinor", "desc")[0].key).toBe(
+      "a",
+    );
+    expect(sortAllocationPeriodChangeRows(rows, "deltaRatio", "asc", true)[0].key).toBe("a");
+    expect(
+      sortAllocationPeriodChangeRows(
+        rows,
+        "unknown" as AllocationPeriodChangeSortColumn,
+        "asc",
+      ),
+    ).toHaveLength(2);
+  });
+
+  it("skips rows when both start and end ratios are null", () => {
+    const nullRatioStart = makePoint("2026-05-31", schemeCode, [
+      {
+        valueCode: "ghost",
+        valueName: "ゴースト",
+        marketValueMinor: 0,
+        ratio: null as unknown as number,
+      },
+    ]);
+    const nullRatioEnd = makePoint("2026-06-07", schemeCode, [
+      {
+        valueCode: "ghost",
+        valueName: "ゴースト",
+        marketValueMinor: 0,
+        ratio: null as unknown as number,
+      },
+    ]);
+    const rows = buildAllocationPeriodChangeRows(
+      nullRatioStart,
+      nullRatioEnd,
+      [nullRatioStart, nullRatioEnd],
+      schemeCode,
+    );
+    expect(rows).toEqual([]);
+  });
+
+  it("resolves slice values and ratio labels from chart data", () => {
+    const { resolveSliceValue } = __allocationPeriodChangeTesting;
+    expect(resolveSliceValue(start, schemeCode, "missing")).toEqual({
+      ratio: null,
+      marketValueMinor: null,
+    });
+    expect(resolveSliceValue(makePoint("2026-06-01", schemeCode, []), schemeCode, "domestic")).toEqual({
+      ratio: null,
+      marketValueMinor: null,
+    });
+    expect(resolveSliceValue(start, "missing_scheme", "domestic")).toEqual({
+      ratio: null,
+      marketValueMinor: null,
+    });
+    expect(resolveSliceValue(start, schemeCode, "domestic")).toEqual({
+      ratio: 0.6,
+      marketValueMinor: 2_000_000,
+    });
+    const series = buildAllocationRatioSeries(chartPoints, schemeCode);
+    expect(series.find((item) => item.key === "domestic")?.label).toBe("国内");
+    expect(series.find((item) => item.key === "domestic")?.values).toEqual([
+      0.6, 0.62, 0.61,
+    ]);
+    const unnamedPoint = makePoint("2026-06-01", schemeCode, [
+      {
+        valueCode: "cash",
+        valueName: undefined as unknown as string,
+        marketValueMinor: 100_000,
+        ratio: 0.1,
+      },
+    ]);
+    const unnamedSeries = buildAllocationRatioSeries([unnamedPoint], schemeCode);
+    expect(unnamedSeries[0]?.label).toBe("cash");
+    const firstOnly = makePoint("2026-06-01", schemeCode, [
+      {
+        valueCode: "domestic",
+        valueName: "国内",
+        marketValueMinor: 2_000_000,
+        ratio: 0.6,
+      },
+    ]);
+    const secondEmpty = makePoint("2026-06-02", schemeCode, []);
+    secondEmpty.allocationsByScheme = {};
+    const mixedSeries = buildAllocationRatioSeries([firstOnly, secondEmpty], schemeCode);
+    expect(mixedSeries[0]?.values).toEqual([0.6, null]);
+  });
+
+  it("handles missing scheme codes in chart points", () => {
+    expect(buildAllocationRatioSeries(chartPoints, "missing_scheme")).toEqual([]);
+    expect(
+      buildAllocationPeriodChangeRows(start, end, chartPoints, "missing_scheme"),
+    ).toEqual([]);
+    const emptySchemePoint = makePoint("2026-06-01", schemeCode, []);
+    emptySchemePoint.allocationsByScheme = {};
+    expect(buildAllocationRatioSeries([emptySchemePoint], schemeCode)).toEqual([]);
+  });
+
+  it("falls back when ratio series is missing a composition", () => {
+    const rows = buildAllocationPeriodChangeRows(start, end, [], schemeCode);
+    expect(rows).toHaveLength(2);
+    expect(rows.every((row) => row.ratioSeries.length === 0)).toBe(true);
   });
 });

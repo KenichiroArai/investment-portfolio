@@ -10,6 +10,8 @@
     "dev:api": "npm run dev -w @repo/api",
     "dev:all": "concurrently -k \"npm:dev:api\" \"npm:dev\"",
     "dev:stop": "kill-port 3000 3001",
+    "clean:web": "node -e \"require('fs').rmSync('apps/web/.next',{recursive:true,force:true})\"",
+    "dev:clean": "npm run dev:stop && npm run clean:web && npm run dev",
     "build": "npm run build -w @repo/web",
     "lint": "npm run lint -w @repo/web && npm run lint -w @repo/api && npm run lint -w @repo/db && npm run lint -w @repo/shared",
     "db:migrate": "npm run db:migrate -w @repo/db",

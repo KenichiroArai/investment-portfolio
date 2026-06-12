@@ -25,6 +25,7 @@ import { GlobalAnalysisView } from "@/features/analysis/GlobalAnalysisView";
 import { PortfolioOverviewView } from "@/features/portfolio/PortfolioOverviewView";
 import { PortfolioShell } from "@/features/portfolio/PortfolioShell";
 import { TrendsView } from "@/features/trends/TrendsView";
+import { generatePortfolioStaticParams } from "@/lib/portfolio-catalog";
 import {
   createPortfolioFetchMock,
   renderWithPortfolioTime,
@@ -88,10 +89,11 @@ describe("portfolio routes", () => {
   });
 
   it("exposes static params for portfolio routes", () => {
-    expect(generatePortfolioLayoutStaticParams()).toEqual([{ code: "ideco" }]);
-    expect(generateOverviewStaticParams()).toEqual([{ code: "ideco" }]);
-    expect(generateAnalysisStaticParams()).toEqual([{ code: "ideco" }]);
-    expect(generateAnalysisSettingsStaticParams()).toEqual([{ code: "ideco" }]);
+    const expected = generatePortfolioStaticParams();
+    expect(generatePortfolioLayoutStaticParams()).toEqual(expected);
+    expect(generateOverviewStaticParams()).toEqual(expected);
+    expect(generateAnalysisStaticParams()).toEqual(expected);
+    expect(generateAnalysisSettingsStaticParams()).toEqual(expected);
   });
 
   it("renders global analysis page", async () => {

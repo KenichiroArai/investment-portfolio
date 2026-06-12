@@ -36,9 +36,11 @@ function resolveSliceValue(
     ratio: null,
     marketValueMinor: null,
   };
-  const slice = (point.allocationsByScheme[schemeCode] ?? []).find(
-    (item) => item.valueCode === valueCode,
-  );
+  let allocations = point.allocationsByScheme[schemeCode];
+  if (allocations === undefined) {
+    allocations = [];
+  }
+  const slice = allocations.find((item) => item.valueCode === valueCode);
   if (!slice) {
     return result;
   }
@@ -203,3 +205,7 @@ export function sortAllocationPeriodChangeRows(
 
   return result;
 }
+
+export const __allocationPeriodChangeTesting = {
+  resolveSliceValue,
+};

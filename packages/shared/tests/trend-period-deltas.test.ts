@@ -51,4 +51,17 @@ describe("computeTrendPeriodRelativeDeltas", () => {
   it("returns an empty array for empty input", () => {
     expect(computeTrendPeriodRelativeDeltas([])).toEqual([]);
   });
+
+  it("uses baseline for the first bucket when provided", () => {
+    const deltas = computeTrendPeriodRelativeDeltas([1_100_000, 1_150_000], {
+      baseline: 1_000_000,
+    });
+
+    expect(deltas[0]).toBeCloseTo(0.1);
+    expect(deltas[1]).toBeCloseTo(50_000 / 1_100_000);
+  });
+
+  it("returns null for the first bucket when baseline is zero", () => {
+    expect(computeTrendPeriodRelativeDeltas([1_100_000], { baseline: 0 })).toEqual([null]);
+  });
 });

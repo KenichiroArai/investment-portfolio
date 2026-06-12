@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  __snapshotTrendAggregationTesting,
   aggregateTrendPoints,
   buildTrendDisplayPoints,
   formatTrendBucketLabel,
@@ -8,6 +9,8 @@ import {
   readTrendBucketPick,
   readTrendDisplayUnit,
   readTrendMinMaxField,
+  TREND_MIN_MAX_FIELD_LABELS,
+  TREND_MIN_MAX_FIELDS,
 } from "../src/snapshot-trend-aggregation";
 import type { SnapshotTrendPointDto } from "../src/snapshot-trends";
 
@@ -31,6 +34,12 @@ function createPoint(
 }
 
 describe("snapshot-trend-aggregation", () => {
+  it("labels every min max field", () => {
+    for (const field of TREND_MIN_MAX_FIELDS) {
+      expect(TREND_MIN_MAX_FIELD_LABELS[field]).toEqual(expect.any(String));
+    }
+  });
+
   it("reads display unit from query value", () => {
     expect(readTrendDisplayUnit(null)).toBe("day");
     expect(readTrendDisplayUnit("week")).toBe("week");
@@ -352,5 +361,324 @@ describe("snapshot-trend-aggregation", () => {
     const bond = slices.find((slice) => slice.valueCode === "bond");
     expect(stock?.ratio).toBeCloseTo(0.7);
     expect(bond?.ratio).toBeCloseTo(0.3);
+  });
+
+  it("returns empty display points when no snapshots exist", () => {
+    expect(
+      buildTrendDisplayPoints([], "day", "2026-06-01", "2026-06-30"),
+    ).toEqual({
+      displayPoints: [],
+      baselinePoint: null,
+    });
+  });
+
+  it("returns null sparse note for empty in-range points", () => {
+    expect(formatTrendSparseDataNote("2026-06-01", [])).toBeNull();
+  });
+
+  it("aggregates by rolling 6 and 12 month buckets", () => {
+    const points = [
+      createPoint("2026-01-15", 100),
+      createPoint("2026-04-15", 200),
+      createPoint("2026-07-15", 300),
+      createPoint("2027-01-15", 400),
+    ];
+    const sixMonth = aggregateTrendPoints(points, "6m", "2026-01-15", "2027-01-15");
+    expect(sixMonth).toHaveLength(2);
+    expect(sixMonth[0]).toMatchObject({
+      bucketKey: "2026-07-15",
+      sourceAsOfDate: "2026-07-15",
+      totalMarketValueMinor: 300,
+    });
+    expect(sixMonth[1]).toMatchObject({
+      bucketKey: "2027-01-15",
+      sourceAsOfDate: "2027-01-15",
+      totalMarketValueMinor: 400,
+    });
+
+    const twelveMonth = aggregateTrendPoints(points, "12m", "2026-01-15", "2027-01-15");
+    expect(twelveMonth).toHaveLength(1);
+    expect(twelveMonth[0]).toMatchObject({
+      bucketKey: "2027-01-15",
+      sourceAsOfDate: "2027-01-15",
+      totalMarketValueMinor: 400,
+    });
+  });
+
+  it("formats cross-year bucket labels", () => {
+    expect(formatTrendBucketLabel("2027-01-15", "12m", "2026-02-01")).toBe(
+      "2026/2/1～2027/1/15",
+    );
+  });
+
+  it("aggregates by min book value and max gain rates", () => {
+    const points = [
+      createPoint("2026-06-02", 300, {
+        totalBookValueMinor: 250,
+        gainRateOnBook: 0.2,
+        gainRateOnContributions: 0.1,
+      }),
+      createPoint("2026-06-05", 150, {
+        totalBookValueMinor: 120,
+        gainRateOnBook: 0.25,
+        gainRateOnContributions: 0.15,
+      }),
+      createPoint("2026-06-09", 200, {
+        totalBookValueMinor: 180,
+        gainRateOnBook: 0.25,
+        gainRateOnContributions: 0.05,
+      }),
+    ];
+    const minBook = aggregateTrendPoints(points, "week", "2026-06-01", "2026-06-30", {
+      pick: "min",
+      minMaxField: "bookValue",
+    });
+    expect(minBook[0]).toMatchObject({
+      sourceAsOfDate: "2026-06-05",
+      totalBookValueMinor: 120,
+    });
+
+    const maxGainRate = aggregateTrendPoints(points, "week", "2026-06-01", "2026-06-30", {
+      pick: "max",
+      minMaxField: "gainRateOnBook",
+    });
+    expect(maxGainRate[0]).toMatchObject({
+      sourceAsOfDate: "2026-06-05",
+      gainRateOnBook: 0.25,
+    });
+
+    const maxContributionsGain = aggregateTrendPoints(
+      points,
+      "week",
+      "2026-06-01",
+      "2026-06-30",
+      { pick: "max", minMaxField: "gainRateOnContributions" },
+    );
+    expect(maxContributionsGain[0]).toMatchObject({
+      sourceAsOfDate: "2026-06-05",
+      gainRateOnContributions: 0.15,
+    });
+  });
+
+  it("prefers newer snapshot when min/max values tie", () => {
+    const points = [
+      createPoint("2026-06-02", 100),
+      createPoint("2026-06-05", 150),
+      createPoint("2026-06-07", 150),
+    ];
+    const aggregated = aggregateTrendPoints(points, "week", "2026-06-01", "2026-06-30", {
+      pick: "max",
+      minMaxField: "marketValue",
+    });
+    expect(aggregated[0]).toMatchObject({
+      sourceAsOfDate: "2026-06-07",
+      totalMarketValueMinor: 150,
+    });
+  });
+
+  it("skips points that do not resolve to a rolling bucket", () => {
+    const points = [createPoint("invalid-date", 100)];
+    expect(aggregateTrendPoints(points, "week", "2026-06-01", "2026-06-30")).toEqual([]);
+  });
+
+  it("covers internal date and bucket helpers", () => {
+    const {
+      parseIsoDate,
+      daysBetween,
+      minIsoDate,
+      resolveRollingBucketIndex,
+      resolveRollingBucketStartDate,
+      resolveRollingBucketEndDate,
+      resolveRollingBucketKey,
+      resolveMinMaxComparableValue,
+      averageBucketPoints,
+      resolveBucketPoint,
+    } = __snapshotTrendAggregationTesting;
+
+    expect(parseIsoDate("bad")).toBeNull();
+    expect(parseIsoDate("2026-02-30")).toBeNull();
+    expect(parseIsoDate("2026-06-01")?.toISOString()).toBe("2026-06-01T00:00:00.000Z");
+    expect(daysBetween("bad", "2026-06-01")).toBeNull();
+    expect(daysBetween("2026-06-10", "2026-06-01")).toBeNull();
+    expect(minIsoDate("2026-06-10", "2026-06-01")).toBe("2026-06-01");
+    expect(resolveRollingBucketIndex("2026-06-02", "day", "2026-06-01")).toBeNull();
+    expect(resolveRollingBucketStartDate(0, "day", "2026-06-01")).toBeNull();
+    expect(resolveRollingBucketEndDate(0, "day", "2026-06-01", "2026-06-30")).toBeNull();
+    expect(
+      resolveRollingBucketKey("2026-06-02", "day", "2026-06-01", "2026-06-30"),
+    ).toBeNull();
+    expect(resolveRollingBucketIndex("invalid", "week", "2026-06-01")).toBeNull();
+    expect(resolveRollingBucketIndex("2026-01-01", "week", "invalid")).toBeNull();
+    expect(resolveRollingBucketStartDate(0, "week", "invalid")).toBeNull();
+    expect(resolveRollingBucketEndDate(0, "week", "invalid", "2026-06-30")).toBeNull();
+
+    const point = createPoint("2026-06-02", 100, {
+      totalBookValueMinor: Number.NaN,
+      gainRateOnBook: null,
+      totalContributionsMinor: Number.POSITIVE_INFINITY,
+      gainRateOnContributions: Number.NaN,
+    });
+    expect(
+      resolveMinMaxComparableValue(
+        createPoint("2026-06-02", 100, { unrealizedGainMinor: Number.NaN }),
+        "unrealizedGain",
+      ),
+    ).toBeNull();
+    expect(resolveMinMaxComparableValue(point, "bookValue")).toBeNull();
+    expect(resolveMinMaxComparableValue(point, "gainRateOnBook")).toBeNull();
+    expect(resolveMinMaxComparableValue(point, "contributions")).toBeNull();
+    expect(resolveMinMaxComparableValue(point, "gainRateOnContributions")).toBeNull();
+    expect(resolveMinMaxComparableValue(createPoint("2026-06-02", 100), "marketValue")).toBe(
+      100,
+    );
+
+    expect(averageBucketPoints([], "2026-06-02")).toBeNull();
+    expect(
+      averageBucketPoints(
+        [
+          createPoint("2026-06-02", Number.NaN, {
+            totalBookValueMinor: Number.NaN,
+            unrealizedGainMinor: Number.NaN,
+          }),
+        ],
+        "2026-06-02",
+      ),
+    ).toMatchObject({
+      totalMarketValueMinor: 0,
+      totalBookValueMinor: 0,
+      unrealizedGainMinor: 0,
+    });
+    const { averageAllocationsByScheme } = __snapshotTrendAggregationTesting;
+    expect(
+      averageAllocationsByScheme([
+        createPoint("2026-06-02", 100, {
+          allocationsByScheme: {
+            asset: [
+              {
+                valueCode: "stock",
+                valueName: "株式",
+                marketValueMinor: 10_000,
+                ratio: 1,
+              },
+            ],
+          },
+        }),
+        createPoint("2026-06-05", 200),
+      ]).asset,
+    ).toHaveLength(1);
+    expect(resolveBucketPoint([], "last", "marketValue", "2026-06-02")).toBeNull();
+    expect(
+      resolveBucketPoint(
+        [createPoint("2026-06-02", 100)],
+        "average",
+        "marketValue",
+        "2026-06-07",
+      ),
+    ).toMatchObject({ isAveraged: true });
+    expect(resolveRollingBucketIndex("2026-05-01", "week", "2026-06-01")).toBeNull();
+    expect(resolveRollingBucketIndex("2026-01-01", "1m", "2026-06-01")).toBeNull();
+    expect(resolveRollingBucketIndex("2026-06-15", "1m", "2026-06-01")).toBe(0);
+    expect(resolveRollingBucketIndex("2026-08-15", "1m", "2026-06-01")).toBe(2);
+    expect(
+      resolveRollingBucketKey("2026-06-02", "week", "invalid", "2026-06-30"),
+    ).toBeNull();
+    expect(
+      resolveMinMaxComparableValue(
+        createPoint("2026-06-02", 100, { unrealizedGainMinor: 500 }),
+        "unrealizedGain",
+      ),
+    ).toBe(500);
+    expect(
+      resolveMinMaxComparableValue(
+        createPoint("2026-06-02", 100, { totalContributionsMinor: 1_000 }),
+        "contributions",
+      ),
+    ).toBe(1_000);
+    expect(
+      resolveMinMaxComparableValue(
+        {
+          ...createPoint("2026-06-02", 100),
+          totalContributionsMinor: undefined,
+        },
+        "contributions",
+      ),
+    ).toBeNull();
+    expect(
+      resolveMinMaxComparableValue(
+        createPoint("2026-06-02", 100, { gainRateOnContributions: 0.05 }),
+        "gainRateOnContributions",
+      ),
+    ).toBe(0.05);
+    expect(
+      resolveMinMaxComparableValue(createPoint("2026-06-02", Number.NaN), "marketValue"),
+    ).toBeNull();
+    expect(
+      resolveRollingBucketKey("2026-06-02", "week", "2026-06-01", "2026-06-30"),
+    ).toBe("2026-06-07");
+    const { toAggregatedTrendPoint, resolveAggregationOptions } =
+      __snapshotTrendAggregationTesting;
+    expect(resolveAggregationOptions()).toEqual({
+      pick: "last",
+      minMaxField: "marketValue",
+    });
+    expect(resolveAggregationOptions({ pick: "first" }).pick).toBe("first");
+    const aggregated = toAggregatedTrendPoint(
+      createPoint("2026-06-02", 100),
+      "2026-07-01",
+      "1m",
+      null,
+      false,
+    );
+    expect(aggregated.bucketLabel).toBe("2026/7/1");
+  });
+
+  it("averages allocations when a composition is missing from some snapshots", () => {
+    const points = [
+      createPoint("2026-06-02", 100, {
+        allocationsByScheme: {
+          asset: [
+            {
+              valueCode: "stock",
+              valueName: "株式",
+              marketValueMinor: 6000,
+              ratio: 0.6,
+            },
+          ],
+        },
+      }),
+      createPoint("2026-06-05", 200, {
+        allocationsByScheme: {
+          asset: [
+            {
+              valueCode: "stock",
+              valueName: "株式",
+              marketValueMinor: 8000,
+              ratio: 0.8,
+            },
+            {
+              valueCode: "bond",
+              valueName: "債券",
+              marketValueMinor: 2000,
+              ratio: 0.2,
+            },
+          ],
+        },
+      }),
+    ];
+    const aggregated = aggregateTrendPoints(
+      points,
+      "week",
+      "2026-06-01",
+      "2026-06-30",
+      { pick: "average" },
+    );
+    const slices = aggregated[0]?.allocationsByScheme.asset ?? [];
+    expect(slices.some((slice) => slice.valueCode === "bond")).toBe(true);
+    expect(slices.some((slice) => slice.valueCode === "stock")).toBe(true);
+  });
+
+  it("skips buckets when rolling end date cannot be resolved", () => {
+    const points = [createPoint("2026-06-02", 100)];
+    expect(aggregateTrendPoints(points, "week", "invalid", "2026-06-30")).toEqual([]);
   });
 });

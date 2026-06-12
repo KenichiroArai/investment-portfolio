@@ -4,9 +4,11 @@ import {
   detectMatchingPreset,
   filterDatesInRange,
   findAdjacentSnapshotDate,
+  getCalendarMonthDateRange,
   listCalendarMonthOptions,
   resolveDateRange,
   resolveLatestSnapshotDate,
+  resolvePeriodBounds,
   resolvePeriodBoundsForPreset,
   __snapshotTimeRangeTesting,
 } from "../src/snapshot-time-range";
@@ -165,5 +167,88 @@ describe("snapshot-time-range", () => {
         customFrom: "2026-06-02",
       }),
     ).toEqual(["2026-06-02", "2026-06-07"]);
+  });
+
+  it("resolves period bounds and calendar month helpers", () => {
+    expect(getCalendarMonthDateRange("2026-06")).toEqual({
+      from: "2026-06-01",
+      to: "2026-06-30",
+    });
+    expect(getCalendarMonthDateRange("invalid")).toBeNull();
+    expect(resolvePeriodBounds({ availableDates: [], preset: "all" })).toBeNull();
+    expect(resolvePeriodBounds({ availableDates: dates, preset: "1w" })).toEqual({
+      from: "2026-06-01",
+      to: "2026-06-07",
+    });
+    expect(
+      resolvePeriodBounds({
+        availableDates: dates,
+        preset: "all",
+        calendarMonth: "2026-02",
+      }),
+    ).toEqual({
+      from: "2026-02-01",
+      to: "2026-02-28",
+    });
+    expect(
+      resolvePeriodBounds({
+        availableDates: dates,
+        preset: "3m",
+        customFrom: "2026-02-01",
+        customTo: "2026-06-07",
+      }),
+    ).toEqual({
+      from: "2026-02-01",
+      to: "2026-06-07",
+    });
+    expect(resolvePeriodBoundsForPreset("3m", dates)).toEqual({
+      from: "2026-03-07",
+      to: "2026-06-07",
+    });
+    expect(detectMatchingPreset(dates, null, "2026-06-07")).toBeNull();
+    expect(detectMatchingPreset(dates, "2026-01-15", "2026-06-07")).toBe("all");
+    expect(resolvePeriodBoundsForPreset("all", [""])).toBeNull();
+    expect(resolvePeriodBounds({ availableDates: [""], preset: "all" })).toBeNull();
+    expect(
+      resolvePeriodBounds({
+        availableDates: dates,
+        preset: "all",
+        customFrom: "2026-02-01",
+        customTo: "2026-06-07",
+      }),
+    ).toEqual({
+      from: "2026-02-01",
+      to: "2026-06-07",
+    });
+    expect(
+      resolvePeriodBounds({
+        availableDates: dates,
+        preset: "all",
+        customFrom: null,
+        customTo: "2026-06-07",
+      }),
+    ).toEqual({
+      from: "2026-01-15",
+      to: "2026-06-07",
+    });
+    expect(
+      resolveDateRange({
+        availableDates: dates,
+        preset: "all",
+        customFrom: "2026-02-01",
+        customTo: null,
+      }),
+    ).toEqual(["2026-02-10", "2026-06-02", "2026-06-07"]);
+    expect(
+      resolvePeriodBounds({
+        availableDates: dates,
+        preset: "all",
+        customFrom: "2026-02-01",
+        customTo: null,
+      }),
+    ).toEqual({
+      from: "2026-02-01",
+      to: "2026-06-07",
+    });
   });
 });

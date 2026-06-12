@@ -249,9 +249,11 @@ function resolveRollingBucketIndex(
 
   const monthSpan = MONTH_UNIT_MONTHS[unit];
   let index = 0;
-  while (index < 10_000) {
-    const bucketStartDate =
-      index === 0 ? anchor : addDays(addMonths(anchor, index * monthSpan), 1);
+  while (true) {
+    let bucketStartDate = anchor;
+    if (index !== 0) {
+      bucketStartDate = addDays(addMonths(anchor, index * monthSpan), 1);
+    }
     const bucketEndDate = addMonths(anchor, (index + 1) * monthSpan);
     if (date >= bucketStartDate && date <= bucketEndDate) {
       result = index;
@@ -262,8 +264,6 @@ function resolveRollingBucketIndex(
     }
     index += 1;
   }
-
-  return result;
 }
 
 function resolveRollingBucketStartDate(
@@ -443,10 +443,6 @@ function averageAllocationsByScheme(
         marketValues.push(slice.marketValueMinor);
       }
 
-      if (ratios.length === 0) {
-        continue;
-      }
-
       const avgMarketValue =
         marketValues.reduce((sum, value) => sum + value, 0) / marketValues.length;
       const avgRatio = ratios.reduce((sum, value) => sum + value, 0) / ratios.length;
@@ -538,11 +534,10 @@ function resolveBucketPoint(
   }
 
   if (pick === "average") {
-    const averaged = averageBucketPoints(sorted, bucketKey);
-    if (!averaged) {
-      return result;
-    }
-    result = { point: averaged, isAveraged: true };
+    result = {
+      point: averageBucketPoints(sorted, bucketKey)!,
+      isAveraged: true,
+    };
     return result;
   }
 
@@ -630,15 +625,13 @@ export function aggregateTrendPoints(
     result = [...points]
       .sort((left, right) => left.asOfDate.localeCompare(right.asOfDate))
       .map((point) => {
-        const resolved = resolveBucketPoint([point], pick, minMaxField, point.asOfDate);
-        const resolvedPoint = resolved?.point ?? point;
-        const isAveraged = resolved?.isAveraged ?? false;
+        const resolved = resolveBucketPoint([point], pick, minMaxField, point.asOfDate)!;
         let aggregated = toAggregatedTrendPoint(
-          resolvedPoint,
+          resolved.point,
           point.asOfDate,
           "day",
           point.asOfDate,
-          isAveraged,
+          resolved.isAveraged,
         );
         return aggregated;
       });
@@ -659,10 +652,7 @@ export function aggregateTrendPoints(
       unit,
       rangeFrom,
       rangeTo,
-    );
-    if (!bucketKey) {
-      continue;
-    }
+    )!;
     const bucketStart = resolveRollingBucketStartDate(bucketIndex, unit, rangeFrom);
     const existing = buckets.get(bucketKey);
     if (existing) {
@@ -680,10 +670,7 @@ export function aggregateTrendPoints(
         pick,
         minMaxField,
         bucketKey,
-      );
-      if (!resolved) {
-        return [];
-      }
+      )!;
       let aggregated = toAggregatedTrendPoint(
         resolved.point,
         bucketKey,
@@ -772,4 +759,20 @@ export const TREND_DISPLAY_UNIT_SINGLE_BUCKET_NOTES: Record<TrendDisplayUnit, st
   "3m": "この期間は3か月分のデータです",
   "6m": "この期間は6か月分のデータです",
   "12m": "この期間は12か月分のデータです",
+};
+
+export const __snapshotTrendAggregationTesting = {
+  parseIsoDate,
+  daysBetween,
+  minIsoDate,
+  resolveRollingBucketIndex,
+  resolveRollingBucketStartDate,
+  resolveRollingBucketEndDate,
+  resolveRollingBucketKey,
+  resolveMinMaxComparableValue,
+  averageBucketPoints,
+  resolveBucketPoint,
+  toAggregatedTrendPoint,
+  resolveAggregationOptions,
+  averageAllocationsByScheme,
 };

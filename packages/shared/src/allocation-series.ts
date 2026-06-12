@@ -24,9 +24,9 @@ export const DEFAULT_ALLOCATION_TOP_N = 6;
 export const OTHER_ALLOCATION_KEY = "__other__";
 export const OTHER_ALLOCATION_LABEL = "その他";
 
-function averageFiniteValues(values: Array<number | null>): number {
+function averageFiniteValues(values: Array<number | null> | undefined): number {
   let result = 0;
-  const finite = values.filter(
+  const finite = (values ?? []).filter(
     (value): value is number => value !== null && Number.isFinite(value),
   );
   if (finite.length === 0) {
@@ -62,13 +62,13 @@ export function collapseAllocationSeries(
     result.push({ ...item });
   }
 
-  const bucketCount = series[0]?.values.length ?? 0;
+  const bucketCount = series[0]?.values?.length ?? 0;
   const otherValues: Array<number | null> = [];
   for (let index = 0; index < bucketCount; index += 1) {
     let sum = 0;
     let hasValue = false;
     for (const item of collapsed) {
-      const value = item.values[index];
+      const value = item.values?.[index] ?? null;
       if (value !== null && Number.isFinite(value)) {
         sum += value;
         hasValue = true;

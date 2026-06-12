@@ -5,14 +5,15 @@ import HoldingsPage, {
   generateStaticParams,
 } from "@/app/portfolios/[code]/holdings/page";
 import { HoldingsView } from "@/features/portfolio/HoldingsView";
+import { generatePortfolioStaticParams } from "@/lib/portfolio-catalog";
 import {
   createPortfolioFetchMock,
   renderWithPortfolioTime,
 } from "../helpers/portfolio-time-test-utils";
 
 describe("HoldingsPage", () => {
-  it("exposes static params for ideco", () => {
-    expect(generateStaticParams()).toEqual([{ code: "ideco" }]);
+  it("exposes static params for each portfolio", () => {
+    expect(generateStaticParams()).toEqual(generatePortfolioStaticParams());
   });
 
   it("renders holdings view for portfolio code", async () => {
