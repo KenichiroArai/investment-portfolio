@@ -193,7 +193,7 @@ export function AllocationPeriodChangeTable({
         </table>
       </div>
       <p className="allocation-period-change-table__footnote">
-        選択期間の期首から期末までの変化です。推移列は表示単位ごとの構成比です。行をクリックすると下の折れ線グラフに追加されます。
+        選択期間の期首から期末までの変化です。推移列は表示単位ごとの構成比です。行をクリックすると下の折れ線グラフの表示を切り替えられます。
       </p>
     </div>
   );

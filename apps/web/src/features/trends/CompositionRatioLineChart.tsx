@@ -29,21 +29,30 @@ export function CompositionRatioLineChart({
   height = 220,
   className,
 }: CompositionRatioLineChartProps) {
+  const colorIndexByKey = useMemo(() => {
+    let result = new Map<string, number>();
+    ratioSeries.forEach((item, index) => {
+      result.set(item.key, index);
+    });
+    return result;
+  }, [ratioSeries]);
+
   const chartSeries = useMemo(() => {
     let result: TrendChartSeries[] = [];
     const selected = ratioSeries.filter((item) => selectedKeys.includes(item.key));
-    result = selected.map((item, index) => {
+    result = selected.map((item) => {
+      const colorIndex = colorIndexByKey.get(item.key) ?? 0;
       let series: TrendChartSeries = {
         key: item.key,
         label: item.label,
-        color: getAllocationChartColor(index),
+        color: getAllocationChartColor(colorIndex),
         values: item.values,
         formatValue: (value) => formatPercent(value),
       };
       return series;
     });
     return result;
-  }, [ratioSeries, selectedKeys]);
+  }, [colorIndexByKey, ratioSeries, selectedKeys]);
 
   let result: ReactNode = null;
 

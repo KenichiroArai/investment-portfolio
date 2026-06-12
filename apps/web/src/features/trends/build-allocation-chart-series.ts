@@ -1,7 +1,4 @@
-import {
-  collapseAllocationSeries,
-  type AggregatedTrendPoint,
-} from "@repo/shared";
+import type { AggregatedTrendPoint } from "@repo/shared";
 
 import { getAllocationChartColor } from "@/features/analysis/chart-colors";
 import type { TrendStackedAreaSeries } from "@/features/trends/TrendStackedAreaChart";
@@ -9,7 +6,6 @@ import type { TrendStackedAreaSeries } from "@/features/trends/TrendStackedAreaC
 export function buildAllocationChartSeries(
   chartPoints: AggregatedTrendPoint[],
   schemeCode: string,
-  topN: number = 6,
 ): TrendStackedAreaSeries[] {
   let result: TrendStackedAreaSeries[] = [];
 
@@ -21,7 +17,7 @@ export function buildAllocationChartSeries(
     }
   }
 
-  const rawSeries = [...valueCodes].map((valueCode, index) => {
+  result = [...valueCodes].map((valueCode, index) => {
     const firstSlice = chartPoints
       .flatMap((point) => point.allocationsByScheme[schemeCode] ?? [])
       .find((slice) => slice.valueCode === valueCode);
@@ -37,16 +33,6 @@ export function buildAllocationChartSeries(
       }),
     };
     return item;
-  });
-
-  const collapsed = collapseAllocationSeries(rawSeries, topN);
-  result = collapsed.map((item, index) => {
-    let mapped: TrendStackedAreaSeries = {
-      ...item,
-      color: getAllocationChartColor(index),
-      otherMembers: item.otherMembers,
-    };
-    return mapped;
   });
 
   return result;

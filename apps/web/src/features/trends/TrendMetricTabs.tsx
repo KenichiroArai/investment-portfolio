@@ -8,6 +8,7 @@ import { useState, type ReactNode } from "react";
 
 import { AllocationPeriodChangeTable } from "@/features/trends/AllocationPeriodChangeTable";
 import { CompositionRatioLineChart } from "@/features/trends/CompositionRatioLineChart";
+import { CompositionSelectionToolbar } from "@/features/trends/CompositionSelectionToolbar";
 import { TrendBarChart } from "@/features/trends/TrendBarChart";
 import { TrendLineChart } from "@/features/trends/TrendLineChart";
 import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
@@ -40,6 +41,8 @@ type TrendMetricTabsAllocation = {
   periodChangeRows: AllocationPeriodChangeRow[];
   selectedCompositionKeys: string[];
   onCompositionToggle: (key: string) => void;
+  onSelectAllCompositions: () => void;
+  onClearCompositionSelection: () => void;
   startDateLabel: string;
   endDateLabel: string;
 };
@@ -144,6 +147,12 @@ export function TrendMetricTabs({
         {allocation.activeSchemeName ? (
           <p className="trends-detail__scheme-label">{allocation.activeSchemeName}</p>
         ) : null}
+        <CompositionSelectionToolbar
+          selectedCount={allocation.selectedCompositionKeys.length}
+          totalCount={allocation.ratioSeries.length}
+          onSelectAll={allocation.onSelectAllCompositions}
+          onClearSelection={allocation.onClearCompositionSelection}
+        />
         <TrendStackedAreaChart
           title="構成比の推移"
           caption={trendDisplayUnitLabel}
@@ -158,6 +167,15 @@ export function TrendMetricTabs({
           selectedSeriesKeys={allocation.selectedCompositionKeys}
           onSeriesToggle={allocation.onCompositionToggle}
         />
+        {allocation.periodChangeRows.length > 0 ? (
+          <AllocationPeriodChangeTable
+            rows={allocation.periodChangeRows}
+            selectedKeys={allocation.selectedCompositionKeys}
+            startDateLabel={allocation.startDateLabel}
+            endDateLabel={allocation.endDateLabel}
+            onToggleRow={allocation.onCompositionToggle}
+          />
+        ) : null}
         {allocation.ratioSeries.length > 0 ? (
           <CompositionRatioLineChart
             labels={labels}
@@ -166,15 +184,6 @@ export function TrendMetricTabs({
             ratioSeries={allocation.ratioSeries}
             selectedKeys={allocation.selectedCompositionKeys}
             caption={trendDisplayUnitLabel}
-          />
-        ) : null}
-        {allocation.periodChangeRows.length > 0 ? (
-          <AllocationPeriodChangeTable
-            rows={allocation.periodChangeRows}
-            selectedKeys={allocation.selectedCompositionKeys}
-            startDateLabel={allocation.startDateLabel}
-            endDateLabel={allocation.endDateLabel}
-            onToggleRow={allocation.onCompositionToggle}
           />
         ) : null}
       </div>

@@ -89,7 +89,7 @@ describe("TrendsDetailPanel", () => {
     });
   });
 
-  it("toggles composition selection from table row click", async () => {
+  it("selects all compositions by default and toggles from table row click", async () => {
     const user = userEvent.setup();
     stubTrendsFetch();
     renderWithPortfolioTime(<TrendsDetailPanel />, {
@@ -98,11 +98,44 @@ describe("TrendsDetailPanel", () => {
 
     await waitFor(() => {
       expect(screen.getByRole("heading", { name: "期間内の構成変化" })).toBeInTheDocument();
+      expect(screen.getByText("2 / 2 件を表示")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "国内 の推移を非表示" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "海外 の推移を非表示" })).toBeInTheDocument();
     });
 
     const rowButton = screen.getByRole("button", { name: "海外 の推移を非表示" });
     await user.click(rowButton);
     expect(screen.getByRole("button", { name: "海外 の推移を表示" })).toBeInTheDocument();
+    expect(screen.getByText("1 / 2 件を表示")).toBeInTheDocument();
+  });
+
+  it("supports bulk select and clear from toolbar", async () => {
+    const user = userEvent.setup();
+    stubTrendsFetch();
+    renderWithPortfolioTime(<TrendsDetailPanel />, {
+      initialSearchParams: "from=2026-05-01&to=2026-07-31&unit=1m",
+    });
+
+    await waitFor(() => {
+      expect(screen.getByRole("toolbar", { name: "構成の選択" })).toBeInTheDocument();
+    });
+
+    const toolbar = within(screen.getByRole("toolbar", { name: "構成の選択" }));
+    await user.click(toolbar.getByRole("button", { name: "選択解除" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("0 / 2 件を表示")).toBeInTheDocument();
+      expect(
+        screen.getByText("凡例または表の行をクリックして、表示する構成を選んでください。"),
+      ).toBeInTheDocument();
+    });
+
+    await user.click(toolbar.getByRole("button", { name: "すべて選択" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("2 / 2 件を表示")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "構成ごとの構成比推移" })).toBeInTheDocument();
+    });
   });
 
   it("switches allocation scheme tabs and shows chart tooltip on hover", async () => {

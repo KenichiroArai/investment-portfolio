@@ -73,6 +73,11 @@ const baseProps = {
         label: "国内",
         values: [0.6, 0.61],
       },
+      {
+        key: "foreign",
+        label: "海外",
+        values: [0.4, 0.39],
+      },
     ],
     periodChangeRows: [
       {
@@ -87,8 +92,10 @@ const baseProps = {
         ratioSeries: [0.4, 0.39],
       },
     ],
-    selectedCompositionKeys: ["foreign"],
+    selectedCompositionKeys: ["domestic", "foreign"],
     onCompositionToggle: vi.fn(),
+    onSelectAllCompositions: vi.fn(),
+    onClearCompositionSelection: vi.fn(),
     startDateLabel: "2026/05/31",
     endDateLabel: "2026/06/07",
   },
@@ -167,5 +174,44 @@ describe("TrendMetricTabs", () => {
     await user.click(metricTabs.getByRole("tab", { name: "構成比" }));
     expect(screen.getByRole("heading", { name: "構成比の推移" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "期間内の構成変化" })).toBeInTheDocument();
+  });
+
+  it("renders composition selection toolbar and places table above line chart", () => {
+    render(<TrendMetricTabs {...baseProps} />);
+
+    expect(screen.getByRole("toolbar", { name: "構成の選択" })).toBeInTheDocument();
+    expect(screen.getByText("2 / 2 件を表示")).toBeInTheDocument();
+
+    const periodChangeHeading = screen.getByRole("heading", { name: "期間内の構成変化" });
+    const lineChartHeading = screen.getByRole("heading", { name: "構成ごとの構成比推移" });
+    expect(
+      periodChangeHeading.compareDocumentPosition(lineChartHeading) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it("calls bulk selection handlers from toolbar", async () => {
+    const user = userEvent.setup();
+    const onSelectAllCompositions = vi.fn();
+    const onClearCompositionSelection = vi.fn();
+
+    render(
+      <TrendMetricTabs
+        {...baseProps}
+        allocation={{
+          ...baseProps.allocation,
+          selectedCompositionKeys: ["foreign"],
+          onSelectAllCompositions,
+          onClearCompositionSelection,
+        }}
+      />,
+    );
+
+    const toolbar = within(screen.getByRole("toolbar", { name: "構成の選択" }));
+    await user.click(toolbar.getByRole("button", { name: "すべて選択" }));
+    expect(onSelectAllCompositions).toHaveBeenCalledTimes(1);
+
+    await user.click(toolbar.getByRole("button", { name: "選択解除" }));
+    expect(onClearCompositionSelection).toHaveBeenCalledTimes(1);
   });
 });

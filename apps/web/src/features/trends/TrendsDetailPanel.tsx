@@ -5,10 +5,10 @@ import {
   buildAllocationRatioSeries,
   findLargestAllocationShareChange,
   formatTrendSparseDataNote,
-  sortAllocationPeriodChangeRows,
   type AggregatedTrendPoint,
+  type AllocationSeriesInput,
 } from "@repo/shared";
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import { buildAllocationChartSeries } from "@/features/trends/build-allocation-chart-series";
 import { TrendMetricTabs } from "@/features/trends/TrendMetricTabs";
@@ -26,9 +26,6 @@ import {
   formatYen,
 } from "@/lib/format-yen";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
-
-const MAX_SELECTED_COMPOSITIONS = 5;
-const AUTO_SELECT_COMPOSITION_COUNT = 3;
 
 function resolvePeriodEndpoints(
   displayPoints: AggregatedTrendPoint[],
@@ -58,32 +55,20 @@ function resolvePeriodEndpoints(
   return result;
 }
 
-function resolveAutoSelectedCompositionKeys(
-  periodChangeRows: ReturnType<typeof buildAllocationPeriodChangeRows>,
-): string[] {
-  let result = sortAllocationPeriodChangeRows(periodChangeRows, "deltaRatio", "desc", true)
-    .slice(0, AUTO_SELECT_COMPOSITION_COUNT)
-    .map((row) => row.key);
+function resolveAllCompositionKeys(ratioSeries: AllocationSeriesInput[]): string[] {
+  let result = ratioSeries.map((item) => item.key);
   return result;
 }
 
-function toggleCompositionKey(
-  explicitKeys: string[],
-  key: string,
-  autoKeys: string[],
-): string[] {
-  let effectiveKeys = explicitKeys.length > 0 ? explicitKeys : autoKeys;
+function toggleCompositionKey(keys: string[], key: string): string[] {
   let result: string[] = [];
 
-  if (effectiveKeys.includes(key)) {
-    result = effectiveKeys.filter((item) => item !== key);
+  if (keys.includes(key)) {
+    result = keys.filter((item) => item !== key);
     return result;
   }
 
-  result = [...effectiveKeys, key];
-  if (result.length > MAX_SELECTED_COMPOSITIONS) {
-    result = result.slice(result.length - MAX_SELECTED_COMPOSITIONS);
-  }
+  result = [...keys, key];
   return result;
 }
 
@@ -99,6 +84,8 @@ export function TrendsDetailPanel() {
   } = usePortfolioTime();
   const [selectedSchemeCode, setSelectedSchemeCode] = useState("");
   const [selectedCompositionKeys, setSelectedCompositionKeys] = useState<string[]>([]);
+  const compositionInitializedRef = useRef(false);
+  const activeSchemeCodeRef = useRef("");
 
   const schemeCodes = snapshot?.analysisSchemes ?? [];
   const activeSchemeCode =
@@ -106,8 +93,8 @@ export function TrendsDetailPanel() {
       ? selectedSchemeCode
       : (schemeCodes[0]?.schemeCode ?? "");
 
-  const periodChangeRowsForHooks = useMemo(() => {
-    let result: ReturnType<typeof buildAllocationPeriodChangeRows> = [];
+  const ratioSeriesForHooks = useMemo(() => {
+    let result: AllocationSeriesInput[] = [];
 
     if (displayTrendPoints.length === 0 || activeSchemeCode === "") {
       return result;
@@ -119,45 +106,49 @@ export function TrendsDetailPanel() {
       trendDisplayUnit,
       formatBaselineSummary: () => null,
     });
-    const periodEndpoints = resolvePeriodEndpoints(displayTrendPoints, baselinePoint);
 
-    if (!periodEndpoints) {
+    result = buildAllocationRatioSeries(chartBuckets.chartPoints, activeSchemeCode);
+    return result;
+  }, [activeSchemeCode, baselinePoint, displayTrendPoints, trendDisplayUnit]);
+
+  const allCompositionKeys = useMemo(() => {
+    let keys = resolveAllCompositionKeys(ratioSeriesForHooks);
+    return keys;
+  }, [ratioSeriesForHooks]);
+
+  useEffect(() => {
+    let result: void = undefined;
+
+    if (allCompositionKeys.length === 0) {
       return result;
     }
 
-    result = buildAllocationPeriodChangeRows(
-      periodEndpoints.start,
-      periodEndpoints.end,
-      chartBuckets.chartPoints,
-      activeSchemeCode,
-    );
-    return result;
-  }, [
-    activeSchemeCode,
-    baselinePoint,
-    displayTrendPoints,
-    trendDisplayUnit,
-  ]);
-
-  const autoSelectedCompositionKeys = useMemo(() => {
-    let keys = resolveAutoSelectedCompositionKeys(periodChangeRowsForHooks);
-    return keys;
-  }, [periodChangeRowsForHooks]);
-
-  const effectiveSelectedCompositionKeys = useMemo(() => {
-    let keys: string[] = [];
-    if (selectedCompositionKeys.length > 0) {
-      keys = selectedCompositionKeys;
-      return keys;
+    const schemeChanged = activeSchemeCodeRef.current !== activeSchemeCode;
+    if (schemeChanged) {
+      activeSchemeCodeRef.current = activeSchemeCode;
+      compositionInitializedRef.current = true;
+      setSelectedCompositionKeys(allCompositionKeys);
+      return result;
     }
-    keys = autoSelectedCompositionKeys;
-    return keys;
-  }, [selectedCompositionKeys, autoSelectedCompositionKeys]);
+
+    if (!compositionInitializedRef.current) {
+      compositionInitializedRef.current = true;
+      setSelectedCompositionKeys(allCompositionKeys);
+    }
+
+    return result;
+  }, [activeSchemeCode, allCompositionKeys]);
 
   const handleCompositionToggle = (key: string): void => {
-    setSelectedCompositionKeys((current) =>
-      toggleCompositionKey(current, key, autoSelectedCompositionKeys),
-    );
+    setSelectedCompositionKeys((current) => toggleCompositionKey(current, key));
+  };
+
+  const handleSelectAllCompositions = (): void => {
+    setSelectedCompositionKeys(allCompositionKeys);
+  };
+
+  const handleClearCompositionSelection = (): void => {
+    setSelectedCompositionKeys([]);
   };
 
   let result: ReactNode = null;
@@ -364,14 +355,15 @@ export function TrendsDetailPanel() {
                 activeSchemeCode,
                 onSchemeChange: (schemeCode) => {
                   setSelectedSchemeCode(schemeCode);
-                  setSelectedCompositionKeys([]);
                 },
                 activeSchemeName: activeScheme?.schemeName ?? null,
                 allocationSeries,
                 ratioSeries,
                 periodChangeRows,
-                selectedCompositionKeys: effectiveSelectedCompositionKeys,
+                selectedCompositionKeys,
                 onCompositionToggle: handleCompositionToggle,
+                onSelectAllCompositions: handleSelectAllCompositions,
+                onClearCompositionSelection: handleClearCompositionSelection,
                 startDateLabel,
                 endDateLabel,
               }
