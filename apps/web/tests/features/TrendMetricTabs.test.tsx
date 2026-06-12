@@ -11,6 +11,7 @@ const baseProps = {
   sourceDateLabels: ["2026/5/31", "2026/6/7"],
   trendDisplayUnitLabel: "1か月単位",
   marketValueLevelValues: [3_400_000, 3_441_347],
+  marketValueBaselineMinor: null,
   marketValueDeltaSeries: [
     {
       key: "market-value-delta",
@@ -20,6 +21,17 @@ const baseProps = {
       formatValue: (value: number) => formatYen(value),
     },
   ],
+  marketValueRelativeRateSeries: [
+    {
+      key: "market-value-relative-rate",
+      label: "評価額の変化率",
+      color: "#2563eb",
+      values: [null, 0.012],
+      formatValue: (value: number) => `${(value * 100).toFixed(1)}%`,
+    },
+  ],
+  gainLevelValues: [400_000, 459_121],
+  gainBaselineMinor: null,
   gainDeltaSeries: [
     {
       key: "gain-delta",
@@ -27,6 +39,15 @@ const baseProps = {
       color: "#16a34a",
       values: [null, 59_121],
       formatValue: (value: number) => formatYen(value),
+    },
+  ],
+  gainRelativeRateSeries: [
+    {
+      key: "gain-relative-rate",
+      label: "評価損益の変化率",
+      color: "#16a34a",
+      values: [null, 0.148],
+      formatValue: (value: number) => `${(value * 100).toFixed(1)}%`,
     },
   ],
   gainRateSeries: [
@@ -43,6 +64,38 @@ const baseProps = {
       color: "#ea580c",
       values: [null, 0.05],
       formatValue: (value: number) => formatPercent(value),
+    },
+  ],
+  gainRateDeltaSeries: [
+    {
+      key: "gain-rate-book-delta",
+      label: "簿価ベース利益率",
+      color: "#7c3aed",
+      values: [null, 0.02],
+      formatValue: (value: number) => `${(value * 100).toFixed(1)} pt`,
+    },
+    {
+      key: "gain-rate-contributions-delta",
+      label: "拠出金ベース利益率",
+      color: "#ea580c",
+      values: [null, 0.05],
+      formatValue: (value: number) => `${(value * 100).toFixed(1)} pt`,
+    },
+  ],
+  gainRateRelativeRateSeries: [
+    {
+      key: "gain-rate-book-relative",
+      label: "簿価ベース利益率",
+      color: "#7c3aed",
+      values: [null, 0.154],
+      formatValue: (value: number) => `${(value * 100).toFixed(1)}%`,
+    },
+    {
+      key: "gain-rate-contributions-relative",
+      label: "拠出金ベース利益率",
+      color: "#ea580c",
+      values: [null, 0.05],
+      formatValue: (value: number) => `${(value * 100).toFixed(1)}%`,
     },
   ],
   allocation: {
@@ -86,6 +139,7 @@ const baseProps = {
         startRatio: 0.4,
         endRatio: 0.39,
         deltaRatio: -0.01,
+        relativeRate: -0.025,
         startMarketValueMinor: 1_400_000,
         endMarketValueMinor: 1_341_347,
         deltaMarketValueMinor: -58_653,
@@ -159,11 +213,19 @@ describe("TrendMetricTabs", () => {
     expect(screen.getByRole("heading", { name: "評価額の増減" })).toBeInTheDocument();
     expect(screen.getByLabelText("推移棒グラフ")).toBeInTheDocument();
 
+    await user.click(marketValueViews.getByRole("tab", { name: "変化率" }));
+    expect(screen.getByRole("heading", { name: "評価額の変化率" })).toBeInTheDocument();
+
     await user.click(metricTabs.getByRole("tab", { name: "損益" }));
+    expect(screen.getByRole("heading", { name: "評価損益" })).toBeInTheDocument();
+
+    const gainViews = within(screen.getByRole("tablist", { name: "損益の表示" }));
+    await user.click(gainViews.getByRole("tab", { name: "増減" }));
     expect(screen.getByRole("heading", { name: "評価損益の増減" })).toBeInTheDocument();
 
     await user.click(metricTabs.getByRole("tab", { name: "利益率" }));
     const gainRateViews = within(screen.getByRole("tablist", { name: "利益率の表示" }));
+    expect(gainRateViews.getByRole("tab", { name: "推移", selected: true })).toBeInTheDocument();
     expect(gainRateViews.getByRole("tab", { name: "簿価ベース", selected: true })).toBeInTheDocument();
 
     await user.click(gainRateViews.getByRole("tab", { name: "拠出金ベース" }));
@@ -174,6 +236,14 @@ describe("TrendMetricTabs", () => {
     await user.click(metricTabs.getByRole("tab", { name: "構成比" }));
     expect(screen.getByRole("heading", { name: "構成比の推移" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "期間内の構成変化" })).toBeInTheDocument();
+
+    const allocationViews = within(
+      screen.getByRole("tablist", { name: "構成比グラフの表示" }),
+    );
+    await user.click(allocationViews.getByRole("tab", { name: "増減" }));
+    expect(screen.getByRole("heading", { name: "構成ごとの構成比増減" })).toBeInTheDocument();
+    await user.click(allocationViews.getByRole("tab", { name: "変化率" }));
+    expect(screen.getByRole("heading", { name: "構成ごとの構成比変化率" })).toBeInTheDocument();
   });
 
   it("renders composition selection toolbar and places table above line chart", () => {

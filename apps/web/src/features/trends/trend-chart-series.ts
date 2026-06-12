@@ -1,9 +1,17 @@
+export type TrendChartTooltipMode =
+  | "percentDelta"
+  | "trendDelta"
+  | "levelDelta"
+  | "relativeRateDelta";
+
 export type TrendChartSeries = {
   key: string;
   label: string;
   color: string;
   values: Array<number | null>;
   levelValues?: Array<number | null>;
-  tooltipMode?: "percentDelta";
+  baselineValue?: number | null;
+  tooltipMode?: TrendChartTooltipMode;
+  tooltipUnit?: "yen" | "percentPoint";
   formatValue?: (value: number) => string;
 };

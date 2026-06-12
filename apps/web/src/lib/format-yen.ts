@@ -112,6 +112,152 @@ export function formatPercentRelativeChange(ratio: number): string {
   return result;
 }
 
+export function formatTrendDeltaTooltip(
+  previous: number | null,
+  current: number | null,
+  formatAbsolute: (value: number) => string,
+): string {
+  let result = "—";
+
+  if (
+    previous === null ||
+    current === null ||
+    !Number.isFinite(previous) ||
+    !Number.isFinite(current)
+  ) {
+    return result;
+  }
+
+  const absoluteDelta = current - previous;
+  let relativeText = "—";
+
+  if (previous !== 0) {
+    relativeText = formatPercentRelativeChange(absoluteDelta / Math.abs(previous));
+  }
+
+  result = `${formatAbsolute(absoluteDelta)} (${relativeText})`;
+  return result;
+}
+
+export function formatYenTrendDeltaTooltip(
+  previous: number | null,
+  current: number | null,
+): string {
+  let result = formatTrendDeltaTooltip(previous, current, formatSignedYenDelta);
+  return result;
+}
+
+export function resolveTrendTooltipPrevious(
+  levelValues: Array<number | null>,
+  index: number,
+  baselineValue?: number | null,
+): number | null {
+  let result: number | null = null;
+
+  if (index > 0) {
+    result = levelValues[index - 1] ?? null;
+    return result;
+  }
+
+  if (
+    baselineValue !== null &&
+    baselineValue !== undefined &&
+    Number.isFinite(baselineValue)
+  ) {
+    result = baselineValue;
+  }
+
+  return result;
+}
+
+export function formatPercentPeriodDeltaSuffix(
+  previous: number | null,
+  current: number | null,
+): string | null {
+  let result: string | null = null;
+
+  if (
+    previous === null ||
+    current === null ||
+    !Number.isFinite(previous) ||
+    !Number.isFinite(current)
+  ) {
+    return result;
+  }
+
+  const ratioDelta = current - previous;
+  let relativeText = "—";
+
+  if (previous !== 0) {
+    relativeText = formatPercentRelativeChange(ratioDelta / Math.abs(previous));
+  }
+
+  result = `${formatPercentPoint(ratioDelta)} / ${relativeText}`;
+  return result;
+}
+
+export function formatYenLevelDeltaTooltip(
+  previous: number | null,
+  current: number | null,
+): string {
+  let result = "—";
+
+  if (current === null || !Number.isFinite(current)) {
+    return result;
+  }
+
+  result = formatYen(current);
+
+  if (previous === null || !Number.isFinite(previous)) {
+    return result;
+  }
+
+  result = `${result} (${formatYenTrendDeltaTooltip(previous, current)})`;
+  return result;
+}
+
+export function formatPercentLevelDeltaTooltip(
+  previous: number | null,
+  current: number | null,
+): string {
+  let result = "—";
+
+  if (current === null || !Number.isFinite(current)) {
+    return result;
+  }
+
+  result = formatPercent(current);
+
+  const deltaSuffix = formatPercentPeriodDeltaSuffix(previous, current);
+  if (deltaSuffix === null) {
+    return result;
+  }
+
+  result = `${result} (${deltaSuffix})`;
+  return result;
+}
+
+export function formatRelativeRateBarTooltip(
+  previous: number | null,
+  current: number | null,
+  relativeRate: number,
+  formatAbsolute: (value: number) => string,
+): string {
+  let result = formatPercentRelativeChange(relativeRate);
+
+  if (
+    previous === null ||
+    current === null ||
+    !Number.isFinite(previous) ||
+    !Number.isFinite(current)
+  ) {
+    return result;
+  }
+
+  result = `${result} (${formatAbsolute(current - previous)})`;
+  return result;
+}
+
 export function formatPercentDeltaTooltip(
   previous: number | null,
   current: number | null,

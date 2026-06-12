@@ -1,5 +1,6 @@
 import type { AllocationSeriesInput } from "./allocation-series";
 import type { AggregatedTrendPoint } from "./snapshot-trend-aggregation";
+import { computePeriodRelativeRate } from "./trend-period-summary";
 import {
   compareNullableNumbers,
   compareStrings,
@@ -12,6 +13,7 @@ export type AllocationPeriodChangeRow = {
   startRatio: number;
   endRatio: number;
   deltaRatio: number;
+  relativeRate: number | null;
   startMarketValueMinor: number;
   endMarketValueMinor: number;
   deltaMarketValueMinor: number;
@@ -23,6 +25,7 @@ export type AllocationPeriodChangeSortColumn =
   | "startRatio"
   | "endRatio"
   | "deltaRatio"
+  | "relativeRate"
   | "startMarketValueMinor"
   | "endMarketValueMinor"
   | "deltaMarketValueMinor";
@@ -125,6 +128,7 @@ export function buildAllocationPeriodChangeRows(
       startRatio: safeStartRatio,
       endRatio: safeEndRatio,
       deltaRatio: safeEndRatio - safeStartRatio,
+      relativeRate: computePeriodRelativeRate(safeStartRatio, safeEndRatio),
       startMarketValueMinor: safeStartMarketValue,
       endMarketValueMinor: safeEndMarketValue,
       deltaMarketValueMinor: safeEndMarketValue - safeStartMarketValue,
@@ -171,6 +175,9 @@ export function sortAllocationPeriodChangeRows(
         break;
       case "deltaRatio":
         cmp = compareNullableNumbers(left.deltaRatio, right.deltaRatio, "asc");
+        break;
+      case "relativeRate":
+        cmp = compareNullableNumbers(left.relativeRate, right.relativeRate, "asc");
         break;
       case "startMarketValueMinor":
         cmp = compareNullableNumbers(

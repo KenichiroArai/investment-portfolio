@@ -13,6 +13,8 @@ import {
   formatTrendChartMeta,
   formatSignedYenDelta,
   formatYen,
+  formatYenLevelDeltaTooltip,
+  formatYenTrendDeltaTooltip,
   formatYenAxis,
   formatYenAxisLabel,
   formatYenMan,
@@ -150,6 +152,18 @@ describe("formatPercentRelativeChange", () => {
   it("formats relative change with sign", () => {
     expect(formatPercentRelativeChange(0.01)).toBe("+1.0%");
     expect(formatPercentRelativeChange(-0.14)).toBe("-14.0%");
+  });
+});
+
+describe("formatYenLevelDeltaTooltip", () => {
+  it("shows level with absolute and relative suffix", () => {
+    expect(formatYenLevelDeltaTooltip(100, 101)).toBe("￥101 (+￥1 (+1.0%))");
+  });
+});
+
+describe("formatYenTrendDeltaTooltip", () => {
+  it("combines yen delta and relative change", () => {
+    expect(formatYenTrendDeltaTooltip(100, 101)).toBe("+￥1 (+1.0%)");
   });
 });
 

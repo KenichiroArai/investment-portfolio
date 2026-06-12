@@ -8,7 +8,12 @@ import {
   resolveTrendChartSlotWidth,
   resolveXLabelAnchor,
 } from "@/features/trends/resolve-trend-chart-slot-width";
-import { formatAsOfDateJa, formatPercent } from "@/lib/format-yen";
+import {
+  formatAsOfDateJa,
+  formatPercent,
+  formatPercentLevelDeltaTooltip,
+  resolveTrendTooltipPrevious,
+} from "@/lib/format-yen";
 
 export type TrendStackedAreaSeries = TrendChartSeries & {
   otherMembers?: string[];
@@ -318,9 +323,19 @@ export function TrendStackedAreaChart({
                 return null;
               }
 
-              const formatted = item.formatValue
-                ? item.formatValue(value)
-                : formatPercent(value);
+              const previous = resolveTrendTooltipPrevious(
+                item.values,
+                hoveredIndex,
+                item.baselineValue,
+              );
+              const current = item.values[hoveredIndex];
+              let formatted = formatPercentLevelDeltaTooltip(previous, current);
+
+              if (previous === null || !Number.isFinite(previous ?? NaN)) {
+                formatted = item.formatValue
+                  ? item.formatValue(value)
+                  : formatPercent(value);
+              }
 
               let row = (
                 <div key={item.key} className="trend-stacked-area-chart__tooltip-row">

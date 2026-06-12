@@ -14,6 +14,7 @@ import { useTableSort } from "@/hooks/useTableSort";
 import {
   formatPercent,
   formatPercentPoint,
+  formatPercentRelativeChange,
   formatYen,
 } from "@/lib/format-yen";
 
@@ -111,6 +112,13 @@ export function AllocationPeriodChangeTable({
                 onSort={toggleSort}
               />
               <SortableTableHeader
+                label="変化率"
+                column="relativeRate"
+                activeColumn={sortColumn}
+                direction={sortDirection}
+                onSort={toggleSort}
+              />
+              <SortableTableHeader
                 label="期首評価額"
                 column="startMarketValueMinor"
                 activeColumn={sortColumn}
@@ -171,6 +179,19 @@ export function AllocationPeriodChangeTable({
                   >
                     {formatPercentPoint(row.deltaRatio)}
                   </td>
+                  <td
+                    className={
+                      row.relativeRate === null
+                        ? undefined
+                        : row.relativeRate >= 0
+                          ? "allocation-period-change-table__delta allocation-period-change-table__delta--positive"
+                          : "allocation-period-change-table__delta allocation-period-change-table__delta--negative"
+                    }
+                  >
+                    {row.relativeRate === null
+                      ? "—"
+                      : formatPercentRelativeChange(row.relativeRate)}
+                  </td>
                   <td>{formatYen(row.startMarketValueMinor)}</td>
                   <td>{formatYen(row.endMarketValueMinor)}</td>
                   <td
@@ -193,7 +214,7 @@ export function AllocationPeriodChangeTable({
         </table>
       </div>
       <p className="allocation-period-change-table__footnote">
-        選択期間の期首から期末までの変化です。推移列は表示単位ごとの構成比です。行をクリックすると下の折れ線グラフの表示を切り替えられます。
+        選択期間の期首から期末までの変化です。変化は構成比のポイント差、変化率は期首比の相対変化です。推移列は表示単位ごとの構成比です。行をクリックすると下の折れ線グラフの表示を切り替えられます。
       </p>
     </div>
   );

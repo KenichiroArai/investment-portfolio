@@ -16,10 +16,15 @@ import {
   TrendStackedAreaChart,
   type TrendStackedAreaSeries,
 } from "@/features/trends/TrendStackedAreaChart";
-import { formatPercent, formatTrendChartMeta, formatYen } from "@/lib/format-yen";
+import {
+  formatPercent,
+  formatPercentRelativeChange,
+  formatTrendChartMeta,
+  formatYen,
+} from "@/lib/format-yen";
 
 type TrendMetricTab = "allocation" | "market-value" | "gain" | "gain-rate";
-type MarketValueView = "level" | "delta";
+type MetricView = "level" | "delta" | "relative-rate";
 
 type AnalysisScheme = {
   schemeCode: string;
@@ -53,9 +58,16 @@ type TrendMetricTabsProps = {
   sourceDateLabels: string[];
   trendDisplayUnitLabel: string;
   marketValueLevelValues: Array<number | null>;
+  marketValueBaselineMinor?: number | null;
   marketValueDeltaSeries: TrendChartSeries[];
+  marketValueRelativeRateSeries: TrendChartSeries[];
+  gainLevelValues: Array<number | null>;
+  gainBaselineMinor?: number | null;
   gainDeltaSeries: TrendChartSeries[];
+  gainRelativeRateSeries: TrendChartSeries[];
   gainRateSeries: TrendChartSeries[];
+  gainRateDeltaSeries: TrendChartSeries[];
+  gainRateRelativeRateSeries: TrendChartSeries[];
   allocation?: TrendMetricTabsAllocation | null;
 };
 
@@ -67,15 +79,40 @@ function resolveInitialMetric(hasAllocation: boolean): TrendMetricTab {
   return result;
 }
 
+const GAIN_RATE_DELTA_KEYS: Record<string, string> = {
+  "gain-rate-book": "gain-rate-book-delta",
+  "gain-rate-contributions": "gain-rate-contributions-delta",
+};
+
+const GAIN_RATE_RELATIVE_KEYS: Record<string, string> = {
+  "gain-rate-book": "gain-rate-book-relative",
+  "gain-rate-contributions": "gain-rate-contributions-relative",
+};
+
+function filterGainRateSeries(
+  series: TrendChartSeries[],
+  mappedKey: string,
+): TrendChartSeries[] {
+  let result = series.filter((item) => item.key === mappedKey);
+  return result;
+}
+
 export function TrendMetricTabs({
   labels,
   sourceDates,
   sourceDateLabels,
   trendDisplayUnitLabel,
   marketValueLevelValues,
+  marketValueBaselineMinor = null,
   marketValueDeltaSeries,
+  marketValueRelativeRateSeries,
+  gainLevelValues,
+  gainBaselineMinor = null,
   gainDeltaSeries,
+  gainRelativeRateSeries,
   gainRateSeries,
+  gainRateDeltaSeries,
+  gainRateRelativeRateSeries,
   allocation = null,
 }: TrendMetricTabsProps) {
   const hasAllocation =
@@ -87,7 +124,11 @@ export function TrendMetricTabs({
     resolveInitialMetric(hasAllocation),
   );
   const [activeMarketValueView, setActiveMarketValueView] =
-    useState<MarketValueView>("level");
+    useState<MetricView>("level");
+  const [activeGainView, setActiveGainView] = useState<MetricView>("level");
+  const [activeGainRateView, setActiveGainRateView] = useState<MetricView>("level");
+  const [activeAllocationView, setActiveAllocationView] =
+    useState<MetricView>("level");
   const [activeGainRateKey, setActiveGainRateKey] = useState(
     gainRateSeries[0]?.key ?? "gain-rate-book",
   );
@@ -110,8 +151,18 @@ export function TrendMetricTabs({
     ? activeGainRateKey
     : (gainRateSeries[0]?.key ?? activeGainRateKey);
 
-  const activeGainRateSeries = gainRateSeries.filter(
+  const activeGainRateLevelSeries = gainRateSeries.filter(
     (series) => series.key === resolvedGainRateKey,
+  );
+
+  const activeGainRateDeltaSeries = filterGainRateSeries(
+    gainRateDeltaSeries,
+    GAIN_RATE_DELTA_KEYS[resolvedGainRateKey] ?? "",
+  );
+
+  const activeGainRateRelativeSeries = filterGainRateSeries(
+    gainRateRelativeRateSeries,
+    GAIN_RATE_RELATIVE_KEYS[resolvedGainRateKey] ?? "",
   );
 
   let chartPanel: ReactNode = null;
@@ -153,20 +204,61 @@ export function TrendMetricTabs({
           onSelectAll={allocation.onSelectAllCompositions}
           onClearSelection={allocation.onClearCompositionSelection}
         />
-        <TrendStackedAreaChart
-          title="構成比の推移"
-          caption={trendDisplayUnitLabel}
-          labels={labels}
-          sourceDates={sourceDates}
-          sourceDateLabels={sourceDateLabels}
-          series={allocation.allocationSeries.map((item) => ({
-            ...item,
-            formatValue: (value) => formatPercent(value),
-          }))}
-          height={300}
-          selectedSeriesKeys={allocation.selectedCompositionKeys}
-          onSeriesToggle={allocation.onCompositionToggle}
-        />
+        <div
+          className="analysis-axis-tabs trend-metric-tabs__subtabs"
+          role="tablist"
+          aria-label="構成比グラフの表示"
+        >
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeAllocationView === "level"}
+            className={activeAllocationView === "level" ? "is-active" : undefined}
+            onClick={() => {
+              setActiveAllocationView("level");
+            }}
+          >
+            推移
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeAllocationView === "delta"}
+            className={activeAllocationView === "delta" ? "is-active" : undefined}
+            onClick={() => {
+              setActiveAllocationView("delta");
+            }}
+          >
+            増減
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeAllocationView === "relative-rate"}
+            className={activeAllocationView === "relative-rate" ? "is-active" : undefined}
+            onClick={() => {
+              setActiveAllocationView("relative-rate");
+            }}
+          >
+            変化率
+          </button>
+        </div>
+        {activeAllocationView === "level" ? (
+          <TrendStackedAreaChart
+            title="構成比の推移"
+            caption={trendDisplayUnitLabel}
+            labels={labels}
+            sourceDates={sourceDates}
+            sourceDateLabels={sourceDateLabels}
+            series={allocation.allocationSeries.map((item) => ({
+              ...item,
+              formatValue: (value) => formatPercent(value),
+            }))}
+            height={300}
+            selectedSeriesKeys={allocation.selectedCompositionKeys}
+            onSeriesToggle={allocation.onCompositionToggle}
+          />
+        ) : null}
         {allocation.periodChangeRows.length > 0 ? (
           <AllocationPeriodChangeTable
             rows={allocation.periodChangeRows}
@@ -183,6 +275,7 @@ export function TrendMetricTabs({
             sourceDateLabels={sourceDateLabels}
             ratioSeries={allocation.ratioSeries}
             selectedKeys={allocation.selectedCompositionKeys}
+            view={activeAllocationView}
             caption={trendDisplayUnitLabel}
           />
         ) : null}
@@ -206,6 +299,10 @@ export function TrendMetricTabs({
             label: "評価額",
             color: "#2563eb",
             values: marketValueLevelValues,
+            levelValues: marketValueLevelValues,
+            baselineValue: marketValueBaselineMinor,
+            tooltipMode: "levelDelta",
+            tooltipUnit: "yen",
             formatValue: (value) => formatYen(value),
           },
         ]}
@@ -229,7 +326,50 @@ export function TrendMetricTabs({
     );
   }
 
-  if (activeMetric === "gain") {
+  if (activeMetric === "market-value" && activeMarketValueView === "relative-rate") {
+    chartPanel = (
+      <TrendBarChart
+        title="評価額の変化率"
+        caption={formatTrendChartMeta(trendDisplayUnitLabel, "percent")}
+        valueKind="percent"
+        height={180}
+        labels={labels}
+        sourceDates={sourceDates}
+        sourceDateLabels={sourceDateLabels}
+        mode="grouped"
+        series={marketValueRelativeRateSeries}
+      />
+    );
+  }
+
+  if (activeMetric === "gain" && activeGainView === "level") {
+    chartPanel = (
+      <TrendLineChart
+        title="評価損益"
+        caption={trendDisplayUnitLabel}
+        valueKind="yen"
+        height={180}
+        labels={labels}
+        sourceDates={sourceDates}
+        sourceDateLabels={sourceDateLabels}
+        series={[
+          {
+            key: "gain",
+            label: "評価損益",
+            color: "#16a34a",
+            values: gainLevelValues,
+            levelValues: gainLevelValues,
+            baselineValue: gainBaselineMinor,
+            tooltipMode: "levelDelta",
+            tooltipUnit: "yen",
+            formatValue: (value) => formatYen(value),
+          },
+        ]}
+      />
+    );
+  }
+
+  if (activeMetric === "gain" && activeGainView === "delta") {
     chartPanel = (
       <TrendBarChart
         title="評価損益の増減"
@@ -245,7 +385,23 @@ export function TrendMetricTabs({
     );
   }
 
-  if (activeMetric === "gain-rate" && activeGainRateSeries.length > 0) {
+  if (activeMetric === "gain" && activeGainView === "relative-rate") {
+    chartPanel = (
+      <TrendBarChart
+        title="評価損益の変化率"
+        caption={formatTrendChartMeta(trendDisplayUnitLabel, "percent")}
+        valueKind="percent"
+        height={180}
+        labels={labels}
+        sourceDates={sourceDates}
+        sourceDateLabels={sourceDateLabels}
+        mode="grouped"
+        series={gainRelativeRateSeries}
+      />
+    );
+  }
+
+  if (activeMetric === "gain-rate" && activeGainRateView === "level" && activeGainRateLevelSeries.length > 0) {
     chartPanel = (
       <TrendLineChart
         title="利益率の推移"
@@ -256,7 +412,46 @@ export function TrendMetricTabs({
         sourceDates={sourceDates}
         sourceDateLabels={sourceDateLabels}
         domainMode="fitData"
-        series={activeGainRateSeries}
+        series={activeGainRateLevelSeries}
+      />
+    );
+  }
+
+  if (activeMetric === "gain-rate" && activeGainRateView === "delta" && activeGainRateDeltaSeries.length > 0) {
+    chartPanel = (
+      <TrendBarChart
+        title="利益率の増減"
+        caption={formatTrendChartMeta(trendDisplayUnitLabel, "percentPoint")}
+        valueKind="percentPoint"
+        height={180}
+        labels={labels}
+        sourceDates={sourceDates}
+        sourceDateLabels={sourceDateLabels}
+        mode="grouped"
+        series={activeGainRateDeltaSeries}
+      />
+    );
+  }
+
+  if (
+    activeMetric === "gain-rate" &&
+    activeGainRateView === "relative-rate" &&
+    activeGainRateRelativeSeries.length > 0
+  ) {
+    chartPanel = (
+      <TrendBarChart
+        title="利益率の変化率"
+        caption={formatTrendChartMeta(trendDisplayUnitLabel, "percent")}
+        valueKind="percent"
+        height={180}
+        labels={labels}
+        sourceDates={sourceDates}
+        sourceDateLabels={sourceDateLabels}
+        mode="grouped"
+        series={activeGainRateRelativeSeries.map((item) => ({
+          ...item,
+          formatValue: (value) => formatPercentRelativeChange(value),
+        }))}
       />
     );
   }
@@ -311,33 +506,121 @@ export function TrendMetricTabs({
           >
             増減
           </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeMarketValueView === "relative-rate"}
+            className={activeMarketValueView === "relative-rate" ? "is-active" : undefined}
+            onClick={() => {
+              setActiveMarketValueView("relative-rate");
+            }}
+          >
+            変化率
+          </button>
         </div>
       ) : null}
 
-      {activeMetric === "gain-rate" && gainRateSeries.length > 1 ? (
+      {activeMetric === "gain" ? (
+        <div
+          className="analysis-axis-tabs trend-metric-tabs__subtabs"
+          role="tablist"
+          aria-label="損益の表示"
+        >
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeGainView === "level"}
+            className={activeGainView === "level" ? "is-active" : undefined}
+            onClick={() => {
+              setActiveGainView("level");
+            }}
+          >
+            推移
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeGainView === "delta"}
+            className={activeGainView === "delta" ? "is-active" : undefined}
+            onClick={() => {
+              setActiveGainView("delta");
+            }}
+          >
+            増減
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeGainView === "relative-rate"}
+            className={activeGainView === "relative-rate" ? "is-active" : undefined}
+            onClick={() => {
+              setActiveGainView("relative-rate");
+            }}
+          >
+            変化率
+          </button>
+        </div>
+      ) : null}
+
+      {activeMetric === "gain-rate" ? (
         <div
           className="analysis-axis-tabs trend-metric-tabs__subtabs"
           role="tablist"
           aria-label="利益率の表示"
         >
-          {gainRateSeries.map((series) => {
-            const subTabLabel = GAIN_RATE_SUB_TAB_LABELS[series.key] ?? series.label;
-            let subTabButton = (
-              <button
-                key={series.key}
-                type="button"
-                role="tab"
-                aria-selected={resolvedGainRateKey === series.key}
-                className={resolvedGainRateKey === series.key ? "is-active" : undefined}
-                onClick={() => {
-                  setActiveGainRateKey(series.key);
-                }}
-              >
-                {subTabLabel}
-              </button>
-            );
-            return subTabButton;
-          })}
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeGainRateView === "level"}
+            className={activeGainRateView === "level" ? "is-active" : undefined}
+            onClick={() => {
+              setActiveGainRateView("level");
+            }}
+          >
+            推移
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeGainRateView === "delta"}
+            className={activeGainRateView === "delta" ? "is-active" : undefined}
+            onClick={() => {
+              setActiveGainRateView("delta");
+            }}
+          >
+            増減
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeGainRateView === "relative-rate"}
+            className={activeGainRateView === "relative-rate" ? "is-active" : undefined}
+            onClick={() => {
+              setActiveGainRateView("relative-rate");
+            }}
+          >
+            変化率
+          </button>
+          {gainRateSeries.length > 1
+            ? gainRateSeries.map((series) => {
+                const subTabLabel = GAIN_RATE_SUB_TAB_LABELS[series.key] ?? series.label;
+                let subTabButton = (
+                  <button
+                    key={series.key}
+                    type="button"
+                    role="tab"
+                    aria-selected={resolvedGainRateKey === series.key}
+                    className={resolvedGainRateKey === series.key ? "is-active" : undefined}
+                    onClick={() => {
+                      setActiveGainRateKey(series.key);
+                    }}
+                  >
+                    {subTabLabel}
+                  </button>
+                );
+                return subTabButton;
+              })
+            : null}
         </div>
       ) : null}
 

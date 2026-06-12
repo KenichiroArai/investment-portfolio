@@ -13,6 +13,7 @@ import {
   resolveXLabelAnchor,
 } from "@/features/trends/resolve-trend-chart-slot-width";
 import { useTrendYAxis } from "@/features/trends/use-trend-y-axis";
+import { formatTrendChartTooltipValue } from "@/features/trends/format-trend-chart-tooltip";
 import { formatAsOfDateJa } from "@/lib/format-yen";
 
 export type TrendBarSeries = TrendChartSeries;
@@ -368,9 +369,12 @@ export function TrendBarChart({
               if (value === null || !Number.isFinite(value)) {
                 return null;
               }
-              const formatted = item.formatValue
-                ? item.formatValue(value)
-                : String(value);
+
+              const formatted = formatTrendChartTooltipValue(item, hoveredIndex);
+              if (formatted === null) {
+                return null;
+              }
+
               let row = (
                 <div key={item.key} className="trend-bar-chart__tooltip-row">
                   <span

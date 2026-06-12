@@ -3,10 +3,16 @@
 import type { AllocationSeriesInput } from "@repo/shared";
 import { useMemo, type ReactNode } from "react";
 
-import { getAllocationChartColor } from "@/features/analysis/chart-colors";
+import {
+  buildAllocationRatioDeltaSeries,
+  buildAllocationRatioLevelSeries,
+  buildAllocationRatioRelativeSeries,
+} from "@/features/trends/build-allocation-ratio-chart-series";
+import { TrendBarChart } from "@/features/trends/TrendBarChart";
 import { TrendLineChart } from "@/features/trends/TrendLineChart";
-import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
-import { formatPercent } from "@/lib/format-yen";
+import { formatTrendChartMeta } from "@/lib/format-yen";
+
+type CompositionChartView = "level" | "delta" | "relative-rate";
 
 type CompositionRatioLineChartProps = {
   labels: string[];
@@ -14,6 +20,7 @@ type CompositionRatioLineChartProps = {
   sourceDateLabels?: string[];
   ratioSeries: AllocationSeriesInput[];
   selectedKeys: string[];
+  view?: CompositionChartView;
   caption?: string;
   height?: number;
   className?: string;
@@ -25,38 +32,32 @@ export function CompositionRatioLineChart({
   sourceDateLabels,
   ratioSeries,
   selectedKeys,
+  view = "level",
   caption,
   height = 220,
   className,
 }: CompositionRatioLineChartProps) {
-  const colorIndexByKey = useMemo(() => {
-    let result = new Map<string, number>();
-    ratioSeries.forEach((item, index) => {
-      result.set(item.key, index);
-    });
+  const levelSeries = useMemo(() => {
+    let result = buildAllocationRatioLevelSeries(ratioSeries, selectedKeys);
     return result;
-  }, [ratioSeries]);
+  }, [ratioSeries, selectedKeys]);
 
-  const chartSeries = useMemo(() => {
-    let result: TrendChartSeries[] = [];
-    const selected = ratioSeries.filter((item) => selectedKeys.includes(item.key));
-    result = selected.map((item) => {
-      const colorIndex = colorIndexByKey.get(item.key) ?? 0;
-      let series: TrendChartSeries = {
-        key: item.key,
-        label: item.label,
-        color: getAllocationChartColor(colorIndex),
-        values: item.values,
-        formatValue: (value) => formatPercent(value),
-      };
-      return series;
-    });
+  const deltaSeries = useMemo(() => {
+    let result = buildAllocationRatioDeltaSeries(ratioSeries, selectedKeys);
     return result;
-  }, [colorIndexByKey, ratioSeries, selectedKeys]);
+  }, [ratioSeries, selectedKeys]);
+
+  const relativeSeries = useMemo(() => {
+    let result = buildAllocationRatioRelativeSeries(ratioSeries, selectedKeys);
+    return result;
+  }, [ratioSeries, selectedKeys]);
+
+  const activeSeries =
+    view === "delta" ? deltaSeries : view === "relative-rate" ? relativeSeries : levelSeries;
 
   let result: ReactNode = null;
 
-  if (chartSeries.length === 0) {
+  if (activeSeries.length === 0) {
     result = (
       <div
         className={
@@ -73,23 +74,51 @@ export function CompositionRatioLineChart({
     return result;
   }
 
+  const chartTitle =
+    view === "delta"
+      ? "構成ごとの構成比増減"
+      : view === "relative-rate"
+        ? "構成ごとの構成比変化率"
+        : "構成ごとの構成比推移";
+
+  const chartCaption =
+    view === "delta"
+      ? formatTrendChartMeta(caption ?? "", "percentPoint")
+      : view === "relative-rate"
+        ? formatTrendChartMeta(caption ?? "", "percent")
+        : caption;
+
   result = (
     <div
       className={
         className ? `composition-ratio-line-chart ${className}` : "composition-ratio-line-chart"
       }
     >
-      <TrendLineChart
-        title="構成ごとの構成比推移"
-        caption={caption}
-        valueKind="percent"
-        domainMode="fitData"
-        height={height}
-        labels={labels}
-        sourceDates={sourceDates}
-        sourceDateLabels={sourceDateLabels}
-        series={chartSeries}
-      />
+      {view === "level" ? (
+        <TrendLineChart
+          title={chartTitle}
+          caption={chartCaption}
+          valueKind="percent"
+          domainMode="fitData"
+          height={height}
+          labels={labels}
+          sourceDates={sourceDates}
+          sourceDateLabels={sourceDateLabels}
+          series={activeSeries}
+        />
+      ) : (
+        <TrendBarChart
+          title={chartTitle}
+          caption={chartCaption}
+          valueKind={view === "delta" ? "percentPoint" : "percent"}
+          height={height}
+          labels={labels}
+          sourceDates={sourceDates}
+          sourceDateLabels={sourceDateLabels}
+          mode="grouped"
+          series={activeSeries}
+        />
+      )}
     </div>
   );
   return result;

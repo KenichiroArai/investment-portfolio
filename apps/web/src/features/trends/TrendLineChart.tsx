@@ -15,7 +15,8 @@ import {
   resolveXLabelAnchor,
 } from "@/features/trends/resolve-trend-chart-slot-width";
 import { useTrendYAxis } from "@/features/trends/use-trend-y-axis";
-import { formatAsOfDateJa, formatPercentDeltaTooltip } from "@/lib/format-yen";
+import { formatTrendChartTooltipValue } from "@/features/trends/format-trend-chart-tooltip";
+import { formatAsOfDateJa } from "@/lib/format-yen";
 
 function formatSourceDateTooltip(label: string | undefined): string | null {
   let result: string | null = null;
@@ -302,18 +303,9 @@ export function TrendLineChart({
                 return null;
               }
 
-              let formatted = item.formatValue
-                ? item.formatValue(value)
-                : String(value);
-
-              if (
-                item.tooltipMode === "percentDelta" &&
-                item.levelValues &&
-                hoveredIndex > 0
-              ) {
-                const previous = item.levelValues[hoveredIndex - 1];
-                const current = item.levelValues[hoveredIndex];
-                formatted = formatPercentDeltaTooltip(previous, current);
+              const formatted = formatTrendChartTooltipValue(item, hoveredIndex);
+              if (formatted === null) {
+                return null;
               }
 
               let row = (

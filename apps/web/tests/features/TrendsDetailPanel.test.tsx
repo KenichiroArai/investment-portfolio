@@ -269,13 +269,20 @@ describe("TrendsDetailPanel", () => {
     await user.click(marketValueViews.getByRole("tab", { name: "増減" }));
     expect(screen.getByRole("heading", { name: "評価額の増減" })).toBeInTheDocument();
 
+    await user.click(marketValueViews.getByRole("tab", { name: "変化率" }));
+    expect(screen.getByRole("heading", { name: "評価額の変化率" })).toBeInTheDocument();
+
     await user.click(metricTabs.getByRole("tab", { name: "損益" }));
-    expect(screen.getByRole("heading", { name: "評価損益の増減" })).toBeInTheDocument();
+    const gainViews = within(screen.getByRole("tablist", { name: "損益の表示" }));
+    await user.click(gainViews.getByRole("tab", { name: "変化率" }));
+    expect(screen.getByRole("heading", { name: "評価損益の変化率" })).toBeInTheDocument();
 
     await user.click(metricTabs.getByRole("tab", { name: "利益率" }));
     expect(screen.getByRole("heading", { name: "利益率の推移" })).toBeInTheDocument();
 
     const gainRateViews = within(screen.getByRole("tablist", { name: "利益率の表示" }));
+    await user.click(gainRateViews.getByRole("tab", { name: "増減" }));
+    expect(screen.getByRole("heading", { name: "利益率の増減" })).toBeInTheDocument();
     await user.click(gainRateViews.getByRole("tab", { name: "拠出金ベース" }));
     expect(gainRateViews.getByRole("tab", { name: "拠出金ベース", selected: true })).toBeInTheDocument();
   });

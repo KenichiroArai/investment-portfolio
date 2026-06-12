@@ -95,6 +95,7 @@ describe("allocation-period-change", () => {
     expect(rows).toHaveLength(2);
     const domestic = rows.find((item) => item.key === "domestic");
     expect(domestic?.deltaRatio).toBeCloseTo(0.01);
+    expect(domestic?.relativeRate).toBeCloseTo(0.01 / 0.6);
     expect(domestic?.deltaMarketValueMinor).toBe(100_000);
     expect(domestic?.ratioSeries).toEqual([0.6, 0.62, 0.61]);
     expect(Math.abs(rows[0].deltaRatio)).toBeGreaterThanOrEqual(
@@ -110,6 +111,7 @@ describe("allocation-period-change", () => {
         startRatio: 0.1,
         endRatio: 0.12,
         deltaRatio: 0.02,
+        relativeRate: 0.2,
         startMarketValueMinor: 100,
         endMarketValueMinor: 120,
         deltaMarketValueMinor: 20,
@@ -121,6 +123,7 @@ describe("allocation-period-change", () => {
         startRatio: 0.5,
         endRatio: 0.4,
         deltaRatio: -0.1,
+        relativeRate: -0.2,
         startMarketValueMinor: 500,
         endMarketValueMinor: 400,
         deltaMarketValueMinor: -100,
@@ -186,6 +189,7 @@ describe("allocation-period-change", () => {
         startRatio: 0.2,
         endRatio: 0.3,
         deltaRatio: 0.1,
+        relativeRate: 0.5,
         startMarketValueMinor: 200,
         endMarketValueMinor: 300,
         deltaMarketValueMinor: 100,
@@ -197,6 +201,7 @@ describe("allocation-period-change", () => {
         startRatio: 0.5,
         endRatio: 0.4,
         deltaRatio: -0.1,
+        relativeRate: -0.2,
         startMarketValueMinor: 500,
         endMarketValueMinor: 400,
         deltaMarketValueMinor: -100,

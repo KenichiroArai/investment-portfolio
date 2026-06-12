@@ -1,5 +1,6 @@
 import {
   computeTrendPeriodDeltas,
+  computeTrendPeriodRelativeDeltas,
   TREND_DISPLAY_UNIT_SINGLE_BUCKET_NOTES,
   type AggregatedTrendPoint,
   type TrendDisplayUnit,
@@ -98,5 +99,22 @@ export function computeTrendChartDeltas(
   }
 
   result = computeTrendPeriodDeltas(levelValues, { baseline: baselineValue });
+  return result;
+}
+
+export function computeTrendChartRelativeDeltas(
+  levelValues: Array<number | null>,
+  displayPoints: AggregatedTrendPoint[],
+  baselinePoint: AggregatedTrendPoint | null,
+  baselineValue: number | null,
+): Array<number | null> {
+  let result: Array<number | null> = [];
+
+  if (displayPoints.length === 1 && baselinePoint) {
+    result = computeTrendPeriodRelativeDeltas(levelValues);
+    return result;
+  }
+
+  result = computeTrendPeriodRelativeDeltas(levelValues, { baseline: baselineValue });
   return result;
 }

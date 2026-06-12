@@ -151,6 +151,11 @@
   font-size: 0.75rem;
 }
 
+.trend-period-summary__range {
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+}
+
 .trend-period-summary__value {
   font-size: 1rem;
   font-weight: 600;

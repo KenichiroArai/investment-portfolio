@@ -9,6 +9,7 @@ export * from "./allocation-series";
 export * from "./allocation-period-change";
 export * from "./chart-axis-scale";
 export * from "./trend-period-deltas";
+export * from "./trend-period-summary";
 export * from "./trend-chart-domain";
 export * from "./trend-chart-axis";
 export * from "./ideco-analysis";
