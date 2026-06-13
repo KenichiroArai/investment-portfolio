@@ -6,6 +6,16 @@ import {
   createPortfolioFetchMock,
   renderWithPortfolioTime,
 } from "../helpers/portfolio-time-test-utils";
+import { portfolioTimeNavigationState } from "../helpers/portfolio-time-navigation-state";
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    replace: vi.fn(),
+    push: vi.fn(),
+  }),
+  usePathname: () => portfolioTimeNavigationState.pathname,
+  useSearchParams: () => portfolioTimeNavigationState.searchParams,
+}));
 
 describe("HoldingsView", () => {
   afterEach(() => {
@@ -49,7 +59,7 @@ describe("HoldingsView", () => {
     }
   });
 
-  it("renders snapshot table", async () => {
+  it("renders snapshot table in range view", async () => {
     vi.stubGlobal(
       "fetch",
       createPortfolioFetchMock({
@@ -88,6 +98,7 @@ describe("HoldingsView", () => {
     });
     await waitFor(() => {
       expect(screen.getByText("テストファンド")).toBeInTheDocument();
+      expect(screen.getByRole("columnheader", { name: "基準日" })).toBeInTheDocument();
       expect(screen.getByRole("columnheader", { name: "資産残高" })).toBeInTheDocument();
       expect(screen.getByRole("columnheader", { name: "購入金額" })).toBeInTheDocument();
       expect(screen.getByRole("columnheader", { name: "地域" })).toBeInTheDocument();
@@ -189,7 +200,7 @@ describe("HoldingsView", () => {
     expect(screen.queryByText(/保有銘柄がありません/)).not.toBeInTheDocument();
   });
 
-  it("shows period range and comparison deltas", async () => {
+  it("shows period range and comparison deltas in compare tab", async () => {
     vi.stubGlobal(
       "fetch",
       createPortfolioFetchMock({
@@ -247,7 +258,7 @@ describe("HoldingsView", () => {
     );
     renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
       pathname: "/portfolios/ideco/holdings",
-      initialSearchParams: "period=all&asOf=2026-06-07",
+      initialSearchParams: "period=all&asOf=2026-06-07&view=compare",
     });
     await waitFor(() => {
       expect(screen.getByText(/期間:/)).toBeInTheDocument();
@@ -262,7 +273,7 @@ describe("HoldingsView", () => {
     });
   });
 
-  it("shows empty holdings message", async () => {
+  it("shows empty holdings message in compare tab", async () => {
     vi.stubGlobal(
       "fetch",
       createPortfolioFetchMock({
@@ -279,9 +290,94 @@ describe("HoldingsView", () => {
     );
     renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
       pathname: "/portfolios/ideco/holdings",
+      initialSearchParams: "view=compare",
     });
     await waitFor(() => {
       expect(screen.getByText(/保有銘柄がありません/)).toBeInTheDocument();
+    });
+  });
+
+  it("filters range rows by instrument search", async () => {
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        dates: [
+          { asOfDate: "2026-06-01", isCurrent: false },
+          { asOfDate: "2026-06-07", isCurrent: true },
+        ],
+        snapshot: {
+          id: "s2",
+          portfolioCode: "ideco",
+          portfolioName: "iDeCo",
+          asOfDate: "2026-06-07",
+          analysisSchemes: [],
+          metrics: [],
+          lines: [
+            {
+              id: "l2",
+              instrumentId: "i1",
+              instrumentName: "国内株式",
+              quantity: 1,
+              marketValueMinor: 1000,
+              bookValueMinor: null,
+              metrics: [],
+              instrumentAttributes: [],
+              tags: [],
+            },
+            {
+              id: "l3",
+              instrumentId: "i2",
+              instrumentName: "外国債券",
+              quantity: 2,
+              marketValueMinor: 2000,
+              bookValueMinor: null,
+              metrics: [],
+              instrumentAttributes: [],
+              tags: [],
+            },
+          ],
+        },
+        snapshotsByDate: {
+          "2026-06-01": {
+            id: "s1",
+            portfolioCode: "ideco",
+            portfolioName: "iDeCo",
+            asOfDate: "2026-06-01",
+            analysisSchemes: [],
+            metrics: [],
+            lines: [
+              {
+                id: "l1",
+                instrumentId: "i1",
+                instrumentName: "国内株式",
+                quantity: 1,
+                marketValueMinor: 900,
+                bookValueMinor: null,
+                metrics: [],
+                instrumentAttributes: [],
+                tags: [],
+              },
+            ],
+          },
+        },
+      }),
+    );
+    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
+      pathname: "/portfolios/ideco/holdings",
+      initialSearchParams: "period=all&asOf=2026-06-07",
+    });
+    await waitFor(() => {
+      expect(screen.getAllByText("国内株式").length).toBe(2);
+      expect(screen.getByText("外国債券")).toBeInTheDocument();
+    });
+
+    fireEvent.change(screen.getByLabelText("銘柄名で検索"), {
+      target: { value: "株式" },
+    });
+
+    await waitFor(() => {
+      expect(screen.getAllByText("国内株式").length).toBe(2);
+      expect(screen.queryByText("外国債券")).not.toBeInTheDocument();
     });
   });
 });
