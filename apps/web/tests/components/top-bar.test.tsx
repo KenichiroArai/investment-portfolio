@@ -31,8 +31,9 @@ describe("TopBar", () => {
     const homeLink = screen.getByRole("link", { name: "ホーム" });
     const analysisLink = screen.getByRole("link", { name: "全口座分析" });
     expect(homeLink.className).toContain("text-muted-foreground");
-    expect(homeLink.className).not.toContain("bg-accent text-accent-foreground");
-    expect(analysisLink.className).toContain("bg-accent text-accent-foreground");
+    expect(homeLink.className).not.toContain("bg-surface text-foreground");
+    expect(analysisLink.className).toContain("bg-surface text-foreground");
+    expect(analysisLink.className).toContain("border-border");
   });
 
   it("toggles theme after mount", async () => {
@@ -53,7 +54,7 @@ describe("TopBar", () => {
     render(<TopBar />);
 
     expect(screen.getByRole("link", { name: "ホーム" }).className).toContain(
-      "bg-accent",
+      "bg-surface",
     );
   });
 });

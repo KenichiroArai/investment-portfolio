@@ -22,6 +22,7 @@ import {
   formatTrendChartMeta,
   formatYen,
 } from "@/lib/format-yen";
+import { CHART_POSITIVE_COLOR } from "@/lib/chart-theme";
 
 type TrendMetricTab = "allocation" | "market-value" | "gain" | "gain-rate";
 type MetricView = "level" | "delta" | "relative-rate";
@@ -356,7 +357,7 @@ export function TrendMetricTabs({
           {
             key: "gain",
             label: "評価損益",
-            color: "#16a34a",
+            color: CHART_POSITIVE_COLOR,
             values: gainLevelValues,
             levelValues: gainLevelValues,
             baselineValue: gainBaselineMinor,

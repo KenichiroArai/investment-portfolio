@@ -184,7 +184,7 @@ export function HomeView() {
       ? "—"
       : formatPercent(totalGainRateOnAssetBalance);
   const gainClassName =
-    totalPortfolioGainMinor >= 0 ? "text-emerald-600" : "text-rose-600";
+    totalPortfolioGainMinor >= 0 ? "text-positive" : "text-negative";
 
   result = (
     <div className="space-y-8">
@@ -241,8 +241,8 @@ export function HomeView() {
                   : formatPercent(card.gainRateOnAssetBalance);
               const cardGainClass =
                 (card.portfolioGainMinor ?? 0) >= 0
-                  ? "text-emerald-600"
-                  : "text-rose-600";
+                  ? "text-positive"
+                  : "text-negative";
 
               let item = (
                 <Card

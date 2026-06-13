@@ -109,7 +109,7 @@ export function SnapshotTimeBar() {
         <div
           className={cn(
             "flex flex-wrap items-center gap-2",
-            emphasizeAsOf && "rounded-lg border bg-background p-2 shadow-sm",
+            emphasizeAsOf && "rounded-lg border bg-surface p-2 shadow-sm",
           )}
         >
           <span className="min-w-12 text-xs font-semibold text-muted-foreground">基準日</span>
@@ -184,7 +184,7 @@ export function SnapshotTimeBar() {
         <div
           className={cn(
             "space-y-2",
-            emphasizePeriod && "rounded-lg border bg-background p-2 shadow-sm",
+            emphasizePeriod && "rounded-lg border bg-surface p-2 shadow-sm",
           )}
         >
           <div className="flex flex-wrap items-center gap-2">

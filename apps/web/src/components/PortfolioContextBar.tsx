@@ -124,7 +124,7 @@ export function PortfolioContextBar({ portfolioCode }: PortfolioContextBarProps)
   }, [portfolioCode]);
 
   let result = (
-    <div className="border-b bg-background">
+    <div className="border-b bg-card">
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         <div className="flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex min-w-0 items-center gap-3">
@@ -192,8 +192,8 @@ export function PortfolioContextBar({ portfolioCode }: PortfolioContextBarProps)
                   className={cn(
                     "shrink-0 border-b-2 px-3 py-2 text-sm font-medium transition-colors",
                     active
-                      ? "border-primary text-foreground"
-                      : "border-transparent text-muted-foreground hover:border-muted-foreground/30 hover:text-foreground",
+                      ? "border-primary bg-surface text-foreground"
+                      : "border-transparent text-muted-foreground hover:border-muted-foreground/30 hover:bg-surface/60 hover:text-foreground",
                   )}
                 >
                   {tab.label}

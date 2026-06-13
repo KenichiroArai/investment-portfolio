@@ -102,7 +102,7 @@ export function PortfolioOverviewView({
     gainRateOnAssetBalance === null
       ? "—"
       : formatPercent(gainRateOnAssetBalance);
-  const gainClassName = portfolioGain >= 0 ? "text-emerald-600" : "text-rose-600";
+  const gainClassName = portfolioGain >= 0 ? "text-positive" : "text-negative";
 
   const latestPoint =
     trends?.points.find((point) => point.asOfDate === currentAsOfDate) ??

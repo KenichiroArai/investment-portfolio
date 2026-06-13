@@ -80,7 +80,7 @@ export function AllocationPeriodChangeTable({
         caption={`${startDateLabel} → ${endDateLabel}`}
       />
       <div className="allocation-period-change-table__scroll">
-        <table className="allocation-period-change-table__table">
+        <table className="data-table allocation-period-change-table__table">
           <thead>
             <tr>
               <SortableTableHeader

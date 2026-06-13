@@ -21,6 +21,7 @@ import {
   mapTrendChartLevelValues,
 } from "@/features/trends/trend-chart-buckets";
 import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
+import { CHART_POSITIVE_COLOR } from "@/lib/chart-theme";
 import {
   formatAsOfDateJa,
   formatMarketValueBaselineSummary,
@@ -310,7 +311,7 @@ export function TrendsDetailPanel() {
     {
       key: "gain-delta",
       label: "評価損益の変化",
-      color: "#16a34a",
+      color: CHART_POSITIVE_COLOR,
       values: gainDeltaValues,
       levelValues: gainLevelValues,
       baselineValue: gainBaselineMinor,
@@ -323,7 +324,7 @@ export function TrendsDetailPanel() {
     {
       key: "gain-relative-rate",
       label: "評価損益の変化率",
-      color: "#16a34a",
+      color: CHART_POSITIVE_COLOR,
       values: computeTrendChartRelativeDeltas(
         gainLevelValues,
         displayTrendPoints,

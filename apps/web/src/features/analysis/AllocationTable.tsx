@@ -2,12 +2,14 @@
 
 import type { AllocationSliceWithLines } from "@repo/shared";
 import { sortAllocationSlices } from "@repo/shared";
+import { ChevronRight } from "lucide-react";
 import { Fragment, useMemo } from "react";
 
 import { SortableTableHeader } from "@/components/SortableTableHeader";
 import { AllocationLineBreakdown } from "@/features/analysis/AllocationLineBreakdown";
 import { useTableSort } from "@/hooks/useTableSort";
 import { formatPercent, formatYen } from "@/lib/format-yen";
+import { cn } from "@/lib/utils";
 
 type AllocationSortColumn = "valueName" | "marketValue" | "weight";
 
@@ -39,7 +41,7 @@ export function AllocationTable({
   }, [slices, sortColumn, sortDirection]);
 
   let result = (
-    <table className="allocation-table">
+    <table className="data-table allocation-table">
       <thead>
         <tr>
           <th aria-label="展開" />
@@ -56,6 +58,7 @@ export function AllocationTable({
             activeColumn={sortColumn}
             direction={sortDirection}
             onSort={toggleSort}
+            className="data-table__cell-numeric"
           />
           <SortableTableHeader
             label="構成比"
@@ -63,21 +66,25 @@ export function AllocationTable({
             activeColumn={sortColumn}
             direction={sortDirection}
             onSort={toggleSort}
+            className="data-table__cell-numeric"
           />
         </tr>
       </thead>
       <tbody>
         {sortedSlices.length === 0 ? (
           <tr>
-            <td colSpan={4}>該当する分類タグがありません。</td>
+            <td colSpan={4} className="data-table__empty">
+              該当する分類タグがありません。
+            </td>
           </tr>
         ) : (
           sortedSlices.map((slice) => {
             const isExpanded = expandedValueCodes.includes(slice.valueCode);
             const isHighlighted = highlightedValueCode === slice.valueCode;
-            const rowClassName = isHighlighted
-              ? "allocation-table__row--highlight"
-              : undefined;
+            const rowClassName = cn(
+              "data-table__row--parent",
+              isHighlighted ? "allocation-table__row--highlight data-table__row--highlight" : undefined,
+            );
 
             let rows = (
               <Fragment key={slice.valueCode}>
@@ -91,23 +98,33 @@ export function AllocationTable({
                   <td>
                     <button
                       type="button"
-                      className="allocation-table__expand"
+                      className="allocation-table__expand data-table__expand"
                       aria-expanded={isExpanded}
                       aria-label={`${slice.valueName} の内訳を${isExpanded ? "閉じる" : "開く"}`}
                       onClick={() => {
                         onToggleExpand(slice.valueCode);
                       }}
                     >
-                      {isExpanded ? "▼" : "▶"}
+                      <ChevronRight
+                        className={cn(
+                          "data-table__expand-icon",
+                          isExpanded ? "data-table__expand-icon--expanded" : undefined,
+                        )}
+                        aria-hidden
+                      />
                     </button>
                   </td>
                   <td>{slice.valueName}</td>
-                  <td>{formatYen(slice.marketValueMinor)}</td>
-                  <td>{formatPercent(slice.weight)}</td>
+                  <td className="data-table__cell-numeric">
+                    {formatYen(slice.marketValueMinor)}
+                  </td>
+                  <td className="data-table__cell-numeric">
+                    {formatPercent(slice.weight)}
+                  </td>
                 </tr>
                 {isExpanded ? (
                   <tr>
-                    <td colSpan={4} className="allocation-table__detail">
+                    <td colSpan={4} className="allocation-table__detail data-table__detail">
                       <AllocationLineBreakdown
                         lines={slice.lines}
                         showPortfolioColumn={showPortfolioColumn}

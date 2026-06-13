@@ -7,6 +7,7 @@ import {
 import { useMemo, type ReactNode } from "react";
 
 import { TrendChartHeader } from "@/features/trends/TrendChartHeader";
+import { CHART_NEGATIVE_COLOR, CHART_POSITIVE_COLOR } from "@/lib/chart-theme";
 import { formatPercentPoint } from "@/lib/format-yen";
 
 type AllocationShareChangeChartProps = {
@@ -22,8 +23,6 @@ type AllocationShareChangeChartProps = {
 const PADDING = { top: 16, right: 16, bottom: 24, left: 120 };
 const ROW_HEIGHT = 28;
 const MIN_CHART_HEIGHT = 160;
-const POSITIVE_COLOR = "#16a34a";
-const NEGATIVE_COLOR = "#dc2626";
 
 export function AllocationShareChangeChart({
   changes,
@@ -137,7 +136,7 @@ export function AllocationShareChangeChart({
               const endX = valueToX(item.deltaRatio);
               const barX = item.deltaRatio >= 0 ? zeroX : endX;
               const barWidth = Math.max(2, Math.abs(endX - zeroX));
-              const color = item.deltaRatio >= 0 ? POSITIVE_COLOR : NEGATIVE_COLOR;
+              const color = item.deltaRatio >= 0 ? CHART_POSITIVE_COLOR : CHART_NEGATIVE_COLOR;
 
               let row = (
                 <g key={item.key}>

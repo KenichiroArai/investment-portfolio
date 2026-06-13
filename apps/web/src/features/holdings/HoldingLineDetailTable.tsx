@@ -14,6 +14,7 @@ import {
 } from "@/lib/format-holding-line";
 import { formatPercent, formatYen } from "@/lib/format-yen";
 import { useTableSort } from "@/hooks/useTableSort";
+import { cn } from "@/lib/utils";
 
 export const HOLDING_LINE_DETAIL_WEIGHT_COLUMN_LABEL = "分類内構成比";
 
@@ -43,6 +44,32 @@ type HoldingLineDetailTableProps = {
   className?: string;
 };
 
+function getMetricToneClass(
+  metrics: HoldingLineMetricDto[],
+  code: string,
+): string | undefined {
+  let result: string | undefined = undefined;
+  const metric = metrics.find((item) => item.code === code);
+
+  if (!metric) {
+    return result;
+  }
+
+  const value =
+    metric.integerValue !== null
+      ? metric.integerValue
+      : metric.realValue !== null
+        ? metric.realValue
+        : null;
+
+  if (value === null || value === 0) {
+    return result;
+  }
+
+  result = value > 0 ? "text-positive" : "text-negative";
+  return result;
+}
+
 export function HoldingLineDetailTable({
   rows,
   weightColumnLabel,
@@ -58,7 +85,7 @@ export function HoldingLineDetailTable({
   }, [rows, sortColumn, sortDirection]);
 
   let result = (
-    <table className={className}>
+    <table className={cn("data-table", className)}>
       <thead>
         <tr>
           {showPortfolioColumn ? (
@@ -83,6 +110,7 @@ export function HoldingLineDetailTable({
             activeColumn={sortColumn}
             direction={sortDirection}
             onSort={toggleSort}
+            className="data-table__cell-numeric"
           />
           <SortableTableHeader
             label="評価額"
@@ -90,6 +118,7 @@ export function HoldingLineDetailTable({
             activeColumn={sortColumn}
             direction={sortDirection}
             onSort={toggleSort}
+            className="data-table__cell-numeric"
           />
           <SortableTableHeader
             label={weightColumnLabel}
@@ -97,6 +126,7 @@ export function HoldingLineDetailTable({
             activeColumn={sortColumn}
             direction={sortDirection}
             onSort={toggleSort}
+            className="data-table__cell-numeric"
           />
           <SortableTableHeader
             label={formatMetricLabel(
@@ -106,6 +136,7 @@ export function HoldingLineDetailTable({
             activeColumn={sortColumn}
             direction={sortDirection}
             onSort={toggleSort}
+            className="data-table__cell-numeric"
           />
           <SortableTableHeader
             label={formatMetricLabel(
@@ -115,27 +146,41 @@ export function HoldingLineDetailTable({
             activeColumn={sortColumn}
             direction={sortDirection}
             onSort={toggleSort}
+            className="data-table__cell-numeric"
           />
         </tr>
       </thead>
       <tbody>
         {sortedRows.map((row) => {
+          const gainToneClass = getMetricToneClass(
+            row.metrics,
+            IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor,
+          );
+          const gainRateToneClass = getMetricToneClass(
+            row.metrics,
+            IDECO_KAKEIBO_METRIC_CODES.unrealizedGainRate,
+          );
+
           let tableRow = (
             <tr key={row.id}>
               {showPortfolioColumn ? (
                 <td>{row.portfolioName ?? "—"}</td>
               ) : null}
               <td>{row.instrumentName}</td>
-              <td>{row.quantity}</td>
-              <td>{formatYen(row.marketValueMinor)}</td>
-              <td>{formatPercent(row.weight)}</td>
-              <td>
+              <td className="data-table__cell-numeric">{row.quantity}</td>
+              <td className="data-table__cell-numeric">
+                {formatYen(row.marketValueMinor)}
+              </td>
+              <td className="data-table__cell-numeric">
+                {formatPercent(row.weight)}
+              </td>
+              <td className={cn("data-table__cell-numeric", gainToneClass)}>
                 {formatLineMetric(
                   row.metrics,
                   IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor,
                 )}
               </td>
-              <td>
+              <td className={cn("data-table__cell-numeric", gainRateToneClass)}>
                 {formatLineMetric(
                   row.metrics,
                   IDECO_KAKEIBO_METRIC_CODES.unrealizedGainRate,

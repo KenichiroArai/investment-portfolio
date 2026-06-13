@@ -23,7 +23,9 @@ export function AnalysisPanelSummary({
         ) : null}
       </p>
       {hasUncovered ? (
-        <p>未分類: {formatYen(uncoveredMinor)}</p>
+        <p className="analysis-panel__summary-uncovered">
+          未分類: {formatYen(uncoveredMinor)}
+        </p>
       ) : null}
     </div>
   );

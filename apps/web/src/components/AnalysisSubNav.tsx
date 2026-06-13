@@ -29,8 +29,8 @@ export function AnalysisSubNav({ portfolioCode }: AnalysisSubNavProps) {
         className={cn(
           "border-b-2 px-3 py-2 text-sm font-medium transition-colors",
           viewActive
-            ? "border-primary text-foreground"
-            : "border-transparent text-muted-foreground hover:text-foreground",
+            ? "border-primary bg-surface text-foreground"
+            : "border-transparent text-muted-foreground hover:bg-surface/60 hover:text-foreground",
         )}
       >
         表示
@@ -41,8 +41,8 @@ export function AnalysisSubNav({ portfolioCode }: AnalysisSubNavProps) {
         className={cn(
           "border-b-2 px-3 py-2 text-sm font-medium transition-colors",
           settingsActive
-            ? "border-primary text-foreground"
-            : "border-transparent text-muted-foreground hover:text-foreground",
+            ? "border-primary bg-surface text-foreground"
+            : "border-transparent text-muted-foreground hover:bg-surface/60 hover:text-foreground",
         )}
       >
         分類設定

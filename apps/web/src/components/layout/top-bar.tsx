@@ -26,7 +26,7 @@ export function TopBar() {
   }, []);
 
   let result = (
-    <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-40 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 md:px-6">
         <div className="flex items-center gap-6">
           <Link
@@ -50,8 +50,8 @@ export function TopBar() {
                   className={cn(
                     "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
                     isActive
-                      ? "bg-accent text-accent-foreground"
-                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                      ? "border border-border bg-surface text-foreground"
+                      : "text-muted-foreground hover:bg-surface hover:text-foreground",
                   )}
                 >
                   <Icon className="h-4 w-4" />
