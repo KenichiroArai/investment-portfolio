@@ -398,6 +398,20 @@ export function formatSignedYenDelta(minor: number): string {
   return result;
 }
 
+export function formatSignedIntegerDelta(value: number): string {
+  let result = new Intl.NumberFormat("ja-JP").format(value);
+
+  if (!Number.isFinite(value)) {
+    return result;
+  }
+
+  if (value > 0) {
+    result = `+${result}`;
+  }
+
+  return result;
+}
+
 export function formatMarketValueBaselineSummary(
   baselineDate: string,
   deltaMinor: number,

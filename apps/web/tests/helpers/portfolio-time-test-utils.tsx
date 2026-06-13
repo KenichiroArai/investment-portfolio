@@ -17,6 +17,7 @@ type SnapshotFixture = {
 
 type PortfolioFetchMockOptions = {
   snapshot?: SnapshotFixture | null;
+  snapshotsByDate?: Record<string, SnapshotFixture>;
   dates?: Array<{ asOfDate: string; isCurrent: boolean }>;
   datesStatus?: number;
   snapshotStatus?: number;
@@ -33,9 +34,29 @@ export function createPortfolioFetchMock(options: PortfolioFetchMockOptions = {}
     metrics: [],
     lines: [],
   };
+  const snapshotsByDate = options.snapshotsByDate ?? {};
   const dates = options.dates ?? [
     { asOfDate: snapshot.asOfDate, isCurrent: true },
   ];
+
+  function resolveSnapshotForUrl(url: string): SnapshotFixture | null {
+    let result: SnapshotFixture | null = snapshot;
+    const dateMatch = /snapshots\/(\d{4}-\d{2}-\d{2})/.exec(url);
+    if (dateMatch) {
+      const date = dateMatch[1];
+      if (date && snapshotsByDate[date]) {
+        result = snapshotsByDate[date];
+        return result;
+      }
+      if (options.snapshot === null) {
+        result = null;
+        return result;
+      }
+      result = { ...snapshot, asOfDate: date ?? snapshot.asOfDate };
+      return result;
+    }
+    return result;
+  }
 
   let result = vi.fn(async (url: string) => {
     if (options.failFetch) {
@@ -76,7 +97,8 @@ export function createPortfolioFetchMock(options: PortfolioFetchMockOptions = {}
 
     if (url.includes("snapshot/current") || /snapshots\/\d{4}-\d{2}-\d{2}/.test(url)) {
       const status = options.snapshotStatus ?? 200;
-      if (status === 404 || options.snapshot === null) {
+      const resolvedSnapshot = resolveSnapshotForUrl(url);
+      if (status === 404 || resolvedSnapshot === null) {
         return {
           ok: false,
           status: 404,
@@ -93,7 +115,7 @@ export function createPortfolioFetchMock(options: PortfolioFetchMockOptions = {}
       return {
         ok: true,
         status: 200,
-        json: async () => snapshot,
+        json: async () => resolvedSnapshot,
       };
     }
 

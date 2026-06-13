@@ -1,4 +1,4 @@
-import { cleanup, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { HoldingsView } from "@/features/portfolio/HoldingsView";
@@ -17,13 +17,16 @@ describe("HoldingsView", () => {
     vi.stubGlobal("fetch", vi.fn(() => new Promise(() => {})));
     const { container } = renderWithPortfolioTime(
       <HoldingsView portfolioCode="ideco" />,
+      { pathname: "/portfolios/ideco/holdings" },
     );
     expect(container.querySelector(".animate-pulse")).toBeTruthy();
   });
 
   it("shows API connection error when fetch fails", async () => {
     vi.stubGlobal("fetch", createPortfolioFetchMock({ failFetch: true }));
-    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />);
+    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
+      pathname: "/portfolios/ideco/holdings",
+    });
     await waitFor(() => {
       expect(screen.getByText(/API に接続できません/)).toBeInTheDocument();
     });
@@ -33,7 +36,9 @@ describe("HoldingsView", () => {
     const prev = process.env.NEXT_PUBLIC_DATA_SOURCE;
     process.env.NEXT_PUBLIC_DATA_SOURCE = "static";
     vi.stubGlobal("fetch", createPortfolioFetchMock({ failFetch: true }));
-    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />);
+    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
+      pathname: "/portfolios/ideco/holdings",
+    });
     await waitFor(() => {
       expect(screen.getByText(/pages:export/)).toBeInTheDocument();
     });
@@ -78,7 +83,9 @@ describe("HoldingsView", () => {
         },
       }),
     );
-    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />);
+    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
+      pathname: "/portfolios/ideco/holdings",
+    });
     await waitFor(() => {
       expect(screen.getByText("テストファンド")).toBeInTheDocument();
       expect(screen.getByRole("columnheader", { name: "資産残高" })).toBeInTheDocument();
@@ -95,7 +102,9 @@ describe("HoldingsView", () => {
         snapshotStatus: 500,
       }),
     );
-    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />);
+    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
+      pathname: "/portfolios/ideco/holdings",
+    });
     await waitFor(() => {
       expect(screen.getByText(/データの取得に失敗しました/)).toBeInTheDocument();
     });
@@ -109,7 +118,9 @@ describe("HoldingsView", () => {
         snapshot: null,
       }),
     );
-    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />);
+    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
+      pathname: "/portfolios/ideco/holdings",
+    });
     await waitFor(() => {
       expect(screen.getByText(/明細がまだ登録されていません/)).toBeInTheDocument();
     });
@@ -142,7 +153,9 @@ describe("HoldingsView", () => {
         },
       }),
     );
-    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />);
+    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
+      pathname: "/portfolios/ideco/holdings",
+    });
     await waitFor(() => {
       expect(screen.getByText("無タグ")).toBeInTheDocument();
       expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(1);
@@ -160,7 +173,9 @@ describe("HoldingsView", () => {
           }),
       ),
     );
-    const { unmount } = renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />);
+    const { unmount } = renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
+      pathname: "/portfolios/ideco/holdings",
+    });
     unmount();
     resolveFetch({
       ok: true,
@@ -172,6 +187,79 @@ describe("HoldingsView", () => {
     });
     await new Promise((r) => setTimeout(r, 10));
     expect(screen.queryByText(/保有銘柄がありません/)).not.toBeInTheDocument();
+  });
+
+  it("shows period range and comparison deltas", async () => {
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        dates: [
+          { asOfDate: "2026-06-01", isCurrent: false },
+          { asOfDate: "2026-06-07", isCurrent: true },
+        ],
+        snapshot: {
+          id: "s2",
+          portfolioCode: "ideco",
+          portfolioName: "iDeCo",
+          asOfDate: "2026-06-07",
+          analysisSchemes: [],
+          metrics: [],
+          lines: [
+            {
+              id: "l2",
+              instrumentId: "i1",
+              instrumentName: "テストファンド",
+              sortOrder: 0,
+              quantity: 120,
+              marketValueMinor: 12000,
+              bookValueMinor: 9000,
+              metrics: [],
+              instrumentAttributes: [],
+              tags: [],
+            },
+          ],
+        },
+        snapshotsByDate: {
+          "2026-06-01": {
+            id: "s1",
+            portfolioCode: "ideco",
+            portfolioName: "iDeCo",
+            asOfDate: "2026-06-01",
+            analysisSchemes: [],
+            metrics: [],
+            lines: [
+              {
+                id: "l1",
+                instrumentId: "i1",
+                instrumentName: "テストファンド",
+                sortOrder: 0,
+                quantity: 100,
+                marketValueMinor: 10000,
+                bookValueMinor: 9000,
+                metrics: [],
+                instrumentAttributes: [],
+                tags: [],
+              },
+            ],
+          },
+        },
+      }),
+    );
+    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
+      pathname: "/portfolios/ideco/holdings",
+      initialSearchParams: "period=all&asOf=2026-06-07",
+    });
+    await waitFor(() => {
+      expect(screen.getByText(/期間:/)).toBeInTheDocument();
+      expect(screen.getByText("期間開始比")).toBeInTheDocument();
+      expect(screen.getByText(/比較:/)).toBeInTheDocument();
+      expect(screen.getByText("+20")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "前回比" }));
+    await waitFor(() => {
+      expect(screen.getByText(/2026\/06\/01 → 2026\/06\/07/)).toBeInTheDocument();
+    });
   });
 
   it("shows empty holdings message", async () => {
@@ -189,7 +277,9 @@ describe("HoldingsView", () => {
         },
       }),
     );
-    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />);
+    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
+      pathname: "/portfolios/ideco/holdings",
+    });
     await waitFor(() => {
       expect(screen.getByText(/保有銘柄がありません/)).toBeInTheDocument();
     });

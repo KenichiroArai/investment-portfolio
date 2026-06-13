@@ -60,6 +60,7 @@ type PortfolioTimeContextValue = {
   calendarMonth: string;
   setCalendarMonth: (value: string) => void;
   rangeDates: string[];
+  periodBounds: { from: string; to: string } | null;
   snapshot: CurrentSnapshotDto | null;
   trends: SnapshotTrendsDto | null;
   trendDisplayUnit: TrendDisplayUnit;
@@ -176,7 +177,11 @@ export function PortfolioTimeProvider({
   }, [availableDates, customFrom, customTo, searchParams]);
 
   const emphasizeAsOf = !pathname.includes("/trends");
-  const emphasizePeriod = pathname.includes("/trends") || pathname.endsWith(`/portfolios/${portfolioCode}/`) || pathname.endsWith(`/portfolios/${portfolioCode}`);
+  const emphasizePeriod =
+    pathname.includes("/trends") ||
+    pathname.includes("/holdings") ||
+    pathname.endsWith(`/portfolios/${portfolioCode}/`) ||
+    pathname.endsWith(`/portfolios/${portfolioCode}`);
 
   const updateSearchParams = useCallback(
     (updates: Record<string, string | null>) => {
@@ -629,6 +634,7 @@ export function PortfolioTimeProvider({
       calendarMonth,
       setCalendarMonth,
       rangeDates,
+      periodBounds,
       snapshot,
       trends,
       trendDisplayUnit,
@@ -670,6 +676,7 @@ export function PortfolioTimeProvider({
     calendarMonth,
     setCalendarMonth,
     rangeDates,
+    periodBounds,
     snapshot,
     trends,
     trendDisplayUnit,

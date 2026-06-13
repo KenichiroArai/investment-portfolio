@@ -188,7 +188,9 @@ export function SnapshotTimeBar() {
           )}
         >
           <div className="flex flex-wrap items-center gap-2">
-            <span className="min-w-12 text-xs font-semibold text-muted-foreground">推移</span>
+            <span className="min-w-12 text-xs font-semibold text-muted-foreground">
+              {pathname.includes("/holdings") ? "期間" : "推移"}
+            </span>
             <div className="flex flex-wrap gap-1">
               {PERIOD_PRESETS.map((preset) => {
                 let button = (

@@ -62,7 +62,7 @@ describe("SnapshotTimeBar", () => {
     render(<SnapshotTimeBar />);
 
     expect(screen.getByLabelText("基準日を選択")).toBeInTheDocument();
-    expect(screen.getByText("推移")).toBeInTheDocument();
+    expect(screen.getByText("期間")).toBeInTheDocument();
   });
 
   it("hides on settings route", () => {
