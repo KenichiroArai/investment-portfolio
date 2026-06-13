@@ -380,4 +380,57 @@ describe("HoldingsView", () => {
       expect(screen.queryByText("外国債券")).not.toBeInTheDocument();
     });
   });
+
+  it("sorts all filtered rows before pagination", async () => {
+    const lines = Array.from({ length: 51 }, (_, index) => ({
+      id: `l${index}`,
+      instrumentId: `i${index}`,
+      instrumentName: `銘柄${String(index).padStart(2, "0")}`,
+      sortOrder: index,
+      quantity: 1,
+      marketValueMinor: (index + 1) * 1000,
+      bookValueMinor: null,
+      metrics: [],
+      instrumentAttributes: [],
+      tags: [],
+    }));
+
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        snapshot: {
+          id: "s1",
+          portfolioCode: "ideco",
+          portfolioName: "iDeCo",
+          asOfDate: "2026-06-01",
+          analysisSchemes: [],
+          metrics: [],
+          lines,
+        },
+      }),
+    );
+    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
+      pathname: "/portfolios/ideco/holdings",
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("銘柄00")).toBeInTheDocument();
+      expect(screen.getByText("1 / 2")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "次のページ" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("銘柄50")).toBeInTheDocument();
+      expect(screen.queryByText("銘柄00")).not.toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "資産残高" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("1 / 2")).toBeInTheDocument();
+      expect(screen.getByText("銘柄00")).toBeInTheDocument();
+      expect(screen.queryByText("銘柄50")).not.toBeInTheDocument();
+    });
+  });
 });

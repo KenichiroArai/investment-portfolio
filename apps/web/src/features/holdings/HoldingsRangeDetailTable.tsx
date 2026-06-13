@@ -6,6 +6,8 @@ import {
   sortHoldingDetailRows,
   type AnalysisSchemeConfig,
   type HoldingDetailRow,
+  type HoldingDetailSortColumn,
+  type SortDirection,
 } from "@repo/shared";
 import { useMemo } from "react";
 
@@ -22,21 +24,12 @@ import { formatMetricLabel } from "@/lib/format-holding-line";
 import { formatAsOfDateJa, formatPercent, formatYen } from "@/lib/format-yen";
 import { cn } from "@/lib/utils";
 
-type HoldingsRangeDetailSortColumn =
-  | "asOfDate"
-  | "sortOrder"
-  | "instrumentName"
-  | "quantity"
-  | "unitPrice"
-  | "marketValue"
-  | "bookValue"
-  | "unrealizedGain"
-  | "unrealizedGainRate"
-  | `classification:${string}`;
-
 type HoldingsRangeDetailTableProps = {
   rows: HoldingDetailRow[];
   classificationSchemes: AnalysisSchemeConfig[];
+  sortColumn?: HoldingDetailSortColumn;
+  sortDirection?: SortDirection;
+  onSort?: (column: HoldingDetailSortColumn) => void;
 };
 
 function formatUnitPrice(value: number | null): string {
@@ -83,14 +76,26 @@ function getToneClass(value: number | null): string | undefined {
 export function HoldingsRangeDetailTable({
   rows,
   classificationSchemes,
+  sortColumn: controlledSortColumn,
+  sortDirection: controlledSortDirection,
+  onSort,
 }: HoldingsRangeDetailTableProps) {
-  const { sortColumn, sortDirection, toggleSort } =
-    useTableSort<HoldingsRangeDetailSortColumn>("asOfDate", "desc");
+  const internalSort = useTableSort<HoldingDetailSortColumn>("asOfDate", "desc");
+  const isControlled = onSort !== undefined;
+  const sortColumn = isControlled
+    ? (controlledSortColumn ?? "asOfDate")
+    : internalSort.sortColumn;
+  const sortDirection = isControlled
+    ? (controlledSortDirection ?? "desc")
+    : internalSort.sortDirection;
+  const toggleSort = onSort ?? internalSort.toggleSort;
 
-  const sortedRows = useMemo(() => {
-    let result = sortHoldingDetailRows(rows, sortColumn, sortDirection);
+  const displayRows = useMemo(() => {
+    let result = isControlled
+      ? rows
+      : sortHoldingDetailRows(rows, sortColumn, sortDirection);
     return result;
-  }, [rows, sortColumn, sortDirection]);
+  }, [isControlled, rows, sortColumn, sortDirection]);
 
   let result = (
     <div className="overflow-x-auto px-2">
@@ -162,7 +167,8 @@ export function HoldingsRangeDetailTable({
               onSort={toggleSort}
             />
             {classificationSchemes.map((scheme) => {
-              const columnKey = `classification:${scheme.schemeCode}` as HoldingsRangeDetailSortColumn;
+              const columnKey =
+                `classification:${scheme.schemeCode}` as HoldingDetailSortColumn;
               let header = (
                 <SortableTableHeader
                   key={scheme.schemeCode}
@@ -179,7 +185,7 @@ export function HoldingsRangeDetailTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sortedRows.length === 0 ? (
+          {displayRows.length === 0 ? (
             <TableRow>
               <TableCell
                 colSpan={8 + classificationSchemes.length}
@@ -189,7 +195,7 @@ export function HoldingsRangeDetailTable({
               </TableCell>
             </TableRow>
           ) : (
-            sortedRows.map((row) => {
+            displayRows.map((row) => {
               const rowKey = `${row.asOfDate}:${row.instrumentId}`;
               let bodyRow = (
                 <TableRow key={rowKey}>

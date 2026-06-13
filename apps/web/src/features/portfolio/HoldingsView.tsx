@@ -8,7 +8,9 @@ import {
   flattenHoldingsInRange,
   paginateRows,
   resolveComparisonDate,
+  sortHoldingDetailRows,
   type HoldingComparisonMode,
+  type HoldingDetailSortColumn,
 } from "@repo/shared";
 import type { CurrentSnapshotDto } from "@repo/shared";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -33,6 +35,7 @@ import {
   getSnapshotByDateFetchUrl,
   getSnapshotLoadErrorMessage,
 } from "@/lib/data-source";
+import { useTableSort } from "@/hooks/useTableSort";
 import { formatAsOfDateJa } from "@/lib/format-yen";
 
 type HoldingsViewProps = {
@@ -100,6 +103,8 @@ export function HoldingsView({ portfolioCode }: HoldingsViewProps) {
   const [classificationValue, setClassificationValue] = useState("__all__");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(HOLDINGS_RANGE_DEFAULT_PAGE_SIZE);
+  const { sortColumn, sortDirection, toggleSort } =
+    useTableSort<HoldingDetailSortColumn>("asOfDate", "desc");
 
   const rangeDatesKey = rangeDates.join(",");
 
@@ -269,7 +274,23 @@ export function HoldingsView({ portfolioCode }: HoldingsViewProps) {
     let result: void = undefined;
     setPage(1);
     return result;
-  }, [query, asOfDateFilter, classificationSchemeCode, classificationValue, pageSize, rangeDatesKey]);
+  }, [
+    query,
+    asOfDateFilter,
+    classificationSchemeCode,
+    classificationValue,
+    pageSize,
+    rangeDatesKey,
+    sortColumn,
+    sortDirection,
+  ]);
+
+  const handleDetailSort = (column: HoldingDetailSortColumn): void => {
+    let result: void = undefined;
+    toggleSort(column);
+    setPage(1);
+    return result;
+  };
 
   const changeRows = useMemo(() => {
     let result = buildHoldingPeriodChangeRows(
@@ -361,10 +382,19 @@ export function HoldingsView({ portfolioCode }: HoldingsViewProps) {
     classificationValue,
   ]);
 
-  const paginatedDetailRows = useMemo(() => {
-    let result = paginateRows(filteredDetailRows, page, pageSize);
+  const sortedDetailRows = useMemo(() => {
+    let result = sortHoldingDetailRows(
+      filteredDetailRows,
+      sortColumn,
+      sortDirection,
+    );
     return result;
-  }, [filteredDetailRows, page, pageSize]);
+  }, [filteredDetailRows, sortColumn, sortDirection]);
+
+  const paginatedDetailRows = useMemo(() => {
+    let result = paginateRows(sortedDetailRows, page, pageSize);
+    return result;
+  }, [sortedDetailRows, page, pageSize]);
 
   const showDeltas = comparisonDate !== null && baselineSnapshot !== null;
   const periodLabel =
@@ -497,6 +527,9 @@ export function HoldingsView({ portfolioCode }: HoldingsViewProps) {
                   <HoldingsRangeDetailTable
                     rows={paginatedDetailRows.pageRows}
                     classificationSchemes={rangeClassificationSchemes}
+                    sortColumn={sortColumn}
+                    sortDirection={sortDirection}
+                    onSort={handleDetailSort}
                   />
                 </>
               )}
