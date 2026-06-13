@@ -14,7 +14,7 @@ type AllocationSortColumn = "valueName" | "marketValue" | "weight";
 type AllocationTableProps = {
   slices: AllocationSliceWithLines[];
   highlightedValueCode: string | null;
-  expandedValueCode: string | null;
+  expandedValueCodes: string[];
   showPortfolioColumn?: boolean;
   onSliceHover: (valueCode: string) => void;
   onSliceLeave: () => void;
@@ -24,7 +24,7 @@ type AllocationTableProps = {
 export function AllocationTable({
   slices,
   highlightedValueCode,
-  expandedValueCode,
+  expandedValueCodes,
   showPortfolioColumn = false,
   onSliceHover,
   onSliceLeave,
@@ -73,7 +73,7 @@ export function AllocationTable({
           </tr>
         ) : (
           sortedSlices.map((slice) => {
-            const isExpanded = expandedValueCode === slice.valueCode;
+            const isExpanded = expandedValueCodes.includes(slice.valueCode);
             const isHighlighted = highlightedValueCode === slice.valueCode;
             const rowClassName = isHighlighted
               ? "allocation-table__row--highlight"

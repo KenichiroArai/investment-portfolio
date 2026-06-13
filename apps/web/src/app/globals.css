@@ -257,6 +257,33 @@
   border-color: var(--foreground);
 }
 
+/* Allocation panel layout */
+.allocation-panel {
+  display: grid;
+  grid-template-columns: minmax(12rem, auto) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.allocation-panel__chart-area {
+  min-width: 0;
+}
+
+.allocation-panel > .allocation-table {
+  min-width: 0;
+  width: 100%;
+}
+
+.allocation-table__detail {
+  overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+  .allocation-panel {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Chart-specific styles (SVG components) */
 .allocation-chart {
   display: grid;

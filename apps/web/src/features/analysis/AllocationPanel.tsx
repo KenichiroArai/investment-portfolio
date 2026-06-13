@@ -25,9 +25,7 @@ export function AllocationPanel({
   const [highlightedValueCode, setHighlightedValueCode] = useState<string | null>(
     null,
   );
-  const [expandedValueCode, setExpandedValueCode] = useState<string | null>(
-    null,
-  );
+  const [expandedValueCodes, setExpandedValueCodes] = useState<string[]>([]);
   const [tooltip, setTooltip] = useState<AllocationTooltipState | null>(null);
 
   function handleSliceHover(
@@ -67,11 +65,13 @@ export function AllocationPanel({
 
   function handleToggleExpand(valueCode: string): void {
     let result: void = undefined;
-    setExpandedValueCode((current) => {
-      let next: string | null = null;
+    setExpandedValueCodes((current) => {
+      let next: string[] = [];
 
-      if (current !== valueCode) {
-        next = valueCode;
+      if (current.includes(valueCode)) {
+        next = current.filter((code) => code !== valueCode);
+      } else {
+        next = [...current, valueCode];
       }
 
       return next;
@@ -107,7 +107,7 @@ export function AllocationPanel({
       <AllocationTable
         slices={slices}
         highlightedValueCode={highlightedValueCode}
-        expandedValueCode={expandedValueCode}
+        expandedValueCodes={expandedValueCodes}
         showPortfolioColumn={showPortfolioColumn}
         onSliceHover={(valueCode) => {
           handleHighlight(valueCode);

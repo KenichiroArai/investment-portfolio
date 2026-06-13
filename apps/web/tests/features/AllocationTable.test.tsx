@@ -15,7 +15,7 @@ describe("AllocationTable", () => {
       <AllocationTable
         slices={[]}
         highlightedValueCode={null}
-        expandedValueCode={null}
+        expandedValueCodes={[]}
         onSliceHover={vi.fn()}
         onSliceLeave={vi.fn()}
         onToggleExpand={vi.fn()}
@@ -35,7 +35,7 @@ describe("AllocationTable", () => {
       <AllocationTable
         slices={sampleAllocationSlices}
         highlightedValueCode={null}
-        expandedValueCode={null}
+        expandedValueCodes={[]}
         onSliceHover={onSliceHover}
         onSliceLeave={onSliceLeave}
         onToggleExpand={onToggleExpand}

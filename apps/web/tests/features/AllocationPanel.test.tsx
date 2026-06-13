@@ -40,6 +40,21 @@ describe("AllocationPanel", () => {
     );
     expect(screen.queryByText("国内ファンド")).not.toBeInTheDocument();
 
+    await user.click(
+      screen.getByRole("button", { name: "国内 の内訳を開く" }),
+    );
+    await user.click(
+      screen.getByRole("button", { name: "海外 の内訳を開く" }),
+    );
+    expect(screen.getByText("国内ファンド")).toBeInTheDocument();
+    expect(screen.getByText("海外ファンド")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "国内 の内訳を閉じる" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "海外 の内訳を閉じる" }),
+    ).toBeInTheDocument();
+
     const foreignRow = Array.from(
       document.querySelectorAll(".allocation-table tbody tr"),
     ).find((row) => row.textContent?.includes("海外"));
