@@ -1,7 +1,7 @@
 {
   "portfolioCode": "ideco",
   "from": "2026-06-02",
-  "to": "2026-06-12",
+  "to": "2026-06-13",
   "points": [
     {
       "asOfDate": "2026-06-02",
@@ -1313,6 +1313,225 @@
             "valueName": "内外資産複合",
             "marketValueMinor": 722501,
             "ratio": 0.44482677945857424
+          }
+        ]
+      }
+    },
+    {
+      "asOfDate": "2026-06-13",
+      "totalMarketValueMinor": 3344982,
+      "totalBookValueMinor": 2982226,
+      "unrealizedGainMinor": 362756,
+      "gainRateOnBook": 0.12163933920500995,
+      "totalContributionsMinor": 2716679,
+      "gainRateOnContributions": 0.23127612794886698,
+      "allocationsByScheme": {
+        "ideco_product_type": [
+          {
+            "valueCode": "domestic_other",
+            "valueName": "国内その他資産",
+            "marketValueMinor": 921154,
+            "ratio": 0.2753838436200852
+          },
+          {
+            "valueCode": "balanced",
+            "valueName": "内外資産複合",
+            "marketValueMinor": 727112,
+            "ratio": 0.21737396494211328
+          },
+          {
+            "valueCode": "domestic_foreign_equity",
+            "valueName": "内外株式",
+            "marketValueMinor": 681683,
+            "ratio": 0.2037927259399303
+          },
+          {
+            "valueCode": "foreign_equity",
+            "valueName": "海外株式",
+            "marketValueMinor": 524270,
+            "ratio": 0.1567332798801309
+          },
+          {
+            "valueCode": "foreign_bond",
+            "valueName": "海外債券",
+            "marketValueMinor": 164432,
+            "ratio": 0.04915781310631866
+          },
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 129003,
+            "ratio": 0.038566126813238455
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 90473,
+            "ratio": 0.027047380225065486
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外不動産投信",
+            "marketValueMinor": 54591,
+            "ratio": 0.016320267194262928
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内不動産投信",
+            "marketValueMinor": 52264,
+            "ratio": 0.015624598278854714
+          }
+        ],
+        "ideco_region": [
+          {
+            "valueCode": "foreign",
+            "valueName": "海外",
+            "marketValueMinor": 2152088,
+            "ratio": 0.6433780510627561
+          },
+          {
+            "valueCode": "domestic",
+            "valueName": "国内",
+            "marketValueMinor": 1192894,
+            "ratio": 0.3566219489372439
+          }
+        ],
+        "ideco_asset_class": [
+          {
+            "valueCode": "equity",
+            "valueName": "株式",
+            "marketValueMinor": 1334956,
+            "ratio": 0.3990921326332997
+          },
+          {
+            "valueCode": "other",
+            "valueName": "その他",
+            "marketValueMinor": 921154,
+            "ratio": 0.2753838436200852
+          },
+          {
+            "valueCode": "balanced",
+            "valueName": "複合",
+            "marketValueMinor": 727112,
+            "ratio": 0.21737396494211328
+          },
+          {
+            "valueCode": "bond",
+            "valueName": "債券",
+            "marketValueMinor": 254905,
+            "ratio": 0.07620519333138415
+          },
+          {
+            "valueCode": "real_estate",
+            "valueName": "不動産",
+            "marketValueMinor": 106855,
+            "ratio": 0.031944865473117645
+          }
+        ],
+        "ideco_product_group": [
+          {
+            "valueCode": "major_assets",
+            "valueName": "主要資産",
+            "marketValueMinor": 1696716,
+            "ratio": 0.5072421914378015
+          },
+          {
+            "valueCode": "other",
+            "valueName": "その他",
+            "marketValueMinor": 1648266,
+            "ratio": 0.49275780856219853
+          }
+        ],
+        "ideco_axis_9b6ea403": [
+          {
+            "valueCode": "domestic_foreign_equity",
+            "valueName": "内外株式",
+            "marketValueMinor": 681683,
+            "ratio": 0.40176611760601066
+          },
+          {
+            "valueCode": "foreign_equity",
+            "valueName": "海外株式",
+            "marketValueMinor": 524270,
+            "ratio": 0.30899101558540143
+          },
+          {
+            "valueCode": "foreign_bond",
+            "valueName": "海外債券",
+            "marketValueMinor": 164432,
+            "ratio": 0.09691191690300557
+          },
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 129003,
+            "ratio": 0.07603099163324917
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 90473,
+            "ratio": 0.05332241813008188
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外不動産投信",
+            "marketValueMinor": 54591,
+            "ratio": 0.03217450651729577
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内不動産投信",
+            "marketValueMinor": 52264,
+            "ratio": 0.0308030336249555
+          }
+        ],
+        "ideco_axis_7452352e": [
+          {
+            "valueCode": "foreign",
+            "valueName": "海外",
+            "marketValueMinor": 1424976,
+            "ratio": 0.8398435566117135
+          },
+          {
+            "valueCode": "domestic",
+            "valueName": "国内",
+            "marketValueMinor": 271740,
+            "ratio": 0.16015644338828655
+          }
+        ],
+        "ideco_axis_40470d15": [
+          {
+            "valueCode": "equity",
+            "valueName": "株式",
+            "marketValueMinor": 1334956,
+            "ratio": 0.7867881248246613
+          },
+          {
+            "valueCode": "bond",
+            "valueName": "債券",
+            "marketValueMinor": 254905,
+            "ratio": 0.15023433503308745
+          },
+          {
+            "valueCode": "real_estate",
+            "valueName": "不動産",
+            "marketValueMinor": 106855,
+            "ratio": 0.06297754014225126
+          }
+        ],
+        "ideco_axis_4381cf4c": [
+          {
+            "valueCode": "domestic_other",
+            "valueName": "国内その他資産",
+            "marketValueMinor": 921154,
+            "ratio": 0.5588624651603564
+          },
+          {
+            "valueCode": "balanced",
+            "valueName": "内外資産複合",
+            "marketValueMinor": 727112,
+            "ratio": 0.4411375348396436
           }
         ]
       }
