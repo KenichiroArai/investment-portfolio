@@ -157,6 +157,54 @@ describe("filterHoldingDetailRows", () => {
     let result = filterHoldingDetailRows(rows, {});
     expect(result).toHaveLength(2);
   });
+
+  it("matches instrument names regardless of half-width and full-width characters", () => {
+    const wideCharRows: HoldingDetailRow[] = [
+      {
+        asOfDate: "2026-06-01",
+        instrumentId: "i1",
+        instrumentName: "ｅＭＡＸＩＳ Ｓｌｉｍ 国内株式",
+        sortOrder: 0,
+        quantity: 1,
+        marketValueMinor: 1000,
+        bookValueMinor: 900,
+        unitPrice: null,
+        unrealizedGainMinor: null,
+        unrealizedGainRate: null,
+        tags: [],
+      },
+      {
+        asOfDate: "2026-06-01",
+        instrumentId: "i2",
+        instrumentName: "ＳＢＩ・全世界株式",
+        sortOrder: 1,
+        quantity: 2,
+        marketValueMinor: 2000,
+        bookValueMinor: 1800,
+        unitPrice: null,
+        unrealizedGainMinor: null,
+        unrealizedGainRate: null,
+        tags: [],
+      },
+    ];
+
+    let emaxisResult = filterHoldingDetailRows(wideCharRows, { query: "emaxis" });
+    expect(emaxisResult).toHaveLength(1);
+    expect(emaxisResult[0]?.instrumentName).toBe("ｅＭＡＸＩＳ Ｓｌｉｍ 国内株式");
+
+    let fullWidthEmaxisResult = filterHoldingDetailRows(wideCharRows, {
+      query: "ＥＭＡＸＩＳ",
+    });
+    expect(fullWidthEmaxisResult).toHaveLength(1);
+    expect(fullWidthEmaxisResult[0]?.instrumentName).toBe("ｅＭＡＸＩＳ Ｓｌｉｍ 国内株式");
+
+    let sbiResult = filterHoldingDetailRows(wideCharRows, { query: "sbi" });
+    expect(sbiResult).toHaveLength(1);
+    expect(sbiResult[0]?.instrumentName).toBe("ＳＢＩ・全世界株式");
+
+    let kanjiResult = filterHoldingDetailRows(wideCharRows, { query: "株式" });
+    expect(kanjiResult).toHaveLength(2);
+  });
 });
 
 describe("sortHoldingDetailRows", () => {

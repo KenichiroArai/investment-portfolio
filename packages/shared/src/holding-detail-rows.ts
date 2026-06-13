@@ -102,16 +102,22 @@ export function flattenHoldingsInRange(
   return result;
 }
 
+function normalizeSearchText(text: string): string {
+  let result = "";
+  result = text.trim().toLowerCase().normalize("NFKC");
+  return result;
+}
+
 function matchesQuery(row: HoldingDetailRow, query: string): boolean {
   let result = false;
-  const normalizedQuery = query.trim().toLowerCase();
+  const normalizedQuery = normalizeSearchText(query);
 
   if (normalizedQuery === "") {
     result = true;
     return result;
   }
 
-  result = row.instrumentName.toLowerCase().includes(normalizedQuery);
+  result = normalizeSearchText(row.instrumentName).includes(normalizedQuery);
   return result;
 }
 
