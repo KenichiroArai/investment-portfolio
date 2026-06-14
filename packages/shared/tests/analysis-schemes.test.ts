@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   collectHoldingsClassificationSchemes,
   findClassificationTagValue,
+  findClassificationTagValueCode,
   listAnalysisSchemesForPortfolio,
   mergeAnalysisSchemesFromSnapshots,
   resolveAnalysisSchemes,
@@ -43,6 +44,24 @@ describe("findClassificationTagValue", () => {
 
   it("returns null when tag is missing", () => {
     expect(findClassificationTagValue([], "region")).toBeNull();
+  });
+});
+
+describe("findClassificationTagValueCode", () => {
+  it("returns valueCode when tag exists", () => {
+    const tags = [
+      {
+        schemeCode: "region",
+        schemeName: "地域",
+        valueCode: "japan",
+        valueName: "日本",
+      },
+    ];
+    expect(findClassificationTagValueCode(tags, "region")).toBe("japan");
+  });
+
+  it("returns null when tag is missing", () => {
+    expect(findClassificationTagValueCode([], "region")).toBeNull();
   });
 });
 

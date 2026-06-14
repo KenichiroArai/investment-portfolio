@@ -49,6 +49,11 @@ import {
   setCurrentSnapshot,
   upsertSnapshotByDate,
 } from "../src/repositories/snapshots";
+import {
+  listAllTargetAllocationsForPortfolio,
+  listTargetAllocationWeights,
+  replaceTargetAllocationWeights,
+} from "../src/repositories/target-allocations";
 import { createTestDb } from "../src/test-utils";
 
 describe("portfolio repositories", () => {
@@ -625,6 +630,57 @@ describe("portfolio repositories", () => {
     expect(await deletePortfolio(db, "sample")).toBe(true);
     expect(await deletePortfolio(db, "missing")).toBe(false);
     expect(await findPortfolioByCode(db, "sample")).toBeNull();
+  });
+
+  it("lists, replaces, and aggregates target allocation weights", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+
+    expect(await listTargetAllocationWeights(db, "missing", "region")).toEqual([]);
+    expect(await replaceTargetAllocationWeights(db, "missing", "region", [])).toBeNull();
+    expect(await listAllTargetAllocationsForPortfolio(db, "missing")).toEqual({});
+
+    expect(await listTargetAllocationWeights(db, "ideco", "region")).toEqual([]);
+
+    const replaced = await replaceTargetAllocationWeights(db, "ideco", "region", [
+      { valueCode: "japan", targetRatio: 0.6 },
+      { valueCode: "global", targetRatio: 0.4 },
+    ]);
+    expect(replaced).toEqual([
+      { valueCode: "japan", targetRatio: 0.6 },
+      { valueCode: "global", targetRatio: 0.4 },
+    ]);
+
+    const listed = await listTargetAllocationWeights(db, "ideco", "region");
+    expect(listed).toEqual(
+      expect.arrayContaining([
+        { valueCode: "japan", targetRatio: 0.6 },
+        { valueCode: "global", targetRatio: 0.4 },
+      ]),
+    );
+    expect(listed).toHaveLength(2);
+
+    await replaceTargetAllocationWeights(db, "ideco", "asset", [
+      { valueCode: "stock", targetRatio: 1 },
+    ]);
+
+    const all = await listAllTargetAllocationsForPortfolio(db, "ideco");
+    expect(all.asset).toEqual([{ valueCode: "stock", targetRatio: 1 }]);
+    expect(all.region).toEqual(
+      expect.arrayContaining([
+        { valueCode: "japan", targetRatio: 0.6 },
+        { valueCode: "global", targetRatio: 0.4 },
+      ]),
+    );
+    expect(all.region).toHaveLength(2);
+
+    const cleared = await replaceTargetAllocationWeights(db, "ideco", "region", []);
+    expect(cleared).toEqual([]);
+    expect(await listTargetAllocationWeights(db, "ideco", "region")).toEqual([]);
   });
 
   it("handles snapshot edge cases for unknown portfolios and date ranges", async () => {

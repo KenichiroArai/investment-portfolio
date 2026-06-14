@@ -74,6 +74,16 @@ describe("flattenHoldingsInRange", () => {
     expect(result[1]?.portfolioWeight).toBeCloseTo(0.7);
   });
 
+  it("returns null portfolio weight when total market value is zero", () => {
+    let result = flattenHoldingsInRange([
+      makeSnapshot("2026-06-01", [
+        makeLine({ id: "l1", instrumentId: "i1", marketValueMinor: 0 }),
+      ]),
+    ]);
+
+    expect(result[0]?.portfolioWeight).toBeNull();
+  });
+
   it("extracts metric values from holding lines", () => {
     let result = flattenHoldingsInRange([
       makeSnapshot("2026-06-01", [
@@ -170,6 +180,27 @@ describe("filterHoldingDetailRows", () => {
     expect(result).toHaveLength(2);
   });
 
+  it("matches classification by valueCode and skips __all__", () => {
+    let byCode = filterHoldingDetailRows(rows, {
+      classificationSchemeCode: "region",
+      classificationValue: "japan",
+    });
+    expect(byCode).toHaveLength(1);
+    expect(byCode[0]?.instrumentName).toBe("国内株式");
+
+    let allClassification = filterHoldingDetailRows(rows, {
+      classificationSchemeCode: "region",
+      classificationValue: "__all__",
+    });
+    expect(allClassification).toHaveLength(2);
+
+    let noTag = filterHoldingDetailRows(rows, {
+      classificationSchemeCode: "missing",
+      classificationValue: "x",
+    });
+    expect(noTag).toHaveLength(0);
+  });
+
   it("matches instrument names regardless of half-width and full-width characters", () => {
     const wideCharRows: HoldingDetailRow[] = [
       {
@@ -260,6 +291,202 @@ describe("sortHoldingDetailRows", () => {
     expect(result[0]?.marketValueMinor).toBe(1000);
     expect(result[1]?.marketValueMinor).toBe(2000);
   });
+
+  it("sorts by numeric and classification columns", () => {
+    const detailedRows: HoldingDetailRow[] = [
+      {
+        asOfDate: "2026-06-01",
+        instrumentId: "i1",
+        instrumentName: "B",
+        sortOrder: 1,
+        quantity: 2,
+        marketValueMinor: 2000,
+        bookValueMinor: 1800,
+        unitPrice: 200,
+        unrealizedGainMinor: 200,
+        unrealizedGainRate: 0.2,
+        portfolioWeight: 0.6,
+        tags: [
+          {
+            schemeCode: "region",
+            schemeName: "地域",
+            valueCode: "global",
+            valueName: "海外",
+          },
+        ],
+      },
+      {
+        asOfDate: "2026-06-01",
+        instrumentId: "i2",
+        instrumentName: "A",
+        sortOrder: 0,
+        quantity: 1,
+        marketValueMinor: 1000,
+        bookValueMinor: 900,
+        unitPrice: 100,
+        unrealizedGainMinor: 100,
+        unrealizedGainRate: 0.1,
+        portfolioWeight: 0.4,
+        tags: [
+          {
+            schemeCode: "region",
+            schemeName: "地域",
+            valueCode: "japan",
+            valueName: "日本",
+          },
+        ],
+      },
+    ];
+
+    expect(sortHoldingDetailRows(detailedRows, "quantity", "asc")[0]?.quantity).toBe(1);
+    expect(sortHoldingDetailRows(detailedRows, "sortOrder", "asc")[0]?.sortOrder).toBe(0);
+    expect(
+      sortHoldingDetailRows(detailedRows, "instrumentName", "asc")[0]?.instrumentName,
+    ).toBe("A");
+    expect(sortHoldingDetailRows(detailedRows, "unitPrice", "asc")[0]?.unitPrice).toBe(100);
+    expect(sortHoldingDetailRows(detailedRows, "bookValue", "asc")[0]?.bookValueMinor).toBe(900);
+    expect(
+      sortHoldingDetailRows(detailedRows, "unrealizedGain", "asc")[0]?.unrealizedGainMinor,
+    ).toBe(100);
+    expect(
+      sortHoldingDetailRows(detailedRows, "unrealizedGainRate", "asc")[0]
+        ?.unrealizedGainRate,
+    ).toBe(0.1);
+    expect(
+      sortHoldingDetailRows(detailedRows, "portfolioWeight", "asc")[0]?.portfolioWeight,
+    ).toBe(0.4);
+    expect(
+      sortHoldingDetailRows(detailedRows, "classification:region", "asc")[0]?.tags[0]
+        ?.valueName,
+    ).toBe("海外");
+  });
+
+  it("uses tie-breakers when primary sort column is equal", () => {
+    const tiedRows: HoldingDetailRow[] = [
+      {
+        asOfDate: "2026-06-01",
+        instrumentId: "i1",
+        instrumentName: "B",
+        sortOrder: 1,
+        quantity: 1,
+        marketValueMinor: 1000,
+        bookValueMinor: null,
+        unitPrice: null,
+        unrealizedGainMinor: null,
+        unrealizedGainRate: null,
+        portfolioWeight: null,
+        tags: [],
+      },
+      {
+        asOfDate: "2026-06-07",
+        instrumentId: "i2",
+        instrumentName: "A",
+        sortOrder: 0,
+        quantity: 1,
+        marketValueMinor: 1000,
+        bookValueMinor: null,
+        unitPrice: null,
+        unrealizedGainMinor: null,
+        unrealizedGainRate: null,
+        portfolioWeight: null,
+        tags: [],
+      },
+    ];
+
+    let result = sortHoldingDetailRows(tiedRows, "quantity", "asc");
+    expect(result[0]?.asOfDate).toBe("2026-06-07");
+    expect(result[1]?.asOfDate).toBe("2026-06-01");
+  });
+
+  it("treats null sortOrder as last when sorting by sortOrder", () => {
+    const rowsWithNullSort: HoldingDetailRow[] = [
+      {
+        asOfDate: "2026-06-01",
+        instrumentId: "i1",
+        instrumentName: "Later",
+        sortOrder: null,
+        quantity: 1,
+        marketValueMinor: 1000,
+        bookValueMinor: null,
+        unitPrice: null,
+        unrealizedGainMinor: null,
+        unrealizedGainRate: null,
+        portfolioWeight: null,
+        tags: [],
+      },
+      {
+        asOfDate: "2026-06-01",
+        instrumentId: "i2",
+        instrumentName: "First",
+        sortOrder: 0,
+        quantity: 1,
+        marketValueMinor: 1000,
+        bookValueMinor: null,
+        unitPrice: null,
+        unrealizedGainMinor: null,
+        unrealizedGainRate: null,
+        portfolioWeight: null,
+        tags: [],
+      },
+    ];
+
+    let result = sortHoldingDetailRows(rowsWithNullSort, "sortOrder", "asc");
+    expect(result[0]?.instrumentName).toBe("First");
+    expect(result[1]?.instrumentName).toBe("Later");
+
+    const reversedNullSort: HoldingDetailRow[] = [
+      {
+        ...rowsWithNullSort[1],
+        instrumentName: "First",
+        sortOrder: 0,
+      },
+      {
+        ...rowsWithNullSort[0],
+        instrumentName: "Later",
+        sortOrder: null,
+      },
+    ];
+    let reversedResult = sortHoldingDetailRows(reversedNullSort, "sortOrder", "asc");
+    expect(reversedResult[0]?.instrumentName).toBe("First");
+    expect(reversedResult[1]?.instrumentName).toBe("Later");
+  });
+
+  it("sorts classification columns when both rows lack tags", () => {
+    const untaggedRows: HoldingDetailRow[] = [
+      {
+        asOfDate: "2026-06-01",
+        instrumentId: "i1",
+        instrumentName: "B",
+        sortOrder: 0,
+        quantity: 1,
+        marketValueMinor: 1000,
+        bookValueMinor: null,
+        unitPrice: null,
+        unrealizedGainMinor: null,
+        unrealizedGainRate: null,
+        portfolioWeight: null,
+        tags: [],
+      },
+      {
+        asOfDate: "2026-06-01",
+        instrumentId: "i2",
+        instrumentName: "A",
+        sortOrder: 0,
+        quantity: 1,
+        marketValueMinor: 1000,
+        bookValueMinor: null,
+        unitPrice: null,
+        unrealizedGainMinor: null,
+        unrealizedGainRate: null,
+        portfolioWeight: null,
+        tags: [],
+      },
+    ];
+
+    let result = sortHoldingDetailRows(untaggedRows, "classification:region", "asc");
+    expect(result[0]?.instrumentName).toBe("A");
+    expect(result[1]?.instrumentName).toBe("B");
+  });
 });
 
 describe("paginateRows", () => {
@@ -283,5 +510,15 @@ describe("paginateRows", () => {
     expect(result.pageRows).toEqual([]);
     expect(result.rangeLabel).toBe("0 件");
     expect(result.totalPages).toBe(0);
+  });
+
+  it("returns empty result when pageSize is zero or negative", () => {
+    let zero = paginateRows(rows, 1, 0);
+    expect(zero.pageRows).toEqual([]);
+    expect(zero.totalPages).toBe(0);
+
+    let negative = paginateRows(rows, 1, -1);
+    expect(negative.pageRows).toEqual([]);
+    expect(negative.totalPages).toBe(0);
   });
 });
