@@ -1,0 +1,52 @@
+{
+  "ideco_axis_4381cf4c": [
+    {
+      "valueCode": "balanced",
+      "targetRatio": 0.4
+    },
+    {
+      "valueCode": "domestic_other",
+      "targetRatio": 0.6
+    }
+  ],
+  "ideco_axis_9b6ea403": [
+    {
+      "valueCode": "domestic_bond",
+      "targetRatio": 0.05
+    },
+    {
+      "valueCode": "domestic_equity",
+      "targetRatio": 0.08
+    },
+    {
+      "valueCode": "domestic_foreign_equity",
+      "targetRatio": 0.4
+    },
+    {
+      "valueCode": "domestic_reit",
+      "targetRatio": 0.03
+    },
+    {
+      "valueCode": "foreign_bond",
+      "targetRatio": 0.1
+    },
+    {
+      "valueCode": "foreign_equity",
+      "targetRatio": 0.3
+    },
+    {
+      "valueCode": "foreign_reit",
+      "targetRatio": 0.03
+    }
+  ],
+  "ideco_product_group": [
+    {
+      "valueCode": "major_assets",
+      "targetRatio": 0.5
+    },
+    {
+      "valueCode": "other",
+      "targetRatio": 0.5
+    }
+  ]
+}
