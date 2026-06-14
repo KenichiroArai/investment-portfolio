@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { computeRebalanceTrades } from "../src/rebalance";
+import {
+  computeRebalanceTrades,
+  distributeAmountProportionally,
+} from "../src/rebalance";
 
 const rows = [
   { key: "a", marketValueMinor: 600_000, targetRatio: 0.5 },
@@ -120,6 +123,39 @@ describe("computeRebalanceTrades", () => {
     expect(result.rows[0]?.buyMinor).toBeGreaterThan(0);
     expect(result.rows[1]?.buyMinor).toBeGreaterThan(0);
     expect(result.rows[2]?.buyMinor).toBe(0);
+  });
+
+  it("distributes amount proportionally across weights", () => {
+    let result = distributeAmountProportionally(
+      [
+        { key: "a", weight: 3 },
+        { key: "b", weight: 1 },
+      ],
+      100,
+    );
+
+    expect(result.get("a")).toBe(75);
+    expect(result.get("b")).toBe(25);
+  });
+
+  it("returns empty map when amount or weights are empty", () => {
+    let zeroAmount = distributeAmountProportionally([{ key: "a", weight: 1 }], 0);
+    let emptyWeights = distributeAmountProportionally([], 100);
+
+    expect(zeroAmount.size).toBe(0);
+    expect(emptyWeights.size).toBe(0);
+  });
+
+  it("returns empty map when total weight is zero", () => {
+    let result = distributeAmountProportionally(
+      [
+        { key: "a", weight: 0 },
+        { key: "b", weight: 0 },
+      ],
+      100,
+    );
+
+    expect(result.size).toBe(0);
   });
 
   it("uses portfolioTotalMinor as denominator when provided", () => {

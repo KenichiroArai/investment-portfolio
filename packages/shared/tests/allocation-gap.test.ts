@@ -40,6 +40,18 @@ describe("buildAllocationGapRows", () => {
     let result = buildAllocationGapRows([], [], 0);
     expect(result).toEqual([]);
   });
+
+  it("uses zero current ratio when asset total is zero", () => {
+    let result = buildAllocationGapRows(
+      slices,
+      [{ valueCode: "domestic", targetRatio: 0.5 }],
+      0,
+    );
+
+    expect(result[0]?.currentRatio).toBe(0);
+    expect(result[0]?.gapRatio).toBe(-0.5);
+    expect(result[0]?.gapMarketValueMinor).toBeNull();
+  });
 });
 
 describe("mergeAllocationGapIntoSlices", () => {
