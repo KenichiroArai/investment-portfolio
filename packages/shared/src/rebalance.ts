@@ -65,10 +65,7 @@ function distributeDepositProportionally(
 
   let allocated = 0;
   for (let index = 0; index < deficits.length; index += 1) {
-    const item = deficits[index];
-    if (!item) {
-      continue;
-    }
+    const item = deficits[index]!;
 
     if (index === deficits.length - 1) {
       result.set(item.key, depositMinor - allocated);

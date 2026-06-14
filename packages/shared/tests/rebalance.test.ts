@@ -52,4 +52,73 @@ describe("computeRebalanceTrades", () => {
     expect(result.rows[0]?.sellMinor).toBe(0);
     expect(result.rows[0]?.gapRatio).toBeNull();
   });
+
+  it("full rebalance uses deposit when computing target market values", () => {
+    let result = computeRebalanceTrades({
+      rows,
+      depositMinor: 200_000,
+      mode: "full",
+    });
+
+    expect(result.rows[0]?.buyMinor).toBe(0);
+    expect(result.rows[0]?.sellMinor).toBe(0);
+    expect(result.rows[1]?.buyMinor).toBe(200_000);
+    expect(result.rows[1]?.sellMinor).toBe(0);
+    expect(result.totalBuyMinor).toBe(200_000);
+    expect(result.totalSellMinor).toBe(0);
+    expect(result.unallocatedDepositMinor).toBe(0);
+  });
+
+  it("returns empty result when portfolio and deposit are both zero", () => {
+    let result = computeRebalanceTrades({
+      rows: [
+        { key: "a", marketValueMinor: 0, targetRatio: 0.5 },
+        { key: "b", marketValueMinor: 0, targetRatio: 0.5 },
+      ],
+      depositMinor: 0,
+      mode: "full",
+    });
+
+    expect(result).toEqual({
+      rows: [],
+      totalBuyMinor: 0,
+      totalSellMinor: 0,
+      unallocatedDepositMinor: 0,
+    });
+  });
+
+  it("deposit_only leaves deposit unallocated when no underweight rows", () => {
+    let result = computeRebalanceTrades({
+      rows: [
+        { key: "a", marketValueMinor: 1_000_000, targetRatio: 0.5 },
+        { key: "b", marketValueMinor: 0, targetRatio: null },
+      ],
+      depositMinor: 150_000,
+      mode: "deposit_only",
+    });
+
+    expect(result.totalBuyMinor).toBe(0);
+    expect(result.totalSellMinor).toBe(0);
+    expect(result.unallocatedDepositMinor).toBe(150_000);
+    expect(result.rows.every((row) => row.buyMinor === 0)).toBe(true);
+  });
+
+  it("deposit_only distributes deposit proportionally when it is less than total deficit", () => {
+    let result = computeRebalanceTrades({
+      rows: [
+        { key: "a", marketValueMinor: 100_000, targetRatio: 0.5 },
+        { key: "b", marketValueMinor: 100_000, targetRatio: 0.3 },
+        { key: "c", marketValueMinor: 100_000, targetRatio: 0.2 },
+      ],
+      depositMinor: 50_000,
+      mode: "deposit_only",
+    });
+
+    expect(result.totalSellMinor).toBe(0);
+    expect(result.totalBuyMinor).toBe(50_000);
+    expect(result.unallocatedDepositMinor).toBe(0);
+    expect(result.rows[0]?.buyMinor).toBeGreaterThan(0);
+    expect(result.rows[1]?.buyMinor).toBeGreaterThan(0);
+    expect(result.rows[2]?.buyMinor).toBe(0);
+  });
 });

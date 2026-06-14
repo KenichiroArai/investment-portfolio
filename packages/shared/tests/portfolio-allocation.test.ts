@@ -51,4 +51,15 @@ describe("buildPortfolioAllocationRows", () => {
     let result = buildPortfolioAllocationRows([], [], 0);
     expect(result).toEqual([]);
   });
+
+  it("uses zero current ratio and null gap market value when asset total is zero", () => {
+    const targets: TargetPortfolioWeight[] = [
+      { instrumentId: "inst-a", targetRatio: 0.5 },
+    ];
+    let result = buildPortfolioAllocationRows(lines, targets, 0);
+
+    expect(result[0]?.currentRatio).toBe(0);
+    expect(result[0]?.gapRatio).toBeCloseTo(-0.5);
+    expect(result[0]?.gapMarketValueMinor).toBeNull();
+  });
 });
