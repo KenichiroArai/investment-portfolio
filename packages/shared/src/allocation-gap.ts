@@ -18,7 +18,6 @@ export type AllocationGapRow = {
 export function buildAllocationGapRows(
   slices: AllocationSlice[],
   targets: TargetAllocationWeight[],
-  assetTotalMinor: number,
 ): AllocationGapRow[] {
   let result: AllocationGapRow[] = [];
 
@@ -27,17 +26,21 @@ export function buildAllocationGapRows(
     targetByCode.set(target.valueCode, target.targetRatio);
   }
 
+  let ratioBaseMinor = 0;
   for (const slice of slices) {
-    const currentRatio =
-      assetTotalMinor > 0 ? slice.marketValueMinor / assetTotalMinor : 0;
+    ratioBaseMinor += slice.marketValueMinor;
+  }
+
+  for (const slice of slices) {
+    const currentRatio = slice.weight;
     const targetRatio = targetByCode.get(slice.valueCode) ?? null;
     let gapRatio: number | null = null;
     let gapMarketValueMinor: number | null = null;
 
     if (targetRatio !== null && Number.isFinite(targetRatio)) {
       gapRatio = currentRatio - targetRatio;
-      if (assetTotalMinor > 0) {
-        gapMarketValueMinor = Math.round(gapRatio * assetTotalMinor);
+      if (ratioBaseMinor > 0) {
+        gapMarketValueMinor = Math.round(gapRatio * ratioBaseMinor);
       }
     }
 

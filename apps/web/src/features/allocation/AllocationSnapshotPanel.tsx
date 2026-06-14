@@ -10,6 +10,7 @@ type AllocationSnapshotPanelProps = {
   slices: AllocationSliceWithLines[];
   axisTotalMinor: number;
   assetTotalMinor: number;
+  targetTotalRatio?: number | null;
   showPortfolioColumn?: boolean;
   portfolioCode?: string;
   schemeCode?: string;
@@ -20,6 +21,7 @@ export function AllocationSnapshotPanel({
   slices,
   axisTotalMinor,
   assetTotalMinor,
+  targetTotalRatio = null,
   showPortfolioColumn = false,
   portfolioCode,
   schemeCode,
@@ -30,6 +32,7 @@ export function AllocationSnapshotPanel({
       <AnalysisPanelSummary
         axisTotalMinor={axisTotalMinor}
         assetTotalMinor={assetTotalMinor}
+        targetTotalRatio={targetTotalRatio}
       />
       <AllocationPanel
         slices={slices}

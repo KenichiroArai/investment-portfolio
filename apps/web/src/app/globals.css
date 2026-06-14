@@ -237,6 +237,10 @@
   font-weight: 500;
 }
 
+.analysis-panel__summary-target-headroom {
+  color: var(--muted-foreground);
+}
+
 /* Trends layout */
 .trend-chart__empty,
 .trend-chart__loading {

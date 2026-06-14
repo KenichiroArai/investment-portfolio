@@ -34,14 +34,6 @@ type RebalanceTableProps = {
   grouped?: boolean;
 };
 
-function formatSignedPercentPoint(value: number): string {
-  let result = formatPercentPoint(value);
-  if (value > 0) {
-    result = `+${result}`;
-  }
-  return result;
-}
-
 function sortRebalanceRows(
   rows: RebalanceDisplayRow[],
   column: RebalanceSortColumn,
@@ -151,7 +143,7 @@ function RebalanceTableRow({ row }: { row: RebalanceDisplayRow }) {
           row.gapRatio !== null && row.gapRatio < 0 ? "text-negative" : undefined,
         )}
       >
-        {row.gapRatio !== null ? formatSignedPercentPoint(row.gapRatio) : "—"}
+        {row.gapRatio !== null ? formatPercentPoint(row.gapRatio) : "—"}
       </td>
       <td className="data-table__cell-numeric text-positive">
         {row.targetRatio !== null && row.buyMinor > 0

@@ -212,10 +212,13 @@ export function AnalysisView({
             scheme.schemeName,
           );
           const targets = allocationsByScheme[scheme.schemeCode] ?? [];
+          const targetTotalRatio =
+            targets.length > 0
+              ? targets.reduce((sum, target) => sum + target.targetRatio, 0)
+              : null;
           const gapRows = buildAllocationGapRows(
             schemeAllocation.slices,
             targets,
-            totalValue,
           );
           const slicesWithGap = mergeAllocationGapIntoSlices(
             schemeAllocation.slices,
@@ -232,6 +235,7 @@ export function AnalysisView({
                   slices={slicesWithGap}
                   axisTotalMinor={schemeAllocation.totalMarketValueMinor}
                   assetTotalMinor={totalValue}
+                  targetTotalRatio={targetTotalRatio}
                   portfolioCode={portfolioCode}
                   schemeCode={scheme.schemeCode}
                   asOfDate={asOfDate}

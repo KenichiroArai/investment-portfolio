@@ -23,14 +23,6 @@ type PortfolioAllocationTableProps = {
   onRowLeave: () => void;
 };
 
-function formatSignedPercentPoint(value: number): string {
-  let result = formatPercentPoint(value);
-  if (value > 0) {
-    result = `+${result}`;
-  }
-  return result;
-}
-
 function sortPortfolioAllocationRows(
   rows: PortfolioAllocationRow[],
   column: PortfolioAllocationSortColumn,
@@ -173,7 +165,7 @@ export function PortfolioAllocationTable({
                         row.gapRatio !== null && row.gapRatio < 0 ? "text-negative" : undefined,
                       )}
                     >
-                      {row.gapRatio !== null ? formatSignedPercentPoint(row.gapRatio) : "—"}
+                      {row.gapRatio !== null ? formatPercentPoint(row.gapRatio) : "—"}
                     </td>
                   </>
                 ) : null}

@@ -39,14 +39,6 @@ type AllocationTableProps = {
   onToggleExpand: (valueCode: string) => void;
 };
 
-function formatSignedPercentPoint(value: number): string {
-  let result = formatPercentPoint(value);
-  if (value > 0) {
-    result = `+${result}`;
-  }
-  return result;
-}
-
 export function AllocationTable({
   slices,
   highlightedValueCode,
@@ -210,7 +202,7 @@ export function AllocationTable({
                         )}
                       >
                         {slice.gapRatio !== null && slice.gapRatio !== undefined
-                          ? formatSignedPercentPoint(slice.gapRatio)
+                          ? formatPercentPoint(slice.gapRatio)
                           : "—"}
                       </td>
                     </>

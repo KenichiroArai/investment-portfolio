@@ -21,14 +21,6 @@ type ImpliedAllocationTargetsCardProps = {
   schemeName: string;
 };
 
-function formatSignedPercentPoint(value: number): string {
-  let result = formatPercentPoint(value);
-  if (value > 0) {
-    result = `+${result}`;
-  }
-  return result;
-}
-
 export function ImpliedAllocationTargetsCard({
   impliedRows,
   allocationTargets,
@@ -117,7 +109,7 @@ export function ImpliedAllocationTargetsCard({
                         row.gapRatio !== null && row.gapRatio < 0 ? "text-negative" : undefined,
                       )}
                     >
-                      {row.gapRatio !== null ? formatSignedPercentPoint(row.gapRatio) : "—"}
+                      {row.gapRatio !== null ? formatPercentPoint(row.gapRatio) : "—"}
                     </TableCell>
                   </TableRow>
                 );
