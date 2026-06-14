@@ -11,6 +11,8 @@ export * from "./allocation-series";
 export * from "./allocation-period-change";
 export * from "./allocation-gap";
 export * from "./portfolio-allocation";
+export * from "./portfolio-allocation-rollup";
+export * from "./allocation-rebalance";
 export * from "./rebalance";
 export * from "./chart-axis-scale";
 export * from "./trend-period-deltas";

@@ -121,4 +121,20 @@ describe("computeRebalanceTrades", () => {
     expect(result.rows[1]?.buyMinor).toBeGreaterThan(0);
     expect(result.rows[2]?.buyMinor).toBe(0);
   });
+
+  it("uses portfolioTotalMinor as denominator when provided", () => {
+    let result = computeRebalanceTrades({
+      rows: [
+        { key: "stock", marketValueMinor: 600_000, targetRatio: 0.5 },
+        { key: "bond", marketValueMinor: 200_000, targetRatio: 0.3 },
+      ],
+      depositMinor: 0,
+      mode: "full",
+      portfolioTotalMinor: 1_000_000,
+    });
+
+    expect(result.rows[0]?.currentRatio).toBeCloseTo(0.6);
+    expect(result.rows[0]?.sellMinor).toBe(100_000);
+    expect(result.rows[1]?.buyMinor).toBe(100_000);
+  });
 });

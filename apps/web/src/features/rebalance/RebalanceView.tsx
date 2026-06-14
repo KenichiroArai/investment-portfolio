@@ -1,15 +1,17 @@
 "use client";
 
+import type { ClassificationSchemeWithValuesDto } from "@repo/shared";
 import {
+  aggregatePortfolioTargetsByScheme,
   buildAllocationBySchemeWithLines,
-  buildAllocationGapRows,
   buildPortfolioAllocationRows,
+  computeAllocationRebalanceByInstrument,
   computeRebalanceTrades,
   resolveAnalysisSchemes,
   sumSnapshotMarketValue,
   type RebalanceMode,
 } from "@repo/shared";
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { LoadingSkeleton } from "@/components/loading-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
@@ -29,12 +31,17 @@ import {
 } from "@/components/ui/select";
 import { useAllocationSchemeParam } from "@/features/allocation/useAllocationSchemeParam";
 import { useTargetAllocations } from "@/features/allocation/useTargetAllocations";
+import { TargetAllocationSettingsCard } from "@/features/manage/TargetAllocationSettingsCard";
+import { TargetPortfolioSettingsCard } from "@/features/portfolio-allocation/TargetPortfolioSettingsCard";
 import { useTargetPortfolioWeights } from "@/features/portfolio-allocation/useTargetPortfolioWeights";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
+import { ImpliedAllocationTargetsCard } from "@/features/rebalance/ImpliedAllocationTargetsCard";
 import {
+  GroupedRebalanceTable,
   RebalanceTable,
   type RebalanceDisplayRow,
 } from "@/features/rebalance/RebalanceTable";
+import { fetchClassificationSchemes } from "@/lib/api-client";
 import { formatAsOfDateJa, formatYen } from "@/lib/format-yen";
 
 type RebalanceBasis = "portfolio" | "allocation";
@@ -60,6 +67,42 @@ export function RebalanceView({ portfolioCode, portfolioKind }: RebalanceViewPro
 
   const [basis, setBasis] = useState<RebalanceBasis>("portfolio");
   const [depositInput, setDepositInput] = useState("0");
+  const [classificationSchemes, setClassificationSchemes] = useState<
+    ClassificationSchemeWithValuesDto[]
+  >([]);
+  const [loadingSchemes, setLoadingSchemes] = useState(true);
+
+  useEffect(() => {
+    let result: () => void = () => {};
+    let cancelled = false;
+
+    async function loadSchemes() {
+      let loadResult: void = undefined;
+
+      setLoadingSchemes(true);
+      const response = await fetchClassificationSchemes(portfolioCode);
+
+      if (cancelled) {
+        return loadResult;
+      }
+
+      setLoadingSchemes(false);
+
+      if (response.ok) {
+        setClassificationSchemes(response.data);
+      } else {
+        setClassificationSchemes([]);
+      }
+
+      return loadResult;
+    }
+
+    void loadSchemes();
+    result = () => {
+      cancelled = true;
+    };
+    return result;
+  }, [portfolioCode]);
 
   const schemeConfigs = useMemo(() => {
     let result = snapshot ? resolveAnalysisSchemes(snapshot, portfolioKind) : [];
@@ -69,6 +112,8 @@ export function RebalanceView({ portfolioCode, portfolioKind }: RebalanceViewPro
   const { activeSchemeCode, setActiveSchemeCode } = useAllocationSchemeParam({
     schemeCodes,
   });
+
+  const activeScheme = schemeConfigs.find((item) => item.schemeCode === activeSchemeCode);
 
   const depositMinor = useMemo(() => {
     let result = 0;
@@ -81,12 +126,24 @@ export function RebalanceView({ portfolioCode, portfolioKind }: RebalanceViewPro
 
   const mode: RebalanceMode = depositMinor > 0 ? "deposit_only" : "full";
 
+  const impliedAllocationRows = useMemo(() => {
+    let result = snapshot && activeSchemeCode !== ""
+      ? aggregatePortfolioTargetsByScheme(
+          snapshot.lines,
+          portfolioWeights,
+          activeSchemeCode,
+        )
+      : [];
+    return result;
+  }, [activeSchemeCode, portfolioWeights, snapshot]);
+
   const rebalanceResult = useMemo(() => {
     let result = {
       rows: [] as RebalanceDisplayRow[],
       totalBuyMinor: 0,
       totalSellMinor: 0,
       unallocatedDepositMinor: 0,
+      grouped: false,
     };
 
     if (!snapshot) {
@@ -113,6 +170,7 @@ export function RebalanceView({ portfolioCode, portfolioKind }: RebalanceViewPro
 
       result = {
         ...trades,
+        grouped: false,
         rows: trades.rows.map((row) => {
           const source = allocationRows.find((item) => item.instrumentId === row.key);
           let displayRow: RebalanceDisplayRow = {
@@ -141,39 +199,79 @@ export function RebalanceView({ portfolioCode, portfolioKind }: RebalanceViewPro
       scheme.schemeName,
     );
     const targets = allocationsByScheme[scheme.schemeCode] ?? [];
-    const gapRows = buildAllocationGapRows(
-      schemeAllocation.slices,
-      targets,
-      totalValue,
-    );
+    const valueNameByCode = new Map<string, string>();
 
-    const trades = computeRebalanceTrades({
-      rows: schemeAllocation.slices.map((slice) => ({
-        key: slice.valueCode,
-        marketValueMinor: slice.marketValueMinor,
-        targetRatio: gapRows.find((gap) => gap.valueCode === slice.valueCode)?.targetRatio ?? null,
-      })),
+    for (const slice of schemeAllocation.slices) {
+      valueNameByCode.set(slice.valueCode, slice.valueName);
+    }
+
+    const selectedClassificationScheme = classificationSchemes.find(
+      (item) => item.code === scheme.schemeCode,
+    );
+    if (selectedClassificationScheme) {
+      for (const value of selectedClassificationScheme.values) {
+        valueNameByCode.set(value.code, value.name);
+      }
+    }
+
+    const allocationRebalance = computeAllocationRebalanceByInstrument({
+      schemeAllocation,
+      targets,
+      portfolioTotalMinor: totalValue,
       depositMinor,
       mode,
     });
 
+    const displayRows: RebalanceDisplayRow[] = [];
+
+    for (const sliceTrade of allocationRebalance.sliceTrades) {
+      const slice = schemeAllocation.slices.find(
+        (item) => item.valueCode === sliceTrade.key,
+      );
+      const valueName = valueNameByCode.get(sliceTrade.key) ?? slice?.valueName ?? sliceTrade.key;
+      const instrumentRows = allocationRebalance.instrumentRows.filter(
+        (row) => row.valueCode === sliceTrade.key,
+      );
+
+      displayRows.push({
+        ...sliceTrade,
+        label: valueName,
+        marketValueMinor: slice?.marketValueMinor ?? 0,
+        isGroupHeader: true,
+        groupKey: sliceTrade.key,
+        groupLabel: valueName,
+        indentLevel: 0,
+        emptySliceNote:
+          instrumentRows.length === 0 && sliceTrade.targetRatio !== null
+            ? "（保有銘柄なしのため銘柄分解不可）"
+            : undefined,
+      });
+
+      for (const instrumentRow of instrumentRows) {
+        displayRows.push({
+          ...instrumentRow,
+          label: instrumentRow.instrumentName,
+          groupKey: sliceTrade.key,
+          groupLabel: valueName,
+          isGroupHeader: false,
+          indentLevel: 1,
+        });
+      }
+    }
+
     result = {
-      ...trades,
-      rows: trades.rows.map((row) => {
-        const source = schemeAllocation.slices.find((slice) => slice.valueCode === row.key);
-        let displayRow: RebalanceDisplayRow = {
-          ...row,
-          label: source?.valueName ?? row.key,
-          marketValueMinor: source?.marketValueMinor ?? 0,
-        };
-        return displayRow;
-      }),
+      rows: displayRows,
+      totalBuyMinor: allocationRebalance.totalBuyMinor,
+      totalSellMinor: allocationRebalance.totalSellMinor,
+      unallocatedDepositMinor: allocationRebalance.unallocatedDepositMinor,
+      grouped: true,
     };
     return result;
   }, [
     activeSchemeCode,
     allocationsByScheme,
     basis,
+    classificationSchemes,
     depositMinor,
     mode,
     portfolioWeights,
@@ -183,7 +281,13 @@ export function RebalanceView({ portfolioCode, portfolioKind }: RebalanceViewPro
 
   let result: ReactNode = null;
 
-  if (loadingDates || loadingSnapshot || loadingAllocations || loadingPortfolioWeights) {
+  if (
+    loadingDates ||
+    loadingSnapshot ||
+    loadingAllocations ||
+    loadingPortfolioWeights ||
+    loadingSchemes
+  ) {
     result = (
       <PageContainer>
         <LoadingSkeleton />
@@ -218,6 +322,8 @@ export function RebalanceView({ portfolioCode, portfolioKind }: RebalanceViewPro
 
   const asOfDate = selectedAsOfDate ?? snapshot.asOfDate;
   const totalValue = sumSnapshotMarketValue(snapshot.lines);
+  const allocationTargetsForScheme =
+    activeSchemeCode !== "" ? (allocationsByScheme[activeSchemeCode] ?? []) : [];
 
   result = (
     <PageContainer>
@@ -237,6 +343,26 @@ export function RebalanceView({ portfolioCode, portfolioKind }: RebalanceViewPro
       </div>
 
       <div className="space-y-6">
+        <TargetPortfolioSettingsCard
+          portfolioCode={portfolioCode}
+          lines={snapshot.lines}
+          disabled={isHistoricalView}
+        />
+
+        <TargetAllocationSettingsCard
+          portfolioCode={portfolioCode}
+          schemes={classificationSchemes}
+          disabled={isHistoricalView}
+        />
+
+        {basis === "portfolio" && activeScheme ? (
+          <ImpliedAllocationTargetsCard
+            impliedRows={impliedAllocationRows}
+            allocationTargets={allocationTargetsForScheme}
+            schemeName={activeScheme.schemeName}
+          />
+        ) : null}
+
         <Card>
           <CardHeader>
             <CardTitle className="text-base">リバランス設定</CardTitle>
@@ -278,30 +404,28 @@ export function RebalanceView({ portfolioCode, portfolioKind }: RebalanceViewPro
               </div>
             </FormField>
 
-            {basis === "allocation" ? (
-              <FormField label="分析軸" htmlFor="rebalance-scheme">
-                <Select
-                  value={activeSchemeCode}
-                  onValueChange={(value) => {
-                    setActiveSchemeCode(value);
-                  }}
-                >
-                  <SelectTrigger id="rebalance-scheme">
-                    <SelectValue placeholder="分析軸を選択" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {schemeConfigs.map((scheme) => {
-                      let item = (
-                        <SelectItem key={scheme.schemeCode} value={scheme.schemeCode}>
-                          {scheme.schemeName}
-                        </SelectItem>
-                      );
-                      return item;
-                    })}
-                  </SelectContent>
-                </Select>
-              </FormField>
-            ) : null}
+            <FormField label="分析軸" htmlFor="rebalance-scheme">
+              <Select
+                value={activeSchemeCode}
+                onValueChange={(value) => {
+                  setActiveSchemeCode(value);
+                }}
+              >
+                <SelectTrigger id="rebalance-scheme">
+                  <SelectValue placeholder="分析軸を選択" />
+                </SelectTrigger>
+                <SelectContent>
+                  {schemeConfigs.map((scheme) => {
+                    let item = (
+                      <SelectItem key={scheme.schemeCode} value={scheme.schemeCode}>
+                        {scheme.schemeName}
+                      </SelectItem>
+                    );
+                    return item;
+                  })}
+                </SelectContent>
+              </Select>
+            </FormField>
 
             <FormField label="入金額（円）" htmlFor="rebalance-deposit">
               <Input
@@ -356,9 +480,18 @@ export function RebalanceView({ portfolioCode, portfolioKind }: RebalanceViewPro
         <Card>
           <CardHeader>
             <CardTitle className="text-base">売買提案</CardTitle>
+            {basis === "allocation" ? (
+              <CardDescription>
+                構成単位の売買を、各構成内の現状比率で銘柄に按分して表示します。
+              </CardDescription>
+            ) : null}
           </CardHeader>
           <CardContent className="space-y-4">
-            <RebalanceTable rows={rebalanceResult.rows} />
+            {rebalanceResult.grouped ? (
+              <GroupedRebalanceTable rows={rebalanceResult.rows} />
+            ) : (
+              <RebalanceTable rows={rebalanceResult.rows} />
+            )}
             <div className="flex flex-wrap gap-4 text-sm">
               <span>合計買い: {formatYen(rebalanceResult.totalBuyMinor)}</span>
               <span>合計売り: {formatYen(rebalanceResult.totalSellMinor)}</span>

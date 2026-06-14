@@ -10,6 +10,8 @@ export type RebalanceInput = {
   rows: RebalanceRowInput[];
   depositMinor: number;
   mode: RebalanceMode;
+  /** When set, ratios and target values use this as the portfolio denominator instead of row sum. */
+  portfolioTotalMinor?: number;
 };
 
 export type RebalanceTradeRow = {
@@ -45,7 +47,42 @@ function computeCurrentRatio(marketValueMinor: number, totalMinor: number): numb
   return result;
 }
 
-function distributeDepositProportionally(
+export function distributeAmountProportionally(
+  weights: Array<{ key: string; weight: number }>,
+  amountMinor: number,
+): Map<string, number> {
+  let result = new Map<string, number>();
+
+  if (amountMinor === 0 || weights.length === 0) {
+    return result;
+  }
+
+  const totalWeight = weights.reduce((sum, item) => sum + item.weight, 0);
+  if (totalWeight <= 0) {
+    return result;
+  }
+
+  const absoluteAmount = Math.abs(amountMinor);
+  const sign = amountMinor > 0 ? 1 : -1;
+  let allocated = 0;
+
+  for (let index = 0; index < weights.length; index += 1) {
+    const item = weights[index]!;
+
+    if (index === weights.length - 1) {
+      result.set(item.key, sign * (absoluteAmount - allocated));
+      continue;
+    }
+
+    const share = Math.round((item.weight / totalWeight) * absoluteAmount);
+    result.set(item.key, sign * share);
+    allocated += share;
+  }
+
+  return result;
+}
+
+export function distributeDepositProportionally(
   deficits: Array<{ key: string; deficitMinor: number }>,
   depositMinor: number,
 ): Map<string, number> {
@@ -89,18 +126,23 @@ export function computeRebalanceTrades(input: RebalanceInput): RebalanceResult {
   };
 
   const currentTotalMinor = sumMarketValue(input.rows);
-  if (currentTotalMinor <= 0 && input.depositMinor <= 0) {
+  const ratioTotalMinor =
+    input.portfolioTotalMinor !== undefined && input.portfolioTotalMinor > 0
+      ? input.portfolioTotalMinor
+      : currentTotalMinor;
+
+  if (ratioTotalMinor <= 0 && input.depositMinor <= 0) {
     return result;
   }
 
-  const effectiveTotalMinor = currentTotalMinor + Math.max(0, input.depositMinor);
+  const effectiveTotalMinor = ratioTotalMinor + Math.max(0, input.depositMinor);
   const tradeRows: RebalanceTradeRow[] = [];
 
   if (input.mode === "deposit_only" && input.depositMinor > 0) {
     const deficits: Array<{ key: string; deficitMinor: number }> = [];
 
     for (const row of input.rows) {
-      const currentRatio = computeCurrentRatio(row.marketValueMinor, currentTotalMinor);
+      const currentRatio = computeCurrentRatio(row.marketValueMinor, ratioTotalMinor);
       let targetMarketValueMinor: number | null = null;
       let gapRatio: number | null = null;
 
@@ -146,7 +188,7 @@ export function computeRebalanceTrades(input: RebalanceInput): RebalanceResult {
   let totalSellMinor = 0;
 
   for (const row of input.rows) {
-    const currentRatio = computeCurrentRatio(row.marketValueMinor, currentTotalMinor);
+    const currentRatio = computeCurrentRatio(row.marketValueMinor, ratioTotalMinor);
     let targetMarketValueMinor: number | null = null;
     let gapRatio: number | null = null;
     let buyMinor = 0;
@@ -154,7 +196,7 @@ export function computeRebalanceTrades(input: RebalanceInput): RebalanceResult {
 
     if (row.targetRatio !== null && Number.isFinite(row.targetRatio)) {
       const rebalanceTotalMinor =
-        input.depositMinor > 0 ? effectiveTotalMinor : currentTotalMinor;
+        input.depositMinor > 0 ? effectiveTotalMinor : ratioTotalMinor;
       targetMarketValueMinor = Math.round(rebalanceTotalMinor * row.targetRatio);
       gapRatio = currentRatio - row.targetRatio;
       const tradeMinor = targetMarketValueMinor - row.marketValueMinor;

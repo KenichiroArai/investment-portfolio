@@ -28,12 +28,14 @@ export function buildAllocationGapRows(
   }
 
   for (const slice of slices) {
+    const currentRatio =
+      assetTotalMinor > 0 ? slice.marketValueMinor / assetTotalMinor : 0;
     const targetRatio = targetByCode.get(slice.valueCode) ?? null;
     let gapRatio: number | null = null;
     let gapMarketValueMinor: number | null = null;
 
     if (targetRatio !== null && Number.isFinite(targetRatio)) {
-      gapRatio = slice.weight - targetRatio;
+      gapRatio = currentRatio - targetRatio;
       if (assetTotalMinor > 0) {
         gapMarketValueMinor = Math.round(gapRatio * assetTotalMinor);
       }
@@ -42,7 +44,7 @@ export function buildAllocationGapRows(
     result.push({
       valueCode: slice.valueCode,
       valueName: slice.valueName,
-      currentRatio: slice.weight,
+      currentRatio,
       targetRatio,
       gapRatio,
       gapMarketValueMinor,
