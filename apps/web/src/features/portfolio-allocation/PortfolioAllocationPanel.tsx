@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 
 import { AllocationChart } from "@/features/analysis/AllocationChart";
 import { PortfolioAllocationTable } from "@/features/portfolio-allocation/PortfolioAllocationTable";
-import { formatPercent, formatYen } from "@/lib/format-yen";
+import { formatAllocationPercent, formatYen } from "@/lib/format-yen";
 
 type PortfolioAllocationTooltipState = {
   x: number;
@@ -91,9 +91,9 @@ export function PortfolioAllocationPanel({ rows }: PortfolioAllocationPanelProps
           >
             <strong>{tooltip.row.instrumentName}</strong>
             <span>評価額: {formatYen(tooltip.row.marketValueMinor)}</span>
-            <span>現状: {formatPercent(tooltip.row.currentRatio)}</span>
+            <span>現状: {formatAllocationPercent(tooltip.row.currentRatio)}</span>
             {tooltip.row.targetRatio !== null ? (
-              <span>目標: {formatPercent(tooltip.row.targetRatio)}</span>
+              <span>目標: {formatAllocationPercent(tooltip.row.targetRatio)}</span>
             ) : null}
           </div>
         ) : null}

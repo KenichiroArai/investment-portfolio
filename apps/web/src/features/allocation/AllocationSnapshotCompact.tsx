@@ -3,7 +3,7 @@
 import type { AllocationSlice } from "@repo/shared";
 import type { ReactNode } from "react";
 
-import { formatPercent } from "@/lib/format-yen";
+import { formatAllocationPercent } from "@/lib/format-yen";
 import { cn } from "@/lib/utils";
 
 type AllocationSnapshotCompactProps = {
@@ -47,7 +47,7 @@ export function AllocationSnapshotCompact({
                 <div className="flex items-center justify-between gap-2 text-sm">
                   <span className="truncate">{slice.valueName}</span>
                   <span className="shrink-0 font-medium tabular-nums">
-                    {formatPercent(slice.weight)}
+                    {formatAllocationPercent(slice.weight)}
                   </span>
                 </div>
                 <div className="h-1.5 overflow-hidden rounded-full bg-muted">

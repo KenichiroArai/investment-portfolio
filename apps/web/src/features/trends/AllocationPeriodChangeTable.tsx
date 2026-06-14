@@ -12,8 +12,8 @@ import { AllocationSparkline } from "@/features/trends/AllocationSparkline";
 import { TrendChartHeader } from "@/features/trends/TrendChartHeader";
 import { useTableSort } from "@/hooks/useTableSort";
 import {
-  formatPercent,
-  formatPercentPoint,
+  formatAllocationPercent,
+  formatAllocationPercentPoint,
   formatPercentRelativeChange,
   formatYen,
 } from "@/lib/format-yen";
@@ -168,8 +168,8 @@ export function AllocationPeriodChangeTable({
                   aria-label={`${row.label} の推移を${isSelected ? "非表示" : "表示"}`}
                 >
                   <td>{row.label}</td>
-                  <td>{formatPercent(row.startRatio)}</td>
-                  <td>{formatPercent(row.endRatio)}</td>
+                  <td>{formatAllocationPercent(row.startRatio)}</td>
+                  <td>{formatAllocationPercent(row.endRatio)}</td>
                   <td
                     className={
                       row.deltaRatio >= 0
@@ -177,7 +177,7 @@ export function AllocationPeriodChangeTable({
                         : "allocation-period-change-table__delta allocation-period-change-table__delta--negative"
                     }
                   >
-                    {formatPercentPoint(row.deltaRatio)}
+                    {formatAllocationPercentPoint(row.deltaRatio)}
                   </td>
                   <td
                     className={

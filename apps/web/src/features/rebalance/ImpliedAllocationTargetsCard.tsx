@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatPercent, formatPercentPoint } from "@/lib/format-yen";
+import { formatAllocationPercent, formatAllocationPercentPoint } from "@/lib/format-yen";
 import { cn } from "@/lib/utils";
 
 type ImpliedAllocationTargetsCardProps = {
@@ -94,12 +94,12 @@ export function ImpliedAllocationTargetsCard({
                     <TableCell>{row.valueName}</TableCell>
                     <TableCell className="text-right">
                       {row.impliedTargetRatio > 0
-                        ? formatPercent(row.impliedTargetRatio)
+                        ? formatAllocationPercent(row.impliedTargetRatio)
                         : "—"}
                     </TableCell>
                     <TableCell className="text-right">
                       {row.allocationTargetRatio !== null
-                        ? formatPercent(row.allocationTargetRatio)
+                        ? formatAllocationPercent(row.allocationTargetRatio)
                         : "—"}
                     </TableCell>
                     <TableCell
@@ -109,7 +109,7 @@ export function ImpliedAllocationTargetsCard({
                         row.gapRatio !== null && row.gapRatio < 0 ? "text-negative" : undefined,
                       )}
                     >
-                      {row.gapRatio !== null ? formatPercentPoint(row.gapRatio) : "—"}
+                      {row.gapRatio !== null ? formatAllocationPercentPoint(row.gapRatio) : "—"}
                     </TableCell>
                   </TableRow>
                 );

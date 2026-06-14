@@ -13,5 +13,6 @@ export type TrendChartSeries = {
   baselineValue?: number | null;
   tooltipMode?: TrendChartTooltipMode;
   tooltipUnit?: "yen" | "percentPoint";
+  allocationPercentFormat?: boolean;
   formatValue?: (value: number) => string;
 };

@@ -1,5 +1,8 @@
 import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
 import {
+  formatAllocationPercentDeltaTooltip,
+  formatAllocationPercentLevelDeltaTooltip,
+  formatAllocationPercentPoint,
   formatPercentDeltaTooltip,
   formatPercentLevelDeltaTooltip,
   formatPercentPoint,
@@ -35,13 +38,17 @@ export function formatTrendChartTooltipValue(
   }
 
   if (item.tooltipMode === "percentDelta") {
-    result = formatPercentDeltaTooltip(previous, current);
+    result = item.allocationPercentFormat
+      ? formatAllocationPercentDeltaTooltip(previous, current)
+      : formatPercentDeltaTooltip(previous, current);
     return result;
   }
 
   if (item.tooltipMode === "levelDelta") {
     if (item.tooltipUnit === "percentPoint") {
-      result = formatPercentLevelDeltaTooltip(previous, current);
+      result = item.allocationPercentFormat
+        ? formatAllocationPercentLevelDeltaTooltip(previous, current)
+        : formatPercentLevelDeltaTooltip(previous, current);
       return result;
     }
 
@@ -55,7 +62,9 @@ export function formatTrendChartTooltipValue(
         previous,
         current,
         value,
-        (absoluteDelta) => formatPercentPoint(absoluteDelta),
+        item.allocationPercentFormat
+          ? (absoluteDelta) => formatAllocationPercentPoint(absoluteDelta)
+          : (absoluteDelta) => formatPercentPoint(absoluteDelta),
       );
       return result;
     }

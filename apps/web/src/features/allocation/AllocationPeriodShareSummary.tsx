@@ -3,7 +3,7 @@
 import type { AllocationShareChange } from "@repo/shared";
 import type { ReactNode } from "react";
 
-import { formatPercentPoint } from "@/lib/format-yen";
+import { formatAllocationPercentPoint } from "@/lib/format-yen";
 
 type AllocationPeriodShareSummaryProps = {
   largestShareChange: AllocationShareChange | null;
@@ -27,7 +27,7 @@ export function AllocationPeriodShareSummary({
     return result;
   }
 
-  const signedDelta = formatPercentPoint(largestShareChange.deltaRatio);
+  const signedDelta = formatAllocationPercentPoint(largestShareChange.deltaRatio);
 
   result = (
     <p className="text-sm text-muted-foreground">

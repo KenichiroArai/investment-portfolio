@@ -7,7 +7,7 @@ import { useMemo } from "react";
 import { SortableTableHeader } from "@/components/SortableTableHeader";
 import { TableHead } from "@/components/ui/table";
 import { useTableSort } from "@/hooks/useTableSort";
-import { formatPercent, formatPercentPoint, formatYen } from "@/lib/format-yen";
+import { formatAllocationPercent, formatAllocationPercentPoint, formatYen } from "@/lib/format-yen";
 import { cn } from "@/lib/utils";
 
 export type RebalanceDisplayRow = RebalanceTradeRow & {
@@ -132,9 +132,9 @@ function RebalanceTableRow({ row }: { row: RebalanceDisplayRow }) {
         ) : null}
       </td>
       <td className="data-table__cell-numeric">{formatYen(row.marketValueMinor)}</td>
-      <td className="data-table__cell-numeric">{formatPercent(row.currentRatio)}</td>
+      <td className="data-table__cell-numeric">{formatAllocationPercent(row.currentRatio)}</td>
       <td className="data-table__cell-numeric">
-        {row.targetRatio !== null ? formatPercent(row.targetRatio) : "—"}
+        {row.targetRatio !== null ? formatAllocationPercent(row.targetRatio) : "—"}
       </td>
       <td
         className={cn(
@@ -143,7 +143,7 @@ function RebalanceTableRow({ row }: { row: RebalanceDisplayRow }) {
           row.gapRatio !== null && row.gapRatio < 0 ? "text-negative" : undefined,
         )}
       >
-        {row.gapRatio !== null ? formatPercentPoint(row.gapRatio) : "—"}
+        {row.gapRatio !== null ? formatAllocationPercentPoint(row.gapRatio) : "—"}
       </td>
       <td className="data-table__cell-numeric text-positive">
         {row.targetRatio !== null && row.buyMinor > 0

@@ -6,7 +6,7 @@ import { useMemo } from "react";
 
 import { SortableTableHeader } from "@/components/SortableTableHeader";
 import { useTableSort } from "@/hooks/useTableSort";
-import { formatPercent, formatPercentPoint, formatYen } from "@/lib/format-yen";
+import { formatAllocationPercent, formatAllocationPercentPoint, formatYen } from "@/lib/format-yen";
 import { cn } from "@/lib/utils";
 
 type PortfolioAllocationSortColumn =
@@ -151,12 +151,12 @@ export function PortfolioAllocationTable({
                   {formatYen(row.marketValueMinor)}
                 </td>
                 <td className="data-table__cell-numeric">
-                  {formatPercent(row.currentRatio)}
+                  {formatAllocationPercent(row.currentRatio)}
                 </td>
                 {showGapColumns ? (
                   <>
                     <td className="data-table__cell-numeric">
-                      {row.targetRatio !== null ? formatPercent(row.targetRatio) : "—"}
+                      {row.targetRatio !== null ? formatAllocationPercent(row.targetRatio) : "—"}
                     </td>
                     <td
                       className={cn(
@@ -165,7 +165,7 @@ export function PortfolioAllocationTable({
                         row.gapRatio !== null && row.gapRatio < 0 ? "text-negative" : undefined,
                       )}
                     >
-                      {row.gapRatio !== null ? formatPercentPoint(row.gapRatio) : "—"}
+                      {row.gapRatio !== null ? formatAllocationPercentPoint(row.gapRatio) : "—"}
                     </td>
                   </>
                 ) : null}

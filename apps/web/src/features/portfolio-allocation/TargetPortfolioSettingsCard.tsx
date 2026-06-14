@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/table";
 import { useTargetPortfolioWeights } from "@/features/portfolio-allocation/useTargetPortfolioWeights";
 import { replaceTargetPortfolioWeights } from "@/lib/api-client";
-import { formatPercent } from "@/lib/format-yen";
+import { formatAllocationPercent } from "@/lib/format-yen";
 
 type TargetPortfolioSettingsCardProps = {
   portfolioCode: string;
@@ -176,7 +176,7 @@ export function TargetPortfolioSettingsCard({
             </Table>
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-sm text-muted-foreground">
-                合計: {formatPercent(totalPercent / 100)}
+                合計: {formatAllocationPercent(totalPercent / 100)}
                 {totalPercent > 100 ? "（100% を超えています）" : null}
               </p>
               <Button

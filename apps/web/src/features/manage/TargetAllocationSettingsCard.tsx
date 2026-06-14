@@ -24,7 +24,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { fetchTargetAllocations, replaceTargetAllocations } from "@/lib/api-client";
-import { formatPercent } from "@/lib/format-yen";
+import { formatAllocationPercent } from "@/lib/format-yen";
 
 type TargetAllocationSettingsCardProps = {
   portfolioCode: string;
@@ -224,7 +224,7 @@ export function TargetAllocationSettingsCard({
             ) : null}
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-sm text-muted-foreground">
-                合計: {formatPercent(totalPercent / 100)}
+                合計: {formatAllocationPercent(totalPercent / 100)}
                 {totalPercent > 100 ? "（100% を超えています）" : null}
               </p>
               <Button

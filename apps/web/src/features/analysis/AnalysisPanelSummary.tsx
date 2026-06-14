@@ -1,4 +1,4 @@
-import { formatPercent, formatYen } from "@/lib/format-yen";
+import { formatAllocationPercent, formatAllocationPercentPoint, formatYen } from "@/lib/format-yen";
 
 type AnalysisPanelSummaryProps = {
   axisTotalMinor: number;
@@ -30,7 +30,7 @@ export function AnalysisPanelSummary({
       <p>
         分類対象額: {formatYen(axisTotalMinor)}
         {hasUncovered ? (
-          <span>（資産全体の {formatPercent(coverageRatio)}）</span>
+          <span>（資産全体の {formatAllocationPercent(coverageRatio)}）</span>
         ) : null}
       </p>
       {hasUncovered ? (
@@ -40,10 +40,10 @@ export function AnalysisPanelSummary({
       ) : null}
       {hasTargetTotal ? (
         <p className="analysis-panel__summary-target">
-          目標合計: {formatPercent(targetTotalRatio)}
+          目標合計: {formatAllocationPercent(targetTotalRatio)}
           {targetHeadroomRatio !== null ? (
             <span className="analysis-panel__summary-target-headroom">
-              （未割当 {formatPercent(targetHeadroomRatio)}）
+              （未割当 {formatAllocationPercent(targetHeadroomRatio)}）
             </span>
           ) : null}
         </p>

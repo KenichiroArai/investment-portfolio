@@ -25,7 +25,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { formatPercent, formatYen } from "@/lib/format-yen";
+import { formatAllocationPercent, formatYen } from "@/lib/format-yen";
 import { buildPortfolioPath } from "@/lib/portfolio-path";
 import {
   getPortfoliosFetchUrl,
@@ -210,7 +210,7 @@ export function GlobalAnalysisView() {
                     </TableCell>
                     <TableCell>{portfolio.asOfDate}</TableCell>
                     <TableCell>{formatYen(portfolio.marketValueMinor)}</TableCell>
-                    <TableCell>{formatPercent(portfolio.weight)}</TableCell>
+                    <TableCell>{formatAllocationPercent(portfolio.weight)}</TableCell>
                   </TableRow>
                 );
                 return row;

@@ -29,6 +29,17 @@ export function formatPercent(ratio: number): string {
   return result;
 }
 
+export function formatAllocationPercent(ratio: number): string {
+  let result = "—";
+
+  if (!Number.isFinite(ratio)) {
+    return result;
+  }
+
+  result = `${(ratio * 100).toFixed(2)}%`;
+  return result;
+}
+
 export function formatPercentAxis(ratio: number): string {
   let result = "0%";
 
@@ -74,6 +85,18 @@ export function formatPercentPoint(ratioDelta: number): string {
   const abs = Math.abs(points);
   const decimals = abs >= 1 ? 1 : 2;
   result = `${formatSignedPointValue(points, decimals)} pt`;
+  return result;
+}
+
+export function formatAllocationPercentPoint(ratioDelta: number): string {
+  let result = "—";
+
+  if (!Number.isFinite(ratioDelta)) {
+    return result;
+  }
+
+  const points = ratioDelta * 100;
+  result = `${formatSignedPointValue(points, 2)} pt`;
   return result;
 }
 
@@ -281,6 +304,79 @@ export function formatPercentDeltaTooltip(
   }
 
   result = `${formatPercent(previous)} → ${formatPercent(current)} (${formatPercentPoint(ratioDelta)} / ${relativeText})`;
+  return result;
+}
+
+export function formatAllocationPercentLevelDeltaTooltip(
+  previous: number | null,
+  current: number | null,
+): string {
+  let result = "—";
+
+  if (current === null || !Number.isFinite(current)) {
+    return result;
+  }
+
+  result = formatAllocationPercent(current);
+
+  const deltaSuffix = formatAllocationPercentPeriodDeltaSuffix(previous, current);
+  if (deltaSuffix === null) {
+    return result;
+  }
+
+  result = `${result} (${deltaSuffix})`;
+  return result;
+}
+
+export function formatAllocationPercentDeltaTooltip(
+  previous: number | null,
+  current: number | null,
+): string {
+  let result = "—";
+
+  if (
+    previous === null ||
+    current === null ||
+    !Number.isFinite(previous) ||
+    !Number.isFinite(current)
+  ) {
+    return result;
+  }
+
+  const ratioDelta = current - previous;
+  let relativeText = "—";
+
+  if (previous !== 0) {
+    relativeText = formatPercentRelativeChange(ratioDelta / Math.abs(previous));
+  }
+
+  result = `${formatAllocationPercent(previous)} → ${formatAllocationPercent(current)} (${formatAllocationPercentPoint(ratioDelta)} / ${relativeText})`;
+  return result;
+}
+
+export function formatAllocationPercentPeriodDeltaSuffix(
+  previous: number | null,
+  current: number | null,
+): string | null {
+  let result: string | null = null;
+
+  if (
+    previous === null ||
+    current === null ||
+    !Number.isFinite(previous) ||
+    !Number.isFinite(current)
+  ) {
+    return result;
+  }
+
+  const ratioDelta = current - previous;
+  let relativeText = "—";
+
+  if (previous !== 0) {
+    relativeText = formatPercentRelativeChange(ratioDelta / Math.abs(previous));
+  }
+
+  result = `${formatAllocationPercentPoint(ratioDelta)} / ${relativeText}`;
   return result;
 }
 

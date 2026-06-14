@@ -8,7 +8,7 @@ import {
   AllocationTable,
   type AllocationSliceTableRow,
 } from "@/features/analysis/AllocationTable";
-import { formatPercent, formatPercentPoint, formatYen } from "@/lib/format-yen";
+import { formatAllocationPercent, formatAllocationPercentPoint, formatYen } from "@/lib/format-yen";
 
 type AllocationTooltipState = {
   x: number;
@@ -108,13 +108,13 @@ export function AllocationPanel({
           >
             <strong>{tooltip.slice.valueName}</strong>
             <span>評価額: {formatYen(tooltip.slice.marketValueMinor)}</span>
-            <span>構成比: {formatPercent(tooltip.slice.weight)}</span>
+            <span>構成比: {formatAllocationPercent(tooltip.slice.weight)}</span>
             {tooltip.slice.targetRatio !== null &&
             tooltip.slice.targetRatio !== undefined ? (
-              <span>目標: {formatPercent(tooltip.slice.targetRatio)}</span>
+              <span>目標: {formatAllocationPercent(tooltip.slice.targetRatio)}</span>
             ) : null}
             {tooltip.slice.gapRatio !== null && tooltip.slice.gapRatio !== undefined ? (
-              <span>差分: {formatPercentPoint(tooltip.slice.gapRatio)}</span>
+              <span>差分: {formatAllocationPercentPoint(tooltip.slice.gapRatio)}</span>
             ) : null}
             <span>明細行数: {tooltip.slice.lines.length}</span>
           </div>

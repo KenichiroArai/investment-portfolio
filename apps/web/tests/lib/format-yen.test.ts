@@ -2,6 +2,8 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
   formatAsOfDateJa,
+  formatAllocationPercent,
+  formatAllocationPercentPoint,
   formatPercent,
   formatPercentAxis,
   formatPercentDeltaTooltip,
@@ -126,6 +128,29 @@ describe("formatPercentAxis", () => {
 
   it("returns zero percent for non-finite ratios", () => {
     expect(formatPercentAxis(Number.NaN)).toBe("0%");
+  });
+});
+
+describe("formatAllocationPercent", () => {
+  it("formats finite ratios with two decimal places", () => {
+    expect(formatAllocationPercent(0.309)).toBe("30.90%");
+    expect(formatAllocationPercent(0.052)).toBe("5.20%");
+  });
+
+  it("returns dash for non-finite ratios", () => {
+    expect(formatAllocationPercent(Number.NaN)).toBe("—");
+  });
+});
+
+describe("formatAllocationPercentPoint", () => {
+  it("formats ratio deltas as signed points with two decimal places", () => {
+    expect(formatAllocationPercentPoint(0.0009)).toBe("+0.09 pt");
+    expect(formatAllocationPercentPoint(-0.0031)).toBe("-0.31 pt");
+    expect(formatAllocationPercentPoint(0.018)).toBe("+1.80 pt");
+  });
+
+  it("returns dash for non-finite ratios", () => {
+    expect(formatAllocationPercentPoint(Number.NaN)).toBe("—");
   });
 });
 

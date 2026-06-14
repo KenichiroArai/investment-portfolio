@@ -7,8 +7,8 @@ import {
 import { getAllocationChartColor } from "@/features/analysis/chart-colors";
 import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
 import {
-  formatPercent,
-  formatPercentPoint,
+  formatAllocationPercent,
+  formatAllocationPercentPoint,
   formatPercentRelativeChange,
 } from "@/lib/format-yen";
 
@@ -37,7 +37,8 @@ export function buildAllocationRatioLevelSeries(
       levelValues: item.values,
       tooltipMode: "levelDelta",
       tooltipUnit: "percentPoint",
-      formatValue: (value) => formatPercent(value),
+      allocationPercentFormat: true,
+      formatValue: (value) => formatAllocationPercent(value),
     };
     return series;
   });
@@ -61,7 +62,8 @@ export function buildAllocationRatioDeltaSeries(
       values: computeTrendPeriodDeltas(item.values),
       levelValues: item.values,
       tooltipMode: "percentDelta",
-      formatValue: (value) => formatPercentPoint(value),
+      allocationPercentFormat: true,
+      formatValue: (value) => formatAllocationPercentPoint(value),
     };
     return series;
   });
@@ -86,6 +88,7 @@ export function buildAllocationRatioRelativeSeries(
       levelValues: item.values,
       tooltipMode: "relativeRateDelta",
       tooltipUnit: "percentPoint",
+      allocationPercentFormat: true,
       formatValue: (value) => formatPercentRelativeChange(value),
     };
     return series;

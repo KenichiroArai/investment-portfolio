@@ -9,7 +9,7 @@ import { Fragment, useMemo } from "react";
 import { SortableTableHeader } from "@/components/SortableTableHeader";
 import { AllocationLineBreakdown } from "@/features/analysis/AllocationLineBreakdown";
 import { useTableSort } from "@/hooks/useTableSort";
-import { formatPercent, formatPercentPoint, formatYen } from "@/lib/format-yen";
+import { formatAllocationPercent, formatAllocationPercentPoint, formatYen } from "@/lib/format-yen";
 import { buildPortfolioPath } from "@/lib/portfolio-path";
 import { cn } from "@/lib/utils";
 
@@ -177,13 +177,13 @@ export function AllocationTable({
                     {formatYen(slice.marketValueMinor)}
                   </td>
                   <td className="data-table__cell-numeric">
-                    {formatPercent(slice.weight)}
+                    {formatAllocationPercent(slice.weight)}
                   </td>
                   {showGapColumns ? (
                     <>
                       <td className="data-table__cell-numeric">
                         {slice.targetRatio !== null && slice.targetRatio !== undefined
-                          ? formatPercent(slice.targetRatio)
+                          ? formatAllocationPercent(slice.targetRatio)
                           : "—"}
                       </td>
                       <td
@@ -202,7 +202,7 @@ export function AllocationTable({
                         )}
                       >
                         {slice.gapRatio !== null && slice.gapRatio !== undefined
-                          ? formatPercentPoint(slice.gapRatio)
+                          ? formatAllocationPercentPoint(slice.gapRatio)
                           : "—"}
                       </td>
                     </>
