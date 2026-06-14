@@ -19,7 +19,10 @@ import {
   listPortfolios,
   listSchemesWithValuesForPortfolio,
   listSnapshotDates,
+  listAllTargetAllocationsForPortfolio,
+  listTargetAllocationWeights,
   replaceCurrentSnapshot,
+  replaceTargetAllocationWeights,
   setInstrumentClassifications,
   updateClassificationSchemeName,
   updateClassificationValue,
@@ -34,6 +37,7 @@ import {
   createInstrumentSchema,
   createPortfolioSchema,
   replaceCurrentSnapshotSchema,
+  replaceTargetAllocationWeightsSchema,
   setInstrumentClassificationsSchema,
   snapshotTrendsQuerySchema,
   updateClassificationSchemeSchema,
@@ -498,6 +502,67 @@ export function createApp(options?: CreateAppOptions) {
     const snapshots = await getSnapshotsInDateRange(db, portfolioCode, from, to);
     const trends = buildSnapshotTrends(portfolioCode, snapshots, from, to);
     result = c.json(trends);
+    return result;
+  });
+
+  app.get("/portfolios/:code/target-allocations", async (c) => {
+    let result!: Response;
+
+    const db = resolveDb();
+    const portfolioCode = c.req.param("code");
+    const portfolio = await findPortfolioByCode(db, portfolioCode);
+    if (!portfolio) {
+      result = c.json({ error: "Portfolio not found" }, 404);
+      return result;
+    }
+
+    const allocations = await listAllTargetAllocationsForPortfolio(db, portfolioCode);
+    result = c.json(allocations);
+    return result;
+  });
+
+  app.get("/portfolios/:code/target-allocations/:schemeCode", async (c) => {
+    let result!: Response;
+
+    const db = resolveDb();
+    const portfolioCode = c.req.param("code");
+    const schemeCode = c.req.param("schemeCode");
+    const portfolio = await findPortfolioByCode(db, portfolioCode);
+    if (!portfolio) {
+      result = c.json({ error: "Portfolio not found" }, 404);
+      return result;
+    }
+
+    const weights = await listTargetAllocationWeights(db, portfolioCode, schemeCode);
+    result = c.json({ schemeCode, weights });
+    return result;
+  });
+
+  app.put("/portfolios/:code/target-allocations/:schemeCode", async (c) => {
+    let result!: Response;
+
+    const body = await c.req.json();
+    const parsed = replaceTargetAllocationWeightsSchema.safeParse(body);
+    if (!parsed.success) {
+      result = c.json({ error: parsed.error.flatten() }, 400);
+      return result;
+    }
+
+    const db = resolveDb();
+    const portfolioCode = c.req.param("code");
+    const schemeCode = c.req.param("schemeCode");
+    const weights = await replaceTargetAllocationWeights(
+      db,
+      portfolioCode,
+      schemeCode,
+      parsed.data.weights,
+    );
+    if (!weights) {
+      result = c.json({ error: "Portfolio not found" }, 404);
+      return result;
+    }
+
+    result = c.json({ schemeCode, weights });
     return result;
   });
 

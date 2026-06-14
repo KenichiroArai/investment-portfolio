@@ -41,6 +41,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { WritableGuard } from "@/features/manage/WritableGuard";
+import { TargetAllocationSettingsCard } from "@/features/manage/TargetAllocationSettingsCard";
 import {
   createClassificationScheme,
   createClassificationValue,
@@ -420,6 +421,12 @@ export function AnalysisSettingsView({ portfolioCode }: AnalysisSettingsViewProp
                 )}
               </CardContent>
             </Card>
+
+            <TargetAllocationSettingsCard
+              portfolioCode={portfolioCode}
+              schemes={schemes}
+              disabled={submitting}
+            />
 
             <Card>
               <CardHeader>

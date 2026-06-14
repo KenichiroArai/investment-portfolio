@@ -3,9 +3,13 @@
 import type {
   AllocationPeriodChangeRow,
   AllocationSeriesInput,
+  AllocationSlice,
 } from "@repo/shared";
 import { useState, type ReactNode } from "react";
 
+import { AllocationCrossLink } from "@/features/allocation/AllocationCrossLink";
+import { AllocationSchemeTabs } from "@/features/allocation/AllocationSchemeTabs";
+import { AllocationSnapshotCompact } from "@/features/allocation/AllocationSnapshotCompact";
 import { AllocationPeriodChangeTable } from "@/features/trends/AllocationPeriodChangeTable";
 import { CompositionRatioLineChart } from "@/features/trends/CompositionRatioLineChart";
 import { CompositionSelectionToolbar } from "@/features/trends/CompositionSelectionToolbar";
@@ -51,6 +55,10 @@ type TrendMetricTabsAllocation = {
   onClearCompositionSelection: () => void;
   startDateLabel: string;
   endDateLabel: string;
+  endSnapshotSlices: AllocationSlice[];
+  endAsOfDate: string | null;
+  uncoveredMinor: number | null;
+  portfolioCode: string;
 };
 
 type TrendMetricTabsProps = {
@@ -70,6 +78,8 @@ type TrendMetricTabsProps = {
   gainRateDeltaSeries: TrendChartSeries[];
   gainRateRelativeRateSeries: TrendChartSeries[];
   allocation?: TrendMetricTabsAllocation | null;
+  initialMetric?: TrendMetricTab;
+  onMetricChange?: (metric: TrendMetricTab) => void;
 };
 
 function resolveInitialMetric(hasAllocation: boolean): TrendMetricTab {
@@ -115,21 +125,34 @@ export function TrendMetricTabs({
   gainRateDeltaSeries,
   gainRateRelativeRateSeries,
   allocation = null,
+  initialMetric,
+  onMetricChange,
 }: TrendMetricTabsProps) {
   const hasAllocation =
     allocation !== null &&
     allocation.schemeCodes.length > 0 &&
     allocation.allocationSeries.length > 0;
 
-  const [activeMetric, setActiveMetric] = useState<TrendMetricTab>(() =>
-    resolveInitialMetric(hasAllocation),
+  const defaultMetric = resolveInitialMetric(hasAllocation);
+  const [activeMetric, setActiveMetricState] = useState<TrendMetricTab>(
+    initialMetric ?? defaultMetric,
   );
+  const activeMetricResolved = initialMetric ?? activeMetric;
+
+  const setActiveMetric = (metric: TrendMetricTab): void => {
+    let result: void = undefined;
+    setActiveMetricState(metric);
+    if (onMetricChange) {
+      onMetricChange(metric);
+    }
+    return result;
+  };
   const [activeMarketValueView, setActiveMarketValueView] =
     useState<MetricView>("level");
   const [activeGainView, setActiveGainView] = useState<MetricView>("level");
   const [activeGainRateView, setActiveGainRateView] = useState<MetricView>("level");
   const [activeAllocationView, setActiveAllocationView] =
-    useState<MetricView>("level");
+    useState<MetricView>("delta");
   const [activeGainRateKey, setActiveGainRateKey] = useState(
     gainRateSeries[0]?.key ?? "gain-rate-book",
   );
@@ -168,123 +191,119 @@ export function TrendMetricTabs({
 
   let chartPanel: ReactNode = null;
 
-  if (activeMetric === "allocation" && allocation && hasAllocation) {
+  if (activeMetricResolved === "allocation" && allocation && hasAllocation) {
     chartPanel = (
-      <div className="trend-metric-tabs__allocation-panel">
-        <div
-          className="analysis-axis-tabs trend-metric-tabs__subtabs"
-          role="tablist"
-          aria-label="構成比の分析軸"
-        >
-          {allocation.schemeCodes.map((scheme) => {
-            let schemeTab = (
-              <button
-                key={scheme.schemeCode}
-                type="button"
-                role="tab"
-                aria-selected={scheme.schemeCode === allocation.activeSchemeCode}
-                className={
-                  scheme.schemeCode === allocation.activeSchemeCode ? "is-active" : undefined
-                }
-                onClick={() => {
-                  allocation.onSchemeChange(scheme.schemeCode);
-                }}
+      <div className="trend-metric-tabs__allocation-panel space-y-4">
+        <AllocationSchemeTabs
+          variant="buttons"
+          schemes={allocation.schemeCodes}
+          activeSchemeCode={allocation.activeSchemeCode}
+          onSchemeChange={allocation.onSchemeChange}
+          renderPanel={() => (
+            <>
+              {allocation.periodChangeRows.length > 0 ? (
+                <AllocationPeriodChangeTable
+                  rows={allocation.periodChangeRows}
+                  selectedKeys={allocation.selectedCompositionKeys}
+                  startDateLabel={allocation.startDateLabel}
+                  endDateLabel={allocation.endDateLabel}
+                  onToggleRow={allocation.onCompositionToggle}
+                />
+              ) : null}
+              <div className="grid gap-4 lg:grid-cols-[minmax(0,18rem)_1fr] lg:items-start">
+                <AllocationSnapshotCompact
+                  slices={allocation.endSnapshotSlices}
+                  asOfDateLabel={allocation.endDateLabel}
+                  uncoveredMinor={allocation.uncoveredMinor}
+                />
+                <AllocationCrossLink
+                  portfolioCode={allocation.portfolioCode}
+                  target="analysis"
+                  schemeCode={allocation.activeSchemeCode}
+                  asOfDate={allocation.endAsOfDate}
+                  label="断面の詳細・銘柄内訳は資産配分で見る"
+                />
+              </div>
+              <CompositionSelectionToolbar
+                selectedCount={allocation.selectedCompositionKeys.length}
+                totalCount={allocation.ratioSeries.length}
+                onSelectAll={allocation.onSelectAllCompositions}
+                onClearSelection={allocation.onClearCompositionSelection}
+              />
+              <div
+                className="analysis-axis-tabs trend-metric-tabs__subtabs"
+                role="tablist"
+                aria-label="構成比グラフの表示"
               >
-                {scheme.schemeName}
-              </button>
-            );
-            return schemeTab;
-          })}
-        </div>
-        {allocation.activeSchemeName ? (
-          <p className="trends-detail__scheme-label">{allocation.activeSchemeName}</p>
-        ) : null}
-        <CompositionSelectionToolbar
-          selectedCount={allocation.selectedCompositionKeys.length}
-          totalCount={allocation.ratioSeries.length}
-          onSelectAll={allocation.onSelectAllCompositions}
-          onClearSelection={allocation.onClearCompositionSelection}
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeAllocationView === "level"}
+                  className={activeAllocationView === "level" ? "is-active" : undefined}
+                  onClick={() => {
+                    setActiveAllocationView("level");
+                  }}
+                >
+                  推移
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeAllocationView === "delta"}
+                  className={activeAllocationView === "delta" ? "is-active" : undefined}
+                  onClick={() => {
+                    setActiveAllocationView("delta");
+                  }}
+                >
+                  増減
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeAllocationView === "relative-rate"}
+                  className={activeAllocationView === "relative-rate" ? "is-active" : undefined}
+                  onClick={() => {
+                    setActiveAllocationView("relative-rate");
+                  }}
+                >
+                  変化率
+                </button>
+              </div>
+              {activeAllocationView === "level" ? (
+                <TrendStackedAreaChart
+                  title="構成比の推移"
+                  caption={trendDisplayUnitLabel}
+                  labels={labels}
+                  sourceDates={sourceDates}
+                  sourceDateLabels={sourceDateLabels}
+                  series={allocation.allocationSeries.map((item) => ({
+                    ...item,
+                    formatValue: (value) => formatPercent(value),
+                  }))}
+                  height={300}
+                  selectedSeriesKeys={allocation.selectedCompositionKeys}
+                  onSeriesToggle={allocation.onCompositionToggle}
+                />
+              ) : null}
+              {allocation.ratioSeries.length > 0 ? (
+                <CompositionRatioLineChart
+                  labels={labels}
+                  sourceDates={sourceDates}
+                  sourceDateLabels={sourceDateLabels}
+                  ratioSeries={allocation.ratioSeries}
+                  selectedKeys={allocation.selectedCompositionKeys}
+                  view={activeAllocationView}
+                  caption={trendDisplayUnitLabel}
+                />
+              ) : null}
+            </>
+          )}
         />
-        <div
-          className="analysis-axis-tabs trend-metric-tabs__subtabs"
-          role="tablist"
-          aria-label="構成比グラフの表示"
-        >
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeAllocationView === "level"}
-            className={activeAllocationView === "level" ? "is-active" : undefined}
-            onClick={() => {
-              setActiveAllocationView("level");
-            }}
-          >
-            推移
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeAllocationView === "delta"}
-            className={activeAllocationView === "delta" ? "is-active" : undefined}
-            onClick={() => {
-              setActiveAllocationView("delta");
-            }}
-          >
-            増減
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeAllocationView === "relative-rate"}
-            className={activeAllocationView === "relative-rate" ? "is-active" : undefined}
-            onClick={() => {
-              setActiveAllocationView("relative-rate");
-            }}
-          >
-            変化率
-          </button>
-        </div>
-        {activeAllocationView === "level" ? (
-          <TrendStackedAreaChart
-            title="構成比の推移"
-            caption={trendDisplayUnitLabel}
-            labels={labels}
-            sourceDates={sourceDates}
-            sourceDateLabels={sourceDateLabels}
-            series={allocation.allocationSeries.map((item) => ({
-              ...item,
-              formatValue: (value) => formatPercent(value),
-            }))}
-            height={300}
-            selectedSeriesKeys={allocation.selectedCompositionKeys}
-            onSeriesToggle={allocation.onCompositionToggle}
-          />
-        ) : null}
-        {allocation.periodChangeRows.length > 0 ? (
-          <AllocationPeriodChangeTable
-            rows={allocation.periodChangeRows}
-            selectedKeys={allocation.selectedCompositionKeys}
-            startDateLabel={allocation.startDateLabel}
-            endDateLabel={allocation.endDateLabel}
-            onToggleRow={allocation.onCompositionToggle}
-          />
-        ) : null}
-        {allocation.ratioSeries.length > 0 ? (
-          <CompositionRatioLineChart
-            labels={labels}
-            sourceDates={sourceDates}
-            sourceDateLabels={sourceDateLabels}
-            ratioSeries={allocation.ratioSeries}
-            selectedKeys={allocation.selectedCompositionKeys}
-            view={activeAllocationView}
-            caption={trendDisplayUnitLabel}
-          />
-        ) : null}
       </div>
     );
   }
 
-  if (activeMetric === "market-value" && activeMarketValueView === "level") {
+  if (activeMetricResolved === "market-value" && activeMarketValueView === "level") {
     chartPanel = (
       <TrendLineChart
         title="評価額"
@@ -311,7 +330,7 @@ export function TrendMetricTabs({
     );
   }
 
-  if (activeMetric === "market-value" && activeMarketValueView === "delta") {
+  if (activeMetricResolved === "market-value" && activeMarketValueView === "delta") {
     chartPanel = (
       <TrendBarChart
         title="評価額の増減"
@@ -327,7 +346,7 @@ export function TrendMetricTabs({
     );
   }
 
-  if (activeMetric === "market-value" && activeMarketValueView === "relative-rate") {
+  if (activeMetricResolved === "market-value" && activeMarketValueView === "relative-rate") {
     chartPanel = (
       <TrendBarChart
         title="評価額の変化率"
@@ -343,7 +362,7 @@ export function TrendMetricTabs({
     );
   }
 
-  if (activeMetric === "gain" && activeGainView === "level") {
+  if (activeMetricResolved === "gain" && activeGainView === "level") {
     chartPanel = (
       <TrendLineChart
         title="評価損益"
@@ -370,7 +389,7 @@ export function TrendMetricTabs({
     );
   }
 
-  if (activeMetric === "gain" && activeGainView === "delta") {
+  if (activeMetricResolved === "gain" && activeGainView === "delta") {
     chartPanel = (
       <TrendBarChart
         title="評価損益の増減"
@@ -386,7 +405,7 @@ export function TrendMetricTabs({
     );
   }
 
-  if (activeMetric === "gain" && activeGainView === "relative-rate") {
+  if (activeMetricResolved === "gain" && activeGainView === "relative-rate") {
     chartPanel = (
       <TrendBarChart
         title="評価損益の変化率"
@@ -402,7 +421,7 @@ export function TrendMetricTabs({
     );
   }
 
-  if (activeMetric === "gain-rate" && activeGainRateView === "level" && activeGainRateLevelSeries.length > 0) {
+  if (activeMetricResolved === "gain-rate" && activeGainRateView === "level" && activeGainRateLevelSeries.length > 0) {
     chartPanel = (
       <TrendLineChart
         title="利益率の推移"
@@ -418,7 +437,7 @@ export function TrendMetricTabs({
     );
   }
 
-  if (activeMetric === "gain-rate" && activeGainRateView === "delta" && activeGainRateDeltaSeries.length > 0) {
+  if (activeMetricResolved === "gain-rate" && activeGainRateView === "delta" && activeGainRateDeltaSeries.length > 0) {
     chartPanel = (
       <TrendBarChart
         title="利益率の増減"
@@ -435,7 +454,7 @@ export function TrendMetricTabs({
   }
 
   if (
-    activeMetric === "gain-rate" &&
+    activeMetricResolved === "gain-rate" &&
     activeGainRateView === "relative-rate" &&
     activeGainRateRelativeSeries.length > 0
   ) {
@@ -466,8 +485,8 @@ export function TrendMetricTabs({
               key={tab.key}
               type="button"
               role="tab"
-              aria-selected={activeMetric === tab.key}
-              className={activeMetric === tab.key ? "is-active" : undefined}
+              aria-selected={activeMetricResolved === tab.key}
+              className={activeMetricResolved === tab.key ? "is-active" : undefined}
               onClick={() => {
                 setActiveMetric(tab.key);
               }}
@@ -479,7 +498,7 @@ export function TrendMetricTabs({
         })}
       </div>
 
-      {activeMetric === "market-value" ? (
+      {activeMetricResolved === "market-value" ? (
         <div
           className="analysis-axis-tabs trend-metric-tabs__subtabs"
           role="tablist"
@@ -521,7 +540,7 @@ export function TrendMetricTabs({
         </div>
       ) : null}
 
-      {activeMetric === "gain" ? (
+      {activeMetricResolved === "gain" ? (
         <div
           className="analysis-axis-tabs trend-metric-tabs__subtabs"
           role="tablist"
@@ -563,7 +582,7 @@ export function TrendMetricTabs({
         </div>
       ) : null}
 
-      {activeMetric === "gain-rate" ? (
+      {activeMetricResolved === "gain-rate" ? (
         <div
           className="analysis-axis-tabs trend-metric-tabs__subtabs"
           role="tablist"

@@ -2,6 +2,7 @@
 
 import type { AnalysisSchemeConfig } from "@repo/shared";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +36,8 @@ type HoldingsRangeToolbarProps = {
   onPageSizeChange: (pageSize: number) => void;
   totalPages: number;
   rangeLabel: string;
+  portfolioCode?: string;
+  analysisHref?: string;
 };
 
 export function HoldingsRangeToolbar({
@@ -55,6 +58,7 @@ export function HoldingsRangeToolbar({
   onPageSizeChange,
   totalPages,
   rangeLabel,
+  analysisHref,
 }: HoldingsRangeToolbarProps) {
   const sortedDates = [...availableDates].sort((left, right) =>
     right.localeCompare(left),
@@ -129,6 +133,11 @@ export function HoldingsRangeToolbar({
               </SelectContent>
             </Select>
           </>
+        ) : null}
+        {analysisHref ? (
+          <Button variant="outline" size="sm" asChild>
+            <Link href={analysisHref}>資産配分で見る</Link>
+          </Button>
         ) : null}
       </div>
       <div className="flex flex-wrap items-center justify-between gap-2">

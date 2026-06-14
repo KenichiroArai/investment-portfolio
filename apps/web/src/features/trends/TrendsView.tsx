@@ -17,7 +17,7 @@ export function TrendsView({ portfolioCode }: TrendsViewProps) {
         title="推移"
         description={`口座: ${portfolioCode}`}
       />
-      <TrendsDetailPanel />
+      <TrendsDetailPanel portfolioCode={portfolioCode} />
     </PageContainer>
   );
   return result;

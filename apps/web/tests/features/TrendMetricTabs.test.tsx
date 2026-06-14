@@ -152,6 +152,23 @@ const baseProps = {
     onClearCompositionSelection: vi.fn(),
     startDateLabel: "2026/05/31",
     endDateLabel: "2026/06/07",
+    endSnapshotSlices: [
+      {
+        valueCode: "domestic",
+        valueName: "国内",
+        marketValueMinor: 2_100_000,
+        weight: 0.61,
+      },
+      {
+        valueCode: "foreign",
+        valueName: "海外",
+        marketValueMinor: 1_341_347,
+        weight: 0.39,
+      },
+    ],
+    endAsOfDate: "2026-06-07",
+    uncoveredMinor: 0,
+    portfolioCode: "ideco",
   },
 };
 
@@ -172,7 +189,8 @@ describe("TrendMetricTabs", () => {
       "利益率",
     ]);
     expect(metricTabs.getByRole("tab", { name: "構成比", selected: true })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "構成比の推移" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "期間内の構成変化" })).toBeInTheDocument();
+    expect(screen.getByText("期末断面サマリー")).toBeInTheDocument();
   });
 
   it("defaults to 評価額 when allocation is unavailable", () => {
@@ -234,12 +252,13 @@ describe("TrendMetricTabs", () => {
     ).toBeInTheDocument();
 
     await user.click(metricTabs.getByRole("tab", { name: "構成比" }));
-    expect(screen.getByRole("heading", { name: "構成比の推移" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "期間内の構成変化" })).toBeInTheDocument();
 
     const allocationViews = within(
       screen.getByRole("tablist", { name: "構成比グラフの表示" }),
     );
+    await user.click(allocationViews.getByRole("tab", { name: "推移" }));
+    expect(screen.getByRole("heading", { name: "構成比の推移" })).toBeInTheDocument();
     await user.click(allocationViews.getByRole("tab", { name: "増減" }));
     expect(screen.getByRole("heading", { name: "構成ごとの構成比増減" })).toBeInTheDocument();
     await user.click(allocationViews.getByRole("tab", { name: "変化率" }));
@@ -253,7 +272,7 @@ describe("TrendMetricTabs", () => {
     expect(screen.getByText("2 / 2 件を表示")).toBeInTheDocument();
 
     const periodChangeHeading = screen.getByRole("heading", { name: "期間内の構成変化" });
-    const lineChartHeading = screen.getByRole("heading", { name: "構成ごとの構成比推移" });
+    const lineChartHeading = screen.getByRole("heading", { name: "構成ごとの構成比増減" });
     expect(
       periodChangeHeading.compareDocumentPosition(lineChartHeading) &
         Node.DOCUMENT_POSITION_FOLLOWING,

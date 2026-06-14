@@ -62,6 +62,18 @@ describe("flattenHoldingsInRange", () => {
     expect(result[1]?.instrumentName).toBe("B");
   });
 
+  it("computes portfolio weight per snapshot date", () => {
+    let result = flattenHoldingsInRange([
+      makeSnapshot("2026-06-01", [
+        makeLine({ id: "l1", instrumentId: "i1", marketValueMinor: 3000 }),
+        makeLine({ id: "l2", instrumentId: "i2", marketValueMinor: 7000 }),
+      ]),
+    ]);
+
+    expect(result[0]?.portfolioWeight).toBeCloseTo(0.3);
+    expect(result[1]?.portfolioWeight).toBeCloseTo(0.7);
+  });
+
   it("extracts metric values from holding lines", () => {
     let result = flattenHoldingsInRange([
       makeSnapshot("2026-06-01", [

@@ -10,6 +10,8 @@ import type {
   PortfolioDto,
   ReplaceCurrentSnapshotInput,
   SetInstrumentClassificationsInput,
+  TargetAllocationsBySchemeDto,
+  TargetAllocationWeightDto,
   UpdateClassificationSchemeInput,
   UpdateClassificationValueInput,
   UpdateInstrumentInput,
@@ -295,6 +297,28 @@ export async function replaceCurrentSnapshot(
     {
       method: "PUT",
       body: JSON.stringify(input),
+    },
+  );
+  return result;
+}
+
+export async function fetchTargetAllocations(portfolioCode: string) {
+  let result = await requestJson<TargetAllocationsBySchemeDto>(
+    `/portfolios/${encodePortfolioCodeForPath(portfolioCode)}/target-allocations`,
+  );
+  return result;
+}
+
+export async function replaceTargetAllocations(
+  portfolioCode: string,
+  schemeCode: string,
+  weights: TargetAllocationWeightDto[],
+) {
+  let result = await requestJson<{ schemeCode: string; weights: TargetAllocationWeightDto[] }>(
+    `/portfolios/${encodePortfolioCodeForPath(portfolioCode)}/target-allocations/${encodeURIComponent(schemeCode)}`,
+    {
+      method: "PUT",
+      body: JSON.stringify({ weights }),
     },
   );
   return result;

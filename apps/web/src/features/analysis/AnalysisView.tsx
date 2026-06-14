@@ -3,16 +3,25 @@
 import Link from "next/link";
 import {
   buildAllocationBySchemeWithLines,
+  buildAllocationGapRows,
+  buildAllocationPeriodChangeRows,
+  findLargestAllocationShareChange,
+  mergeAllocationGapIntoSlices,
   resolveAnalysisSchemes,
   sumSnapshotMarketValue,
   type AnalysisSchemeConfig,
 } from "@repo/shared";
 import { Settings } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 
-import { AllocationPanel } from "@/features/analysis/AllocationPanel";
-import { AnalysisPanelSummary } from "@/features/analysis/AnalysisPanelSummary";
+import { AllocationCrossLink } from "@/features/allocation/AllocationCrossLink";
+import { AllocationPeriodShareSummary } from "@/features/allocation/AllocationPeriodShareSummary";
+import { AllocationSchemeTabs } from "@/features/allocation/AllocationSchemeTabs";
+import { AllocationSnapshotPanel } from "@/features/allocation/AllocationSnapshotPanel";
+import { useAllocationSchemeParam } from "@/features/allocation/useAllocationSchemeParam";
+import { useTargetAllocations } from "@/features/allocation/useTargetAllocations";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
+import { buildTrendChartBuckets } from "@/features/trends/trend-chart-buckets";
 import { LoadingSkeleton } from "@/components/loading-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
@@ -20,7 +29,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatAsOfDateJa, formatYen } from "@/lib/format-yen";
 import { buildPortfolioPath } from "@/lib/portfolio-path";
 
@@ -33,7 +41,6 @@ export function AnalysisView({
   portfolioCode,
   portfolioKind,
 }: AnalysisViewProps) {
-  const [selectedSchemeCode, setSelectedSchemeCode] = useState("");
   const {
     snapshot,
     loadingSnapshot,
@@ -41,7 +48,75 @@ export function AnalysisView({
     error,
     selectedAsOfDate,
     isHistoricalView,
+    displayTrendPoints,
+    baselinePoint,
+    trendDisplayUnit,
+    loadingTrends,
   } = usePortfolioTime();
+  const { allocationsByScheme } = useTargetAllocations(portfolioCode);
+
+  const schemeConfigs = snapshot
+    ? resolveAnalysisSchemes(snapshot, portfolioKind)
+    : [];
+  const schemeCodes = schemeConfigs.map((config) => config.schemeCode);
+  const { activeSchemeCode, setActiveSchemeCode } = useAllocationSchemeParam({
+    schemeCodes,
+  });
+
+  const periodShareChange = useMemo(() => {
+    let largestChange = null;
+
+    if (displayTrendPoints.length === 0 || activeSchemeCode === "") {
+      return largestChange;
+    }
+
+    const chartBuckets = buildTrendChartBuckets({
+      displayPoints: displayTrendPoints,
+      baselinePoint,
+      trendDisplayUnit,
+      formatBaselineSummary: () => null,
+    });
+
+    let periodEndpoints: {
+      start: (typeof displayTrendPoints)[number];
+      end: (typeof displayTrendPoints)[number];
+    } | null = null;
+
+    if (displayTrendPoints.length === 1 && baselinePoint) {
+      periodEndpoints = {
+        start: baselinePoint,
+        end: displayTrendPoints[0],
+      };
+    } else if (displayTrendPoints.length > 1) {
+      periodEndpoints = {
+        start: displayTrendPoints[0],
+        end: displayTrendPoints[displayTrendPoints.length - 1],
+      };
+    }
+
+    if (!periodEndpoints) {
+      return largestChange;
+    }
+
+    const periodChangeRows = buildAllocationPeriodChangeRows(
+      periodEndpoints.start,
+      periodEndpoints.end,
+      chartBuckets.chartPoints,
+      activeSchemeCode,
+    );
+
+    largestChange = findLargestAllocationShareChange(
+      periodChangeRows.map((row) => ({
+        key: row.key,
+        label: row.label,
+        startRatio: row.startRatio,
+        endRatio: row.endRatio,
+        deltaRatio: row.deltaRatio,
+      })),
+    );
+
+    return largestChange;
+  }, [activeSchemeCode, baselinePoint, displayTrendPoints, trendDisplayUnit]);
 
   let result: ReactNode = null;
 
@@ -78,20 +153,6 @@ export function AnalysisView({
     return result;
   }
 
-  const schemeConfigs = resolveAnalysisSchemes(snapshot, portfolioKind);
-  const activeSchemeCode = (() => {
-    let activeResult = schemeConfigs[0]?.schemeCode ?? "";
-
-    const selected = schemeConfigs.find(
-      (config) => config.schemeCode === selectedSchemeCode,
-    );
-    if (selected) {
-      activeResult = selected.schemeCode;
-    }
-
-    return activeResult;
-  })();
-
   if (schemeConfigs.length === 0) {
     result = (
       <PageContainer>
@@ -104,14 +165,7 @@ export function AnalysisView({
     return result;
   }
 
-  const activeScheme = schemeConfigs.find(
-    (config) => config.schemeCode === activeSchemeCode,
-  ) as AnalysisSchemeConfig;
-  const allocation = buildAllocationBySchemeWithLines(
-    snapshot.lines,
-    activeScheme.schemeCode,
-    activeScheme.schemeName,
-  );
+  const asOfDate = selectedAsOfDate ?? snapshot.asOfDate;
   const totalValue = sumSnapshotMarketValue(snapshot.lines);
 
   result = (
@@ -121,9 +175,7 @@ export function AnalysisView({
         description={`${snapshot.portfolioName}（${snapshot.portfolioCode}）`}
         actions={
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="outline">
-              {formatAsOfDateJa(selectedAsOfDate ?? snapshot.asOfDate)}
-            </Badge>
+            <Badge variant="outline">{formatAsOfDateJa(asOfDate)}</Badge>
             {isHistoricalView ? <Badge variant="secondary">履歴</Badge> : null}
             <Button variant="outline" size="sm" asChild>
               <Link href={buildPortfolioPath(portfolioCode, "settings", "classification")}>
@@ -134,54 +186,62 @@ export function AnalysisView({
           </div>
         }
       />
-      <p className="-mt-4 mb-4 text-sm font-medium">
-        評価額合計: {formatYen(totalValue)}
-      </p>
+      <div className="mb-4 space-y-3">
+        <p className="text-sm font-medium">評価額合計: {formatYen(totalValue)}</p>
+        <AllocationPeriodShareSummary
+          largestShareChange={periodShareChange}
+          loading={loadingTrends}
+        />
+        <AllocationCrossLink
+          portfolioCode={portfolioCode}
+          target="trends"
+          schemeCode={activeSchemeCode}
+          metric="allocation"
+          label="この軸の推移を見る"
+        />
+      </div>
 
-      <Tabs
-        value={activeSchemeCode}
-        onValueChange={setSelectedSchemeCode}
-        className="space-y-4"
-      >
-        <TabsList className="flex h-auto flex-wrap">
-          {schemeConfigs.map((config) => {
-            let tab = (
-              <TabsTrigger key={config.schemeCode} value={config.schemeCode}>
-                {config.schemeName}
-              </TabsTrigger>
-            );
-            return tab;
-          })}
-        </TabsList>
-        {schemeConfigs.map((config) => {
-          const schemeAllocation =
-            config.schemeCode === activeSchemeCode
-              ? allocation
-              : buildAllocationBySchemeWithLines(
-                  snapshot.lines,
-                  config.schemeCode,
-                  config.schemeName,
-                );
-
-          let content = (
-            <TabsContent key={config.schemeCode} value={config.schemeCode}>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">{config.schemeName}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <AnalysisPanelSummary
-                    axisTotalMinor={schemeAllocation.totalMarketValueMinor}
-                    assetTotalMinor={totalValue}
-                  />
-                  <AllocationPanel slices={schemeAllocation.slices} />
-                </CardContent>
-              </Card>
-            </TabsContent>
+      <AllocationSchemeTabs
+        schemes={schemeConfigs}
+        activeSchemeCode={activeSchemeCode}
+        onSchemeChange={setActiveSchemeCode}
+        renderPanel={(scheme: AnalysisSchemeConfig) => {
+          const schemeAllocation = buildAllocationBySchemeWithLines(
+            snapshot.lines,
+            scheme.schemeCode,
+            scheme.schemeName,
           );
-          return content;
-        })}
-      </Tabs>
+          const targets = allocationsByScheme[scheme.schemeCode] ?? [];
+          const gapRows = buildAllocationGapRows(
+            schemeAllocation.slices,
+            targets,
+            totalValue,
+          );
+          const slicesWithGap = mergeAllocationGapIntoSlices(
+            schemeAllocation.slices,
+            gapRows,
+          );
+
+          let panel = (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">{scheme.schemeName}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <AllocationSnapshotPanel
+                  slices={slicesWithGap}
+                  axisTotalMinor={schemeAllocation.totalMarketValueMinor}
+                  assetTotalMinor={totalValue}
+                  portfolioCode={portfolioCode}
+                  schemeCode={scheme.schemeCode}
+                  asOfDate={asOfDate}
+                />
+              </CardContent>
+            </Card>
+          );
+          return panel;
+        }}
+      />
     </PageContainer>
   );
   return result;

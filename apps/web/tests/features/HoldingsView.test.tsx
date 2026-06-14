@@ -364,7 +364,7 @@ describe("HoldingsView", () => {
     );
     renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
       pathname: "/portfolios/ideco/holdings",
-      initialSearchParams: "period=all&asOf=2026-06-07",
+      initialSearchParams: "period=all&from=2026-06-01&to=2026-06-07&asOf=2026-06-07",
     });
     await waitFor(() => {
       expect(screen.getAllByText("国内株式").length).toBe(2);

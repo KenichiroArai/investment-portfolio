@@ -50,6 +50,13 @@ export type InstrumentClassificationsDto = {
   classificationValueIds: string[];
 };
 
+export type TargetAllocationWeightDto = {
+  valueCode: string;
+  targetRatio: number;
+};
+
+export type TargetAllocationsBySchemeDto = Record<string, TargetAllocationWeightDto[]>;
+
 export type HoldingLineDto = {
   id: string;
   instrumentId: string;

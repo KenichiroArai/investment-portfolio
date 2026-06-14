@@ -142,6 +142,13 @@ export function HoldingsRangeDetailTable({
               onSort={toggleSort}
             />
             <SortableTableHeader
+              label="構成比"
+              column="portfolioWeight"
+              activeColumn={sortColumn}
+              direction={sortDirection}
+              onSort={toggleSort}
+            />
+            <SortableTableHeader
               label="購入金額"
               column="bookValue"
               activeColumn={sortColumn}
@@ -188,7 +195,7 @@ export function HoldingsRangeDetailTable({
           {displayRows.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={8 + classificationSchemes.length}
+                colSpan={9 + classificationSchemes.length}
                 className="py-8 text-center text-sm text-muted-foreground"
               >
                 条件に一致する明細がありません。
@@ -208,6 +215,7 @@ export function HoldingsRangeDetailTable({
                   <TableCell>{row.quantity.toLocaleString("ja-JP")}</TableCell>
                   <TableCell>{formatUnitPrice(row.unitPrice)}</TableCell>
                   <TableCell>{formatYen(row.marketValueMinor)}</TableCell>
+                  <TableCell>{formatNullableRate(row.portfolioWeight)}</TableCell>
                   <TableCell>{formatNullableYen(row.bookValueMinor)}</TableCell>
                   <TableCell className={getToneClass(row.unrealizedGainMinor)}>
                     {formatNullableYen(row.unrealizedGainMinor)}

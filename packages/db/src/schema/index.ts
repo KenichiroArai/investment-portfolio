@@ -240,11 +240,40 @@ export const holdingLineMetrics = sqliteTable(
   },
 );
 
+/** 目標配分 — 口座×分類体系×分類値ごとの目標構成比。詳細は packages/db/README.md */
+export const targetAllocationWeights = sqliteTable(
+  "target_allocation_weights",
+  {
+    id: text("id").primaryKey(), // ID
+    portfolioId: text("portfolio_id")
+      .notNull()
+      .references(() => {
+        let result = portfolios.id;
+        return result;
+      }, { onDelete: "cascade" }), // 口座ID
+    schemeCode: text("scheme_code").notNull(), // 分類体系コード
+    valueCode: text("value_code").notNull(), // 分類値コード
+    targetRatio: real("target_ratio").notNull(), // 目標構成比（0–1）
+    updatedAt: text("updated_at").notNull(), // 更新日時
+  },
+  (table) => {
+    let result = [
+      unique("target_allocation_weights_unique").on(
+        table.portfolioId,
+        table.schemeCode,
+        table.valueCode,
+      ),
+    ];
+    return result;
+  },
+);
+
 /** 口座リレーション */
 export const portfoliosRelations = relations(portfolios, ({ many }) => {
   let result = {
     classificationSchemes: many(classificationSchemes),
     snapshots: many(portfolioSnapshots),
+    targetAllocationWeights: many(targetAllocationWeights),
   };
   return result;
 });

@@ -116,3 +116,19 @@ export const snapshotTrendsQuerySchema = z.object({
 });
 
 export type SnapshotTrendsQueryInput = z.infer<typeof snapshotTrendsQuerySchema>;
+
+export const targetAllocationWeightInputSchema = z.object({
+  valueCode: z.string().min(1).max(64),
+  targetRatio: z.number().min(0).max(1),
+});
+
+export const replaceTargetAllocationWeightsSchema = z.object({
+  weights: z.array(targetAllocationWeightInputSchema),
+});
+
+export type TargetAllocationWeightInput = z.infer<
+  typeof targetAllocationWeightInputSchema
+>;
+export type ReplaceTargetAllocationWeightsInput = z.infer<
+  typeof replaceTargetAllocationWeightsSchema
+>;

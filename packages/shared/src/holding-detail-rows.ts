@@ -21,6 +21,7 @@ export type HoldingDetailRow = {
   unrealizedGainMinor: number | null;
   unrealizedGainRate: number | null;
   tags: ClassificationTagDto[];
+  portfolioWeight: number | null;
 };
 
 export type HoldingDetailFilter = {
@@ -40,6 +41,7 @@ export type HoldingDetailSortColumn =
   | "bookValue"
   | "unrealizedGain"
   | "unrealizedGainRate"
+  | "portfolioWeight"
   | `classification:${string}`;
 
 export type PaginatedRowsResult<T> = {
@@ -85,14 +87,22 @@ export function flattenHoldingsInRange(
   );
 
   for (const snapshot of sortedSnapshots) {
+    let totalMarketValue = 0;
+    for (const line of snapshot.lines) {
+      totalMarketValue += line.marketValueMinor;
+    }
+
     for (const line of snapshot.lines) {
       const values = extractHoldingDetailValues(line);
+      const portfolioWeight =
+        totalMarketValue > 0 ? line.marketValueMinor / totalMarketValue : null;
       let row: HoldingDetailRow = {
         asOfDate: snapshot.asOfDate,
         instrumentId: line.instrumentId,
         instrumentName: line.instrumentName,
         sortOrder: line.sortOrder,
         tags: line.tags,
+        portfolioWeight,
         ...values,
       };
       result.push(row);
@@ -132,8 +142,13 @@ function matchesClassification(
     return result;
   }
 
-  const tagValue = findClassificationTagValue(row.tags, schemeCode) ?? "";
-  result = tagValue === value;
+  const tag = row.tags.find((item) => item.schemeCode === schemeCode);
+  if (!tag) {
+    result = false;
+    return result;
+  }
+
+  result = tag.valueName === value || tag.valueCode === value;
   return result;
 }
 
@@ -208,6 +223,8 @@ export function compareHoldingDetailRows(
       right.unrealizedGainRate,
       direction,
     );
+  } else if (column === "portfolioWeight") {
+    result = compareNullableNumbers(left.portfolioWeight, right.portfolioWeight, direction);
   } else if (column.startsWith("classification:")) {
     const schemeCode = column.slice("classification:".length);
     const leftValue = findClassificationTagValue(left.tags, schemeCode) ?? "";

@@ -13,6 +13,8 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import { buildAllocationChartSeries } from "@/features/trends/build-allocation-chart-series";
 import { TrendMetricTabs } from "@/features/trends/TrendMetricTabs";
+import { useAllocationMetricParam } from "@/features/allocation/useAllocationMetricParam";
+import { useAllocationSchemeParam } from "@/features/allocation/useAllocationSchemeParam";
 import { TrendPeriodSummary } from "@/features/trends/TrendPeriodSummary";
 import {
   buildTrendChartBuckets,
@@ -77,7 +79,11 @@ function toggleCompositionKey(keys: string[], key: string): string[] {
   return result;
 }
 
-export function TrendsDetailPanel() {
+type TrendsDetailPanelProps = {
+  portfolioCode: string;
+};
+
+export function TrendsDetailPanel({ portfolioCode }: TrendsDetailPanelProps) {
   const {
     displayTrendPoints,
     baselinePoint,
@@ -87,21 +93,27 @@ export function TrendsDetailPanel() {
     snapshot,
     trends,
   } = usePortfolioTime();
-  const [selectedSchemeCode, setSelectedSchemeCode] = useState("");
+
+  const schemeCodesList = snapshot?.analysisSchemes ?? [];
+  const schemeCodeValues = schemeCodesList.map((scheme) => scheme.schemeCode);
+  const { activeSchemeCode, setActiveSchemeCode } = useAllocationSchemeParam({
+    schemeCodes: schemeCodeValues,
+  });
+  const hasAllocationSchemes = schemeCodesList.length > 0;
+  const { activeMetric, setActiveMetric } = useAllocationMetricParam({
+    defaultMetric: hasAllocationSchemes ? "allocation" : "market-value",
+  });
   const [selectedCompositionKeys, setSelectedCompositionKeys] = useState<string[]>([]);
   const compositionInitializedRef = useRef(false);
   const activeSchemeCodeRef = useRef("");
 
-  const schemeCodes = snapshot?.analysisSchemes ?? [];
-  const activeSchemeCode =
-    selectedSchemeCode !== ""
-      ? selectedSchemeCode
-      : (schemeCodes[0]?.schemeCode ?? "");
+  const activeSchemeCodeForHooks =
+    activeSchemeCode !== "" ? activeSchemeCode : (schemeCodesList[0]?.schemeCode ?? "");
 
   const ratioSeriesForHooks = useMemo(() => {
     let result: AllocationSeriesInput[] = [];
 
-    if (displayTrendPoints.length === 0 || activeSchemeCode === "") {
+    if (displayTrendPoints.length === 0 || activeSchemeCodeForHooks === "") {
       return result;
     }
 
@@ -112,9 +124,9 @@ export function TrendsDetailPanel() {
       formatBaselineSummary: () => null,
     });
 
-    result = buildAllocationRatioSeries(chartBuckets.chartPoints, activeSchemeCode);
+    result = buildAllocationRatioSeries(chartBuckets.chartPoints, activeSchemeCodeForHooks);
     return result;
-  }, [activeSchemeCode, baselinePoint, displayTrendPoints, trendDisplayUnit]);
+  }, [activeSchemeCodeForHooks, baselinePoint, displayTrendPoints, trendDisplayUnit]);
 
   const allCompositionKeys = useMemo(() => {
     let keys = resolveAllCompositionKeys(ratioSeriesForHooks);
@@ -128,9 +140,9 @@ export function TrendsDetailPanel() {
       return result;
     }
 
-    const schemeChanged = activeSchemeCodeRef.current !== activeSchemeCode;
+    const schemeChanged = activeSchemeCodeRef.current !== activeSchemeCodeForHooks;
     if (schemeChanged) {
-      activeSchemeCodeRef.current = activeSchemeCode;
+      activeSchemeCodeRef.current = activeSchemeCodeForHooks;
       compositionInitializedRef.current = true;
       setSelectedCompositionKeys(allCompositionKeys);
       return result;
@@ -142,7 +154,7 @@ export function TrendsDetailPanel() {
     }
 
     return result;
-  }, [activeSchemeCode, allCompositionKeys]);
+  }, [activeSchemeCodeForHooks, allCompositionKeys]);
 
   const handleCompositionToggle = (key: string): void => {
     setSelectedCompositionKeys((current) => toggleCompositionKey(current, key));
@@ -207,31 +219,48 @@ export function TrendsDetailPanel() {
     return note;
   })();
 
-  const activeScheme = schemeCodes.find(
-    (scheme) => scheme.schemeCode === activeSchemeCode,
+  const activeScheme = schemeCodesList.find(
+    (scheme) => scheme.schemeCode === activeSchemeCodeForHooks,
   );
 
   const periodEndpoints = resolvePeriodEndpoints(displayTrendPoints, baselinePoint);
 
   const allocationSeries =
-    activeSchemeCode !== ""
-      ? buildAllocationChartSeries(chartPoints, activeSchemeCode)
+    activeSchemeCodeForHooks !== ""
+      ? buildAllocationChartSeries(chartPoints, activeSchemeCodeForHooks)
       : [];
 
   const ratioSeries =
-    activeSchemeCode !== ""
-      ? buildAllocationRatioSeries(chartPoints, activeSchemeCode)
+    activeSchemeCodeForHooks !== ""
+      ? buildAllocationRatioSeries(chartPoints, activeSchemeCodeForHooks)
       : [];
 
   const periodChangeRows =
-    periodEndpoints && activeSchemeCode !== ""
+    periodEndpoints && activeSchemeCodeForHooks !== ""
       ? buildAllocationPeriodChangeRows(
           periodEndpoints.start,
           periodEndpoints.end,
           chartPoints,
-          activeSchemeCode,
+          activeSchemeCodeForHooks,
         )
       : [];
+
+  const endTrendSlices =
+    periodEndpoints?.end.allocationsByScheme[activeSchemeCodeForHooks] ?? [];
+  const endSnapshotSlices = endTrendSlices.map((slice) => ({
+    valueCode: slice.valueCode,
+    valueName: slice.valueName,
+    marketValueMinor: slice.marketValueMinor,
+    weight: slice.ratio,
+  }));
+  const axisTotalMinor = endTrendSlices.reduce(
+    (sum, slice) => sum + slice.marketValueMinor,
+    0,
+  );
+  const endAssetTotalMinor = periodEndpoints?.end.totalMarketValueMinor ?? 0;
+  const uncoveredMinor =
+    endAssetTotalMinor > axisTotalMinor ? endAssetTotalMinor - axisTotalMinor : 0;
+  const endAsOfDate = periodEndpoints?.end.sourceAsOfDate ?? null;
 
   const largestShareChange = findLargestAllocationShareChange(
     periodChangeRows.map((row) => ({
@@ -512,14 +541,14 @@ export function TrendsDetailPanel() {
         gainRateSeries={gainRateSeries}
         gainRateDeltaSeries={gainRateDeltaSeries}
         gainRateRelativeRateSeries={gainRateRelativeRateSeries}
+        initialMetric={activeMetric}
+        onMetricChange={setActiveMetric}
         allocation={
-          schemeCodes.length > 0 && allocationSeries.length > 0
+          schemeCodesList.length > 0 && allocationSeries.length > 0
             ? {
-                schemeCodes,
-                activeSchemeCode,
-                onSchemeChange: (schemeCode) => {
-                  setSelectedSchemeCode(schemeCode);
-                },
+                schemeCodes: schemeCodesList,
+                activeSchemeCode: activeSchemeCodeForHooks,
+                onSchemeChange: setActiveSchemeCode,
                 activeSchemeName: activeScheme?.schemeName ?? null,
                 allocationSeries,
                 ratioSeries,
@@ -530,6 +559,10 @@ export function TrendsDetailPanel() {
                 onClearCompositionSelection: handleClearCompositionSelection,
                 startDateLabel,
                 endDateLabel,
+                endSnapshotSlices,
+                endAsOfDate,
+                uncoveredMinor,
+                portfolioCode,
               }
             : null
         }

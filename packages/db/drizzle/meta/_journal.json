@@ -36,6 +36,13 @@
       "when": 1781000000000,
       "tag": "0004_portfolio_snapshots_date_unique",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1781100000000,
+      "tag": "0005_target_allocation_weights",
+      "breakpoints": true
     }
   ]
 }

@@ -4,23 +4,32 @@ import type { AllocationSliceWithLines } from "@repo/shared";
 import { useState } from "react";
 
 import { AllocationChart } from "@/features/analysis/AllocationChart";
-import { AllocationTable } from "@/features/analysis/AllocationTable";
+import {
+  AllocationTable,
+  type AllocationSliceTableRow,
+} from "@/features/analysis/AllocationTable";
 import { formatPercent, formatYen } from "@/lib/format-yen";
 
 type AllocationTooltipState = {
   x: number;
   y: number;
-  slice: AllocationSliceWithLines;
+  slice: AllocationSliceTableRow;
 };
 
 type AllocationPanelProps = {
-  slices: AllocationSliceWithLines[];
+  slices: AllocationSliceTableRow[];
   showPortfolioColumn?: boolean;
+  portfolioCode?: string;
+  schemeCode?: string;
+  asOfDate?: string | null;
 };
 
 export function AllocationPanel({
   slices,
   showPortfolioColumn = false,
+  portfolioCode,
+  schemeCode,
+  asOfDate,
 }: AllocationPanelProps) {
   const [highlightedValueCode, setHighlightedValueCode] = useState<string | null>(
     null,
@@ -109,6 +118,9 @@ export function AllocationPanel({
         highlightedValueCode={highlightedValueCode}
         expandedValueCodes={expandedValueCodes}
         showPortfolioColumn={showPortfolioColumn}
+        portfolioCode={portfolioCode}
+        schemeCode={schemeCode}
+        asOfDate={asOfDate}
         onSliceHover={(valueCode) => {
           handleHighlight(valueCode);
         }}

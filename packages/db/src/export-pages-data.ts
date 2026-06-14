@@ -12,6 +12,7 @@ import {
   getSnapshotByDate,
   listSnapshotDates,
 } from "./repositories/snapshots";
+import { listAllTargetAllocationsForPortfolio } from "./repositories/target-allocations";
 
 const packageDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(packageDir, "../../..");
@@ -153,6 +154,17 @@ export function findPortfolioByCode(code: string): PortfolioDto | null {
       );
       console.log(`Exported: ${resolve(outDir, "trends-summary.json")}`);
     }
+
+    const targetAllocations = await listAllTargetAllocationsForPortfolio(
+      db,
+      portfolio.code,
+    );
+    writeFileSync(
+      resolve(outDir, "target-allocations.json"),
+      `${JSON.stringify(targetAllocations, null, 2)}\n`,
+      "utf8",
+    );
+    console.log(`Exported: ${resolve(outDir, "target-allocations.json")}`);
   }
 
   sqlite.close();

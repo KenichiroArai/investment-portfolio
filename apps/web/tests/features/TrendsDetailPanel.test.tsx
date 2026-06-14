@@ -61,25 +61,21 @@ describe("TrendsDetailPanel", () => {
 
   it("renders allocation hero charts and period summary", async () => {
     stubTrendsFetch();
-    renderWithPortfolioTime(<TrendsDetailPanel />, {
+    renderWithPortfolioTime(<TrendsDetailPanel portfolioCode="ideco" />, {
       initialSearchParams: "from=2026-05-01&to=2026-07-31&unit=1m",
     });
 
     await waitFor(() => {
       expect(screen.getByText("期首（2026/05/31）")).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: "構成比の推移" })).toBeInTheDocument();
       expect(screen.getByRole("heading", { name: "期間内の構成変化" })).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: "構成ごとの構成比推移" })).toBeInTheDocument();
+      expect(screen.getByText("期末断面サマリー")).toBeInTheDocument();
       expect(screen.getByRole("tab", { name: "構成比", selected: true })).toBeInTheDocument();
-      expect(screen.getByLabelText("構成比積み上げエリアグラフ")).toBeInTheDocument();
-      expect(screen.getAllByText("1か月単位").length).toBeGreaterThan(0);
-      expect(screen.getAllByText("2026/5/1～6/1").length).toBeGreaterThan(0);
     });
   });
 
   it("renders daily labels when a calendar month is selected", async () => {
     stubTrendsFetch([trendsPointsFixture[1]]);
-    renderWithPortfolioTime(<TrendsDetailPanel />, {
+    renderWithPortfolioTime(<TrendsDetailPanel portfolioCode="ideco" />, {
       initialSearchParams: "month=2026-06&unit=day",
     });
 
@@ -92,7 +88,7 @@ describe("TrendsDetailPanel", () => {
   it("selects all compositions by default and toggles from table row click", async () => {
     const user = userEvent.setup();
     stubTrendsFetch();
-    renderWithPortfolioTime(<TrendsDetailPanel />, {
+    renderWithPortfolioTime(<TrendsDetailPanel portfolioCode="ideco" />, {
       initialSearchParams: "from=2026-05-01&to=2026-07-31&unit=1m",
     });
 
@@ -112,7 +108,7 @@ describe("TrendsDetailPanel", () => {
   it("supports bulk select and clear from toolbar", async () => {
     const user = userEvent.setup();
     stubTrendsFetch();
-    renderWithPortfolioTime(<TrendsDetailPanel />, {
+    renderWithPortfolioTime(<TrendsDetailPanel portfolioCode="ideco" />, {
       initialSearchParams: "from=2026-05-01&to=2026-07-31&unit=1m",
     });
 
@@ -134,14 +130,25 @@ describe("TrendsDetailPanel", () => {
 
     await waitFor(() => {
       expect(screen.getByText("2 / 2 件を表示")).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: "構成ごとの構成比推移" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "構成ごとの構成比増減" })).toBeInTheDocument();
     });
   });
 
   it("switches allocation scheme tabs and shows chart tooltip on hover", async () => {
     const user = userEvent.setup();
     stubTrendsFetch();
-    const { container } = renderWithPortfolioTime(<TrendsDetailPanel />);
+    const { container } = renderWithPortfolioTime(
+      <TrendsDetailPanel portfolioCode="ideco" />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "期間内の構成変化" })).toBeInTheDocument();
+    });
+
+    const allocationViews = within(
+      screen.getByRole("tablist", { name: "構成比グラフの表示" }),
+    );
+    await user.click(allocationViews.getByRole("tab", { name: "推移" }));
 
     await waitFor(() => {
       expect(screen.getByRole("heading", { name: "構成比の推移" })).toBeInTheDocument();
@@ -168,7 +175,7 @@ describe("TrendsDetailPanel", () => {
         dates: [{ asOfDate: "2026-06-07", isCurrent: true }],
       }),
     );
-    renderWithPortfolioTime(<TrendsDetailPanel />);
+    renderWithPortfolioTime(<TrendsDetailPanel portfolioCode="ideco" />);
 
     await waitFor(() => {
       expect(
@@ -200,7 +207,7 @@ describe("TrendsDetailPanel", () => {
       }),
     );
 
-    renderWithPortfolioTime(<TrendsDetailPanel />, {
+    renderWithPortfolioTime(<TrendsDetailPanel portfolioCode="ideco" />, {
       initialSearchParams: "unit=1m",
     });
 
@@ -219,7 +226,7 @@ describe("TrendsDetailPanel", () => {
       },
       trendsPointsFixture[1],
     ]);
-    renderWithPortfolioTime(<TrendsDetailPanel />, {
+    renderWithPortfolioTime(<TrendsDetailPanel portfolioCode="ideco" />, {
       initialSearchParams: "from=2026-03-11&to=2026-06-11&unit=3m",
     });
 
@@ -233,7 +240,7 @@ describe("TrendsDetailPanel", () => {
 
   it("shows baseline summary for a single in-range snapshot", async () => {
     stubTrendsFetch([trendsPointsFixture[0], trendsPointsFixture[1]]);
-    renderWithPortfolioTime(<TrendsDetailPanel />, {
+    renderWithPortfolioTime(<TrendsDetailPanel portfolioCode="ideco" />, {
       initialSearchParams: "month=2026-06&unit=day",
     });
 
@@ -250,7 +257,7 @@ describe("TrendsDetailPanel", () => {
   it("switches metric tabs and sub-tabs", async () => {
     const user = userEvent.setup();
     stubTrendsFetch();
-    renderWithPortfolioTime(<TrendsDetailPanel />, {
+    renderWithPortfolioTime(<TrendsDetailPanel portfolioCode="ideco" />, {
       initialSearchParams: "from=2026-05-01&to=2026-07-31&unit=1m",
     });
 

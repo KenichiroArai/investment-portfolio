@@ -108,6 +108,20 @@ export function getSnapshotTrendsFetchUrl(
   return result;
 }
 
+export function getTargetAllocationsFetchUrl(portfolioCode: string): string {
+  let result = "";
+  const encodedCode = encodePortfolioCodeForPath(portfolioCode);
+
+  const source = getDataSource();
+  if (source === "static") {
+    result = `${getStaticDataPrefix()}/data/portfolios/${encodedCode}/target-allocations.json`;
+    return result;
+  }
+
+  result = `${getApiBaseUrl()}/portfolios/${encodedCode}/target-allocations`;
+  return result;
+}
+
 export function getPortfoliosFetchUrl(): string {
   let result = "";
 

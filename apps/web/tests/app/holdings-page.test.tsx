@@ -40,7 +40,7 @@ describe("HoldingsPage", () => {
     renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />);
 
     await waitFor(() => {
-      expect(screen.getByText(/保有銘柄がありません/)).toBeInTheDocument();
+      expect(screen.getByText(/期間内の明細がありません/)).toBeInTheDocument();
     });
   });
 });

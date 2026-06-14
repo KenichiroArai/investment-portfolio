@@ -68,6 +68,21 @@ export function findClassificationTagValue(
   return result;
 }
 
+export function findClassificationTagValueCode(
+  tags: ClassificationTagDto[],
+  schemeCode: string,
+): string | null {
+  let result: string | null = null;
+
+  const tag = tags.find((item) => item.schemeCode === schemeCode);
+  if (!tag) {
+    return result;
+  }
+
+  result = tag.valueCode;
+  return result;
+}
+
 function compareHoldingsLinesBySortOrder(
   left: HoldingLineDto,
   right: HoldingLineDto,

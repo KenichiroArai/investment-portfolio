@@ -37,6 +37,7 @@ import {
 } from "@/lib/data-source";
 import { useTableSort } from "@/hooks/useTableSort";
 import { formatAsOfDateJa } from "@/lib/format-yen";
+import { buildPortfolioPath } from "@/lib/portfolio-path";
 
 type HoldingsViewProps = {
   portfolioCode: string;
@@ -98,9 +99,34 @@ export function HoldingsView({ portfolioCode }: HoldingsViewProps) {
   );
 
   const [query, setQuery] = useState("");
-  const [asOfDateFilter, setAsOfDateFilter] = useState("__all__");
-  const [classificationSchemeCode, setClassificationSchemeCode] = useState("");
-  const [classificationValue, setClassificationValue] = useState("__all__");
+  const [asOfDateFilter, setAsOfDateFilter] = useState(() => {
+    let result = "__all__";
+    const asOf = searchParams.get("asOf");
+    const hasClassificationDeepLink =
+      searchParams.get("scheme") !== null || searchParams.get("value") !== null;
+
+    if (asOf && hasClassificationDeepLink) {
+      result = asOf;
+    }
+
+    return result;
+  });
+  const [classificationSchemeCode, setClassificationSchemeCode] = useState(() => {
+    let result = "";
+    const scheme = searchParams.get("scheme");
+    if (scheme) {
+      result = scheme;
+    }
+    return result;
+  });
+  const [classificationValue, setClassificationValue] = useState(() => {
+    let result = "__all__";
+    const value = searchParams.get("value");
+    if (value) {
+      result = value;
+    }
+    return result;
+  });
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(HOLDINGS_RANGE_DEFAULT_PAGE_SIZE);
   const { sortColumn, sortDirection, toggleSort } =
@@ -523,6 +549,12 @@ export function HoldingsView({ portfolioCode }: HoldingsViewProps) {
                     }}
                     totalPages={paginatedDetailRows.totalPages}
                     rangeLabel={paginatedDetailRows.rangeLabel}
+                    portfolioCode={portfolioCode}
+                    analysisHref={
+                      classificationSchemeCode !== ""
+                        ? `${buildPortfolioPath(portfolioCode, "analysis")}?scheme=${encodeURIComponent(classificationSchemeCode)}`
+                        : buildPortfolioPath(portfolioCode, "analysis")
+                    }
                   />
                   <HoldingsRangeDetailTable
                     rows={paginatedDetailRows.pageRows}
