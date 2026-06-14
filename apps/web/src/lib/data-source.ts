@@ -122,6 +122,20 @@ export function getTargetAllocationsFetchUrl(portfolioCode: string): string {
   return result;
 }
 
+export function getTargetPortfolioWeightsFetchUrl(portfolioCode: string): string {
+  let result = "";
+  const encodedCode = encodePortfolioCodeForPath(portfolioCode);
+
+  const source = getDataSource();
+  if (source === "static") {
+    result = `${getStaticDataPrefix()}/data/portfolios/${encodedCode}/target-portfolio-weights.json`;
+    return result;
+  }
+
+  result = `${getApiBaseUrl()}/portfolios/${encodedCode}/target-portfolio-weights`;
+  return result;
+}
+
 export function getPortfoliosFetchUrl(): string {
   let result = "";
 

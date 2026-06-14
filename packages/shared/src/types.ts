@@ -57,6 +57,11 @@ export type TargetAllocationWeightDto = {
 
 export type TargetAllocationsBySchemeDto = Record<string, TargetAllocationWeightDto[]>;
 
+export type TargetPortfolioWeightDto = {
+  instrumentId: string;
+  targetRatio: number;
+};
+
 export type HoldingLineDto = {
   id: string;
   instrumentId: string;

@@ -35,7 +35,9 @@ type ContextTab = {
 const CONTEXT_TABS: ContextTab[] = [
   { segment: "", label: "概要", enabled: true },
   { segment: "holdings", label: "明細", enabled: true },
+  { segment: "portfolio-allocation", label: "ポートフォリオ配分", enabled: true },
   { segment: "analysis", label: "資産配分", enabled: true },
+  { segment: "rebalance", label: "リバランス", enabled: true },
   { segment: "trends", label: "推移", enabled: true },
 ];
 
@@ -59,6 +61,16 @@ function isTabActive(pathname: string, portfolioCode: string, segment: string): 
 
   if (segment === "analysis") {
     result = pathname.startsWith(`${base}/analysis`);
+    return result;
+  }
+
+  if (segment === "portfolio-allocation") {
+    result = pathname.startsWith(`${base}/portfolio-allocation`);
+    return result;
+  }
+
+  if (segment === "rebalance") {
+    result = pathname.startsWith(`${base}/rebalance`);
     return result;
   }
 

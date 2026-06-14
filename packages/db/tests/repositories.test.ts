@@ -54,6 +54,10 @@ import {
   listTargetAllocationWeights,
   replaceTargetAllocationWeights,
 } from "../src/repositories/target-allocations";
+import {
+  listTargetPortfolioWeights,
+  replaceTargetPortfolioWeights,
+} from "../src/repositories/target-portfolio-weights";
 import { createTestDb } from "../src/test-utils";
 
 describe("portfolio repositories", () => {
@@ -681,6 +685,32 @@ describe("portfolio repositories", () => {
     const cleared = await replaceTargetAllocationWeights(db, "ideco", "region", []);
     expect(cleared).toEqual([]);
     expect(await listTargetAllocationWeights(db, "ideco", "region")).toEqual([]);
+  });
+
+  it("lists and replaces target portfolio weights", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+    const instrument = await createInstrument(db, { name: "Alpha Fund" });
+
+    expect(await listTargetPortfolioWeights(db, "missing")).toEqual([]);
+    expect(await replaceTargetPortfolioWeights(db, "missing", [])).toBeNull();
+    expect(await listTargetPortfolioWeights(db, "ideco")).toEqual([]);
+
+    const replaced = await replaceTargetPortfolioWeights(db, "ideco", [
+      { instrumentId: instrument.id, targetRatio: 0.6 },
+    ]);
+    expect(replaced).toEqual([{ instrumentId: instrument.id, targetRatio: 0.6 }]);
+    expect(await listTargetPortfolioWeights(db, "ideco")).toEqual([
+      { instrumentId: instrument.id, targetRatio: 0.6 },
+    ]);
+
+    const cleared = await replaceTargetPortfolioWeights(db, "ideco", []);
+    expect(cleared).toEqual([]);
+    expect(await listTargetPortfolioWeights(db, "ideco")).toEqual([]);
   });
 
   it("handles snapshot edge cases for unknown portfolios and date ranges", async () => {

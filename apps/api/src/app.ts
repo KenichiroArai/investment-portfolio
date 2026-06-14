@@ -21,8 +21,10 @@ import {
   listSnapshotDates,
   listAllTargetAllocationsForPortfolio,
   listTargetAllocationWeights,
+  listTargetPortfolioWeights,
   replaceCurrentSnapshot,
   replaceTargetAllocationWeights,
+  replaceTargetPortfolioWeights,
   setInstrumentClassifications,
   updateClassificationSchemeName,
   updateClassificationValue,
@@ -38,6 +40,7 @@ import {
   createPortfolioSchema,
   replaceCurrentSnapshotSchema,
   replaceTargetAllocationWeightsSchema,
+  replaceTargetPortfolioWeightsSchema,
   setInstrumentClassificationsSchema,
   snapshotTrendsQuerySchema,
   updateClassificationSchemeSchema,
@@ -563,6 +566,48 @@ export function createApp(options?: CreateAppOptions) {
     }
 
     result = c.json({ schemeCode, weights });
+    return result;
+  });
+
+  app.get("/portfolios/:code/target-portfolio-weights", async (c) => {
+    let result!: Response;
+
+    const db = resolveDb();
+    const portfolioCode = c.req.param("code");
+    const portfolio = await findPortfolioByCode(db, portfolioCode);
+    if (!portfolio) {
+      result = c.json({ error: "Portfolio not found" }, 404);
+      return result;
+    }
+
+    const weights = await listTargetPortfolioWeights(db, portfolioCode);
+    result = c.json({ weights });
+    return result;
+  });
+
+  app.put("/portfolios/:code/target-portfolio-weights", async (c) => {
+    let result!: Response;
+
+    const body = await c.req.json();
+    const parsed = replaceTargetPortfolioWeightsSchema.safeParse(body);
+    if (!parsed.success) {
+      result = c.json({ error: parsed.error.flatten() }, 400);
+      return result;
+    }
+
+    const db = resolveDb();
+    const portfolioCode = c.req.param("code");
+    const weights = await replaceTargetPortfolioWeights(
+      db,
+      portfolioCode,
+      parsed.data.weights,
+    );
+    if (!weights) {
+      result = c.json({ error: "Portfolio not found" }, 404);
+      return result;
+    }
+
+    result = c.json({ weights });
     return result;
   });
 

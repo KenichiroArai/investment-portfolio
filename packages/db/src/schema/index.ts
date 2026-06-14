@@ -268,12 +268,44 @@ export const targetAllocationWeights = sqliteTable(
   },
 );
 
+/** 銘柄目標配分 — 口座×銘柄ごとの目標構成比。詳細は packages/db/README.md */
+export const targetPortfolioWeights = sqliteTable(
+  "target_portfolio_weights",
+  {
+    id: text("id").primaryKey(), // ID
+    portfolioId: text("portfolio_id")
+      .notNull()
+      .references(() => {
+        let result = portfolios.id;
+        return result;
+      }, { onDelete: "cascade" }), // 口座ID
+    instrumentId: text("instrument_id")
+      .notNull()
+      .references(() => {
+        let result = instruments.id;
+        return result;
+      }, { onDelete: "cascade" }), // 銘柄ID
+    targetRatio: real("target_ratio").notNull(), // 目標構成比（0–1）
+    updatedAt: text("updated_at").notNull(), // 更新日時
+  },
+  (table) => {
+    let result = [
+      unique("target_portfolio_weights_unique").on(
+        table.portfolioId,
+        table.instrumentId,
+      ),
+    ];
+    return result;
+  },
+);
+
 /** 口座リレーション */
 export const portfoliosRelations = relations(portfolios, ({ many }) => {
   let result = {
     classificationSchemes: many(classificationSchemes),
     snapshots: many(portfolioSnapshots),
     targetAllocationWeights: many(targetAllocationWeights),
+    targetPortfolioWeights: many(targetPortfolioWeights),
   };
   return result;
 });

@@ -10,6 +10,8 @@ export * from "./snapshot-trend-aggregation";
 export * from "./allocation-series";
 export * from "./allocation-period-change";
 export * from "./allocation-gap";
+export * from "./portfolio-allocation";
+export * from "./rebalance";
 export * from "./chart-axis-scale";
 export * from "./trend-period-deltas";
 export * from "./trend-period-summary";

@@ -7,3 +7,4 @@ export * from "./repositories/instruments";
 export * from "./repositories/classifications";
 export * from "./repositories/snapshots";
 export * from "./repositories/target-allocations";
+export * from "./repositories/target-portfolio-weights";

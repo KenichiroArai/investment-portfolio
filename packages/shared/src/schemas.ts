@@ -132,3 +132,19 @@ export type TargetAllocationWeightInput = z.infer<
 export type ReplaceTargetAllocationWeightsInput = z.infer<
   typeof replaceTargetAllocationWeightsSchema
 >;
+
+export const targetPortfolioWeightInputSchema = z.object({
+  instrumentId: z.string().uuid(),
+  targetRatio: z.number().min(0).max(1),
+});
+
+export const replaceTargetPortfolioWeightsSchema = z.object({
+  weights: z.array(targetPortfolioWeightInputSchema),
+});
+
+export type TargetPortfolioWeightInput = z.infer<
+  typeof targetPortfolioWeightInputSchema
+>;
+export type ReplaceTargetPortfolioWeightsInput = z.infer<
+  typeof replaceTargetPortfolioWeightsSchema
+>;

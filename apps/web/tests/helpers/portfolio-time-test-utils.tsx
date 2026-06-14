@@ -138,6 +138,22 @@ export function createPortfolioFetchMock(options: PortfolioFetchMockOptions = {}
       };
     }
 
+    if (url.includes("target-portfolio-weights")) {
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ weights: [] }),
+      };
+    }
+
+    if (url.includes("target-allocations")) {
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({}),
+      };
+    }
+
     return {
       ok: true,
       status: 200,
