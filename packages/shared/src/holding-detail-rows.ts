@@ -55,7 +55,7 @@ export type PaginatedRowsResult<T> = {
 
 function extractHoldingDetailValues(line: HoldingLineDto): Omit<
   HoldingDetailRow,
-  "asOfDate" | "instrumentId" | "instrumentName" | "sortOrder" | "tags"
+  "asOfDate" | "instrumentId" | "instrumentName" | "sortOrder" | "tags" | "portfolioWeight"
 > {
   let result = {
     quantity: line.quantity,

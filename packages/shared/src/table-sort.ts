@@ -186,9 +186,14 @@ export function sortHoldingsDetailLines(
   return result;
 }
 
+type AllocationSliceSortRow = AllocationSliceWithLines & {
+  targetRatio?: number | null;
+  gapRatio?: number | null;
+};
+
 export function compareAllocationSlices(
-  left: AllocationSliceWithLines,
-  right: AllocationSliceWithLines,
+  left: AllocationSliceSortRow,
+  right: AllocationSliceSortRow,
   column: string,
   direction: SortDirection,
 ): number {
@@ -204,6 +209,10 @@ export function compareAllocationSlices(
     );
   } else if (column === "weight") {
     result = compareNullableNumbers(left.weight, right.weight, direction);
+  } else if (column === "targetRatio") {
+    result = compareNullableNumbers(left.targetRatio, right.targetRatio, direction);
+  } else if (column === "gapRatio") {
+    result = compareNullableNumbers(left.gapRatio, right.gapRatio, direction);
   }
 
   if (result !== 0) {
@@ -214,11 +223,11 @@ export function compareAllocationSlices(
   return result;
 }
 
-export function sortAllocationSlices(
-  slices: AllocationSliceWithLines[],
+export function sortAllocationSlices<T extends AllocationSliceWithLines>(
+  slices: T[],
   column: string,
   direction: SortDirection,
-): AllocationSliceWithLines[] {
+): T[] {
   let result = [...slices];
   result.sort((left, right) =>
     compareAllocationSlices(left, right, column, direction),
