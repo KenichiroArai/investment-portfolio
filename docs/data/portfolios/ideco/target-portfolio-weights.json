@@ -1,3 +1,64 @@
 {
-  "weights": []
+  "weights": [
+    {
+      "instrumentId": "13462933-8a0b-48f4-912a-3bfd25762509",
+      "targetRatio": 0.03
+    },
+    {
+      "instrumentId": "31275e89-c5aa-46ec-8108-bc56f6ea17b2",
+      "targetRatio": 0.2
+    },
+    {
+      "instrumentId": "362250ad-b3df-44b8-a221-a599b923e754",
+      "targetRatio": 0.1
+    },
+    {
+      "instrumentId": "37996eea-0305-4a45-8400-996f1962292c",
+      "targetRatio": 0.015
+    },
+    {
+      "instrumentId": "47ccafe2-9d8f-49a7-b922-cf2e484a7860",
+      "targetRatio": 0.1
+    },
+    {
+      "instrumentId": "53bdddb7-cab9-48eb-9f3e-9bf731df27b7",
+      "targetRatio": 0.01
+    },
+    {
+      "instrumentId": "68b9b628-c237-4397-8530-c099d33c6658",
+      "targetRatio": 0.29
+    },
+    {
+      "instrumentId": "a3028224-f890-4258-b8f9-417133d7cf6a",
+      "targetRatio": 0.01
+    },
+    {
+      "instrumentId": "ba158649-918a-42c7-824b-021765191743",
+      "targetRatio": 0.1
+    },
+    {
+      "instrumentId": "bb25c6ee-a8d6-402d-b971-67f1e582c69a",
+      "targetRatio": 0.025
+    },
+    {
+      "instrumentId": "c991d741-dcd5-479f-abd9-7da4a97e7547",
+      "targetRatio": 0.015
+    },
+    {
+      "instrumentId": "d642675f-5dd0-42df-8feb-63429b27ca60",
+      "targetRatio": 0.01
+    },
+    {
+      "instrumentId": "e251ef8b-9dc7-443f-9a76-8ae44ba08faa",
+      "targetRatio": 0.04
+    },
+    {
+      "instrumentId": "e6dc9d16-d6b0-4a65-ab00-e5c4d338df88",
+      "targetRatio": 0.02
+    },
+    {
+      "instrumentId": "f74a084e-8eee-45c3-abef-a9337b908b01",
+      "targetRatio": 0.035
+    }
+  ]
 }
