@@ -21,9 +21,9 @@ dev/sql/
     └── instrument-lookup.sql
 ```
 
-## iDeCo（4 CSV ディレクトリ投入）
+## iDeCo（5 CSV ディレクトリ投入）
 
-投入元は `data/imports/ideco/` 以下の4 CSV です（`data/` は git 無視）。
+投入元は `data/imports/ideco/` 以下の 5 CSV です（`data/` は git 無視）。
 
 ```bash
 npm run db:import:ideco -- data/imports/ideco

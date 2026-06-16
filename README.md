@@ -13,7 +13,7 @@ investment-portfolio/
 │   └── web/                 # Next.js（GitHub Pages、静的エクスポート）
 ├── packages/
 │   ├── db/                  # スキーマ・リポジトリ・マイグレーション
-│   ├── shared/              # DTO・Zod スキーマ
+│   ├── shared/              # 計算・DTO・Zod スキーマ（フレームワーク非依存）
 │   ├── tsconfig/
 │   └── ui/
 ├── docs/                    # GitHub Pages 公開用データ（JSON 正本）
@@ -69,9 +69,10 @@ data/
 - `DATABASE_PATH` — SQLite ファイル（既定: `data/portfolio.db`）
 - `PORT` / `HOST` — API の待ち受け（既定: `127.0.0.1:3001`）
 - `NEXT_PUBLIC_API_URL` — Web から参照する API（既定: `http://127.0.0.1:3001`）
+- `NEXT_PUBLIC_DATA_SOURCE` — `api` / `static`（本番ビルドでは `static` に自動設定）
 
-- 開発時は Web がローカル API から明細を取得します。
-- 本番（GitHub Pages）ビルドでは `docs/data/` の JSON を静的に読み込みます（登録・更新はローカルのみ）。
+- 開発時は Web がローカル API からデータを取得します（登録・更新も API 経由）。
+- 本番（GitHub Pages）ビルドでは `docs/data/` の JSON を静的に読み込みます（閲覧のみ）。
 
 ## iDeCo データ投入
 
@@ -88,10 +89,35 @@ npm run db:import:ideco -- data/imports/ideco
 - 口座 `ideco`（未作成なら自動作成）
 - 分類体系（商品タイプ・大分類・スタイル・ステータス・地域・資産）と銘柄へのタグ付け
 - 銘柄マスタ（属性: 略称・提供会社・信託報酬など）
-- 最新明細（`asOfDate` は明細 CSV の日付列、金額は円のまま保存）
+- 保有スナップショット（明細 CSV の日付列ごとに複数基準日を upsert、最大基準日が最新）
 - 口座レベル指標（汎用 CSV の拠出金累計など）
 
 SQLite の内容を SQL で確認する場合は [dev/sql/README.md](dev/sql/README.md) を参照してください。
+
+## 機能
+
+### 実装済み
+
+| 領域 | 内容 |
+| --- | --- |
+| ホーム | 全口座の評価額・損益サマリー、口座の追加・編集 |
+| 全口座分析 | 複数口座を合算した資産配分（`/analysis/`） |
+| 口座概要 | 評価額・損益・拠出金、推移チャート、基準日切替 |
+| 明細 | 保有銘柄一覧、期間比較、銘柄別詳細 |
+| 資産配分 | 分類軸（商品タイプ・地域・資産など）ごとの構成比・目標配分・ギャップ |
+| ポートフォリオ配分 | 銘柄ごとの目標構成比（コア・サテライト戦略の銘柄ウェイト管理） |
+| リバランス | 資産配分軸または銘柄軸での売買案・追加投資額の試算 |
+| 推移 | 評価額・構成比の時系列チャート、期間変化テーブル |
+| 設定 | データ管理（銘柄・明細・指標の登録・更新）、分類設定、目標配分 |
+| データ投入 | iDeCo 5 CSV の一括インポート、複数基準日のスナップショット |
+| GitHub Pages | 静的 JSON による閲覧（登録・更新はローカルのみ） |
+
+### 今後の予定
+
+- 投資シミュレーション
+- 通貨別分析（外貨建て資産の換算・集計）
+- NISA・課税口座など他口座種別の CSV インポート
+- PostgreSQL への移行
 
 ## 動作確認
 
@@ -108,6 +134,11 @@ curl -s http://127.0.0.1:3001/portfolios
 
 # 最新明細（ideco を投入済みの場合）
 curl -s http://127.0.0.1:3001/portfolios/ideco/snapshot/current
+
+# 基準日一覧・推移・目標配分
+curl -s http://127.0.0.1:3001/portfolios/ideco/snapshots
+curl -s "http://127.0.0.1:3001/portfolios/ideco/snapshots/trends"
+curl -s http://127.0.0.1:3001/portfolios/ideco/target-allocations
 ```
 
 `health` が JSON で返れば API は待ち受けできています。明細は [iDeCo データ投入](#ideco-データ投入) のあと `snapshot/current` で確認します。
@@ -116,10 +147,17 @@ curl -s http://127.0.0.1:3001/portfolios/ideco/snapshot/current
 
 | URL | 内容 |
 | --- | --- |
-| [http://localhost:3000/](http://localhost:3000/) | トップ（ハブ） |
-| [http://localhost:3000/portfolios/ideco/holdings/](http://localhost:3000/portfolios/ideco/holdings/) | 口座明細（iDeCo） |
+| [http://localhost:3000/](http://localhost:3000/) | ホーム（全口座サマリー） |
+| [http://localhost:3000/analysis/](http://localhost:3000/analysis/) | 全口座分析 |
+| [http://localhost:3000/portfolios/ideco/](http://localhost:3000/portfolios/ideco/) | 口座概要（iDeCo） |
+| [http://localhost:3000/portfolios/ideco/holdings/](http://localhost:3000/portfolios/ideco/holdings/) | 明細 |
+| [http://localhost:3000/portfolios/ideco/analysis/](http://localhost:3000/portfolios/ideco/analysis/) | 資産配分 |
+| [http://localhost:3000/portfolios/ideco/portfolio-allocation/](http://localhost:3000/portfolios/ideco/portfolio-allocation/) | ポートフォリオ配分 |
+| [http://localhost:3000/portfolios/ideco/rebalance/](http://localhost:3000/portfolios/ideco/rebalance/) | リバランス |
+| [http://localhost:3000/portfolios/ideco/trends/](http://localhost:3000/portfolios/ideco/trends/) | 推移 |
+| [http://localhost:3000/portfolios/ideco/settings/data/](http://localhost:3000/portfolios/ideco/settings/data/) | データ管理（ローカル API のみ） |
 
-メニュー **口座明細（iDeCo）** からも同じ明細画面に遷移します。API が止まっている、または `NEXT_PUBLIC_API_URL` が実際の API と一致しない場合は画面上でエラーになります。
+口座画面のタブから各機能に遷移します。API が止まっている、または `NEXT_PUBLIC_API_URL` が実際の API と一致しない場合は画面上でエラーになります。設定・登録系はローカル API 接続時のみ利用できます。
 
 ### 型チェック・テスト（起動不要）
 
@@ -134,16 +172,19 @@ npm run test:coverage
 公開用 JSON の正本は [`docs/`](docs/) 以下のみです（詳細は [docs/README.md](docs/README.md)）。
 
 1. [iDeCo データ投入](#ideco-データ投入) で SQLite にデータを投入する。
-2. エクスポートする。
+2. 目標配分などローカルで編集した内容も SQLite に反映しておく。
+3. エクスポートする。
 
    ```bash
    npm run pages:export
    ```
 
-3. `docs/data/` の変更をコミットして `main` に push する。
-4. GitHub Actions がビルド時に `docs/data` を `apps/web/public/data` へ同期し、静的サイトをデプロイする（CI では SQLite に接続しません）。
+   口座一覧・各口座の `current.json`、基準日別スナップショット、推移サマリー、目標配分、銘柄目標ウェイト、および `apps/web/src/lib/portfolio-catalog.ts` が更新されます。
 
-初回のみ、サンプル JSON が `docs/data/portfolios/ideco/current.json` に含まれています。実データに差し替える場合は上記 1〜3 を実行してください。
+4. `docs/data/` と `portfolio-catalog.ts` の変更をコミットして `main` に push する。
+5. GitHub Actions がビルド時に `docs/data` を `apps/web/public/data` へ同期し、静的サイトをデプロイする（CI では SQLite に接続しません）。
+
+初回のみ、サンプル JSON が `docs/data/` に含まれています。実データに差し替える場合は上記 1〜4 を実行してください。
 
 ### デプロイ設定（初回のみ）
 
@@ -165,12 +206,15 @@ npx serve apps/web/out
 
 - **Next.js**（App Router）+ **TypeScript** + **React** — 静的エクスポート（GitHub Pages）
 - **Hono** + **better-sqlite3** + **Drizzle ORM** — ローカル API / SQLite
-- **Vitest** — 単体テスト
+- **Recharts** — チャート可視化
+- **Vitest** + **Testing Library** — 単体・コンポーネントテスト
 
-## 将来の機能
+## コード配置
 
-- 資産配分、コア・サテライト、リバランス
-- 口座別・通貨別分析、日付履歴、シミュレーション、可視化
-- PostgreSQL への移行
-
-変更履歴は [CHANGELOG.md](CHANGELOG.md) を参照してください。
+| パス | 役割 |
+| --- | --- |
+| `apps/web/src/features/` | 画面単位の機能（[README](apps/web/src/features/README.md)） |
+| `apps/web/src/lib/` | Web 専用ユーティリティ（[README](apps/web/src/lib/README.md)） |
+| `apps/web/src/components/` | 共有 UI（[README](apps/web/src/components/README.md)） |
+| `packages/shared/` | 計算・整形・Zod スキーマ（フレームワーク非依存） |
+| `packages/db/` | スキーマ・リポジトリ・マイグレーション（[README](packages/db/README.md)） |
