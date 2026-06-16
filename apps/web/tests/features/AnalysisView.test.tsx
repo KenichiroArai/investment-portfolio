@@ -113,7 +113,7 @@ describe("AnalysisView", () => {
       expect(screen.getByText(/分類対象額/)).toBeInTheDocument();
     });
 
-    expect(screen.getByText(/資産全体の 66\.7%/)).toBeInTheDocument();
+    expect(screen.getByText(/資産全体の 66\.67%/)).toBeInTheDocument();
     expect(screen.getByText(/未分類:.*50,000/)).toBeInTheDocument();
   });
 

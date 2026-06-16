@@ -205,6 +205,27 @@ describe("importIdecoData", () => {
     ).rejects.toThrow(IdecoCsvError);
   });
 
+  it("rejects holdings csv when different names resolve to the same instrument", async () => {
+    const db = setup();
+    const instrumentsCsv = `No.,大分類,商品タイプ,商品タイプ(スタイル),ステータス,運用商品名,運用商品名(略称),提供・委託会社,信託報酬（％）（税込）,信託財産保留額（％）
+1,投資信託,国内株式,パッシブ,,ｅＭＡＸＩＳ Ｓｌｉｍ 国内株式（ＴＯＰＩＸ）,eMAXIS Slim 国内株式(TOPIX),三菱UFJアセットマネジメント,0.143以内,0
+`;
+    const holdingsCsv = `番号,日付,運用商品名,時価単価(1万口当り),残高数量,資産残高,購入金額,損益,損益率
+1,2026/06/02,ｅＭＡＸＩＳ Ｓｌｉｍ 国内株式（ＴＯＰＩＸ）,"31351","41773","130962","128324","2638","0.021"
+2,2026/06/02,eMAXIS Slim 国内株式(TOPIX),"31351","41773","130962","128324","2638","0.021"
+`;
+
+    await expect(
+      importIdecoData(
+        db,
+        readIdecoImportFiles({
+          instrumentsCsv,
+          holdingsCsv,
+        }),
+      ),
+    ).rejects.toThrow(/同一銘柄が重複しています/);
+  });
+
   it("returns null when holdings reference unknown short name", async () => {
     const db = setup();
     const outcome = await importIdecoData(

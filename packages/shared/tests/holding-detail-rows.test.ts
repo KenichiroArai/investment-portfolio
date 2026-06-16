@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  compareHoldingDetailRows,
   filterHoldingDetailRows,
   flattenHoldingsInRange,
   paginateRows,
@@ -215,6 +216,11 @@ describe("filterHoldingDetailRows", () => {
     expect(result).toHaveLength(2);
   });
 
+  it("skips as-of date filtering when value is __all__", () => {
+    let result = filterHoldingDetailRows(rows, { asOfDate: "__all__" });
+    expect(result).toHaveLength(2);
+  });
+
   it("matches classification by valueCode and skips __all__", () => {
     let byCode = filterHoldingDetailRows(rows, {
       classificationSchemeCode: "region",
@@ -401,6 +407,59 @@ describe("sortHoldingDetailRows", () => {
     let result = sortHoldingDetailRows(tiedRows, "quantity", "asc");
     expect(result[0]?.asOfDate).toBe("2026-06-07");
     expect(result[1]?.asOfDate).toBe("2026-06-01");
+  });
+
+  it("uses lineId as final tie-breaker when date, sortOrder, and name match", () => {
+    const tiedRows: HoldingDetailRow[] = [
+      makeDetailRow({
+        lineId: "line-b",
+        asOfDate: "2026-06-01",
+        instrumentId: "i1",
+        instrumentName: "Same",
+        sortOrder: 0,
+        quantity: 1,
+        marketValueMinor: 1000,
+        bookValueMinor: null,
+      }),
+      makeDetailRow({
+        lineId: "line-a",
+        asOfDate: "2026-06-01",
+        instrumentId: "i1",
+        instrumentName: "Same",
+        sortOrder: 0,
+        quantity: 1,
+        marketValueMinor: 1000,
+        bookValueMinor: null,
+      }),
+    ];
+
+    let result = sortHoldingDetailRows(tiedRows, "quantity", "asc");
+    expect(result.map((row) => row.lineId)).toEqual(["line-a", "line-b"]);
+  });
+
+  it("compares sortOrder when either side lacks sortOrder", () => {
+    const defined = makeDetailRow({
+      asOfDate: "2026-06-01",
+      instrumentId: "i1",
+      instrumentName: "First",
+      sortOrder: 1,
+      quantity: 1,
+      marketValueMinor: 1000,
+      bookValueMinor: null,
+    });
+    const nullish = makeDetailRow({
+      asOfDate: "2026-06-01",
+      instrumentId: "i2",
+      instrumentName: "Later",
+      quantity: 1,
+      marketValueMinor: 1000,
+      bookValueMinor: null,
+    });
+    nullish.sortOrder = null;
+
+    expect(compareHoldingDetailRows(defined, nullish, "sortOrder", "asc")).toBeLessThan(0);
+    expect(compareHoldingDetailRows(nullish, defined, "sortOrder", "asc")).toBeGreaterThan(0);
+    expect(compareHoldingDetailRows(nullish, nullish, "sortOrder", "desc")).toBe(0);
   });
 
   it("treats null sortOrder as last when sorting by sortOrder", () => {

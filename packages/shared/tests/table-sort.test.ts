@@ -382,6 +382,35 @@ describe("sortAllocationSlices", () => {
       ).map((slice) => slice.valueCode),
     ).toEqual(["a", "b"]);
   });
+
+  it("sorts slices by target ratio and gap ratio", () => {
+    const slices: (AllocationSliceWithLines & {
+      targetRatio?: number | null;
+      gapRatio?: number | null;
+    })[] = [
+      {
+        valueCode: "low",
+        valueName: "低",
+        marketValueMinor: 100,
+        weight: 0.2,
+        targetRatio: 0.2,
+        gapRatio: -0.05,
+        lines: [],
+      },
+      {
+        valueCode: "high",
+        valueName: "高",
+        marketValueMinor: 400,
+        weight: 0.8,
+        targetRatio: 0.5,
+        gapRatio: 0.1,
+        lines: [],
+      },
+    ];
+
+    expect(sortAllocationSlices(slices, "targetRatio", "desc")[0]?.valueCode).toBe("high");
+    expect(sortAllocationSlices(slices, "gapRatio", "desc")[0]?.valueCode).toBe("high");
+  });
 });
 
 describe("sortHoldingLineDetailRows", () => {
