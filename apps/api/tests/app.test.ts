@@ -221,6 +221,34 @@ describe("API app", () => {
     });
     expect(badSnapshot.status).toBe(400);
 
+    const instrumentRes = await app.request("/instruments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: "重複テスト銘柄" }),
+    });
+    const instrument = (await instrumentRes.json()) as { id: string };
+
+    const duplicateSnapshot = await app.request("/portfolios/ideco/snapshot/current", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        asOfDate: "2026-06-01",
+        lines: [
+          {
+            instrumentId: instrument.id,
+            quantity: 1,
+            marketValueMinor: 1000,
+          },
+          {
+            instrumentId: instrument.id,
+            quantity: 2,
+            marketValueMinor: 2000,
+          },
+        ],
+      }),
+    });
+    expect(duplicateSnapshot.status).toBe(400);
+
     const missingPortfolioSnapshot = await app.request(
       "/portfolios/unknown/snapshot/current",
       {

@@ -10,6 +10,7 @@ import {
 import type { ClassificationTagDto, CurrentSnapshotDto, HoldingLineDto } from "./types";
 
 export type HoldingDetailRow = {
+  lineId: string;
   asOfDate: string;
   instrumentId: string;
   instrumentName: string;
@@ -55,7 +56,7 @@ export type PaginatedRowsResult<T> = {
 
 function extractHoldingDetailValues(line: HoldingLineDto): Omit<
   HoldingDetailRow,
-  "asOfDate" | "instrumentId" | "instrumentName" | "sortOrder" | "tags" | "portfolioWeight"
+  "lineId" | "asOfDate" | "instrumentId" | "instrumentName" | "sortOrder" | "tags" | "portfolioWeight"
 > {
   let result = {
     quantity: line.quantity,
@@ -97,6 +98,7 @@ export function flattenHoldingsInRange(
       const portfolioWeight =
         totalMarketValue > 0 ? line.marketValueMinor / totalMarketValue : null;
       let row: HoldingDetailRow = {
+        lineId: line.id,
         asOfDate: snapshot.asOfDate,
         instrumentId: line.instrumentId,
         instrumentName: line.instrumentName,
@@ -249,6 +251,11 @@ export function compareHoldingDetailRows(
   }
 
   result = compareStrings(left.instrumentName, right.instrumentName, "asc");
+  if (result !== 0) {
+    return result;
+  }
+
+  result = compareStrings(left.lineId, right.lineId, "asc");
   return result;
 }
 

@@ -244,7 +244,7 @@ export function HoldingsPeriodDetailTable({
           {sortedRows.map((row) => {
             const deltaRowVisible = showDeltas && row.hasBaseline;
             let bodyRows = (
-              <Fragment key={row.instrumentId}>
+              <Fragment key={row.lineId}>
                 <TableRow>
                   <TableCell className="sticky left-0 z-10 bg-card font-medium">
                     {row.instrumentName}

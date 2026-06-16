@@ -8,6 +8,7 @@ function makeRow(
   overrides: Partial<HoldingDetailRow> & Pick<HoldingDetailRow, "asOfDate" | "instrumentId">,
 ): HoldingDetailRow {
   let result: HoldingDetailRow = {
+    lineId: overrides.lineId ?? `line-${overrides.instrumentId}`,
     asOfDate: overrides.asOfDate,
     instrumentId: overrides.instrumentId,
     instrumentName: overrides.instrumentName ?? "テスト銘柄",

@@ -169,6 +169,17 @@ describe("ideco csv parsers", () => {
     ]);
   });
 
+  it("rejects duplicate instrument names on the same as-of date in holdings csv", () => {
+    expect(() =>
+      parseIdecoHoldingsCsvByDate(
+        `番号,日付,運用商品名,時価単価(1万口当り),残高数量,資産残高,購入金額,損益,損益率
+1,2026/06/13,テスト銘柄,"10000","1","10000","9000","1000","0.1"
+2,2026/06/13,テスト銘柄,"10000","2","20000","18000","2000","0.1"
+`,
+      ),
+    ).toThrow(/運用商品名「テスト銘柄」が重複/);
+  });
+
   it("parses modern three-column analysis csv", () => {
     const analysis = parseIdecoAnalysisCsv(
       `分析軸名,カテゴリ名,メンバー名

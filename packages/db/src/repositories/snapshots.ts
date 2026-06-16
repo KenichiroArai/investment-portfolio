@@ -1,5 +1,7 @@
 import { and, eq, inArray } from "drizzle-orm";
 
+import { assertUniqueSnapshotInstrumentIds } from "@repo/shared";
+
 import type { AppDatabase } from "../client";
 import { newId, nowIso } from "../id";
 import {
@@ -550,6 +552,8 @@ export async function upsertSnapshotByDate(
   if (!portfolio) {
     return result;
   }
+
+  assertUniqueSnapshotInstrumentIds(params.lines);
 
   db.transaction((tx) => {
     let txResult: void = undefined;

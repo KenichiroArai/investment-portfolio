@@ -28,6 +28,7 @@ export * from "./ideco-instrument-attributes";
 export * from "./ideco-instruments-csv";
 export * from "./ideco-portfolio-metrics";
 export * from "./ideco-product-types-csv";
+export * from "./snapshot-line-validation";
 export * from "./schemas";
 export * from "./table-sort";
 export * from "./types";

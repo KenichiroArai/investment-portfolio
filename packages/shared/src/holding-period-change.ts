@@ -31,6 +31,7 @@ export type HoldingPeriodDeltas = {
 };
 
 export type HoldingPeriodChangeRow = {
+  lineId: string;
   instrumentId: string;
   instrumentName: string;
   sortOrder: number | null;
@@ -173,6 +174,7 @@ export function buildHoldingPeriodChangeRows(
     const startValues = startLine ? extractHoldingPeriodValues(startLine) : null;
 
     let row: HoldingPeriodChangeRow = {
+      lineId: endLine.id,
       instrumentId: endLine.instrumentId,
       instrumentName: endLine.instrumentName,
       sortOrder: endLine.sortOrder,

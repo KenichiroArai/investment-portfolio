@@ -203,7 +203,7 @@ export function HoldingsRangeDetailTable({
             </TableRow>
           ) : (
             displayRows.map((row) => {
-              const rowKey = `${row.asOfDate}:${row.instrumentId}`;
+              const rowKey = `${row.asOfDate}:${row.lineId}`;
               let bodyRow = (
                 <TableRow key={rowKey}>
                   <TableCell className="sticky left-0 z-10 whitespace-nowrap bg-card">

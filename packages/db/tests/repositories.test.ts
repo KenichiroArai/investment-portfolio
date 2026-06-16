@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 
-import { IDECO_SCHEME_CODES } from "@repo/shared";
+import { IDECO_SCHEME_CODES, SnapshotValidationError } from "@repo/shared";
 
 import {
   createClassificationScheme,
@@ -234,6 +234,35 @@ describe("portfolio repositories", () => {
       lines: [],
     });
     expect(again?.lines).toHaveLength(0);
+  });
+
+  it("rejects duplicate instrument ids in snapshot lines", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+    const instrument = await createInstrument(db, { name: "テストファンド" });
+
+    await expect(
+      replaceCurrentSnapshot(db, {
+        portfolioCode: "ideco",
+        asOfDate: "2026-06-01",
+        lines: [
+          {
+            instrumentId: instrument.id,
+            quantity: 1,
+            marketValueMinor: 1000,
+          },
+          {
+            instrumentId: instrument.id,
+            quantity: 2,
+            marketValueMinor: 2000,
+          },
+        ],
+      }),
+    ).rejects.toThrow(SnapshotValidationError);
   });
 
   it("returns null when scheme portfolio is missing", async () => {

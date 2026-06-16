@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { findDuplicateInstrumentId } from "./snapshot-line-validation";
+
 const portfolioKindSchema = z.enum(["ideco", "nisa", "taxable", "satellite"]);
 
 export const createPortfolioSchema = z.object({
@@ -74,11 +76,27 @@ export const holdingLineInputSchema = z.object({
   metrics: z.array(holdingLineMetricInputSchema).optional(),
 });
 
-export const replaceCurrentSnapshotSchema = z.object({
-  asOfDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  lines: z.array(holdingLineInputSchema),
-  metrics: z.array(portfolioSnapshotMetricInputSchema).optional(),
-});
+export const replaceCurrentSnapshotSchema = z
+  .object({
+    asOfDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    lines: z.array(holdingLineInputSchema),
+    metrics: z.array(portfolioSnapshotMetricInputSchema).optional(),
+  })
+  .superRefine((data, ctx) => {
+    let result: void = undefined;
+
+    const duplicateId = findDuplicateInstrumentId(data.lines);
+    if (!duplicateId) {
+      return result;
+    }
+
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `同一銘柄が複数行に含まれています（instrumentId: ${duplicateId}）`,
+      path: ["lines"],
+    });
+    return result;
+  });
 
 export type CreatePortfolioInput = z.infer<typeof createPortfolioSchema>;
 export type UpdatePortfolioInput = z.infer<typeof updatePortfolioSchema>;

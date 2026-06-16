@@ -42,6 +42,7 @@ import {
   replaceTargetAllocationWeightsSchema,
   replaceTargetPortfolioWeightsSchema,
   setInstrumentClassificationsSchema,
+  SnapshotValidationError,
   snapshotTrendsQuerySchema,
   updateClassificationSchemeSchema,
   updateClassificationValueSchema,
@@ -656,10 +657,21 @@ export function createApp(options?: CreateAppOptions) {
     }
 
     const db = resolveDb();
-    const snapshot = await replaceCurrentSnapshot(db, {
-      portfolioCode: c.req.param("code"),
-      ...parsed.data,
-    });
+    let snapshot: Awaited<ReturnType<typeof replaceCurrentSnapshot>> = null;
+
+    try {
+      snapshot = await replaceCurrentSnapshot(db, {
+        portfolioCode: c.req.param("code"),
+        ...parsed.data,
+      });
+    } catch (error) {
+      if (error instanceof SnapshotValidationError) {
+        result = c.json({ error: error.message }, 400);
+        return result;
+      }
+      throw error;
+    }
+
     if (!snapshot) {
       result = c.json({ error: "Portfolio not found" }, 404);
       return result;

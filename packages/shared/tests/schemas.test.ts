@@ -36,6 +36,23 @@ describe("shared schemas", () => {
     });
     expect(snapshot.success).toBe(true);
 
+    const duplicateLines = replaceCurrentSnapshotSchema.safeParse({
+      asOfDate: "2026-06-01",
+      lines: [
+        {
+          instrumentId: "550e8400-e29b-41d4-a716-446655440000",
+          quantity: 1,
+          marketValueMinor: 1000,
+        },
+        {
+          instrumentId: "550e8400-e29b-41d4-a716-446655440000",
+          quantity: 2,
+          marketValueMinor: 2000,
+        },
+      ],
+    });
+    expect(duplicateLines.success).toBe(false);
+
     const tags = setInstrumentClassificationsSchema.safeParse({
       classificationValueIds: ["550e8400-e29b-41d4-a716-446655440001"],
     });

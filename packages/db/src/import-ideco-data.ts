@@ -9,6 +9,7 @@ import {
   IDECO_SCHEME_CODES,
   IDECO_SCHEME_NAMES,
   isIdecoAnalysisSchemeCode,
+  IdecoCsvError,
   parseIdecoAnalysisCsv,
   parseIdecoGenericCsv,
   parseIdecoHoldingsCsvByDate,
@@ -493,12 +494,22 @@ async function buildHoldingLinesFromRows(db: AppDatabase, rows: IdecoHoldingsCsv
     metrics: ReturnType<typeof buildIdecoKakeiboMetrics>;
   }> | null = [];
 
+  const instrumentNameById = new Map<string, string>();
+
   for (const row of rows) {
     const instrumentId = await resolveHoldingInstrumentId(db, row.instrumentName);
     if (!instrumentId) {
       result = null;
       return result;
     }
+
+    const existingName = instrumentNameById.get(instrumentId);
+    if (existingName !== undefined) {
+      throw new IdecoCsvError(
+        `明細 CSV の基準日 ${row.asOfDate} で同一銘柄が重複しています（運用商品名「${existingName}」と「${row.instrumentName}」）`,
+      );
+    }
+    instrumentNameById.set(instrumentId, row.instrumentName);
 
     result.push({
       instrumentId,

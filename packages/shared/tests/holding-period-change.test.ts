@@ -230,6 +230,7 @@ describe("buildHoldingPeriodChangeRows", () => {
 describe("sortHoldingPeriodChangeRows", () => {
   const rows: HoldingPeriodChangeRow[] = [
     {
+      lineId: "line-i2",
       instrumentId: "i2",
       instrumentName: "B",
       sortOrder: 1,
@@ -260,6 +261,7 @@ describe("sortHoldingPeriodChangeRows", () => {
       hasBaseline: true,
     },
     {
+      lineId: "line-i1",
       instrumentId: "i1",
       instrumentName: "A",
       sortOrder: 0,

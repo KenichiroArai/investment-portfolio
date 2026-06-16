@@ -28,6 +28,27 @@ function makeLine(
   return result;
 }
 
+function makeDetailRow(
+  overrides: Partial<HoldingDetailRow> & Pick<HoldingDetailRow, "asOfDate" | "instrumentId">,
+): HoldingDetailRow {
+  let result: HoldingDetailRow = {
+    lineId: overrides.lineId ?? `line-${overrides.instrumentId}`,
+    asOfDate: overrides.asOfDate,
+    instrumentId: overrides.instrumentId,
+    instrumentName: overrides.instrumentName ?? "テスト銘柄",
+    sortOrder: overrides.sortOrder ?? 0,
+    quantity: overrides.quantity ?? 100,
+    marketValueMinor: overrides.marketValueMinor ?? 10000,
+    bookValueMinor: overrides.bookValueMinor ?? 9000,
+    unitPrice: overrides.unitPrice ?? null,
+    unrealizedGainMinor: overrides.unrealizedGainMinor ?? null,
+    unrealizedGainRate: overrides.unrealizedGainRate ?? null,
+    tags: overrides.tags ?? [],
+    portfolioWeight: overrides.portfolioWeight ?? null,
+  };
+  return result;
+}
+
 function makeSnapshot(
   asOfDate: string,
   lines: HoldingLineDto[],
@@ -118,21 +139,37 @@ describe("flattenHoldingsInRange", () => {
     expect(result[0]?.unrealizedGainMinor).toBe(500);
     expect(result[0]?.unrealizedGainRate).toBe(0.05);
   });
+
+  it("keeps separate rows when the same instrument appears multiple times on one date", () => {
+    let result = flattenHoldingsInRange([
+      makeSnapshot("2026-06-13", [
+        makeLine({
+          id: "line-a",
+          instrumentId: "inst-1",
+          instrumentName: "セレブライフ・ストーリー2045",
+          sortOrder: 10,
+        }),
+        makeLine({
+          id: "line-b",
+          instrumentId: "inst-1",
+          instrumentName: "セレブライフ・ストーリー2045",
+          sortOrder: 20,
+        }),
+      ]),
+    ]);
+
+    expect(result).toHaveLength(2);
+    expect(result.map((row) => row.lineId)).toEqual(["line-a", "line-b"]);
+  });
 });
 
 describe("filterHoldingDetailRows", () => {
   const rows: HoldingDetailRow[] = [
-    {
+    makeDetailRow({
+      lineId: "line-1",
       asOfDate: "2026-06-01",
       instrumentId: "i1",
       instrumentName: "国内株式",
-      sortOrder: 0,
-      quantity: 1,
-      marketValueMinor: 1000,
-      bookValueMinor: 900,
-      unitPrice: null,
-      unrealizedGainMinor: null,
-      unrealizedGainRate: null,
       tags: [
         {
           schemeCode: "region",
@@ -141,8 +178,9 @@ describe("filterHoldingDetailRows", () => {
           valueName: "日本",
         },
       ],
-    },
-    {
+    }),
+    makeDetailRow({
+      lineId: "line-2",
       asOfDate: "2026-06-07",
       instrumentId: "i2",
       instrumentName: "外国債券",
@@ -150,9 +188,6 @@ describe("filterHoldingDetailRows", () => {
       quantity: 2,
       marketValueMinor: 2000,
       bookValueMinor: 1800,
-      unitPrice: null,
-      unrealizedGainMinor: null,
-      unrealizedGainRate: null,
       tags: [
         {
           schemeCode: "region",
@@ -161,7 +196,7 @@ describe("filterHoldingDetailRows", () => {
           valueName: "海外",
         },
       ],
-    },
+    }),
   ];
 
   it("filters by query, date, and classification", () => {
@@ -203,20 +238,15 @@ describe("filterHoldingDetailRows", () => {
 
   it("matches instrument names regardless of half-width and full-width characters", () => {
     const wideCharRows: HoldingDetailRow[] = [
-      {
+      makeDetailRow({
         asOfDate: "2026-06-01",
         instrumentId: "i1",
         instrumentName: "ｅＭＡＸＩＳ Ｓｌｉｍ 国内株式",
-        sortOrder: 0,
         quantity: 1,
         marketValueMinor: 1000,
         bookValueMinor: 900,
-        unitPrice: null,
-        unrealizedGainMinor: null,
-        unrealizedGainRate: null,
-        tags: [],
-      },
-      {
+      }),
+      makeDetailRow({
         asOfDate: "2026-06-01",
         instrumentId: "i2",
         instrumentName: "ＳＢＩ・全世界株式",
@@ -224,11 +254,7 @@ describe("filterHoldingDetailRows", () => {
         quantity: 2,
         marketValueMinor: 2000,
         bookValueMinor: 1800,
-        unitPrice: null,
-        unrealizedGainMinor: null,
-        unrealizedGainRate: null,
-        tags: [],
-      },
+      }),
     ];
 
     let emaxisResult = filterHoldingDetailRows(wideCharRows, { query: "emaxis" });
@@ -252,7 +278,7 @@ describe("filterHoldingDetailRows", () => {
 
 describe("sortHoldingDetailRows", () => {
   const rows: HoldingDetailRow[] = [
-    {
+    makeDetailRow({
       asOfDate: "2026-06-01",
       instrumentId: "i2",
       instrumentName: "B",
@@ -260,24 +286,15 @@ describe("sortHoldingDetailRows", () => {
       quantity: 1,
       marketValueMinor: 1000,
       bookValueMinor: null,
-      unitPrice: null,
-      unrealizedGainMinor: null,
-      unrealizedGainRate: null,
-      tags: [],
-    },
-    {
+    }),
+    makeDetailRow({
       asOfDate: "2026-06-07",
       instrumentId: "i1",
       instrumentName: "A",
-      sortOrder: 0,
       quantity: 2,
       marketValueMinor: 2000,
       bookValueMinor: null,
-      unitPrice: null,
-      unrealizedGainMinor: null,
-      unrealizedGainRate: null,
-      tags: [],
-    },
+    }),
   ];
 
   it("sorts by asOfDate descending by default column", () => {
@@ -294,7 +311,7 @@ describe("sortHoldingDetailRows", () => {
 
   it("sorts by numeric and classification columns", () => {
     const detailedRows: HoldingDetailRow[] = [
-      {
+      makeDetailRow({
         asOfDate: "2026-06-01",
         instrumentId: "i1",
         instrumentName: "B",
@@ -314,12 +331,11 @@ describe("sortHoldingDetailRows", () => {
             valueName: "海外",
           },
         ],
-      },
-      {
+      }),
+      makeDetailRow({
         asOfDate: "2026-06-01",
         instrumentId: "i2",
         instrumentName: "A",
-        sortOrder: 0,
         quantity: 1,
         marketValueMinor: 1000,
         bookValueMinor: 900,
@@ -335,7 +351,7 @@ describe("sortHoldingDetailRows", () => {
             valueName: "日本",
           },
         ],
-      },
+      }),
     ];
 
     expect(sortHoldingDetailRows(detailedRows, "quantity", "asc")[0]?.quantity).toBe(1);
@@ -363,7 +379,7 @@ describe("sortHoldingDetailRows", () => {
 
   it("uses tie-breakers when primary sort column is equal", () => {
     const tiedRows: HoldingDetailRow[] = [
-      {
+      makeDetailRow({
         asOfDate: "2026-06-01",
         instrumentId: "i1",
         instrumentName: "B",
@@ -371,26 +387,15 @@ describe("sortHoldingDetailRows", () => {
         quantity: 1,
         marketValueMinor: 1000,
         bookValueMinor: null,
-        unitPrice: null,
-        unrealizedGainMinor: null,
-        unrealizedGainRate: null,
-        portfolioWeight: null,
-        tags: [],
-      },
-      {
+      }),
+      makeDetailRow({
         asOfDate: "2026-06-07",
         instrumentId: "i2",
         instrumentName: "A",
-        sortOrder: 0,
         quantity: 1,
         marketValueMinor: 1000,
         bookValueMinor: null,
-        unitPrice: null,
-        unrealizedGainMinor: null,
-        unrealizedGainRate: null,
-        portfolioWeight: null,
-        tags: [],
-      },
+      }),
     ];
 
     let result = sortHoldingDetailRows(tiedRows, "quantity", "asc");
@@ -400,7 +405,7 @@ describe("sortHoldingDetailRows", () => {
 
   it("treats null sortOrder as last when sorting by sortOrder", () => {
     const rowsWithNullSort: HoldingDetailRow[] = [
-      {
+      makeDetailRow({
         asOfDate: "2026-06-01",
         instrumentId: "i1",
         instrumentName: "Later",
@@ -408,26 +413,15 @@ describe("sortHoldingDetailRows", () => {
         quantity: 1,
         marketValueMinor: 1000,
         bookValueMinor: null,
-        unitPrice: null,
-        unrealizedGainMinor: null,
-        unrealizedGainRate: null,
-        portfolioWeight: null,
-        tags: [],
-      },
-      {
+      }),
+      makeDetailRow({
         asOfDate: "2026-06-01",
         instrumentId: "i2",
         instrumentName: "First",
-        sortOrder: 0,
         quantity: 1,
         marketValueMinor: 1000,
         bookValueMinor: null,
-        unitPrice: null,
-        unrealizedGainMinor: null,
-        unrealizedGainRate: null,
-        portfolioWeight: null,
-        tags: [],
-      },
+      }),
     ];
 
     let result = sortHoldingDetailRows(rowsWithNullSort, "sortOrder", "asc");
@@ -453,34 +447,22 @@ describe("sortHoldingDetailRows", () => {
 
   it("sorts classification columns when both rows lack tags", () => {
     const untaggedRows: HoldingDetailRow[] = [
-      {
+      makeDetailRow({
         asOfDate: "2026-06-01",
         instrumentId: "i1",
         instrumentName: "B",
-        sortOrder: 0,
         quantity: 1,
         marketValueMinor: 1000,
         bookValueMinor: null,
-        unitPrice: null,
-        unrealizedGainMinor: null,
-        unrealizedGainRate: null,
-        portfolioWeight: null,
-        tags: [],
-      },
-      {
+      }),
+      makeDetailRow({
         asOfDate: "2026-06-01",
         instrumentId: "i2",
         instrumentName: "A",
-        sortOrder: 0,
         quantity: 1,
         marketValueMinor: 1000,
         bookValueMinor: null,
-        unitPrice: null,
-        unrealizedGainMinor: null,
-        unrealizedGainRate: null,
-        portfolioWeight: null,
-        tags: [],
-      },
+      }),
     ];
 
     let result = sortHoldingDetailRows(untaggedRows, "classification:region", "asc");

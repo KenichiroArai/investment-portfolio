@@ -3,7 +3,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { migrate } from "drizzle-orm/better-sqlite3/migrator";
-import { IdecoCsvError } from "@repo/shared";
+import { IdecoCsvError, SnapshotValidationError } from "@repo/shared";
 
 import { createDb } from "./client";
 import { resolveDatabasePath } from "./database-path";
@@ -98,6 +98,8 @@ async function main() {
   } catch (error) {
     if (error instanceof IdecoCsvError) {
       console.error(`CSV エラー: ${error.message}`);
+    } else if (error instanceof SnapshotValidationError) {
+      console.error(`検証エラー: ${error.message}`);
     } else {
       const message = error instanceof Error ? error.message : String(error);
       console.error(`投入エラー: ${message}`);

@@ -136,6 +136,26 @@ function parseHoldingsDataRow(
   return result;
 }
 
+function assertUniqueHoldingsInstrumentNames(
+  asOfDate: string,
+  rows: IdecoHoldingsCsvRow[],
+): void {
+  let result: void = undefined;
+  const seen = new Map<string, number>();
+
+  for (const row of rows) {
+    const existingLineNumber = seen.get(row.instrumentName);
+    if (existingLineNumber !== undefined) {
+      throw new IdecoCsvError(
+        `明細 CSV の基準日 ${asOfDate} で運用商品名「${row.instrumentName}」が重複しています（${existingLineNumber} 行目と ${row.rowNumber} 行目）`,
+      );
+    }
+    seen.set(row.instrumentName, row.rowNumber);
+  }
+
+  return result;
+}
+
 export function parseIdecoHoldingsCsvByDate(
   content: string,
 ): ParseIdecoHoldingsCsvByDateResult {
@@ -166,6 +186,7 @@ export function parseIdecoHoldingsCsvByDate(
   const snapshots = [...groups.entries()]
     .sort(([leftDate], [rightDate]) => leftDate.localeCompare(rightDate))
     .map(([asOfDate, rows]) => {
+      assertUniqueHoldingsInstrumentNames(asOfDate, rows);
       let group: IdecoHoldingsCsvSnapshotGroup = { asOfDate, rows };
       return group;
     });

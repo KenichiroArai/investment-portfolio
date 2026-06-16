@@ -8,6 +8,7 @@ import {
   IDECO_KAKEIBO_METRIC_CODES,
   IDECO_PORTFOLIO_METRIC_CODES,
   IDECO_SCHEME_CODES,
+  IdecoCsvError,
   parseIdecoGenericCsv,
 } from "@repo/shared";
 
@@ -185,6 +186,23 @@ describe("importIdecoData", () => {
         }),
       ]),
     );
+  });
+
+  it("rejects holdings csv with duplicate instrument names on the same date", async () => {
+    const db = setup();
+    const holdingsCsv = `番号,日付,運用商品名,時価単価(1万口当り),残高数量,資産残高,購入金額,損益,損益率
+1,2026/06/02,eMAXIS Slim 国内株式(TOPIX),"31351","41773","130962","128324","2638","0.021"
+2,2026/06/02,eMAXIS Slim 国内株式(TOPIX),"31351","41773","130962","128324","2638","0.021"
+`;
+
+    await expect(
+      importIdecoData(
+        db,
+        readIdecoImportFiles({
+          holdingsCsv,
+        }),
+      ),
+    ).rejects.toThrow(IdecoCsvError);
   });
 
   it("returns null when holdings reference unknown short name", async () => {
