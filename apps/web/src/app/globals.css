@@ -162,6 +162,20 @@
   font-weight: 500;
 }
 
+.rebalance-table__group-start td {
+  border-top: 2px solid var(--border);
+}
+
+.rebalance-table__group-label {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.rebalance-table__child-label {
+  padding-left: 2.25rem !important;
+}
+
 .data-table__cell-numeric {
   text-align: right;
   font-variant-numeric: tabular-nums;
