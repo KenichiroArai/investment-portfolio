@@ -258,7 +258,7 @@ export function RebalanceTable({ rows, grouped = false }: RebalanceTableProps) {
   }, [grouped, sortedRows]);
 
   useEffect(() => {
-    let result: void = undefined;
+    let result: () => void = () => {};
     if (!grouped) {
       setExpandedGroupKeys([]);
       return result;
@@ -277,6 +277,7 @@ export function RebalanceTable({ rows, grouped = false }: RebalanceTableProps) {
       }
       return [...preserved, ...added];
     });
+    result = () => {};
     return result;
   }, [grouped, groupedRows]);
 

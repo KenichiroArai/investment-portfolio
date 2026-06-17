@@ -147,6 +147,27 @@ describe("AnalysisView", () => {
     expect(screen.getByText("テスト銘柄")).toBeInTheDocument();
   });
 
+  it("shows rebalance trades summary for active scheme", async () => {
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        snapshot: snapshotFixture,
+      }),
+    );
+
+    renderWithPortfolioTime(
+      <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("リバランス設定")).toBeInTheDocument();
+    });
+
+    expect(screen.getByText("売買提案")).toBeInTheDocument();
+    expect(screen.getByText(/合計買い/)).toBeInTheDocument();
+    expect(screen.getByText(/合計売り/)).toBeInTheDocument();
+  });
+
   it("shows loading skeleton while snapshot loads", () => {
     vi.stubGlobal("fetch", vi.fn(() => new Promise(() => {})));
     const { container } = renderWithPortfolioTime(

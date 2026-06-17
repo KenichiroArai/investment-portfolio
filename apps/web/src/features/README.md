@@ -10,9 +10,8 @@
 | `portfolio/` | 口座シェル、基準日コンテキスト、概要 |
 | `holdings/` | 明細テーブル、期間比較 |
 | `analysis/` | 資産配分、全口座分析 |
-| `allocation/` | 配分パネル・目標配分フック（analysis / rebalance で共有） |
-| `portfolio-allocation/` | 銘柄ごとのポートフォリオ配分 |
-| `rebalance/` | リバランス試算 |
+| `allocation/` | 配分パネル・目標配分フック・リバランス試算 UI |
+| `portfolio-allocation/` | 銘柄ごとのポートフォリオ配分・銘柄軸リバランス |
 | `trends/` | 推移チャート・期間変化 |
 | `manage/` | 設定（データ管理、分類、目標配分カード） |
 
@@ -26,7 +25,6 @@
 | `/portfolios/[code]/holdings/` | `portfolio/HoldingsView` |
 | `/portfolios/[code]/analysis/` | `analysis/AnalysisView` |
 | `/portfolios/[code]/portfolio-allocation/` | `portfolio-allocation/PortfolioAllocationView` |
-| `/portfolios/[code]/rebalance/` | `rebalance/RebalanceView` |
 | `/portfolios/[code]/trends/` | `trends/TrendsView` |
 | `/portfolios/[code]/settings/` | `manage/DataManageView` ほか |
 

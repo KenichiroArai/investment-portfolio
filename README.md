@@ -104,9 +104,8 @@ SQLite の内容を SQL で確認する場合は [dev/sql/README.md](dev/sql/REA
 | 全口座分析 | 複数口座を合算した資産配分（`/analysis/`） |
 | 口座概要 | 評価額・損益・拠出金、推移チャート、基準日切替 |
 | 明細 | 保有銘柄一覧、期間比較、銘柄別詳細 |
-| 資産配分 | 分類軸（商品タイプ・地域・資産など）ごとの構成比・目標配分・ギャップ |
-| ポートフォリオ配分 | 銘柄ごとの目標構成比（コア・サテライト戦略の銘柄ウェイト管理） |
-| リバランス | 資産配分軸または銘柄軸での売買案・追加投資額の試算 |
+| 資産配分 | 分類軸（商品タイプ・地域・資産など）ごとの構成比・目標配分・ギャップ・売買試算 |
+| ポートフォリオ配分 | 銘柄ごとの目標構成比、構成目標との比較、銘柄軸の売買試算 |
 | 推移 | 評価額・構成比の時系列チャート、期間変化テーブル |
 | 設定 | データ管理（銘柄・明細・指標の登録・更新）、分類設定、目標配分 |
 | データ投入 | iDeCo 5 CSV の一括インポート、複数基準日のスナップショット |
@@ -153,7 +152,6 @@ curl -s http://127.0.0.1:3001/portfolios/ideco/target-allocations
 | [http://localhost:3000/portfolios/ideco/holdings/](http://localhost:3000/portfolios/ideco/holdings/) | 明細 |
 | [http://localhost:3000/portfolios/ideco/analysis/](http://localhost:3000/portfolios/ideco/analysis/) | 資産配分 |
 | [http://localhost:3000/portfolios/ideco/portfolio-allocation/](http://localhost:3000/portfolios/ideco/portfolio-allocation/) | ポートフォリオ配分 |
-| [http://localhost:3000/portfolios/ideco/rebalance/](http://localhost:3000/portfolios/ideco/rebalance/) | リバランス |
 | [http://localhost:3000/portfolios/ideco/trends/](http://localhost:3000/portfolios/ideco/trends/) | 推移 |
 | [http://localhost:3000/portfolios/ideco/settings/data/](http://localhost:3000/portfolios/ideco/settings/data/) | データ管理（ローカル API のみ） |
 

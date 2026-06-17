@@ -129,7 +129,7 @@ export function TargetPortfolioSettingsCard({
       <CardHeader>
         <CardTitle>銘柄目標配分</CardTitle>
         <CardDescription>
-          保有銘柄ごとの目標構成比（%）を設定します。ポートフォリオ配分画面とリバランスで現状との差分に使います。
+          保有銘柄ごとの目標構成比（%）を設定します。ポートフォリオ配分画面のギャップ表示と売買試算に使います。
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

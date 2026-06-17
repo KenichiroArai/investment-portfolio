@@ -154,6 +154,14 @@ export function createPortfolioFetchMock(options: PortfolioFetchMockOptions = {}
       };
     }
 
+    if (url.includes("classification-schemes")) {
+      return {
+        ok: true,
+        status: 200,
+        json: async () => [],
+      };
+    }
+
     return {
       ok: true,
       status: 200,

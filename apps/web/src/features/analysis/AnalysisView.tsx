@@ -1,5 +1,6 @@
 "use client";
 
+import type { ClassificationSchemeWithValuesDto } from "@repo/shared";
 import Link from "next/link";
 import {
   buildAllocationBySchemeWithLines,
@@ -12,13 +13,17 @@ import {
   type AnalysisSchemeConfig,
 } from "@repo/shared";
 import { Settings } from "lucide-react";
-import { useMemo, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { AllocationCrossLink } from "@/features/allocation/AllocationCrossLink";
 import { AllocationPeriodShareSummary } from "@/features/allocation/AllocationPeriodShareSummary";
 import { AllocationSchemeTabs } from "@/features/allocation/AllocationSchemeTabs";
 import { AllocationSnapshotPanel } from "@/features/allocation/AllocationSnapshotPanel";
+import { buildAllocationRebalanceDisplayRows } from "@/features/allocation/build-allocation-rebalance-display-rows";
+import { RebalanceSettingsCard } from "@/features/allocation/RebalanceSettingsCard";
+import { RebalanceTradesSummary } from "@/features/allocation/RebalanceTradesSummary";
 import { useAllocationSchemeParam } from "@/features/allocation/useAllocationSchemeParam";
+import { useRebalanceDeposit } from "@/features/allocation/useRebalanceDeposit";
 import { useTargetAllocations } from "@/features/allocation/useTargetAllocations";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
 import { buildTrendChartBuckets } from "@/features/trends/trend-chart-buckets";
@@ -29,6 +34,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { fetchClassificationSchemes } from "@/lib/api-client";
 import { formatAsOfDateJa, formatYen } from "@/lib/format-yen";
 import { buildPortfolioPath } from "@/lib/portfolio-path";
 
@@ -54,6 +60,43 @@ export function AnalysisView({
     loadingTrends,
   } = usePortfolioTime();
   const { allocationsByScheme } = useTargetAllocations(portfolioCode);
+  const { depositInput, setDepositInput, depositMinor, mode } = useRebalanceDeposit();
+  const [classificationSchemes, setClassificationSchemes] = useState<
+    ClassificationSchemeWithValuesDto[]
+  >([]);
+  const [loadingSchemes, setLoadingSchemes] = useState(true);
+
+  useEffect(() => {
+    let result: () => void = () => {};
+    let cancelled = false;
+
+    async function loadSchemes() {
+      let loadResult: void = undefined;
+
+      setLoadingSchemes(true);
+      const response = await fetchClassificationSchemes(portfolioCode);
+
+      if (cancelled) {
+        return loadResult;
+      }
+
+      setLoadingSchemes(false);
+
+      if (response.ok) {
+        setClassificationSchemes(response.data);
+      } else {
+        setClassificationSchemes([]);
+      }
+
+      return loadResult;
+    }
+
+    void loadSchemes();
+    result = () => {
+      cancelled = true;
+    };
+    return result;
+  }, [portfolioCode]);
 
   const schemeConfigs = snapshot
     ? resolveAnalysisSchemes(snapshot, portfolioKind)
@@ -120,7 +163,7 @@ export function AnalysisView({
 
   let result: ReactNode = null;
 
-  if (loadingDates || loadingSnapshot) {
+  if (loadingDates || loadingSnapshot || loadingSchemes) {
     result = (
       <PageContainer>
         <LoadingSkeleton />
@@ -201,51 +244,80 @@ export function AnalysisView({
         />
       </div>
 
-      <AllocationSchemeTabs
-        schemes={schemeConfigs}
-        activeSchemeCode={activeSchemeCode}
-        onSchemeChange={setActiveSchemeCode}
-        renderPanel={(scheme: AnalysisSchemeConfig) => {
-          const schemeAllocation = buildAllocationBySchemeWithLines(
-            snapshot.lines,
-            scheme.schemeCode,
-            scheme.schemeName,
-          );
-          const targets = allocationsByScheme[scheme.schemeCode] ?? [];
-          const targetTotalRatio =
-            targets.length > 0
-              ? targets.reduce((sum, target) => sum + target.targetRatio, 0)
-              : null;
-          const gapRows = buildAllocationGapRows(
-            schemeAllocation.slices,
-            targets,
-          );
-          const slicesWithGap = mergeAllocationGapIntoSlices(
-            schemeAllocation.slices,
-            gapRows,
-          );
+      <div className="space-y-6">
+        <RebalanceSettingsCard
+          depositInput={depositInput}
+          depositMinor={depositMinor}
+          mode={mode}
+          onDepositInputChange={setDepositInput}
+          depositInputId="analysis-rebalance-deposit"
+        />
 
-          let panel = (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">{scheme.schemeName}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <AllocationSnapshotPanel
-                  slices={slicesWithGap}
-                  axisTotalMinor={schemeAllocation.totalMarketValueMinor}
-                  assetTotalMinor={totalValue}
-                  targetTotalRatio={targetTotalRatio}
-                  portfolioCode={portfolioCode}
-                  schemeCode={scheme.schemeCode}
-                  asOfDate={asOfDate}
+        <AllocationSchemeTabs
+          schemes={schemeConfigs}
+          activeSchemeCode={activeSchemeCode}
+          onSchemeChange={setActiveSchemeCode}
+          renderPanel={(scheme: AnalysisSchemeConfig) => {
+            const schemeAllocation = buildAllocationBySchemeWithLines(
+              snapshot.lines,
+              scheme.schemeCode,
+              scheme.schemeName,
+            );
+            const targets = allocationsByScheme[scheme.schemeCode] ?? [];
+            const targetTotalRatio =
+              targets.length > 0
+                ? targets.reduce((sum, target) => sum + target.targetRatio, 0)
+                : null;
+            const gapRows = buildAllocationGapRows(
+              schemeAllocation.slices,
+              targets,
+            );
+            const slicesWithGap = mergeAllocationGapIntoSlices(
+              schemeAllocation.slices,
+              gapRows,
+            );
+            const rebalanceResult = buildAllocationRebalanceDisplayRows({
+              schemeAllocation,
+              targets,
+              portfolioTotalMinor: totalValue,
+              depositMinor,
+              mode,
+              classificationSchemes,
+            });
+
+            let panel = (
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">{scheme.schemeName}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <AllocationSnapshotPanel
+                      slices={slicesWithGap}
+                      axisTotalMinor={schemeAllocation.totalMarketValueMinor}
+                      assetTotalMinor={totalValue}
+                      targetTotalRatio={targetTotalRatio}
+                      portfolioCode={portfolioCode}
+                      schemeCode={scheme.schemeCode}
+                      asOfDate={asOfDate}
+                    />
+                  </CardContent>
+                </Card>
+
+                <RebalanceTradesSummary
+                  description="構成単位の売買を、各構成内の現状比率で銘柄に按分して表示します。"
+                  rows={rebalanceResult.rows}
+                  totalBuyMinor={rebalanceResult.totalBuyMinor}
+                  totalSellMinor={rebalanceResult.totalSellMinor}
+                  unallocatedDepositMinor={rebalanceResult.unallocatedDepositMinor}
+                  grouped
                 />
-              </CardContent>
-            </Card>
-          );
-          return panel;
-        }}
-      />
+              </div>
+            );
+            return panel;
+          }}
+        />
+      </div>
     </PageContainer>
   );
   return result;

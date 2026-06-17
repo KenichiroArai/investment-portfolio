@@ -1,5 +1,5 @@
 import { PortfolioAllocationView } from "@/features/portfolio-allocation/PortfolioAllocationView";
-import { generatePortfolioStaticParams } from "@/lib/portfolio-catalog";
+import { findPortfolioByCode, generatePortfolioStaticParams } from "@/lib/portfolio-catalog";
 import { resolvePortfolioCodeParam } from "@/lib/portfolio-path";
 
 type PageProps = {
@@ -12,9 +12,11 @@ export function generateStaticParams() {
 }
 
 export default async function PortfolioAllocationPage({ params }: PageProps) {
-  let result = <PortfolioAllocationView portfolioCode="" />;
+  let result = <PortfolioAllocationView portfolioCode="" portfolioKind="ideco" />;
 
   const code = await resolvePortfolioCodeParam(params);
-  result = <PortfolioAllocationView portfolioCode={code} />;
+  const portfolio = findPortfolioByCode(code);
+  const kind = portfolio?.kind ?? "ideco";
+  result = <PortfolioAllocationView portfolioCode={code} portfolioKind={kind} />;
   return result;
 }

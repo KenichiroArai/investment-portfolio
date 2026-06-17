@@ -8,7 +8,7 @@
 | --- | --- |
 | `layout/` | `app-shell`, `top-bar`, `page-header`, `page-container`, `settings-sidebar` |
 | `ui/` | shadcn/ui ベースのプリミティブ（Button, Card, Table, Tabs など） |
-| `PortfolioContextBar.tsx` | 口座タブナビ（概要・明細・配分・リバランス・推移） |
+| `PortfolioContextBar.tsx` | 口座タブナビ（概要・明細・配分・推移） |
 | `SnapshotTimeBar.tsx` | 基準日選択バー |
 | `AnalysisSubNav.tsx` | 資産配分画面のサブナビ |
 | `SortableTableHeader.tsx` | ソート可能テーブルヘッダ |
