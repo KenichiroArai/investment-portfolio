@@ -245,14 +245,6 @@ export function AnalysisView({
       </div>
 
       <div className="space-y-6">
-        <RebalanceSettingsCard
-          depositInput={depositInput}
-          depositMinor={depositMinor}
-          mode={mode}
-          onDepositInputChange={setDepositInput}
-          depositInputId="analysis-rebalance-deposit"
-        />
-
         <AllocationSchemeTabs
           schemes={schemeConfigs}
           activeSchemeCode={activeSchemeCode}
@@ -303,6 +295,14 @@ export function AnalysisView({
                     />
                   </CardContent>
                 </Card>
+
+                <RebalanceSettingsCard
+                  depositInput={depositInput}
+                  depositMinor={depositMinor}
+                  mode={mode}
+                  onDepositInputChange={setDepositInput}
+                  depositInputId="analysis-rebalance-deposit"
+                />
 
                 <RebalanceTradesSummary
                   description="構成単位の売買を、各構成内の現状比率で銘柄に按分して表示します。"
