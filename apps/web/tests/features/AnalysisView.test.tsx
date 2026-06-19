@@ -51,6 +51,7 @@ describe("AnalysisView", () => {
   afterEach(() => {
     cleanup();
     vi.unstubAllGlobals();
+    delete process.env.NEXT_PUBLIC_DATA_SOURCE;
   });
 
   it("renders allocation by active scheme", async () => {
@@ -147,7 +148,8 @@ describe("AnalysisView", () => {
     expect(screen.getByText("テスト銘柄")).toBeInTheDocument();
   });
 
-  it("shows rebalance trades summary for active scheme", async () => {
+  it("shows rebalance trades summary for active scheme in api mode", async () => {
+    process.env.NEXT_PUBLIC_DATA_SOURCE = "api";
     vi.stubGlobal(
       "fetch",
       createPortfolioFetchMock({
@@ -166,6 +168,27 @@ describe("AnalysisView", () => {
     expect(screen.getByText("売買提案")).toBeInTheDocument();
     expect(screen.getByText(/合計買い/)).toBeInTheDocument();
     expect(screen.getByText(/合計売り/)).toBeInTheDocument();
+  });
+
+  it("hides rebalance section in static mode", async () => {
+    process.env.NEXT_PUBLIC_DATA_SOURCE = "static";
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        snapshot: snapshotFixture,
+      }),
+    );
+
+    renderWithPortfolioTime(
+      <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/評価額合計/)).toBeInTheDocument();
+    });
+
+    expect(screen.queryByText("リバランス設定")).not.toBeInTheDocument();
+    expect(screen.queryByText("売買提案")).not.toBeInTheDocument();
   });
 
   it("shows loading skeleton while snapshot loads", () => {

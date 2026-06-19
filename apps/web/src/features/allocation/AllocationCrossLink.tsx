@@ -5,7 +5,6 @@ import { ArrowRightLeft } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
-import { isWritableDataSource } from "@/lib/data-source";
 import { buildPortfolioPath } from "@/lib/portfolio-path";
 
 type AllocationCrossLinkProps = {
@@ -55,11 +54,6 @@ export function AllocationCrossLink({
   metric,
   label,
 }: AllocationCrossLinkProps) {
-  if (target === "analysis" && !isWritableDataSource()) {
-    let result: ReactNode = null;
-    return result;
-  }
-
   const href = buildHref({
     portfolioCode,
     target,

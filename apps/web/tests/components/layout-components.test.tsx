@@ -69,7 +69,10 @@ describe("layout components", () => {
         expect(screen.getByRole("navigation", { name: "口座メニュー" })).toBeInTheDocument();
       });
       expect(screen.queryByRole("link", { name: "設定" })).not.toBeInTheDocument();
-      expect(screen.queryByRole("link", { name: "資産配分" })).not.toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "資産配分" })).toHaveAttribute(
+        "href",
+        "/portfolios/ideco/analysis",
+      );
     });
   });
 

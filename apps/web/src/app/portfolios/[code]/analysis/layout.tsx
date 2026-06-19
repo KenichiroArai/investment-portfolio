@@ -1,8 +1,5 @@
-import { redirect } from "next/navigation";
-
 import { AnalysisSubNav } from "@/components/AnalysisSubNav";
-import { isWritableDataSource } from "@/lib/data-source";
-import { buildPortfolioPath, resolvePortfolioCodeParam } from "@/lib/portfolio-path";
+import { resolvePortfolioCodeParam } from "@/lib/portfolio-path";
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -14,11 +11,6 @@ export default async function PortfolioAnalysisLayout({
   params,
 }: LayoutProps) {
   const code = await resolvePortfolioCodeParam(params);
-
-  if (!isWritableDataSource()) {
-    let result: never = redirect(buildPortfolioPath(code)) as never;
-    return result;
-  }
 
   let result = (
     <>

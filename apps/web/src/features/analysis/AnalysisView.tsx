@@ -36,6 +36,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { fetchClassificationSchemes } from "@/lib/api-client";
+import { isWritableDataSource } from "@/lib/data-source";
 import { formatAsOfDateJa, formatYen } from "@/lib/format-yen";
 import { buildPortfolioPath } from "@/lib/portfolio-path";
 
@@ -65,11 +66,15 @@ export function AnalysisView({
   const [classificationSchemes, setClassificationSchemes] = useState<
     ClassificationSchemeWithValuesDto[]
   >([]);
-  const [loadingSchemes, setLoadingSchemes] = useState(true);
+  const [loadingSchemes, setLoadingSchemes] = useState(isWritableDataSource());
 
   useEffect(() => {
     let result: () => void = () => {};
     let cancelled = false;
+
+    if (!isWritableDataSource()) {
+      return result;
+    }
 
     async function loadSchemes() {
       let loadResult: void = undefined;
@@ -271,14 +276,38 @@ export function AnalysisView({
               schemeAllocation.slices,
               gapRows,
             );
-            const rebalanceResult = buildAllocationRebalanceDisplayRows({
-              schemeAllocation,
-              targets,
-              portfolioTotalMinor: totalValue,
-              depositMinor,
-              mode,
-              classificationSchemes,
-            });
+
+            let rebalanceSection: ReactNode = null;
+            if (isWritableDataSource()) {
+              const rebalanceResult = buildAllocationRebalanceDisplayRows({
+                schemeAllocation,
+                targets,
+                portfolioTotalMinor: totalValue,
+                depositMinor,
+                mode,
+                classificationSchemes,
+              });
+              rebalanceSection = (
+                <>
+                  <RebalanceSettingsCard
+                    depositInput={depositInput}
+                    depositMinor={depositMinor}
+                    mode={mode}
+                    onDepositInputChange={setDepositInput}
+                    depositInputId="analysis-rebalance-deposit"
+                  />
+
+                  <RebalanceTradesSummary
+                    description="構成単位の売買を、各構成内の現状比率で銘柄に按分して表示します。"
+                    rows={rebalanceResult.rows}
+                    totalBuyMinor={rebalanceResult.totalBuyMinor}
+                    totalSellMinor={rebalanceResult.totalSellMinor}
+                    unallocatedDepositMinor={rebalanceResult.unallocatedDepositMinor}
+                    grouped
+                  />
+                </>
+              );
+            }
 
             let panel = (
               <div className="space-y-6">
@@ -299,22 +328,7 @@ export function AnalysisView({
                   </CardContent>
                 </Card>
 
-                <RebalanceSettingsCard
-                  depositInput={depositInput}
-                  depositMinor={depositMinor}
-                  mode={mode}
-                  onDepositInputChange={setDepositInput}
-                  depositInputId="analysis-rebalance-deposit"
-                />
-
-                <RebalanceTradesSummary
-                  description="構成単位の売買を、各構成内の現状比率で銘柄に按分して表示します。"
-                  rows={rebalanceResult.rows}
-                  totalBuyMinor={rebalanceResult.totalBuyMinor}
-                  totalSellMinor={rebalanceResult.totalSellMinor}
-                  unallocatedDepositMinor={rebalanceResult.unallocatedDepositMinor}
-                  grouped
-                />
+                {rebalanceSection}
               </div>
             );
             return panel;

@@ -160,7 +160,18 @@ export async function deletePortfolio(code: string) {
 }
 
 export async function fetchClassificationSchemes(portfolioCode: string) {
-  let result = await requestJson<ClassificationSchemeWithValuesDto[]>(
+  let result:
+    | { ok: true; data: ClassificationSchemeWithValuesDto[] }
+    | { ok: false; status: number; message: string } = {
+    ok: true,
+    data: [],
+  };
+
+  if (!isWritableDataSource()) {
+    return result;
+  }
+
+  result = await requestJson<ClassificationSchemeWithValuesDto[]>(
     `/portfolios/${encodePortfolioCodeForPath(portfolioCode)}/classification-schemes`,
   );
   return result;

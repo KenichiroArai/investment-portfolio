@@ -20,7 +20,6 @@ import { buildPortfolioPath } from "@/lib/portfolio-path";
 import {
   getPortfoliosFetchUrl,
   getSnapshotLoadErrorMessage,
-  isWritableDataSource,
   type PortfolioListItem,
 } from "@/lib/data-source";
 
@@ -180,10 +179,6 @@ export function PortfolioContextBar({ portfolioCode }: PortfolioContextBarProps)
               let tabResult: ReactNode = null;
               const href = buildPortfolioHref(portfolioCode, tab.segment);
               const active = isTabActive(pathname, portfolioCode, tab.segment);
-
-              if (tab.segment === "analysis" && !isWritableDataSource()) {
-                return tabResult;
-              }
 
               if (!tab.enabled) {
                 tabResult = (
