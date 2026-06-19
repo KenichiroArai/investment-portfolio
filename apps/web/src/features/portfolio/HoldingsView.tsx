@@ -34,6 +34,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   getSnapshotByDateFetchUrl,
   getSnapshotLoadErrorMessage,
+  isWritableDataSource,
 } from "@/lib/data-source";
 import { useTableSort } from "@/hooks/useTableSort";
 import { formatAsOfDateJa } from "@/lib/format-yen";
@@ -551,9 +552,11 @@ export function HoldingsView({ portfolioCode }: HoldingsViewProps) {
                     rangeLabel={paginatedDetailRows.rangeLabel}
                     portfolioCode={portfolioCode}
                     analysisHref={
-                      classificationSchemeCode !== ""
-                        ? `${buildPortfolioPath(portfolioCode, "analysis")}?scheme=${encodeURIComponent(classificationSchemeCode)}`
-                        : buildPortfolioPath(portfolioCode, "analysis")
+                      isWritableDataSource()
+                        ? classificationSchemeCode !== ""
+                          ? `${buildPortfolioPath(portfolioCode, "analysis")}?scheme=${encodeURIComponent(classificationSchemeCode)}`
+                          : buildPortfolioPath(portfolioCode, "analysis")
+                        : undefined
                     }
                   />
                   <HoldingsRangeDetailTable

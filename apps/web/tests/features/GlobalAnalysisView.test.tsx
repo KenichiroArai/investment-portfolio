@@ -82,7 +82,7 @@ describe("GlobalAnalysisView", () => {
     expect(screen.getByText("口座別内訳")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "iDeCo" })).toHaveAttribute(
       "href",
-      "/portfolios/ideco/analysis",
+      "/portfolios/ideco",
     );
     expect(screen.getByRole("tab", { name: "地域分類" })).toBeInTheDocument();
   });

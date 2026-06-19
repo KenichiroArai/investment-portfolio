@@ -299,12 +299,14 @@ export function HomeView() {
                           明細
                         </Link>
                       </Button>
-                      <Button variant="outline" size="sm" asChild>
-                        <Link href={buildPortfolioPath(card.code, "analysis")}>
-                          <BarChart3 className="h-3.5 w-3.5" />
-                          資産配分
-                        </Link>
-                      </Button>
+                      <WritableOnly>
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href={buildPortfolioPath(card.code, "analysis")}>
+                            <BarChart3 className="h-3.5 w-3.5" />
+                            資産配分
+                          </Link>
+                        </Button>
+                      </WritableOnly>
                     </div>
                   </CardContent>
                 </Card>

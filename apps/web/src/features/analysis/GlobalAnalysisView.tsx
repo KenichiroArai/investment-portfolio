@@ -31,6 +31,7 @@ import {
   getPortfoliosFetchUrl,
   getSnapshotFetchUrl,
   getSnapshotLoadErrorMessage,
+  isWritableDataSource,
   type PortfolioListItem,
 } from "@/lib/data-source";
 
@@ -198,11 +199,14 @@ export function GlobalAnalysisView() {
             </TableHeader>
             <TableBody>
               {merged.portfolios.map((portfolio) => {
+                const portfolioHref = isWritableDataSource()
+                  ? buildPortfolioPath(portfolio.portfolioCode, "analysis")
+                  : buildPortfolioPath(portfolio.portfolioCode);
                 let row = (
                   <TableRow key={portfolio.portfolioCode}>
                     <TableCell>
                       <Link
-                        href={buildPortfolioPath(portfolio.portfolioCode, "analysis")}
+                        href={portfolioHref}
                         className="font-medium hover:underline"
                       >
                         {portfolio.portfolioName}
