@@ -55,6 +55,7 @@ export const IDECO_PRODUCT_TYPES: IdecoClassificationDefinition[] = [
 export const IDECO_MAJOR_CATEGORIES: IdecoClassificationDefinition[] = [
   { name: "定期預金", code: "time_deposit", sortOrder: 0 },
   { name: "投資信託", code: "mutual_fund", sortOrder: 1 },
+  { name: "待機資金", code: "standby_cash", sortOrder: 2 },
 ];
 
 export const IDECO_PRODUCT_STYLES: IdecoClassificationDefinition[] = [

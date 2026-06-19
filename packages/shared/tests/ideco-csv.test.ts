@@ -306,6 +306,22 @@ describe("ideco csv parsers", () => {
     ).toThrow(/残高数量が不正/);
   });
 
+  it("parses standby cash holdings with zero quantity", () => {
+    const parsed = parseIdecoHoldingsCsv(
+      `番号,日付,運用商品名,時価単価(1万口当り),残高数量,資産残高,購入金額,損益,損益率
+1,2026/6/19,待機資金,"0","0","46","0","0",0
+`,
+    );
+    expect(parsed.rows[0]).toMatchObject({
+      instrumentName: "待機資金",
+      quantity: 0,
+      marketValueMinor: 46,
+      bookValueMinor: 0,
+      unrealizedGainMinor: 0,
+      unrealizedGainRate: 0,
+    });
+  });
+
   it("parses ideco generic csv", () => {
     const parsed = parseIdecoGenericCsv(`汎用名,汎用値
 拠出金累計,"2,716,679"

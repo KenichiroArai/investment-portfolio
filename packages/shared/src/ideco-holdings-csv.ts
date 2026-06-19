@@ -7,6 +7,8 @@ import {
   stripUtf8Bom,
 } from "./ideco-csv-utils";
 
+export const IDECO_STANDBY_CASH_INSTRUMENT_NAME = "待機資金";
+
 export const IDECO_HOLDINGS_CSV_HEADERS = [
   "番号",
   "日付",
@@ -44,6 +46,11 @@ export type IdecoHoldingsCsvSnapshotGroup = {
 export type ParseIdecoHoldingsCsvByDateResult = {
   snapshots: IdecoHoldingsCsvSnapshotGroup[];
 };
+
+export function isIdecoStandbyCashInstrument(instrumentName: string): boolean {
+  let result = instrumentName.trim() === IDECO_STANDBY_CASH_INSTRUMENT_NAME;
+  return result;
+}
 
 function assertHoldingsHeader(headerRow: string[]): void {
   let result: void = undefined;
@@ -118,8 +125,19 @@ function parseHoldingsDataRow(
     throw new IdecoCsvError(`${lineNumber} 行目の数値が不正です`);
   }
 
-  if (quantity <= 0) {
+  const isStandbyCash = isIdecoStandbyCashInstrument(instrumentName);
+  if (!isStandbyCash && quantity <= 0) {
     throw new IdecoCsvError(`${lineNumber} 行目の残高数量が不正です`);
+  }
+
+  if (isStandbyCash && quantity !== 0) {
+    throw new IdecoCsvError(
+      `${lineNumber} 行目の待機資金は残高数量が 0 である必要があります`,
+    );
+  }
+
+  if (isStandbyCash && marketValueYen < 0) {
+    throw new IdecoCsvError(`${lineNumber} 行目の資産残高が不正です`);
   }
 
   result = {

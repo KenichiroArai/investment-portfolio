@@ -69,7 +69,7 @@ export const portfolioSnapshotMetricInputSchema = z.object({
 
 export const holdingLineInputSchema = z.object({
   instrumentId: z.string().uuid(),
-  quantity: z.number().positive(),
+  quantity: z.number().nonnegative(),
   marketValueMinor: z.number().int().nonnegative(),
   bookValueMinor: z.number().int().nonnegative().nullable().optional(),
   sortOrder: z.number().int().positive().nullable().optional(),
