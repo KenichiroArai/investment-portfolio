@@ -6,7 +6,7 @@ import DataManagePage from "@/app/portfolios/[code]/settings/data/page";
 
 describe("settings pages", () => {
   beforeEach(() => {
-    process.env.NEXT_PUBLIC_DATA_SOURCE = "static";
+    process.env.NEXT_PUBLIC_DATA_SOURCE = "api";
     vi.stubGlobal(
       "fetch",
       vi.fn(async (input: RequestInfo | URL) => {
@@ -42,7 +42,7 @@ describe("settings pages", () => {
       screen.getByRole("heading", { name: "分類設定" }),
     ).toBeInTheDocument();
     await waitFor(() => {
-      expect(screen.getByRole("status")).toHaveTextContent(/読み取り専用/);
+      expect(screen.getByText("資産配分の集計軸を追加・編集します。")).toBeInTheDocument();
     });
   });
 
@@ -57,7 +57,7 @@ describe("settings pages", () => {
       screen.getByText(/閲覧画面の基準日切り替えとは別です/),
     ).toBeInTheDocument();
     await waitFor(() => {
-      expect(screen.getByRole("status")).toHaveTextContent(/読み取り専用/);
+      expect(screen.getByRole("tab", { name: "銘柄" })).toBeInTheDocument();
     });
   });
 });

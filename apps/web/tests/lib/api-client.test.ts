@@ -23,6 +23,7 @@ import {
   updateInstrument,
   updatePortfolio,
 } from "@/lib/api-client";
+import { WRITABLE_BLOCKED_MESSAGE } from "@/lib/data-source";
 
 function mockJsonResponse(
   init: {
@@ -379,5 +380,26 @@ describe("api-client fetch functions", () => {
       "http://127.0.0.1:3001/instruments",
       expect.any(Object),
     );
+  });
+
+  it("blocks mutations without calling fetch in static mode", async () => {
+    process.env.NEXT_PUBLIC_DATA_SOURCE = "static";
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await createPortfolio({
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      status: 403,
+      message: WRITABLE_BLOCKED_MESSAGE,
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    delete process.env.NEXT_PUBLIC_DATA_SOURCE;
   });
 });

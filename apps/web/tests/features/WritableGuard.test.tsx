@@ -15,15 +15,14 @@ describe("WritableGuard", () => {
     }
   });
 
-  it("shows readonly banner in static mode", () => {
+  it("renders nothing in static mode", () => {
     process.env.NEXT_PUBLIC_DATA_SOURCE = "static";
-    render(
+    const { container } = render(
       <WritableGuard>
         <p>編集フォーム</p>
       </WritableGuard>,
     );
-    expect(screen.getByRole("status")).toHaveTextContent(/読み取り専用/);
-    expect(screen.queryByText("編集フォーム")).not.toBeInTheDocument();
+    expect(container).toBeEmptyDOMElement();
   });
 
   it("renders children in api mode", () => {

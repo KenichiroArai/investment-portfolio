@@ -20,17 +20,17 @@ import type {
 } from "@repo/shared";
 
 import { getApiBaseUrl } from "@/lib/api-base";
-import { getDataSource } from "@/lib/data-source";
+import {
+  isWritableDataSource,
+  WRITABLE_BLOCKED_MESSAGE,
+} from "@/lib/data-source";
 import { encodePortfolioCodeForPath } from "@/lib/portfolio-path";
 
 export type ApiErrorBody = {
   error: string | { fieldErrors?: Record<string, string[]> };
 };
 
-export function isWritableDataSource(): boolean {
-  let result = getDataSource() === "api";
-  return result;
-}
+export { isWritableDataSource };
 
 export function formatApiError(body: ApiErrorBody): string {
   let result = "リクエストに失敗しました。";
@@ -103,6 +103,26 @@ async function requestJson<T>(
   }
 }
 
+async function requestWritableJson<T>(
+  path: string,
+  init?: RequestInit,
+): Promise<{ ok: true; data: T } | { ok: false; status: number; message: string }> {
+  let result:
+    | { ok: true; data: T }
+    | { ok: false; status: number; message: string } = {
+    ok: false,
+    status: 403,
+    message: WRITABLE_BLOCKED_MESSAGE,
+  };
+
+  if (!isWritableDataSource()) {
+    return result;
+  }
+
+  result = await requestJson<T>(path, init);
+  return result;
+}
+
 export async function fetchPortfolio(code: string) {
   let result = await requestJson<PortfolioDto>(
     `/portfolios/${encodePortfolioCodeForPath(code)}`,
@@ -111,7 +131,7 @@ export async function fetchPortfolio(code: string) {
 }
 
 export async function createPortfolio(input: CreatePortfolioInput) {
-  let result = await requestJson<PortfolioDto>("/portfolios", {
+  let result = await requestWritableJson<PortfolioDto>("/portfolios", {
     method: "POST",
     body: JSON.stringify(input),
   });
@@ -119,7 +139,7 @@ export async function createPortfolio(input: CreatePortfolioInput) {
 }
 
 export async function updatePortfolio(code: string, input: UpdatePortfolioInput) {
-  let result = await requestJson<PortfolioDto>(
+  let result = await requestWritableJson<PortfolioDto>(
     `/portfolios/${encodePortfolioCodeForPath(code)}`,
     {
       method: "PUT",
@@ -130,7 +150,7 @@ export async function updatePortfolio(code: string, input: UpdatePortfolioInput)
 }
 
 export async function deletePortfolio(code: string) {
-  let result = await requestJson<{ ok: boolean }>(
+  let result = await requestWritableJson<{ ok: boolean }>(
     `/portfolios/${encodePortfolioCodeForPath(code)}`,
     {
       method: "DELETE",
@@ -150,7 +170,7 @@ export async function createClassificationScheme(
   portfolioCode: string,
   input: CreateClassificationSchemeInput,
 ) {
-  let result = await requestJson<{ id: string; code: string; name: string }>(
+  let result = await requestWritableJson<{ id: string; code: string; name: string }>(
     `/portfolios/${encodePortfolioCodeForPath(portfolioCode)}/classification-schemes`,
     {
       method: "POST",
@@ -164,7 +184,7 @@ export async function updateClassificationScheme(
   schemeId: string,
   input: UpdateClassificationSchemeInput,
 ) {
-  let result = await requestJson<{ id: string; code: string; name: string }>(
+  let result = await requestWritableJson<{ id: string; code: string; name: string }>(
     `/classification-schemes/${schemeId}`,
     {
       method: "PUT",
@@ -175,7 +195,7 @@ export async function updateClassificationScheme(
 }
 
 export async function deleteClassificationScheme(schemeId: string) {
-  let result = await requestJson<{ ok: boolean }>(
+  let result = await requestWritableJson<{ ok: boolean }>(
     `/classification-schemes/${schemeId}`,
     { method: "DELETE" },
   );
@@ -186,7 +206,7 @@ export async function createClassificationValue(
   schemeId: string,
   input: CreateClassificationValueInput,
 ) {
-  let result = await requestJson<{
+  let result = await requestWritableJson<{
     id: string;
     code: string;
     name: string;
@@ -202,7 +222,7 @@ export async function updateClassificationValue(
   valueId: string,
   input: UpdateClassificationValueInput,
 ) {
-  let result = await requestJson<{
+  let result = await requestWritableJson<{
     id: string;
     code: string;
     name: string;
@@ -215,7 +235,7 @@ export async function updateClassificationValue(
 }
 
 export async function deleteClassificationValue(valueId: string) {
-  let result = await requestJson<{ ok: boolean }>(
+  let result = await requestWritableJson<{ ok: boolean }>(
     `/classification-values/${valueId}`,
     { method: "DELETE" },
   );
@@ -232,7 +252,7 @@ export async function fetchInstruments(searchQuery?: string) {
 }
 
 export async function createInstrument(input: CreateInstrumentInput) {
-  let result = await requestJson<InstrumentListItemDto>("/instruments", {
+  let result = await requestWritableJson<InstrumentListItemDto>("/instruments", {
     method: "POST",
     body: JSON.stringify(input),
   });
@@ -243,7 +263,7 @@ export async function updateInstrument(
   instrumentId: string,
   input: UpdateInstrumentInput,
 ) {
-  let result = await requestJson<InstrumentListItemDto>(
+  let result = await requestWritableJson<InstrumentListItemDto>(
     `/instruments/${instrumentId}`,
     {
       method: "PUT",
@@ -254,7 +274,7 @@ export async function updateInstrument(
 }
 
 export async function deleteInstrument(instrumentId: string) {
-  let result = await requestJson<{ ok: boolean }>(
+  let result = await requestWritableJson<{ ok: boolean }>(
     `/instruments/${instrumentId}`,
     { method: "DELETE" },
   );
@@ -272,7 +292,7 @@ export async function setInstrumentClassifications(
   instrumentId: string,
   input: SetInstrumentClassificationsInput,
 ) {
-  let result = await requestJson<{ ok: boolean }>(
+  let result = await requestWritableJson<{ ok: boolean }>(
     `/instruments/${instrumentId}/classifications`,
     {
       method: "PUT",
@@ -293,7 +313,7 @@ export async function replaceCurrentSnapshot(
   portfolioCode: string,
   input: ReplaceCurrentSnapshotInput,
 ) {
-  let result = await requestJson<CurrentSnapshotDto>(
+  let result = await requestWritableJson<CurrentSnapshotDto>(
     `/portfolios/${encodePortfolioCodeForPath(portfolioCode)}/snapshot/current`,
     {
       method: "PUT",
@@ -315,7 +335,7 @@ export async function replaceTargetAllocations(
   schemeCode: string,
   weights: TargetAllocationWeightDto[],
 ) {
-  let result = await requestJson<{ schemeCode: string; weights: TargetAllocationWeightDto[] }>(
+  let result = await requestWritableJson<{ schemeCode: string; weights: TargetAllocationWeightDto[] }>(
     `/portfolios/${encodePortfolioCodeForPath(portfolioCode)}/target-allocations/${encodeURIComponent(schemeCode)}`,
     {
       method: "PUT",
@@ -336,7 +356,7 @@ export async function replaceTargetPortfolioWeights(
   portfolioCode: string,
   weights: TargetPortfolioWeightDto[],
 ) {
-  let result = await requestJson<{ weights: TargetPortfolioWeightDto[] }>(
+  let result = await requestWritableJson<{ weights: TargetPortfolioWeightDto[] }>(
     `/portfolios/${encodePortfolioCodeForPath(portfolioCode)}/target-portfolio-weights`,
     {
       method: "PUT",

@@ -164,7 +164,18 @@ describe("portfolio routes", () => {
     });
   });
 
-  it("renders portfolio analysis layout with sub navigation", async () => {
+  it("hides portfolio analysis sub navigation in static mode", async () => {
+    const layout = await PortfolioAnalysisLayout({
+      params: Promise.resolve({ code: "ideco" }),
+      children: <p>analysis-body</p>,
+    });
+    const { container } = render(layout);
+    expect(container.querySelector('[aria-label="分析メニュー"]')).toBeNull();
+    expect(screen.getByText("analysis-body")).toBeInTheDocument();
+  });
+
+  it("renders portfolio analysis layout with sub navigation in api mode", async () => {
+    process.env.NEXT_PUBLIC_DATA_SOURCE = "api";
     const layout = await PortfolioAnalysisLayout({
       params: Promise.resolve({ code: "ideco" }),
       children: <p>analysis-body</p>,
@@ -220,7 +231,18 @@ describe("portfolio routes", () => {
     expect(mockRedirect).toHaveBeenCalledWith("/portfolios/ideco/settings/data/");
   });
 
-  it("renders settings layout with sidebar", async () => {
+  it("redirects settings layout to portfolio overview in static mode", async () => {
+    await expect(
+      SettingsLayout({
+        params: Promise.resolve({ code: "ideco" }),
+        children: <p>settings-body</p>,
+      }),
+    ).rejects.toThrow("NEXT_REDIRECT");
+    expect(mockRedirect).toHaveBeenCalledWith("/portfolios/ideco/");
+  });
+
+  it("renders settings layout with sidebar in api mode", async () => {
+    process.env.NEXT_PUBLIC_DATA_SOURCE = "api";
     const layout = await SettingsLayout({
       params: Promise.resolve({ code: "ideco" }),
       children: <p>settings-body</p>,

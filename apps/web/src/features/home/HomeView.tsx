@@ -13,6 +13,7 @@ import { useEffect, useState, type ReactNode } from "react";
 
 import { EmptyState } from "@/components/empty-state";
 import { LoadingSkeleton } from "@/components/loading-skeleton";
+import { WritableOnly } from "@/components/WritableOnly";
 import { StatCard } from "@/components/stat-card";
 import { AccountManagePanel } from "@/features/manage/AccountManagePanel";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -223,12 +224,14 @@ export function HomeView() {
       <section className="space-y-4">
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-lg font-semibold">口座</h2>
-          <AccountManagePanel
-            portfolios={portfolios}
-            onChanged={() => {
-              setReloadKey((value) => value + 1);
-            }}
-          />
+          <WritableOnly>
+            <AccountManagePanel
+              portfolios={portfolios}
+              onChanged={() => {
+                setReloadKey((value) => value + 1);
+              }}
+            />
+          </WritableOnly>
         </div>
         {cards.length === 0 ? (
           <EmptyState title="登録済みの口座がありません" />

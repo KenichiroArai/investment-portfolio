@@ -30,6 +30,7 @@ import { buildTrendChartBuckets } from "@/features/trends/trend-chart-buckets";
 import { LoadingSkeleton } from "@/components/loading-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
+import { WritableOnly } from "@/components/WritableOnly";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -220,12 +221,14 @@ export function AnalysisView({
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="outline">{formatAsOfDateJa(asOfDate)}</Badge>
             {isHistoricalView ? <Badge variant="secondary">履歴</Badge> : null}
-            <Button variant="outline" size="sm" asChild>
-              <Link href={buildPortfolioPath(portfolioCode, "settings", "classification")}>
-                <Settings className="h-4 w-4" />
-                分類設定
-              </Link>
-            </Button>
+            <WritableOnly>
+              <Button variant="outline" size="sm" asChild>
+                <Link href={buildPortfolioPath(portfolioCode, "settings", "classification")}>
+                  <Settings className="h-4 w-4" />
+                  分類設定
+                </Link>
+              </Button>
+            </WritableOnly>
           </div>
         }
       />

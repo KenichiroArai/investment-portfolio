@@ -1,8 +1,10 @@
 import type { ReactNode } from "react";
+import { redirect } from "next/navigation";
 
 import { PageContainer } from "@/components/layout/page-container";
 import { SettingsSidebar } from "@/components/layout/settings-sidebar";
-import { resolvePortfolioCodeParam } from "@/lib/portfolio-path";
+import { isWritableDataSource } from "@/lib/data-source";
+import { buildPortfolioPath, resolvePortfolioCodeParam } from "@/lib/portfolio-path";
 
 type SettingsLayoutProps = {
   children: ReactNode;
@@ -11,6 +13,11 @@ type SettingsLayoutProps = {
 
 export default async function SettingsLayout({ children, params }: SettingsLayoutProps) {
   const code = await resolvePortfolioCodeParam(params);
+
+  if (!isWritableDataSource()) {
+    let result: never = redirect(buildPortfolioPath(code)) as never;
+    return result;
+  }
 
   let result = (
     <PageContainer>

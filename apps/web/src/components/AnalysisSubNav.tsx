@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { isWritableDataSource } from "@/lib/data-source";
 import { buildPortfolioPath } from "@/lib/portfolio-path";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +18,11 @@ export function AnalysisSubNav({ portfolioCode }: AnalysisSubNavProps) {
   const analysisBase = buildPortfolioPath(portfolioCode, "analysis").replace(/\/$/, "");
   const viewActive = pathname === analysisBase || pathname === viewHref;
   const settingsActive = pathname.startsWith(settingsHref);
+
+  if (!isWritableDataSource()) {
+    let result = null;
+    return result;
+  }
 
   let result = (
     <nav

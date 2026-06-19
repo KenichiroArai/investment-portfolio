@@ -27,7 +27,6 @@ describe("layout components", () => {
   });
 
   beforeEach(() => {
-    process.env.NEXT_PUBLIC_DATA_SOURCE = "static";
     vi.stubGlobal(
       "fetch",
       vi.fn(async () => ({
@@ -51,107 +50,135 @@ describe("layout components", () => {
     delete process.env.NEXT_PUBLIC_DATA_SOURCE;
   });
 
-  it("renders analysis sub navigation with active view link", () => {
-    usePathname.mockReturnValue("/portfolios/ideco/analysis/");
-    render(<AnalysisSubNav portfolioCode="ideco" />);
-
-    const viewLink = screen.getByRole("link", { name: "表示" });
-    expect(viewLink).toHaveAttribute("href", "/portfolios/ideco/analysis");
-    expect(viewLink).toHaveAttribute("aria-current", "page");
-    expect(screen.getByRole("link", { name: "分類設定" })).toHaveAttribute(
-      "href",
-      "/portfolios/ideco/settings/classification",
-    );
-  });
-
-  it("marks classification settings as active on settings route", () => {
-    usePathname.mockReturnValue("/portfolios/ideco/settings/classification/");
-    render(<AnalysisSubNav portfolioCode="ideco" />);
-
-    expect(screen.getByRole("link", { name: "分類設定" })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
-  });
-
-  it("renders portfolio context bar tabs and settings link", async () => {
-    usePathname.mockReturnValue("/portfolios/ideco/");
-    render(<PortfolioContextBar portfolioCode="ideco" />);
-
-    await waitFor(() => {
-      expect(screen.getByRole("navigation", { name: "口座メニュー" })).toBeInTheDocument();
-    });
-    expect(screen.getByRole("link", { name: "概要" })).toHaveAttribute(
-      "href",
-      "/portfolios/ideco",
-    );
-    expect(screen.getByRole("link", { name: "明細" })).toHaveAttribute(
-      "href",
-      "/portfolios/ideco/holdings",
-    );
-    expect(screen.getByRole("link", { name: "設定" })).toHaveAttribute(
-      "href",
-      "/portfolios/ideco/settings/data",
-    );
-  });
-
-  it("hides context tabs on settings route", () => {
-    usePathname.mockReturnValue("/portfolios/ideco/settings/data/");
-    render(<PortfolioContextBar portfolioCode="ideco" />);
-
-    expect(screen.queryByRole("navigation", { name: "口座メニュー" })).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "設定" })).toBeInTheDocument();
-  });
-
-  it("renders portfolio selector when multiple portfolios exist", async () => {
-    const user = userEvent.setup();
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(async () => ({
-        ok: true,
-        status: 200,
-        json: async () => [
-          { id: "p1", code: "ideco", name: "iDeCo", kind: "ideco" },
-          { id: "p2", code: "nisa", name: "NISA", kind: "generic" },
-        ],
-      })),
-    );
-
-    usePathname.mockReturnValue("/portfolios/ideco/analysis/");
-    render(<PortfolioContextBar portfolioCode="ideco" />);
-
-    await waitFor(() => {
-      expect(screen.getByRole("combobox", { name: "口座を選択" })).toBeInTheDocument();
+  describe("static mode", () => {
+    beforeEach(() => {
+      process.env.NEXT_PUBLIC_DATA_SOURCE = "static";
     });
 
-    await user.click(screen.getByRole("combobox", { name: "口座を選択" }));
-    await user.click(screen.getByRole("option", { name: "NISA" }));
-    expect(window.location.assign).toHaveBeenCalledWith("/portfolios/nisa/");
+    it("hides analysis sub navigation", () => {
+      usePathname.mockReturnValue("/portfolios/ideco/analysis/");
+      const { container } = render(<AnalysisSubNav portfolioCode="ideco" />);
+      expect(container).toBeEmptyDOMElement();
+    });
+
+    it("hides settings link in portfolio context bar", async () => {
+      usePathname.mockReturnValue("/portfolios/ideco/");
+      render(<PortfolioContextBar portfolioCode="ideco" />);
+
+      await waitFor(() => {
+        expect(screen.getByRole("navigation", { name: "口座メニュー" })).toBeInTheDocument();
+      });
+      expect(screen.queryByRole("link", { name: "設定" })).not.toBeInTheDocument();
+    });
   });
 
-  it("marks analysis and trends tabs active on nested routes", () => {
-    usePathname.mockReturnValue("/portfolios/ideco/trends/");
-    render(<PortfolioContextBar portfolioCode="ideco" />);
+  describe("api mode", () => {
+    beforeEach(() => {
+      process.env.NEXT_PUBLIC_DATA_SOURCE = "api";
+    });
 
-    expect(screen.getByRole("link", { name: "推移" })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
-  });
+    it("renders analysis sub navigation with active view link", () => {
+      usePathname.mockReturnValue("/portfolios/ideco/analysis/");
+      render(<AnalysisSubNav portfolioCode="ideco" />);
 
-  it("renders settings sidebar navigation links", () => {
-    usePathname.mockReturnValue("/portfolios/ideco/settings/data/");
-    render(<SettingsSidebar portfolioCode="ideco" />);
+      const viewLink = screen.getByRole("link", { name: "表示" });
+      expect(viewLink).toHaveAttribute("href", "/portfolios/ideco/analysis");
+      expect(viewLink).toHaveAttribute("aria-current", "page");
+      expect(screen.getByRole("link", { name: "分類設定" })).toHaveAttribute(
+        "href",
+        "/portfolios/ideco/settings/classification",
+      );
+    });
 
-    expect(screen.getByRole("navigation", { name: "設定メニュー" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /データ管理/ })).toHaveAttribute(
-      "href",
-      "/portfolios/ideco/settings/data",
-    );
-    expect(screen.getByRole("link", { name: /分類設定/ })).toHaveAttribute(
-      "href",
-      "/portfolios/ideco/settings/classification",
-    );
-    expect(screen.getByRole("button", { name: "設定メニュー" })).toBeInTheDocument();
+    it("marks classification settings as active on settings route", () => {
+      usePathname.mockReturnValue("/portfolios/ideco/settings/classification/");
+      render(<AnalysisSubNav portfolioCode="ideco" />);
+
+      expect(screen.getByRole("link", { name: "分類設定" })).toHaveAttribute(
+        "aria-current",
+        "page",
+      );
+    });
+
+    it("renders portfolio context bar tabs and settings link", async () => {
+      usePathname.mockReturnValue("/portfolios/ideco/");
+      render(<PortfolioContextBar portfolioCode="ideco" />);
+
+      await waitFor(() => {
+        expect(screen.getByRole("navigation", { name: "口座メニュー" })).toBeInTheDocument();
+      });
+      expect(screen.getByRole("link", { name: "概要" })).toHaveAttribute(
+        "href",
+        "/portfolios/ideco",
+      );
+      expect(screen.getByRole("link", { name: "明細" })).toHaveAttribute(
+        "href",
+        "/portfolios/ideco/holdings",
+      );
+      expect(screen.getByRole("link", { name: "設定" })).toHaveAttribute(
+        "href",
+        "/portfolios/ideco/settings/data",
+      );
+    });
+
+    it("hides context tabs on settings route", () => {
+      usePathname.mockReturnValue("/portfolios/ideco/settings/data/");
+      render(<PortfolioContextBar portfolioCode="ideco" />);
+
+      expect(screen.queryByRole("navigation", { name: "口座メニュー" })).not.toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "設定" })).toBeInTheDocument();
+    });
+
+    it("renders portfolio selector when multiple portfolios exist", async () => {
+      const user = userEvent.setup();
+      vi.stubGlobal(
+        "fetch",
+        vi.fn(async () => ({
+          ok: true,
+          status: 200,
+          json: async () => [
+            { id: "p1", code: "ideco", name: "iDeCo", kind: "ideco" },
+            { id: "p2", code: "nisa", name: "NISA", kind: "generic" },
+          ],
+        })),
+      );
+
+      usePathname.mockReturnValue("/portfolios/ideco/analysis/");
+      render(<PortfolioContextBar portfolioCode="ideco" />);
+
+      await waitFor(() => {
+        expect(screen.getByRole("combobox", { name: "口座を選択" })).toBeInTheDocument();
+      });
+
+      await user.click(screen.getByRole("combobox", { name: "口座を選択" }));
+      await user.click(screen.getByRole("option", { name: "NISA" }));
+      expect(window.location.assign).toHaveBeenCalledWith("/portfolios/nisa/");
+    });
+
+    it("marks analysis and trends tabs active on nested routes", () => {
+      usePathname.mockReturnValue("/portfolios/ideco/trends/");
+      render(<PortfolioContextBar portfolioCode="ideco" />);
+
+      expect(screen.getByRole("link", { name: "推移" })).toHaveAttribute(
+        "aria-current",
+        "page",
+      );
+    });
+
+    it("renders settings sidebar navigation links", () => {
+      usePathname.mockReturnValue("/portfolios/ideco/settings/data/");
+      render(<SettingsSidebar portfolioCode="ideco" />);
+
+      expect(screen.getByRole("navigation", { name: "設定メニュー" })).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: /データ管理/ })).toHaveAttribute(
+        "href",
+        "/portfolios/ideco/settings/data",
+      );
+      expect(screen.getByRole("link", { name: /分類設定/ })).toHaveAttribute(
+        "href",
+        "/portfolios/ideco/settings/classification",
+      );
+      expect(screen.getByRole("button", { name: "設定メニュー" })).toBeInTheDocument();
+    });
   });
 });

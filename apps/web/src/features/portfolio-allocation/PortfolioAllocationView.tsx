@@ -10,6 +10,7 @@ import { FormField } from "@/components/form-field";
 import { LoadingSkeleton } from "@/components/loading-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
+import { WritableOnly } from "@/components/WritableOnly";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -161,11 +162,13 @@ export function PortfolioAllocationView({
           </CardContent>
         </Card>
 
-        <TargetPortfolioSettingsCard
-          portfolioCode={portfolioCode}
-          lines={snapshot.lines}
-          disabled={isHistoricalView}
-        />
+        <WritableOnly>
+          <TargetPortfolioSettingsCard
+            portfolioCode={portfolioCode}
+            lines={snapshot.lines}
+            disabled={isHistoricalView}
+          />
+        </WritableOnly>
 
         {schemeConfigs.length > 0 ? (
           <>

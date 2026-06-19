@@ -3,6 +3,9 @@ import { encodePortfolioCodeForPath } from "@/lib/portfolio-path";
 
 export type DataSource = "api" | "static";
 
+export const WRITABLE_BLOCKED_MESSAGE =
+  "編集はローカル開発環境（API 接続時）のみ利用できます。";
+
 export type PortfolioListItem = {
   id: string;
   code: string;
@@ -19,6 +22,11 @@ export function getDataSource(): DataSource {
     return result;
   }
 
+  return result;
+}
+
+export function isWritableDataSource(): boolean {
+  let result = getDataSource() === "api";
   return result;
 }
 

@@ -39,9 +39,6 @@ describe("PortfolioShell", () => {
       expect(screen.getByRole("navigation", { name: "口座メニュー" })).toBeInTheDocument();
     });
     expect(screen.getByText("shell-child")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "設定" })).toHaveAttribute(
-      "href",
-      "/portfolios/ideco/settings/data",
-    );
+    expect(screen.queryByRole("link", { name: "設定" })).not.toBeInTheDocument();
   });
 });

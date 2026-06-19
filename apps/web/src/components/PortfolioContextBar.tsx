@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
+import { WritableOnly } from "@/components/WritableOnly";
 import {
   Select,
   SelectContent,
@@ -159,16 +160,18 @@ export function PortfolioContextBar({ portfolioCode }: PortfolioContextBarProps)
               <span className="text-sm font-semibold">{portfolioName}</span>
             )}
           </div>
-          <Button
-            variant={settingsActive ? "secondary" : "outline"}
-            size="sm"
-            asChild
-          >
-            <Link href={buildPortfolioPath(portfolioCode, "settings", "data")}>
-              <Settings className="h-4 w-4" />
-              設定
-            </Link>
-          </Button>
+          <WritableOnly>
+            <Button
+              variant={settingsActive ? "secondary" : "outline"}
+              size="sm"
+              asChild
+            >
+              <Link href={buildPortfolioPath(portfolioCode, "settings", "data")}>
+                <Settings className="h-4 w-4" />
+                設定
+              </Link>
+            </Button>
+          </WritableOnly>
         </div>
         {!settingsActive ? (
           <nav aria-label="口座メニュー" className="-mb-px flex gap-1 overflow-x-auto pb-0">

@@ -9,6 +9,7 @@ import {
   getSnapshotFetchUrl,
   getSnapshotLoadErrorMessage,
   getSnapshotTrendsFetchUrl,
+  isWritableDataSource,
 } from "@/lib/data-source";
 
 describe("data-source", () => {
@@ -40,6 +41,7 @@ describe("data-source", () => {
 
   it("defaults to api data source", () => {
     expect(getDataSource()).toBe("api");
+    expect(isWritableDataSource()).toBe(true);
     expect(getSnapshotFetchUrl("ideco")).toBe(
       "http://127.0.0.1:3001/portfolios/ideco/snapshot/current",
     );
@@ -58,6 +60,7 @@ describe("data-source", () => {
     process.env.NEXT_PUBLIC_DATA_SOURCE = "static";
     process.env.NEXT_PUBLIC_BASE_PATH = "/investment-portfolio";
     expect(getDataSource()).toBe("static");
+    expect(isWritableDataSource()).toBe(false);
     expect(getBasePath()).toBe("/investment-portfolio");
     expect(getSnapshotFetchUrl("ideco")).toBe(
       "/investment-portfolio/data/portfolios/ideco/current.json",
