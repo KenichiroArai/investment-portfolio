@@ -65,6 +65,28 @@ describe("PortfolioAllocationView", () => {
     expect(screen.getByText("構成目標（銘柄合計）")).toBeInTheDocument();
   });
 
+  it("shows rebalance section in static mode", async () => {
+    process.env.NEXT_PUBLIC_DATA_SOURCE = "static";
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        snapshot: snapshotFixture,
+      }),
+    );
+
+    renderWithPortfolioTime(
+      <PortfolioAllocationView portfolioCode="ideco" portfolioKind="ideco" />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("銘柄別構成比")).toBeInTheDocument();
+    });
+
+    expect(screen.getByText("リバランス設定")).toBeInTheDocument();
+    expect(screen.getByText("売買提案")).toBeInTheDocument();
+    expect(screen.getByText(/合計買い/)).toBeInTheDocument();
+  });
+
   it("shows empty message when snapshot is missing", async () => {
     vi.stubGlobal(
       "fetch",

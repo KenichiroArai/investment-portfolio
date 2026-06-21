@@ -277,37 +277,34 @@ export function AnalysisView({
               gapRows,
             );
 
-            let rebalanceSection: ReactNode = null;
-            if (isWritableDataSource()) {
-              const rebalanceResult = buildAllocationRebalanceDisplayRows({
-                schemeAllocation,
-                targets,
-                portfolioTotalMinor: totalValue,
-                depositMinor,
-                mode,
-                classificationSchemes,
-              });
-              rebalanceSection = (
-                <>
-                  <RebalanceSettingsCard
-                    depositInput={depositInput}
-                    depositMinor={depositMinor}
-                    mode={mode}
-                    onDepositInputChange={setDepositInput}
-                    depositInputId="analysis-rebalance-deposit"
-                  />
+            const rebalanceResult = buildAllocationRebalanceDisplayRows({
+              schemeAllocation,
+              targets,
+              portfolioTotalMinor: totalValue,
+              depositMinor,
+              mode,
+              classificationSchemes,
+            });
+            const rebalanceSection = (
+              <>
+                <RebalanceSettingsCard
+                  depositInput={depositInput}
+                  depositMinor={depositMinor}
+                  mode={mode}
+                  onDepositInputChange={setDepositInput}
+                  depositInputId="analysis-rebalance-deposit"
+                />
 
-                  <RebalanceTradesSummary
-                    description="構成単位の売買を、各構成内の現状比率で銘柄に按分して表示します。"
-                    rows={rebalanceResult.rows}
-                    totalBuyMinor={rebalanceResult.totalBuyMinor}
-                    totalSellMinor={rebalanceResult.totalSellMinor}
-                    unallocatedDepositMinor={rebalanceResult.unallocatedDepositMinor}
-                    grouped
-                  />
-                </>
-              );
-            }
+                <RebalanceTradesSummary
+                  description="構成単位の売買を、各構成内の現状比率で銘柄に按分して表示します。"
+                  rows={rebalanceResult.rows}
+                  totalBuyMinor={rebalanceResult.totalBuyMinor}
+                  totalSellMinor={rebalanceResult.totalSellMinor}
+                  unallocatedDepositMinor={rebalanceResult.unallocatedDepositMinor}
+                  grouped
+                />
+              </>
+            );
 
             let panel = (
               <div className="space-y-6">

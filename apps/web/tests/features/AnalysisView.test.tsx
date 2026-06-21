@@ -170,7 +170,7 @@ describe("AnalysisView", () => {
     expect(screen.getByText(/合計売り/)).toBeInTheDocument();
   });
 
-  it("hides rebalance section in static mode", async () => {
+  it("shows rebalance section in static mode", async () => {
     process.env.NEXT_PUBLIC_DATA_SOURCE = "static";
     vi.stubGlobal(
       "fetch",
@@ -187,8 +187,9 @@ describe("AnalysisView", () => {
       expect(screen.getByText(/評価額合計/)).toBeInTheDocument();
     });
 
-    expect(screen.queryByText("リバランス設定")).not.toBeInTheDocument();
-    expect(screen.queryByText("売買提案")).not.toBeInTheDocument();
+    expect(screen.getByText("リバランス設定")).toBeInTheDocument();
+    expect(screen.getByText("売買提案")).toBeInTheDocument();
+    expect(screen.getByText(/合計買い/)).toBeInTheDocument();
   });
 
   it("shows loading skeleton while snapshot loads", () => {
