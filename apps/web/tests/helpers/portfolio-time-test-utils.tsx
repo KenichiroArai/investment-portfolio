@@ -22,6 +22,8 @@ type PortfolioFetchMockOptions = {
   datesStatus?: number;
   snapshotStatus?: number;
   failFetch?: boolean;
+  classificationSchemes?: unknown[];
+  targetAllocations?: Record<string, unknown[]>;
 };
 
 export function createPortfolioFetchMock(options: PortfolioFetchMockOptions = {}) {
@@ -150,7 +152,7 @@ export function createPortfolioFetchMock(options: PortfolioFetchMockOptions = {}
       return {
         ok: true,
         status: 200,
-        json: async () => ({}),
+        json: async () => options.targetAllocations ?? {},
       };
     }
 
@@ -158,7 +160,7 @@ export function createPortfolioFetchMock(options: PortfolioFetchMockOptions = {}
       return {
         ok: true,
         status: 200,
-        json: async () => [],
+        json: async () => options.classificationSchemes ?? [],
       };
     }
 

@@ -47,6 +47,24 @@ const snapshotFixture = {
   ],
 };
 
+const classificationSchemesFixture = [
+  {
+    id: "sch-region",
+    code: "ideco_region",
+    name: "地域分類",
+    values: [
+      { id: "v-domestic", code: "domestic", name: "国内", sortOrder: 0 },
+      { id: "v-foreign", code: "foreign", name: "海外", sortOrder: 1 },
+    ],
+  },
+  {
+    id: "sch-asset",
+    code: "ideco_asset_class",
+    name: "資産分類",
+    values: [{ id: "v-equity", code: "equity", name: "株式", sortOrder: 0 }],
+  },
+];
+
 describe("AnalysisView", () => {
   afterEach(() => {
     cleanup();
@@ -190,6 +208,50 @@ describe("AnalysisView", () => {
     expect(screen.getByText("リバランス設定")).toBeInTheDocument();
     expect(screen.getByText("売買提案")).toBeInTheDocument();
     expect(screen.getByText(/合計買い/)).toBeInTheDocument();
+  });
+
+  it("shows target allocation edit card in api mode", async () => {
+    process.env.NEXT_PUBLIC_DATA_SOURCE = "api";
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        snapshot: snapshotFixture,
+        classificationSchemes: classificationSchemesFixture,
+      }),
+    );
+
+    renderWithPortfolioTime(
+      <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("目標配分")).toBeInTheDocument();
+    });
+
+    expect(screen.getByRole("button", { name: "目標配分を保存" })).toBeInTheDocument();
+    expect(screen.getByText("目標設定済み: 0 / 2 分類")).toBeInTheDocument();
+  });
+
+  it("hides target allocation edit card in static mode", async () => {
+    process.env.NEXT_PUBLIC_DATA_SOURCE = "static";
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        snapshot: snapshotFixture,
+        classificationSchemes: classificationSchemesFixture,
+      }),
+    );
+
+    renderWithPortfolioTime(
+      <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/評価額合計/)).toBeInTheDocument();
+    });
+
+    expect(screen.queryByText("目標配分")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "目標配分を保存" })).not.toBeInTheDocument();
   });
 
   it("shows loading skeleton while snapshot loads", () => {

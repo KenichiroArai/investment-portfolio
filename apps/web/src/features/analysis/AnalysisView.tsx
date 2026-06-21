@@ -22,6 +22,7 @@ import { AllocationSnapshotPanel } from "@/features/allocation/AllocationSnapsho
 import { buildAllocationRebalanceDisplayRows } from "@/features/allocation/build-allocation-rebalance-display-rows";
 import { RebalanceSettingsCard } from "@/features/allocation/RebalanceSettingsCard";
 import { RebalanceTradesSummary } from "@/features/allocation/RebalanceTradesSummary";
+import { TargetAllocationEditCard } from "@/features/allocation/TargetAllocationEditCard";
 import { useAllocationSchemeParam } from "@/features/allocation/useAllocationSchemeParam";
 import { useRebalanceDeposit } from "@/features/allocation/useRebalanceDeposit";
 import { useTargetAllocations } from "@/features/allocation/useTargetAllocations";
@@ -61,7 +62,8 @@ export function AnalysisView({
     trendDisplayUnit,
     loadingTrends,
   } = usePortfolioTime();
-  const { allocationsByScheme } = useTargetAllocations(portfolioCode);
+  const { allocationsByScheme, refetch: refetchTargetAllocations } =
+    useTargetAllocations(portfolioCode);
   const { depositInput, setDepositInput, depositMinor, mode } = useRebalanceDeposit();
   const [classificationSchemes, setClassificationSchemes] = useState<
     ClassificationSchemeWithValuesDto[]
@@ -216,6 +218,12 @@ export function AnalysisView({
 
   const asOfDate = selectedAsOfDate ?? snapshot.asOfDate;
   const totalValue = sumSnapshotMarketValue(snapshot.lines);
+  const activeClassificationScheme =
+    classificationSchemes.find((scheme) => scheme.code === activeSchemeCode) ?? null;
+  const activeSchemeTargets =
+    activeSchemeCode !== "" ? (allocationsByScheme[activeSchemeCode] ?? []) : [];
+  const activeSchemeValueCount = activeClassificationScheme?.values.length ?? 0;
+  const activeSchemeTargetCount = activeSchemeTargets.length;
 
   result = (
     <PageContainer>
@@ -238,7 +246,14 @@ export function AnalysisView({
         }
       />
       <div className="mb-4 space-y-3">
-        <p className="text-sm font-medium">評価額合計: {formatYen(totalValue)}</p>
+        <div className="space-y-1">
+          <p className="text-sm font-medium">評価額合計: {formatYen(totalValue)}</p>
+          {activeSchemeValueCount > 0 ? (
+            <p className="text-sm text-muted-foreground">
+              目標設定済み: {activeSchemeTargetCount} / {activeSchemeValueCount} 分類
+            </p>
+          ) : null}
+        </div>
         <AllocationPeriodShareSummary
           largestShareChange={periodShareChange}
           loading={loadingTrends}
@@ -306,6 +321,10 @@ export function AnalysisView({
               </>
             );
 
+            const classificationValues =
+              classificationSchemes.find((item) => item.code === scheme.schemeCode)
+                ?.values ?? [];
+
             let panel = (
               <div className="space-y-6">
                 <Card>
@@ -324,6 +343,18 @@ export function AnalysisView({
                     />
                   </CardContent>
                 </Card>
+
+                <WritableOnly>
+                  <TargetAllocationEditCard
+                    portfolioCode={portfolioCode}
+                    schemeCode={scheme.schemeCode}
+                    values={classificationValues}
+                    disabled={isHistoricalView}
+                    onSaved={() => {
+                      void refetchTargetAllocations();
+                    }}
+                  />
+                </WritableOnly>
 
                 {rebalanceSection}
               </div>

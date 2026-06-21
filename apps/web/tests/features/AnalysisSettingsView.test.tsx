@@ -49,6 +49,7 @@ describe("AnalysisSettingsView", () => {
     expect(document.querySelector(".animate-pulse")).toBeTruthy();
     await waitForLoaded();
     expect(screen.getAllByText("地域").length).toBeGreaterThan(0);
+    expect(screen.queryByText("目標配分")).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "資産配分へ" })).toHaveAttribute(
       "href",
       "/portfolios/ideco/analysis",

@@ -1,17 +1,39 @@
 "use client";
 
 import type { TargetAllocationsBySchemeDto } from "@repo/shared";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { getTargetAllocationsFetchUrl } from "@/lib/data-source";
 
 export function useTargetAllocations(portfolioCode: string): {
   allocationsByScheme: TargetAllocationsBySchemeDto;
   loading: boolean;
+  refetch: () => Promise<void>;
 } {
   const [allocationsByScheme, setAllocationsByScheme] =
     useState<TargetAllocationsBySchemeDto>({});
   const [loading, setLoading] = useState(true);
+
+  const refetch = useCallback(async (): Promise<void> => {
+    let result: void = undefined;
+    setLoading(true);
+
+    try {
+      const response = await fetch(getTargetAllocationsFetchUrl(portfolioCode));
+      if (!response.ok) {
+        setAllocationsByScheme({});
+        return result;
+      }
+      const data = (await response.json()) as TargetAllocationsBySchemeDto;
+      setAllocationsByScheme(data);
+    } catch {
+      setAllocationsByScheme({});
+    } finally {
+      setLoading(false);
+    }
+
+    return result;
+  }, [portfolioCode]);
 
   useEffect(() => {
     let result: () => void = () => {};
@@ -19,29 +41,12 @@ export function useTargetAllocations(portfolioCode: string): {
 
     async function load() {
       let loadResult: void = undefined;
-      setLoading(true);
 
-      try {
-        const response = await fetch(getTargetAllocationsFetchUrl(portfolioCode));
-        if (cancelled) {
-          return loadResult;
-        }
-        if (!response.ok) {
-          setAllocationsByScheme({});
-          return loadResult;
-        }
-        const data = (await response.json()) as TargetAllocationsBySchemeDto;
-        setAllocationsByScheme(data);
-      } catch {
-        if (!cancelled) {
-          setAllocationsByScheme({});
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
+      if (cancelled) {
+        return loadResult;
       }
 
+      await refetch();
       return loadResult;
     }
 
@@ -50,8 +55,8 @@ export function useTargetAllocations(portfolioCode: string): {
       cancelled = true;
     };
     return result;
-  }, [portfolioCode]);
+  }, [refetch]);
 
-  let result = { allocationsByScheme, loading };
+  let result = { allocationsByScheme, loading, refetch };
   return result;
 }
