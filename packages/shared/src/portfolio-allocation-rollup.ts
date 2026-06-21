@@ -32,17 +32,18 @@ export function aggregatePortfolioTargetsByScheme(
     }
 
     const tag = line.tags.find((item) => item.schemeCode === schemeCode);
-    const valueCode = tag?.valueCode ?? UNTAGGED_ALLOCATION_VALUE_CODE;
-    const valueName = tag?.valueName ?? UNTAGGED_ALLOCATION_VALUE_NAME;
+    if (!tag) {
+      continue;
+    }
 
-    const existing = totals.get(valueCode);
+    const existing = totals.get(tag.valueCode);
     if (existing) {
       existing.impliedTargetRatio += targetRatio;
       continue;
     }
 
-    totals.set(valueCode, {
-      valueName,
+    totals.set(tag.valueCode, {
+      valueName: tag.valueName,
       impliedTargetRatio: targetRatio,
     });
   }
@@ -56,6 +57,31 @@ export function aggregatePortfolioTargetsByScheme(
   }
 
   result.sort((left, right) => right.impliedTargetRatio - left.impliedTargetRatio);
+  return result;
+}
+
+export function normalizeImpliedAllocationTargets(
+  rows: ImpliedAllocationTargetRow[],
+): ImpliedAllocationTargetRow[] {
+  let result: ImpliedAllocationTargetRow[] = [];
+
+  let total = 0;
+  for (const row of rows) {
+    total += row.impliedTargetRatio;
+  }
+
+  if (total <= 0 || !Number.isFinite(total)) {
+    return result;
+  }
+
+  for (const row of rows) {
+    result.push({
+      valueCode: row.valueCode,
+      valueName: row.valueName,
+      impliedTargetRatio: row.impliedTargetRatio / total,
+    });
+  }
+
   return result;
 }
 

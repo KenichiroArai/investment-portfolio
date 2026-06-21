@@ -5,6 +5,7 @@ import {
   buildAllocationBySchemeWithLines,
   buildPortfolioAllocationRows,
   buildPortfolioCompositionGapRows,
+  normalizeImpliedAllocationTargets,
   sumSnapshotMarketValue,
 } from "@repo/shared";
 import { useMemo, type ReactNode } from "react";
@@ -92,10 +93,12 @@ export function PortfolioAllocationView({
       activeScheme.schemeCode,
       activeScheme.schemeName,
     );
-    const impliedRows = aggregatePortfolioTargetsByScheme(
-      snapshot.lines,
-      weights,
-      activeSchemeCode,
+    const impliedRows = normalizeImpliedAllocationTargets(
+      aggregatePortfolioTargetsByScheme(
+        snapshot.lines,
+        weights,
+        activeSchemeCode,
+      ),
     );
     result = buildPortfolioCompositionGapRows(schemeAllocation.slices, impliedRows);
     return result;

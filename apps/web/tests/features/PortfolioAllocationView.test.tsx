@@ -70,6 +70,95 @@ describe("PortfolioAllocationView", () => {
     expect(screen.getByText("国内")).toBeInTheDocument();
   });
 
+  it("excludes untagged holdings from composition targets and normalizes tagged targets", async () => {
+    const multiLineSnapshot = {
+      ...snapshotFixture,
+      analysisSchemes: [{ schemeCode: "other", schemeName: "その他" }],
+      lines: [
+        {
+          id: "line-1",
+          instrumentId: "inst-1",
+          instrumentName: "国内銘柄",
+          sortOrder: 0,
+          quantity: 1,
+          marketValueMinor: 500_000,
+          bookValueMinor: null,
+          metrics: [],
+          instrumentAttributes: [],
+          tags: [
+            {
+              schemeCode: "other",
+              schemeName: "その他",
+              valueCode: "domestic_other",
+              valueName: "国内その他資産",
+            },
+          ],
+        },
+        {
+          id: "line-2",
+          instrumentId: "inst-2",
+          instrumentName: "複合銘柄",
+          sortOrder: 1,
+          quantity: 1,
+          marketValueMinor: 400_000,
+          bookValueMinor: null,
+          metrics: [],
+          instrumentAttributes: [],
+          tags: [
+            {
+              schemeCode: "other",
+              schemeName: "その他",
+              valueCode: "composite",
+              valueName: "内外資産複合",
+            },
+          ],
+        },
+        {
+          id: "line-3",
+          instrumentId: "inst-3",
+          instrumentName: "タグなし銘柄",
+          sortOrder: 2,
+          quantity: 1,
+          marketValueMinor: 100_000,
+          bookValueMinor: null,
+          metrics: [],
+          instrumentAttributes: [],
+          tags: [],
+        },
+      ],
+    };
+
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        snapshot: multiLineSnapshot,
+        targetPortfolioWeights: [
+          { instrumentId: "inst-1", targetRatio: 0.29 },
+          { instrumentId: "inst-2", targetRatio: 0.21 },
+          { instrumentId: "inst-3", targetRatio: 0.5 },
+        ],
+        targetAllocations: {
+          other: [
+            { valueCode: "domestic_other", targetRatio: 0.6 },
+            { valueCode: "composite", targetRatio: 0.4 },
+          ],
+        },
+      }),
+    );
+
+    renderWithPortfolioTime(
+      <PortfolioAllocationView portfolioCode="ideco" portfolioKind="ideco" />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("国内その他資産")).toBeInTheDocument();
+    });
+    expect(screen.getByText("内外資産複合")).toBeInTheDocument();
+    expect(screen.queryByText("未分類")).not.toBeInTheDocument();
+    expect(screen.getByText("58.00%")).toBeInTheDocument();
+    expect(screen.getByText("42.00%")).toBeInTheDocument();
+  });
+
   it("shows rebalance section in static mode", async () => {
     process.env.NEXT_PUBLIC_DATA_SOURCE = "static";
     vi.stubGlobal(

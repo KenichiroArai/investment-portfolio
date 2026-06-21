@@ -54,7 +54,7 @@ export function ImpliedAllocationTargetsCard({
       <CardHeader>
         <CardTitle className="text-base">構成比目標</CardTitle>
         <CardDescription>
-          銘柄目標の合計から導出した構成比目標（{schemeName}）。現状との差分を表示します。資産配分目標は参考です。
+          分析軸タグ付き銘柄の目標から導出した構成比目標（{schemeName}）。タグのない銘柄は含めず、タグ付き銘柄の目標を100%に正規化して現状との差分を表示します。資産配分目標は参考です。
         </CardDescription>
       </CardHeader>
       <CardContent>

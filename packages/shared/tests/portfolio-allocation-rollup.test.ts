@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   aggregatePortfolioTargetsByScheme,
   buildPortfolioCompositionGapRows,
+  normalizeImpliedAllocationTargets,
   UNTAGGED_ALLOCATION_VALUE_CODE,
   UNTAGGED_ALLOCATION_VALUE_NAME,
 } from "../src/portfolio-allocation-rollup";
@@ -87,7 +88,7 @@ describe("aggregatePortfolioTargetsByScheme", () => {
     expect(result[1]?.impliedTargetRatio).toBeCloseTo(0.1);
   });
 
-  it("groups untagged holdings with targets into untagged row", () => {
+  it("skips holdings without scheme tag", () => {
     const lines = [
       makeLine(100_000, [], { instrumentId: "a", instrumentName: "銘柄A" }),
     ];
@@ -98,13 +99,7 @@ describe("aggregatePortfolioTargetsByScheme", () => {
       "asset",
     );
 
-    expect(result).toEqual([
-      {
-        valueCode: UNTAGGED_ALLOCATION_VALUE_CODE,
-        valueName: UNTAGGED_ALLOCATION_VALUE_NAME,
-        impliedTargetRatio: 0.15,
-      },
-    ]);
+    expect(result).toEqual([]);
   });
 
   it("skips holdings without portfolio targets", () => {
@@ -124,6 +119,26 @@ describe("aggregatePortfolioTargetsByScheme", () => {
     ];
 
     let result = aggregatePortfolioTargetsByScheme(lines, [], "asset");
+    expect(result).toEqual([]);
+  });
+});
+
+describe("normalizeImpliedAllocationTargets", () => {
+  it("normalizes implied targets to sum to 100%", () => {
+    const rows = [
+      { valueCode: "domestic_other", valueName: "国内その他資産", impliedTargetRatio: 0.29 },
+      { valueCode: "composite", valueName: "内外資産複合", impliedTargetRatio: 0.21 },
+    ];
+
+    let result = normalizeImpliedAllocationTargets(rows);
+
+    expect(result).toHaveLength(2);
+    expect(result[0]?.impliedTargetRatio).toBeCloseTo(0.58);
+    expect(result[1]?.impliedTargetRatio).toBeCloseTo(0.42);
+  });
+
+  it("returns empty array when total is zero", () => {
+    let result = normalizeImpliedAllocationTargets([]);
     expect(result).toEqual([]);
   });
 });
@@ -235,5 +250,72 @@ describe("buildPortfolioCompositionGapRows", () => {
         marketValueMinor: 500_000,
       },
     ]);
+  });
+
+  it("excludes untagged targets and compares normalized targets to tagged current ratios", () => {
+    const schemeCode = "other";
+    const lines = [
+      makeLine(
+        500_000,
+        [
+          {
+            schemeCode,
+            schemeName: "その他",
+            valueCode: "domestic_other",
+            valueName: "国内その他資産",
+          },
+        ],
+        { instrumentId: "a", instrumentName: "銘柄A" },
+      ),
+      makeLine(
+        400_000,
+        [
+          {
+            schemeCode,
+            schemeName: "その他",
+            valueCode: "composite",
+            valueName: "内外資産複合",
+          },
+        ],
+        { instrumentId: "b", instrumentName: "銘柄B" },
+      ),
+      makeLine(100_000, [], { instrumentId: "c", instrumentName: "銘柄C" }),
+    ];
+    const targets = [
+      { instrumentId: "a", targetRatio: 0.29 },
+      { instrumentId: "b", targetRatio: 0.21 },
+      { instrumentId: "c", targetRatio: 0.5 },
+    ];
+
+    const impliedRows = normalizeImpliedAllocationTargets(
+      aggregatePortfolioTargetsByScheme(lines, targets, schemeCode),
+    );
+    const slices: AllocationSlice[] = [
+      {
+        valueCode: "domestic_other",
+        valueName: "国内その他資産",
+        marketValueMinor: 500_000,
+        weight: 500_000 / 900_000,
+      },
+      {
+        valueCode: "composite",
+        valueName: "内外資産複合",
+        marketValueMinor: 400_000,
+        weight: 400_000 / 900_000,
+      },
+    ];
+
+    let result = buildPortfolioCompositionGapRows(slices, impliedRows);
+
+    expect(result).toHaveLength(2);
+    expect(result.find((row) => row.valueCode === UNTAGGED_ALLOCATION_VALUE_CODE)).toBeUndefined();
+    const domesticRow = result.find((row) => row.valueCode === "domestic_other");
+    expect(domesticRow?.targetRatio).toBeCloseTo(0.58);
+    expect(domesticRow?.currentRatio).toBeCloseTo(500_000 / 900_000);
+    expect(domesticRow?.gapRatio).toBeCloseTo(500_000 / 900_000 - 0.58);
+    const compositeRow = result.find((row) => row.valueCode === "composite");
+    expect(compositeRow?.targetRatio).toBeCloseTo(0.42);
+    expect(compositeRow?.currentRatio).toBeCloseTo(400_000 / 900_000);
+    expect(compositeRow?.gapRatio).toBeCloseTo(400_000 / 900_000 - 0.42);
   });
 });
