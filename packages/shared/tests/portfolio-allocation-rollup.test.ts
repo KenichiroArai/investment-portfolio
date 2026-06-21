@@ -2,9 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import {
   aggregatePortfolioTargetsByScheme,
+  buildPortfolioCompositionGapRows,
   UNTAGGED_ALLOCATION_VALUE_CODE,
   UNTAGGED_ALLOCATION_VALUE_NAME,
 } from "../src/portfolio-allocation-rollup";
+import type { AllocationSlice } from "../src/snapshot-allocation";
 import type { HoldingLineDto } from "../src/types";
 
 function makeLine(
@@ -123,5 +125,115 @@ describe("aggregatePortfolioTargetsByScheme", () => {
 
     let result = aggregatePortfolioTargetsByScheme(lines, [], "asset");
     expect(result).toEqual([]);
+  });
+});
+
+describe("buildPortfolioCompositionGapRows", () => {
+  it("computes gap between current allocation and portfolio target rollup", () => {
+    const slices: AllocationSlice[] = [
+      {
+        valueCode: "stock",
+        valueName: "株式",
+        marketValueMinor: 700_000,
+        weight: 0.7,
+      },
+      {
+        valueCode: "bond",
+        valueName: "債券",
+        marketValueMinor: 300_000,
+        weight: 0.3,
+      },
+    ];
+    const impliedTargets = [
+      { valueCode: "stock", valueName: "株式", impliedTargetRatio: 0.5 },
+      { valueCode: "bond", valueName: "債券", impliedTargetRatio: 0.1 },
+    ];
+
+    let result = buildPortfolioCompositionGapRows(slices, impliedTargets);
+
+    expect(result).toHaveLength(2);
+    const stockRow = result.find((row) => row.valueCode === "stock");
+    expect(stockRow?.currentRatio).toBeCloseTo(0.7);
+    expect(stockRow?.targetRatio).toBeCloseTo(0.5);
+    expect(stockRow?.gapRatio).toBeCloseTo(0.2);
+    const bondRow = result.find((row) => row.valueCode === "bond");
+    expect(bondRow?.currentRatio).toBeCloseTo(0.3);
+    expect(bondRow?.targetRatio).toBeCloseTo(0.1);
+    expect(bondRow?.gapRatio).toBeCloseTo(0.2);
+  });
+
+  it("includes target-only classification with zero current ratio", () => {
+    const slices: AllocationSlice[] = [
+      {
+        valueCode: "stock",
+        valueName: "株式",
+        marketValueMinor: 1_000_000,
+        weight: 1,
+      },
+    ];
+    const impliedTargets = [
+      { valueCode: "stock", valueName: "株式", impliedTargetRatio: 0.6 },
+      { valueCode: "bond", valueName: "債券", impliedTargetRatio: 0.2 },
+    ];
+
+    let result = buildPortfolioCompositionGapRows(slices, impliedTargets);
+
+    const bondRow = result.find((row) => row.valueCode === "bond");
+    expect(bondRow).toEqual({
+      valueCode: "bond",
+      valueName: "債券",
+      currentRatio: 0,
+      targetRatio: 0.2,
+      gapRatio: -0.2,
+      marketValueMinor: 0,
+    });
+  });
+
+  it("handles untagged implied targets", () => {
+    const slices: AllocationSlice[] = [];
+    const impliedTargets = [
+      {
+        valueCode: UNTAGGED_ALLOCATION_VALUE_CODE,
+        valueName: UNTAGGED_ALLOCATION_VALUE_NAME,
+        impliedTargetRatio: 0.15,
+      },
+    ];
+
+    let result = buildPortfolioCompositionGapRows(slices, impliedTargets);
+
+    expect(result).toEqual([
+      {
+        valueCode: UNTAGGED_ALLOCATION_VALUE_CODE,
+        valueName: UNTAGGED_ALLOCATION_VALUE_NAME,
+        currentRatio: 0,
+        targetRatio: 0.15,
+        gapRatio: -0.15,
+        marketValueMinor: 0,
+      },
+    ]);
+  });
+
+  it("leaves gap null when no portfolio target is set for a slice", () => {
+    const slices: AllocationSlice[] = [
+      {
+        valueCode: "stock",
+        valueName: "株式",
+        marketValueMinor: 500_000,
+        weight: 1,
+      },
+    ];
+
+    let result = buildPortfolioCompositionGapRows(slices, []);
+
+    expect(result).toEqual([
+      {
+        valueCode: "stock",
+        valueName: "株式",
+        currentRatio: 1,
+        targetRatio: null,
+        gapRatio: null,
+        marketValueMinor: 500_000,
+      },
+    ]);
   });
 });

@@ -43,11 +43,15 @@ describe("PortfolioAllocationView", () => {
     vi.unstubAllGlobals();
   });
 
-  it("renders allocation panel and rebalance trades summary", async () => {
+  it("renders allocation panel and composition target card", async () => {
     vi.stubGlobal(
       "fetch",
       createPortfolioFetchMock({
         snapshot: snapshotFixture,
+        targetPortfolioWeights: [{ instrumentId: "inst-1", targetRatio: 0.5 }],
+        targetAllocations: {
+          ideco_region: [{ valueCode: "domestic", targetRatio: 0.4 }],
+        },
       }),
     );
 
@@ -62,7 +66,8 @@ describe("PortfolioAllocationView", () => {
     expect(screen.getByText("リバランス設定")).toBeInTheDocument();
     expect(screen.getByText("売買提案")).toBeInTheDocument();
     expect(screen.getByText(/合計買い/)).toBeInTheDocument();
-    expect(screen.getByText("構成目標（銘柄合計）")).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "資産配分目標" })).toBeInTheDocument();
+    expect(screen.getByText("国内")).toBeInTheDocument();
   });
 
   it("shows rebalance section in static mode", async () => {

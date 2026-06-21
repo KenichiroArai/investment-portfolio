@@ -24,6 +24,7 @@ type PortfolioFetchMockOptions = {
   failFetch?: boolean;
   classificationSchemes?: unknown[];
   targetAllocations?: Record<string, unknown[]>;
+  targetPortfolioWeights?: unknown[];
 };
 
 export function createPortfolioFetchMock(options: PortfolioFetchMockOptions = {}) {
@@ -144,7 +145,7 @@ export function createPortfolioFetchMock(options: PortfolioFetchMockOptions = {}
       return {
         ok: true,
         status: 200,
-        json: async () => ({ weights: [] }),
+        json: async () => ({ weights: options.targetPortfolioWeights ?? [] }),
       };
     }
 

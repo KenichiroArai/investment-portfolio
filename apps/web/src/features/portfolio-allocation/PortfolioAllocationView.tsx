@@ -1,7 +1,10 @@
 "use client";
 
 import {
+  aggregatePortfolioTargetsByScheme,
+  buildAllocationBySchemeWithLines,
   buildPortfolioAllocationRows,
+  buildPortfolioCompositionGapRows,
   sumSnapshotMarketValue,
 } from "@repo/shared";
 import { useMemo, type ReactNode } from "react";
@@ -30,7 +33,6 @@ import { ImpliedAllocationTargetsCard } from "@/features/portfolio-allocation/Im
 import { PortfolioAllocationPanel } from "@/features/portfolio-allocation/PortfolioAllocationPanel";
 import { TargetPortfolioSettingsCard } from "@/features/portfolio-allocation/TargetPortfolioSettingsCard";
 import {
-  useImpliedAllocationRows,
   usePortfolioAnalysisSchemes,
   usePortfolioRebalanceResult,
 } from "@/features/portfolio-allocation/usePortfolioRebalanceResult";
@@ -78,11 +80,26 @@ export function PortfolioAllocationView({
     return result;
   }, [snapshot, weights]);
 
-  const impliedAllocationRows = useImpliedAllocationRows(
-    snapshot?.lines ?? [],
-    weights,
-    activeSchemeCode,
-  );
+  const compositionGapRows = useMemo(() => {
+    let result: ReturnType<typeof buildPortfolioCompositionGapRows> = [];
+
+    if (!snapshot || activeSchemeCode === "" || !activeScheme) {
+      return result;
+    }
+
+    const schemeAllocation = buildAllocationBySchemeWithLines(
+      snapshot.lines,
+      activeScheme.schemeCode,
+      activeScheme.schemeName,
+    );
+    const impliedRows = aggregatePortfolioTargetsByScheme(
+      snapshot.lines,
+      weights,
+      activeSchemeCode,
+    );
+    result = buildPortfolioCompositionGapRows(schemeAllocation.slices, impliedRows);
+    return result;
+  }, [activeScheme, activeSchemeCode, snapshot, weights]);
 
   const rebalanceResult = usePortfolioRebalanceResult({
     lines: snapshot?.lines ?? [],
@@ -196,7 +213,7 @@ export function PortfolioAllocationView({
             </FormField>
             {activeScheme ? (
               <ImpliedAllocationTargetsCard
-                impliedRows={impliedAllocationRows}
+                gapRows={compositionGapRows}
                 allocationTargets={allocationTargetsForScheme}
                 schemeName={activeScheme.schemeName}
               />

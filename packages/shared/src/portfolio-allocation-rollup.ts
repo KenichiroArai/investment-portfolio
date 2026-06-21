@@ -1,4 +1,5 @@
 import type { TargetPortfolioWeight } from "./portfolio-allocation";
+import type { AllocationSlice } from "./snapshot-allocation";
 import type { HoldingLineDto } from "./types";
 
 export const UNTAGGED_ALLOCATION_VALUE_CODE = "__untagged__";
@@ -55,5 +56,56 @@ export function aggregatePortfolioTargetsByScheme(
   }
 
   result.sort((left, right) => right.impliedTargetRatio - left.impliedTargetRatio);
+  return result;
+}
+
+export type PortfolioCompositionGapRow = {
+  valueCode: string;
+  valueName: string;
+  currentRatio: number;
+  targetRatio: number | null;
+  gapRatio: number | null;
+  marketValueMinor: number;
+};
+
+export function buildPortfolioCompositionGapRows(
+  slices: AllocationSlice[],
+  impliedTargets: ImpliedAllocationTargetRow[],
+): PortfolioCompositionGapRow[] {
+  let result: PortfolioCompositionGapRow[] = [];
+
+  const sliceByCode = new Map(slices.map((slice) => [slice.valueCode, slice]));
+  const impliedByCode = new Map(impliedTargets.map((row) => [row.valueCode, row]));
+  const allCodes = new Set([...sliceByCode.keys(), ...impliedByCode.keys()]);
+
+  for (const valueCode of allCodes) {
+    const slice = sliceByCode.get(valueCode);
+    const implied = impliedByCode.get(valueCode);
+    const currentRatio = slice?.weight ?? 0;
+    const targetRatio = implied?.impliedTargetRatio ?? null;
+    let gapRatio: number | null = null;
+
+    if (targetRatio !== null && Number.isFinite(targetRatio)) {
+      gapRatio = currentRatio - targetRatio;
+    }
+
+    result.push({
+      valueCode,
+      valueName: slice?.valueName ?? implied?.valueName ?? valueCode,
+      currentRatio,
+      targetRatio,
+      gapRatio,
+      marketValueMinor: slice?.marketValueMinor ?? 0,
+    });
+  }
+
+  result.sort((left, right) => {
+    const leftTarget = left.targetRatio ?? 0;
+    const rightTarget = right.targetRatio ?? 0;
+    if (rightTarget !== leftTarget) {
+      return rightTarget - leftTarget;
+    }
+    return right.currentRatio - left.currentRatio;
+  });
   return result;
 }
