@@ -4,14 +4,16 @@ import type {
   ClassificationSchemeWithValuesDto,
   TargetAllocationWeightDto,
 } from "@repo/shared";
-import { computeAllocationRebalanceByInstrument } from "@repo/shared";
+import {
+  computeAllocationRebalanceByInstrument,
+  normalizeTargetAllocationWeights,
+} from "@repo/shared";
 
 import type { RebalanceDisplayRow } from "@/features/allocation/RebalanceTable";
 
 type BuildAllocationRebalanceDisplayRowsInput = {
   schemeAllocation: AllocationBySchemeWithLines;
   targets: TargetAllocationWeightDto[];
-  portfolioTotalMinor: number;
   depositMinor: number;
   mode: Parameters<typeof computeAllocationRebalanceByInstrument>[0]["mode"];
   classificationSchemes: ClassificationSchemeWithValuesDto[];
@@ -48,10 +50,13 @@ export function buildAllocationRebalanceDisplayRows(
     }
   }
 
+  const normalizedTargets = normalizeTargetAllocationWeights(input.targets);
+  const classifiedTotalMinor = input.schemeAllocation.totalMarketValueMinor;
+
   const allocationRebalance = computeAllocationRebalanceByInstrument({
     schemeAllocation: input.schemeAllocation,
-    targets: input.targets,
-    portfolioTotalMinor: input.portfolioTotalMinor,
+    targets: normalizedTargets,
+    portfolioTotalMinor: classifiedTotalMinor,
     depositMinor: input.depositMinor,
     mode: input.mode,
   });

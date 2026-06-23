@@ -295,11 +295,15 @@ export function AnalysisView({
             const rebalanceResult = buildAllocationRebalanceDisplayRows({
               schemeAllocation,
               targets,
-              portfolioTotalMinor: totalValue,
               depositMinor,
               mode,
               classificationSchemes,
             });
+            const hasUncovered =
+              schemeAllocation.totalMarketValueMinor < totalValue;
+            const rebalanceDescription = hasUncovered
+              ? "未分類の銘柄は売買対象外です。目標はタグ付き銘柄内で100%に正規化して試算しています。構成単位の売買を、各構成内の現状比率で銘柄に按分して表示します。"
+              : "構成単位の売買を、各構成内の現状比率で銘柄に按分して表示します。";
             const rebalanceSection = (
               <>
                 <RebalanceSettingsCard
@@ -311,7 +315,7 @@ export function AnalysisView({
                 />
 
                 <RebalanceTradesSummary
-                  description="構成単位の売買を、各構成内の現状比率で銘柄に按分して表示します。"
+                  description={rebalanceDescription}
                   rows={rebalanceResult.rows}
                   totalBuyMinor={rebalanceResult.totalBuyMinor}
                   totalSellMinor={rebalanceResult.totalSellMinor}

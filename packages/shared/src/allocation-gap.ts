@@ -15,14 +15,39 @@ export type AllocationGapRow = {
   marketValueMinor: number;
 };
 
+export function normalizeTargetAllocationWeights(
+  targets: TargetAllocationWeight[],
+): TargetAllocationWeight[] {
+  let result: TargetAllocationWeight[] = [];
+
+  let total = 0;
+  for (const target of targets) {
+    total += target.targetRatio;
+  }
+
+  if (total <= 0 || !Number.isFinite(total)) {
+    return result;
+  }
+
+  for (const target of targets) {
+    result.push({
+      valueCode: target.valueCode,
+      targetRatio: target.targetRatio / total,
+    });
+  }
+
+  return result;
+}
+
 export function buildAllocationGapRows(
   slices: AllocationSlice[],
   targets: TargetAllocationWeight[],
 ): AllocationGapRow[] {
   let result: AllocationGapRow[] = [];
 
+  const normalizedTargets = normalizeTargetAllocationWeights(targets);
   const targetByCode = new Map<string, number>();
-  for (const target of targets) {
+  for (const target of normalizedTargets) {
     targetByCode.set(target.valueCode, target.targetRatio);
   }
 

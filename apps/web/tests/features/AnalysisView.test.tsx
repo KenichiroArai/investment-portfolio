@@ -121,6 +121,12 @@ describe("AnalysisView", () => {
             },
           ],
         },
+        targetAllocations: {
+          ideco_region: [
+            { valueCode: "domestic", targetRatio: 0.4 },
+            { valueCode: "foreign", targetRatio: 0.59 },
+          ],
+        },
       }),
     );
 
@@ -134,6 +140,12 @@ describe("AnalysisView", () => {
 
     expect(screen.getByText(/資産全体の 66\.67%/)).toBeInTheDocument();
     expect(screen.getByText(/未分類:.*50,000/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/差分はタグ付き銘柄内で目標を100%に正規化して比較/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/未分類の銘柄は売買対象外です/),
+    ).toBeInTheDocument();
   });
 
   it("switches scheme tabs and expands allocation breakdown", async () => {

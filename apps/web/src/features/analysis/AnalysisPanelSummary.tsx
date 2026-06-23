@@ -46,6 +46,12 @@ export function AnalysisPanelSummary({
               （未割当 {formatAllocationPercent(targetHeadroomRatio)}）
             </span>
           ) : null}
+          {hasUncovered ? (
+            <span className="analysis-panel__summary-target-normalized">
+              {" "}
+              — 差分はタグ付き銘柄内で目標を100%に正規化して比較
+            </span>
+          ) : null}
         </p>
       ) : null}
     </div>

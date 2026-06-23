@@ -228,4 +228,95 @@ describe("computeAllocationRebalanceByInstrument", () => {
     expect(cashSlice?.buyMinor).toBe(100_000);
     expect(result.instrumentRows.every((row) => row.valueCode !== "cash")).toBe(true);
   });
+
+  it("rebalances within classified total using normalized targets when unclassified exists", () => {
+    const classifiedAllocation: AllocationBySchemeWithLines = {
+      schemeCode: "asset",
+      schemeName: "資産",
+      totalMarketValueMinor: 1_000_000,
+      slices: [
+        {
+          valueCode: "domestic",
+          valueName: "国内",
+          marketValueMinor: 700_000,
+          weight: 0.7,
+          lines: [
+            {
+              line: {
+                id: "line-domestic",
+                instrumentId: "inst-domestic",
+                instrumentName: "国内ファンド",
+                sortOrder: null,
+                quantity: 1,
+                marketValueMinor: 700_000,
+                bookValueMinor: null,
+                metrics: [],
+                instrumentAttributes: [],
+                tags: [],
+              },
+              weightInSlice: 1,
+            },
+          ],
+        },
+        {
+          valueCode: "foreign",
+          valueName: "海外",
+          marketValueMinor: 300_000,
+          weight: 0.3,
+          lines: [
+            {
+              line: {
+                id: "line-foreign",
+                instrumentId: "inst-foreign",
+                instrumentName: "海外ファンド",
+                sortOrder: null,
+                quantity: 1,
+                marketValueMinor: 300_000,
+                bookValueMinor: null,
+                metrics: [],
+                instrumentAttributes: [],
+                tags: [],
+              },
+              weightInSlice: 1,
+            },
+          ],
+        },
+      ],
+    };
+
+    const normalizedTargets = [
+      { valueCode: "domestic", targetRatio: 0.4 / 0.99 },
+      { valueCode: "foreign", targetRatio: 0.59 / 0.99 },
+    ];
+
+    let result = computeAllocationRebalanceByInstrument({
+      schemeAllocation: classifiedAllocation,
+      targets: normalizedTargets,
+      portfolioTotalMinor: classifiedAllocation.totalMarketValueMinor,
+      depositMinor: 0,
+      mode: "full",
+    });
+
+    const domesticTrade = result.sliceTrades.find((row) => row.key === "domestic");
+    const foreignTrade = result.sliceTrades.find((row) => row.key === "foreign");
+
+    expect(domesticTrade?.currentRatio).toBeCloseTo(0.7);
+    expect(domesticTrade?.targetRatio).toBeCloseTo(0.4 / 0.99, 4);
+    expect(domesticTrade?.sellMinor).toBeGreaterThan(0);
+    expect(foreignTrade?.buyMinor).toBeGreaterThan(0);
+    expect(result.totalBuyMinor).toBe(result.totalSellMinor);
+
+    const portfolioWideResult = computeAllocationRebalanceByInstrument({
+      schemeAllocation: classifiedAllocation,
+      targets: [{ valueCode: "domestic", targetRatio: 0.4 }],
+      portfolioTotalMinor: 2_000_000,
+      depositMinor: 0,
+      mode: "full",
+    });
+    const portfolioWideDomestic = portfolioWideResult.sliceTrades.find(
+      (row) => row.key === "domestic",
+    );
+    expect(portfolioWideDomestic?.currentRatio).toBeCloseTo(0.35);
+    expect(portfolioWideDomestic?.buyMinor).toBeGreaterThan(0);
+  });
 });
