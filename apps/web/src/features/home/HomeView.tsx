@@ -25,7 +25,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { formatPercent, formatYen } from "@/lib/format-yen";
+import { formatAsOfDateJa, formatPercent, formatYen } from "@/lib/format-yen";
 import { buildPortfolioPath } from "@/lib/portfolio-path";
 import {
   getPortfoliosFetchUrl,
@@ -268,7 +268,9 @@ export function HomeView() {
                       <dl className="grid grid-cols-2 gap-2 text-sm">
                         <div>
                           <dt className="text-muted-foreground">基準日</dt>
-                          <dd className="font-medium">{card.asOfDate}</dd>
+                          <dd className="font-medium">
+                            {formatAsOfDateJa(card.asOfDate)}
+                          </dd>
                         </div>
                         <div>
                           <dt className="text-muted-foreground">評価額</dt>

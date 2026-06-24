@@ -84,6 +84,7 @@ describe("GlobalAnalysisView", () => {
       "href",
       "/portfolios/ideco/analysis",
     );
+    expect(screen.getByText("2026/06/01")).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "地域分類" })).toBeInTheDocument();
   });
 
