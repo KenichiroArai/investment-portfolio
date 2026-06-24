@@ -1,4 +1,6 @@
-import { TrendsView } from "@/features/trends/TrendsView";
+import { Suspense } from "react";
+
+import { LegacyPortfolioRouteRedirect } from "@/features/portfolio/LegacyPortfolioRouteRedirect";
 import { resolvePortfolioCodeParam } from "@/lib/portfolio-path";
 
 type PageProps = {
@@ -6,9 +8,17 @@ type PageProps = {
 };
 
 export default async function TrendsPage({ params }: PageProps) {
-  let result = <TrendsView portfolioCode="" />;
+  let result = (
+    <Suspense fallback={null}>
+      <LegacyPortfolioRouteRedirect portfolioCode="" target="trends" />
+    </Suspense>
+  );
 
   const code = await resolvePortfolioCodeParam(params);
-  result = <TrendsView portfolioCode={code} />;
+  result = (
+    <Suspense fallback={null}>
+      <LegacyPortfolioRouteRedirect portfolioCode={code} target="trends" />
+    </Suspense>
+  );
   return result;
 }

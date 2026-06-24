@@ -1,4 +1,6 @@
-import { HoldingsView } from "@/features/portfolio/HoldingsView";
+import { Suspense } from "react";
+
+import { LegacyPortfolioRouteRedirect } from "@/features/portfolio/LegacyPortfolioRouteRedirect";
 import { generatePortfolioStaticParams } from "@/lib/portfolio-catalog";
 import { resolvePortfolioCodeParam } from "@/lib/portfolio-path";
 
@@ -12,9 +14,17 @@ export function generateStaticParams() {
 }
 
 export default async function HoldingsPage({ params }: PageProps) {
-  let result = <HoldingsView portfolioCode="" />;
+  let result = (
+    <Suspense fallback={null}>
+      <LegacyPortfolioRouteRedirect portfolioCode="" target="holdings" />
+    </Suspense>
+  );
 
   const code = await resolvePortfolioCodeParam(params);
-  result = <HoldingsView portfolioCode={code} />;
+  result = (
+    <Suspense fallback={null}>
+      <LegacyPortfolioRouteRedirect portfolioCode={code} target="holdings" />
+    </Suspense>
+  );
   return result;
 }

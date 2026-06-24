@@ -6,6 +6,16 @@ import {
   createPortfolioFetchMock,
   renderWithPortfolioTime,
 } from "../helpers/portfolio-time-test-utils";
+import { portfolioTimeNavigationState } from "../helpers/portfolio-time-navigation-state";
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    replace: vi.fn(),
+    push: vi.fn(),
+  }),
+  usePathname: () => portfolioTimeNavigationState.pathname,
+  useSearchParams: () => portfolioTimeNavigationState.searchParams,
+}));
 
 const snapshotFixture = {
   id: "snap-1",
@@ -57,6 +67,10 @@ describe("PortfolioAllocationView", () => {
 
     renderWithPortfolioTime(
       <PortfolioAllocationView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/portfolio-allocation",
+        initialSearchParams: "view=allocation",
+      },
     );
 
     await waitFor(() => {
@@ -148,6 +162,10 @@ describe("PortfolioAllocationView", () => {
 
     renderWithPortfolioTime(
       <PortfolioAllocationView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/portfolio-allocation",
+        initialSearchParams: "view=allocation",
+      },
     );
 
     await waitFor(() => {
@@ -170,6 +188,10 @@ describe("PortfolioAllocationView", () => {
 
     renderWithPortfolioTime(
       <PortfolioAllocationView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/portfolio-allocation",
+        initialSearchParams: "view=allocation",
+      },
     );
 
     await waitFor(() => {
@@ -191,6 +213,10 @@ describe("PortfolioAllocationView", () => {
 
     renderWithPortfolioTime(
       <PortfolioAllocationView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/portfolio-allocation",
+        initialSearchParams: "view=allocation",
+      },
     );
 
     await waitFor(() => {

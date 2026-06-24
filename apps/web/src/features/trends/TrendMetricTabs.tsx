@@ -80,13 +80,24 @@ type TrendMetricTabsProps = {
   allocation?: TrendMetricTabsAllocation | null;
   initialMetric?: TrendMetricTab;
   onMetricChange?: (metric: TrendMetricTab) => void;
+  metricMode?: "portfolio" | "allocation" | "all";
 };
 
-function resolveInitialMetric(hasAllocation: boolean): TrendMetricTab {
+function resolveInitialMetric(
+  hasAllocation: boolean,
+  metricMode: "portfolio" | "allocation" | "all",
+): TrendMetricTab {
   let result: TrendMetricTab = "market-value";
-  if (hasAllocation) {
+
+  if (metricMode === "allocation") {
+    result = "allocation";
+    return result;
+  }
+
+  if (hasAllocation && metricMode === "all") {
     result = "allocation";
   }
+
   return result;
 }
 
@@ -127,13 +138,15 @@ export function TrendMetricTabs({
   allocation = null,
   initialMetric,
   onMetricChange,
+  metricMode = "all",
 }: TrendMetricTabsProps) {
   const hasAllocation =
+    metricMode !== "portfolio" &&
     allocation !== null &&
     allocation.schemeCodes.length > 0 &&
     allocation.allocationSeries.length > 0;
 
-  const defaultMetric = resolveInitialMetric(hasAllocation);
+  const defaultMetric = resolveInitialMetric(hasAllocation, metricMode);
   const [activeMetric, setActiveMetricState] = useState<TrendMetricTab>(
     initialMetric ?? defaultMetric,
   );
@@ -161,12 +174,14 @@ export function TrendMetricTabs({
   if (hasAllocation) {
     mainTabs.push({ key: "allocation", label: "構成比" });
   }
-  mainTabs.push(
-    { key: "market-value", label: "評価額" },
-    { key: "gain", label: "損益" },
-  );
-  if (gainRateSeries.length > 0) {
-    mainTabs.push({ key: "gain-rate", label: "利益率" });
+  if (metricMode !== "allocation") {
+    mainTabs.push(
+      { key: "market-value", label: "評価額" },
+      { key: "gain", label: "損益" },
+    );
+    if (gainRateSeries.length > 0) {
+      mainTabs.push({ key: "gain-rate", label: "利益率" });
+    }
   }
 
   const resolvedGainRateKey = gainRateSeries.some(

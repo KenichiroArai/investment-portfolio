@@ -176,12 +176,76 @@ export function PortfolioTimeProvider({
     return null;
   }, [availableDates, customFrom, customTo, searchParams]);
 
-  const emphasizeAsOf = !pathname.includes("/trends");
-  const emphasizePeriod =
-    pathname.includes("/trends") ||
-    pathname.includes("/holdings") ||
-    pathname.endsWith(`/portfolios/${portfolioCode}/`) ||
-    pathname.endsWith(`/portfolios/${portfolioCode}`);
+  const emphasizeAsOf = (() => {
+    let result = true;
+    const view = searchParams.get("view");
+    const panel = searchParams.get("panel");
+    const onPortfolioAllocation = pathname.includes(
+      `/portfolios/${portfolioCode}/portfolio-allocation`,
+    );
+    const onAnalysis = pathname.includes(`/portfolios/${portfolioCode}/analysis`);
+
+    if (pathname.includes("/trends")) {
+      result = false;
+      return result;
+    }
+
+    if (onPortfolioAllocation && panel === "trends") {
+      result = false;
+      return result;
+    }
+
+    if (onAnalysis && view === "trends") {
+      result = false;
+      return result;
+    }
+
+    return result;
+  })();
+
+  const emphasizePeriod = (() => {
+    let result = false;
+    const view = searchParams.get("view");
+    const panel = searchParams.get("panel");
+    const onPortfolioAllocation = pathname.includes(
+      `/portfolios/${portfolioCode}/portfolio-allocation`,
+    );
+    const onAnalysis = pathname.includes(`/portfolios/${portfolioCode}/analysis`);
+
+    if (pathname.includes("/trends") || pathname.includes("/holdings")) {
+      result = true;
+      return result;
+    }
+
+    if (
+      pathname.endsWith(`/portfolios/${portfolioCode}/`) ||
+      pathname.endsWith(`/portfolios/${portfolioCode}`)
+    ) {
+      result = true;
+      return result;
+    }
+
+    if (onPortfolioAllocation && view !== "allocation") {
+      result = true;
+      return result;
+    }
+
+    if (onAnalysis && view === "trends") {
+      result = true;
+      return result;
+    }
+
+    if (onPortfolioAllocation && view === null && panel === null) {
+      result = true;
+      return result;
+    }
+
+    if (onPortfolioAllocation && panel === "holdings") {
+      result = true;
+    }
+
+    return result;
+  })();
 
   const updateSearchParams = useCallback(
     (updates: Record<string, string | null>) => {

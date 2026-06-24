@@ -102,11 +102,11 @@ SQLite の内容を SQL で確認する場合は [dev/sql/README.md](dev/sql/REA
 | --- | --- |
 | ホーム | 全口座の評価額・損益サマリー、口座の追加・編集 |
 | 全口座分析 | 複数口座を合算した資産配分（`/analysis/`） |
-| 口座概要 | 評価額・損益・拠出金、推移チャート、基準日切替 |
-| 明細 | 保有銘柄一覧、期間比較、銘柄別詳細 |
-| 資産配分 | 分類軸（商品タイプ・地域・資産など）ごとの構成比・目標配分・ギャップ・売買試算 |
-| ポートフォリオ配分 | 銘柄ごとの目標構成比、銘柄目標から導出した構成比目標と現状のギャップ（資産配分目標は参考）、銘柄軸の売買試算 |
-| 推移 | 評価額・構成比の時系列チャート、期間変化テーブル |
+| 口座概要 | 評価額・損益・拠出金サマリー、配分ページへの導線、基準日切替 |
+| 明細 | ポートフォリオ配分ページ内（明細・推移タブ）— 保有銘柄一覧、期間比較 |
+| 資産配分 | 推移タブ（構成比）と配分タブ（目標・リバランス） |
+| ポートフォリオ配分 | 明細・推移タブと配分タブ（銘柄目標・リバランス試算） |
+| 推移 | ポートフォリオ配分（評価額・損益）と資産配分（構成比）に統合 |
 | 設定 | データ管理（銘柄・明細・指標の登録・更新）、分類設定、目標配分 |
 | データ投入 | iDeCo 5 CSV の一括インポート、複数基準日のスナップショット |
 | GitHub Pages | 静的 JSON による閲覧（登録・更新はローカルのみ） |
@@ -149,10 +149,8 @@ curl -s http://127.0.0.1:3001/portfolios/ideco/target-allocations
 | [http://localhost:3000/](http://localhost:3000/) | ホーム（全口座サマリー） |
 | [http://localhost:3000/analysis/](http://localhost:3000/analysis/) | 全口座分析 |
 | [http://localhost:3000/portfolios/ideco/](http://localhost:3000/portfolios/ideco/) | 口座概要（iDeCo） |
-| [http://localhost:3000/portfolios/ideco/holdings/](http://localhost:3000/portfolios/ideco/holdings/) | 明細 |
-| [http://localhost:3000/portfolios/ideco/analysis/](http://localhost:3000/portfolios/ideco/analysis/) | 資産配分 |
-| [http://localhost:3000/portfolios/ideco/portfolio-allocation/](http://localhost:3000/portfolios/ideco/portfolio-allocation/) | ポートフォリオ配分 |
-| [http://localhost:3000/portfolios/ideco/trends/](http://localhost:3000/portfolios/ideco/trends/) | 推移 |
+| [http://localhost:3000/portfolios/ideco/portfolio-allocation/](http://localhost:3000/portfolios/ideco/portfolio-allocation/) | ポートフォリオ配分（明細・推移・配分） |
+| [http://localhost:3000/portfolios/ideco/analysis/](http://localhost:3000/portfolios/ideco/analysis/) | 資産配分（推移・配分） |
 | [http://localhost:3000/portfolios/ideco/settings/data/](http://localhost:3000/portfolios/ideco/settings/data/) | データ管理（ローカル API のみ） |
 
 口座画面のタブから各機能に遷移します。API が止まっている、または `NEXT_PUBLIC_API_URL` が実際の API と一致しない場合は画面上でエラーになります。設定・登録系はローカル API 接続時のみ利用できます。

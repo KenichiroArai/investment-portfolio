@@ -1,4 +1,5 @@
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { Suspense } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import GlobalAnalysisPage from "@/app/analysis/page";
@@ -24,12 +25,13 @@ import { AnalysisView } from "@/features/analysis/AnalysisView";
 import { GlobalAnalysisView } from "@/features/analysis/GlobalAnalysisView";
 import { PortfolioOverviewView } from "@/features/portfolio/PortfolioOverviewView";
 import { PortfolioShell } from "@/features/portfolio/PortfolioShell";
-import { TrendsView } from "@/features/trends/TrendsView";
+import { LegacyPortfolioRouteRedirect } from "@/features/portfolio/LegacyPortfolioRouteRedirect";
 import { generatePortfolioStaticParams } from "@/lib/portfolio-catalog";
 import {
   createPortfolioFetchMock,
   renderWithPortfolioTime,
 } from "../helpers/portfolio-time-test-utils";
+import { portfolioTimeNavigationState } from "../helpers/portfolio-time-navigation-state";
 
 const mockRedirect = vi.hoisted(() => vi.fn());
 
@@ -38,8 +40,8 @@ vi.mock("next/navigation", () => ({
     replace: vi.fn(),
     push: vi.fn(),
   }),
-  usePathname: () => "/portfolios/ideco/",
-  useSearchParams: () => new URLSearchParams(),
+  usePathname: () => portfolioTimeNavigationState.pathname,
+  useSearchParams: () => portfolioTimeNavigationState.searchParams,
   redirect: (url: string) => {
     mockRedirect(url);
     throw new Error("NEXT_REDIRECT");
@@ -196,7 +198,10 @@ describe("portfolio routes", () => {
     expect(page).toEqual(
       <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
     );
-    renderWithPortfolioTime(page);
+    renderWithPortfolioTime(page, {
+      pathname: "/portfolios/ideco/analysis",
+      initialSearchParams: "view=allocation",
+    });
     await waitFor(() => {
       expect(screen.getByText(/評価額合計/)).toBeInTheDocument();
     });
@@ -265,13 +270,14 @@ describe("portfolio routes", () => {
     expect(mockRedirect).toHaveBeenCalledWith("/portfolios/ideco/settings/data/");
   });
 
-  it("renders trends page", async () => {
+  it("renders trends redirect page", async () => {
     const page = await TrendsPage({
       params: Promise.resolve({ code: "ideco" }),
     });
-    expect(page).toEqual(<TrendsView portfolioCode="ideco" />);
-    renderWithPortfolioTime(page);
-    expect(screen.getByRole("heading", { name: "推移" })).toBeInTheDocument();
-    expect(screen.getByText(/口座: ideco/)).toBeInTheDocument();
+    expect(page).toEqual(
+      <Suspense fallback={null}>
+        <LegacyPortfolioRouteRedirect portfolioCode="ideco" target="trends" />
+      </Suspense>,
+    );
   });
 });

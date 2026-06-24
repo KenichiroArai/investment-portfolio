@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { HoldingsView } from "@/features/portfolio/HoldingsView";
+import { HoldingsDetailPanel } from "@/features/portfolio/HoldingsDetailPanel";
 import {
   createPortfolioFetchMock,
   renderWithPortfolioTime,
@@ -17,7 +17,26 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => portfolioTimeNavigationState.searchParams,
 }));
 
-describe("HoldingsView", () => {
+describe("HoldingsDetailPanel", () => {
+  const renderPanel = (
+    holdingsMode: "range" | "compare" = "range",
+    options?: Parameters<typeof renderWithPortfolioTime>[1],
+  ) => {
+    const onHoldingsModeChange = vi.fn();
+    const view = renderWithPortfolioTime(
+      <HoldingsDetailPanel
+        portfolioCode="ideco"
+        holdingsMode={holdingsMode}
+        onHoldingsModeChange={onHoldingsModeChange}
+      />,
+      {
+        pathname: "/portfolios/ideco/portfolio-allocation",
+        ...options,
+      },
+    );
+    return { ...view, onHoldingsModeChange };
+  };
+
   afterEach(() => {
     cleanup();
     vi.unstubAllGlobals();
@@ -25,18 +44,15 @@ describe("HoldingsView", () => {
 
   it("shows loading state initially", () => {
     vi.stubGlobal("fetch", vi.fn(() => new Promise(() => {})));
-    const { container } = renderWithPortfolioTime(
-      <HoldingsView portfolioCode="ideco" />,
-      { pathname: "/portfolios/ideco/holdings" },
-    );
+    const { container } = renderPanel("range", {
+      pathname: "/portfolios/ideco/portfolio-allocation",
+    });
     expect(container.querySelector(".animate-pulse")).toBeTruthy();
   });
 
   it("shows API connection error when fetch fails", async () => {
     vi.stubGlobal("fetch", createPortfolioFetchMock({ failFetch: true }));
-    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
-      pathname: "/portfolios/ideco/holdings",
-    });
+    renderPanel();
     await waitFor(() => {
       expect(screen.getByText(/API に接続できません/)).toBeInTheDocument();
     });
@@ -46,9 +62,7 @@ describe("HoldingsView", () => {
     const prev = process.env.NEXT_PUBLIC_DATA_SOURCE;
     process.env.NEXT_PUBLIC_DATA_SOURCE = "static";
     vi.stubGlobal("fetch", createPortfolioFetchMock({ failFetch: true }));
-    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
-      pathname: "/portfolios/ideco/holdings",
-    });
+    renderPanel();
     await waitFor(() => {
       expect(screen.getByText(/pages:export/)).toBeInTheDocument();
     });
@@ -93,9 +107,7 @@ describe("HoldingsView", () => {
         },
       }),
     );
-    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
-      pathname: "/portfolios/ideco/holdings",
-    });
+    renderPanel();
     await waitFor(() => {
       expect(screen.getByText("テストファンド")).toBeInTheDocument();
       expect(screen.getByRole("columnheader", { name: "基準日" })).toBeInTheDocument();
@@ -113,9 +125,7 @@ describe("HoldingsView", () => {
         snapshotStatus: 500,
       }),
     );
-    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
-      pathname: "/portfolios/ideco/holdings",
-    });
+    renderPanel();
     await waitFor(() => {
       expect(screen.getByText(/データの取得に失敗しました/)).toBeInTheDocument();
     });
@@ -129,9 +139,7 @@ describe("HoldingsView", () => {
         snapshot: null,
       }),
     );
-    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
-      pathname: "/portfolios/ideco/holdings",
-    });
+    renderPanel();
     await waitFor(() => {
       expect(screen.getByText(/明細がまだ登録されていません/)).toBeInTheDocument();
     });
@@ -164,9 +172,7 @@ describe("HoldingsView", () => {
         },
       }),
     );
-    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
-      pathname: "/portfolios/ideco/holdings",
-    });
+    renderPanel();
     await waitFor(() => {
       expect(screen.getByText("無タグ")).toBeInTheDocument();
       expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(1);
@@ -184,8 +190,8 @@ describe("HoldingsView", () => {
           }),
       ),
     );
-    const { unmount } = renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
-      pathname: "/portfolios/ideco/holdings",
+    const { unmount } = renderPanel("range", {
+      pathname: "/portfolios/ideco/portfolio-allocation",
     });
     unmount();
     resolveFetch({
@@ -256,9 +262,9 @@ describe("HoldingsView", () => {
         },
       }),
     );
-    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
-      pathname: "/portfolios/ideco/holdings",
-      initialSearchParams: "period=all&asOf=2026-06-07&view=compare",
+    renderPanel("compare", {
+      pathname: "/portfolios/ideco/portfolio-allocation",
+      initialSearchParams: "period=all&asOf=2026-06-07&holdingsMode=compare",
     });
     await waitFor(() => {
       expect(screen.getByText(/期間:/)).toBeInTheDocument();
@@ -288,9 +294,9 @@ describe("HoldingsView", () => {
         },
       }),
     );
-    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
-      pathname: "/portfolios/ideco/holdings",
-      initialSearchParams: "view=compare",
+    renderPanel("compare", {
+      pathname: "/portfolios/ideco/portfolio-allocation",
+      initialSearchParams: "holdingsMode=compare",
     });
     await waitFor(() => {
       expect(screen.getByText(/保有銘柄がありません/)).toBeInTheDocument();
@@ -362,8 +368,8 @@ describe("HoldingsView", () => {
         },
       }),
     );
-    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
-      pathname: "/portfolios/ideco/holdings",
+    renderPanel("range", {
+      pathname: "/portfolios/ideco/portfolio-allocation",
       initialSearchParams: "period=all&from=2026-06-01&to=2026-06-07&asOf=2026-06-07",
     });
     await waitFor(() => {
@@ -409,9 +415,7 @@ describe("HoldingsView", () => {
         },
       }),
     );
-    renderWithPortfolioTime(<HoldingsView portfolioCode="ideco" />, {
-      pathname: "/portfolios/ideco/holdings",
-    });
+    renderPanel();
 
     await waitFor(() => {
       expect(screen.getByText("銘柄00")).toBeInTheDocument();

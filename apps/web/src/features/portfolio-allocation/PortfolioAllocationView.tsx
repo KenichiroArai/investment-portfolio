@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RebalanceSettingsCard } from "@/features/allocation/RebalanceSettingsCard";
 import { RebalanceTradesSummary } from "@/features/allocation/RebalanceTradesSummary";
 import { useAllocationSchemeParam } from "@/features/allocation/useAllocationSchemeParam";
@@ -38,7 +39,10 @@ import {
   usePortfolioRebalanceResult,
 } from "@/features/portfolio-allocation/usePortfolioRebalanceResult";
 import { useTargetPortfolioWeights } from "@/features/portfolio-allocation/useTargetPortfolioWeights";
+import { PortfolioDetailsPanel } from "@/features/portfolio/PortfolioDetailsPanel";
+import { PortfolioOverviewSummary } from "@/features/portfolio/PortfolioOverviewSummary";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
+import { usePortfolioSubviewParam } from "@/features/portfolio/usePortfolioSubviewParam";
 import { formatAsOfDateJa, formatYen } from "@/lib/format-yen";
 
 type PortfolioAllocationViewProps = {
@@ -57,11 +61,21 @@ export function PortfolioAllocationView({
     error,
     selectedAsOfDate,
     isHistoricalView,
+    currentAsOfDate,
+    trends,
   } = usePortfolioTime();
   const { weights, loading: loadingWeights } = useTargetPortfolioWeights(portfolioCode);
   const { allocationsByScheme, loading: loadingAllocations } =
     useTargetAllocations(portfolioCode);
   const { depositInput, setDepositInput, depositMinor, mode } = useRebalanceDeposit();
+
+  const subview = usePortfolioSubviewParam({ page: "portfolio-allocation" });
+  const mainView = subview.mainView;
+  const setMainView = subview.setMainView;
+  const panel = subview.panel;
+  const setPanel = subview.setPanel;
+  const holdingsMode = subview.holdingsMode;
+  const setHoldingsMode = subview.setHoldingsMode;
 
   const schemeConfigs = usePortfolioAnalysisSchemes(snapshot, portfolioKind);
   const schemeCodes = schemeConfigs.map((config) => config.schemeCode);
@@ -151,7 +165,84 @@ export function PortfolioAllocationView({
   }
 
   const asOfDate = selectedAsOfDate ?? snapshot.asOfDate;
-  const totalValue = sumSnapshotMarketValue(snapshot.lines);
+  const assetBalance = sumSnapshotMarketValue(snapshot.lines);
+  const latestPoint =
+    trends?.points.find((point) => point.asOfDate === currentAsOfDate) ??
+    trends?.points[trends.points.length - 1];
+  const deltaHint =
+    isHistoricalView && latestPoint
+      ? `最新比 評価額 ${formatYen(latestPoint.totalMarketValueMinor - assetBalance)}`
+      : null;
+
+  const allocationTabContent = (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">銘柄別構成比</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <PortfolioAllocationPanel rows={allocationRows} />
+        </CardContent>
+      </Card>
+
+      {schemeConfigs.length > 0 ? (
+        <>
+          <FormField label="分析軸" htmlFor="portfolio-allocation-scheme">
+            <Select
+              value={activeSchemeCode}
+              onValueChange={(value) => {
+                setActiveSchemeCode(value);
+              }}
+            >
+              <SelectTrigger id="portfolio-allocation-scheme">
+                <SelectValue placeholder="分析軸を選択" />
+              </SelectTrigger>
+              <SelectContent>
+                {schemeConfigs.map((scheme) => {
+                  let item = (
+                    <SelectItem key={scheme.schemeCode} value={scheme.schemeCode}>
+                      {scheme.schemeName}
+                    </SelectItem>
+                  );
+                  return item;
+                })}
+              </SelectContent>
+            </Select>
+          </FormField>
+          {activeScheme ? (
+            <ImpliedAllocationTargetsCard
+              gapRows={compositionGapRows}
+              allocationTargets={allocationTargetsForScheme}
+              schemeName={activeScheme.schemeName}
+            />
+          ) : null}
+        </>
+      ) : null}
+
+      <WritableOnly>
+        <TargetPortfolioSettingsCard
+          portfolioCode={portfolioCode}
+          lines={snapshot.lines}
+          disabled={isHistoricalView}
+        />
+      </WritableOnly>
+
+      <RebalanceSettingsCard
+        depositInput={depositInput}
+        depositMinor={depositMinor}
+        mode={mode}
+        onDepositInputChange={setDepositInput}
+        depositInputId="portfolio-allocation-rebalance-deposit"
+      />
+
+      <RebalanceTradesSummary
+        rows={rebalanceResult.rows}
+        totalBuyMinor={rebalanceResult.totalBuyMinor}
+        totalSellMinor={rebalanceResult.totalSellMinor}
+        unallocatedDepositMinor={rebalanceResult.unallocatedDepositMinor}
+      />
+    </div>
+  );
 
   result = (
     <PageContainer>
@@ -165,80 +256,39 @@ export function PortfolioAllocationView({
           </div>
         }
       />
-      <div className="mb-4 space-y-1">
-        <p className="text-sm font-medium">評価額合計: {formatYen(totalValue)}</p>
-        <p className="text-sm text-muted-foreground">
+      <PortfolioOverviewSummary
+        snapshot={snapshot}
+        deltaHint={deltaHint}
+        className="mb-6"
+      />
+      {mainView === "allocation" ? (
+        <p className="mb-4 text-sm text-muted-foreground">
           目標設定済み: {targetCount} / {allocationRows.length} 銘柄
         </p>
-      </div>
-
-      <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">銘柄別構成比</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <PortfolioAllocationPanel rows={allocationRows} />
-          </CardContent>
-        </Card>
-
-        <WritableOnly>
-          <TargetPortfolioSettingsCard
+      ) : null}
+      <Tabs
+        value={mainView}
+        onValueChange={(value) => {
+          setMainView(value as "details" | "allocation");
+        }}
+      >
+        <TabsList>
+          <TabsTrigger value="details">明細・推移</TabsTrigger>
+          <TabsTrigger value="allocation">配分（リバランス）</TabsTrigger>
+        </TabsList>
+        <TabsContent value="details" className="mt-4">
+          <PortfolioDetailsPanel
             portfolioCode={portfolioCode}
-            lines={snapshot.lines}
-            disabled={isHistoricalView}
+            panel={panel}
+            onPanelChange={setPanel}
+            holdingsMode={holdingsMode}
+            onHoldingsModeChange={setHoldingsMode}
           />
-        </WritableOnly>
-
-        {schemeConfigs.length > 0 ? (
-          <>
-            <FormField label="分析軸" htmlFor="portfolio-allocation-scheme">
-              <Select
-                value={activeSchemeCode}
-                onValueChange={(value) => {
-                  setActiveSchemeCode(value);
-                }}
-              >
-                <SelectTrigger id="portfolio-allocation-scheme">
-                  <SelectValue placeholder="分析軸を選択" />
-                </SelectTrigger>
-                <SelectContent>
-                  {schemeConfigs.map((scheme) => {
-                    let item = (
-                      <SelectItem key={scheme.schemeCode} value={scheme.schemeCode}>
-                        {scheme.schemeName}
-                      </SelectItem>
-                    );
-                    return item;
-                  })}
-                </SelectContent>
-              </Select>
-            </FormField>
-            {activeScheme ? (
-              <ImpliedAllocationTargetsCard
-                gapRows={compositionGapRows}
-                allocationTargets={allocationTargetsForScheme}
-                schemeName={activeScheme.schemeName}
-              />
-            ) : null}
-          </>
-        ) : null}
-
-        <RebalanceSettingsCard
-          depositInput={depositInput}
-          depositMinor={depositMinor}
-          mode={mode}
-          onDepositInputChange={setDepositInput}
-          depositInputId="portfolio-allocation-rebalance-deposit"
-        />
-
-        <RebalanceTradesSummary
-          rows={rebalanceResult.rows}
-          totalBuyMinor={rebalanceResult.totalBuyMinor}
-          totalSellMinor={rebalanceResult.totalSellMinor}
-          unallocatedDepositMinor={rebalanceResult.unallocatedDepositMinor}
-        />
-      </div>
+        </TabsContent>
+        <TabsContent value="allocation" className="mt-4">
+          {allocationTabContent}
+        </TabsContent>
+      </Tabs>
     </PageContainer>
   );
   return result;

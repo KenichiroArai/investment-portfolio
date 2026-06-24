@@ -115,9 +115,9 @@ describe("layout components", () => {
         "href",
         "/portfolios/ideco",
       );
-      expect(screen.getByRole("link", { name: "明細" })).toHaveAttribute(
+      expect(screen.getByRole("link", { name: "ポートフォリオ配分" })).toHaveAttribute(
         "href",
-        "/portfolios/ideco/holdings",
+        "/portfolios/ideco/portfolio-allocation",
       );
       expect(screen.getByRole("link", { name: "資産配分" })).toHaveAttribute(
         "href",
@@ -163,11 +163,11 @@ describe("layout components", () => {
       expect(window.location.assign).toHaveBeenCalledWith("/portfolios/nisa/");
     });
 
-    it("marks analysis and trends tabs active on nested routes", () => {
-      usePathname.mockReturnValue("/portfolios/ideco/trends/");
+    it("marks portfolio allocation tab active on nested routes", () => {
+      usePathname.mockReturnValue("/portfolios/ideco/portfolio-allocation/");
       render(<PortfolioContextBar portfolioCode="ideco" />);
 
-      expect(screen.getByRole("link", { name: "推移" })).toHaveAttribute(
+      expect(screen.getByRole("link", { name: "ポートフォリオ配分" })).toHaveAttribute(
         "aria-current",
         "page",
       );

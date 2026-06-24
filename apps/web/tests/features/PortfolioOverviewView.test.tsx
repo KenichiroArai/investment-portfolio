@@ -57,7 +57,8 @@ describe("PortfolioOverviewView", () => {
     expect(screen.getByText("資産残高")).toBeInTheDocument();
     expect(screen.getByText("拠出金累計")).toBeInTheDocument();
     expect(screen.getByText("損益")).toBeInTheDocument();
-    expect(screen.getByText("資産推移")).toBeInTheDocument();
+    expect(screen.getByText("明細・推移を見る")).toBeInTheDocument();
+    expect(screen.getByText("資産配分を見る")).toBeInTheDocument();
   });
 
   it("shows error when fetch fails", async () => {

@@ -35,10 +35,8 @@ type ContextTab = {
 
 const CONTEXT_TABS: ContextTab[] = [
   { segment: "", label: "概要", enabled: true },
-  { segment: "holdings", label: "明細", enabled: true },
   { segment: "portfolio-allocation", label: "ポートフォリオ配分", enabled: true },
   { segment: "analysis", label: "資産配分", enabled: true },
-  { segment: "trends", label: "推移", enabled: true },
 ];
 
 function buildPortfolioHref(portfolioCode: string, segment: string): string {
@@ -66,11 +64,6 @@ function isTabActive(pathname: string, portfolioCode: string, segment: string): 
 
   if (segment === "portfolio-allocation") {
     result = pathname.startsWith(`${base}/portfolio-allocation`);
-    return result;
-  }
-
-  if (segment === "trends") {
-    result = pathname.startsWith(`${base}/trends`);
     return result;
   }
 

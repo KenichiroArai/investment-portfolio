@@ -3,6 +3,8 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { buildPortfolioPath } from "@/lib/portfolio-path";
+
 import { TrendLineChart } from "@/features/trends/TrendLineChart";
 import {
   buildTrendChartBuckets,
@@ -127,8 +129,10 @@ export function OverviewTrendChart() {
         ]}
       />
       <p className="overview-trend__link">
-        <Link href={`/portfolios/${portfolioCode}/trends`}>
-          構成比の推移を見る →
+        <Link
+          href={`${buildPortfolioPath(portfolioCode, "portfolio-allocation")}?view=details&panel=trends`}
+        >
+          推移の詳細を見る →
         </Link>
       </p>
     </section>

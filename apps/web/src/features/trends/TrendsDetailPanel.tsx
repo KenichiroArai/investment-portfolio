@@ -79,11 +79,17 @@ function toggleCompositionKey(keys: string[], key: string): string[] {
   return result;
 }
 
+type TrendsPanelMode = "portfolio" | "allocation" | "all";
+
 type TrendsDetailPanelProps = {
   portfolioCode: string;
+  mode?: TrendsPanelMode;
 };
 
-export function TrendsDetailPanel({ portfolioCode }: TrendsDetailPanelProps) {
+export function TrendsDetailPanel({
+  portfolioCode,
+  mode = "all",
+}: TrendsDetailPanelProps) {
   const {
     displayTrendPoints,
     baselinePoint,
@@ -99,9 +105,14 @@ export function TrendsDetailPanel({ portfolioCode }: TrendsDetailPanelProps) {
   const { activeSchemeCode, setActiveSchemeCode } = useAllocationSchemeParam({
     schemeCodes: schemeCodeValues,
   });
-  const hasAllocationSchemes = schemeCodesList.length > 0;
+  const hasAllocationSchemes = schemeCodesList.length > 0 && mode !== "portfolio";
   const { activeMetric, setActiveMetric } = useAllocationMetricParam({
-    defaultMetric: hasAllocationSchemes ? "allocation" : "market-value",
+    defaultMetric:
+      mode === "portfolio"
+        ? "market-value"
+        : hasAllocationSchemes
+          ? "allocation"
+          : "market-value",
   });
   const [selectedCompositionKeys, setSelectedCompositionKeys] = useState<string[]>([]);
   const compositionInitializedRef = useRef(false);
@@ -113,7 +124,7 @@ export function TrendsDetailPanel({ portfolioCode }: TrendsDetailPanelProps) {
   const ratioSeriesForHooks = useMemo(() => {
     let result: AllocationSeriesInput[] = [];
 
-    if (displayTrendPoints.length === 0 || activeSchemeCodeForHooks === "") {
+    if (mode === "portfolio" || displayTrendPoints.length === 0 || activeSchemeCodeForHooks === "") {
       return result;
     }
 
@@ -126,7 +137,7 @@ export function TrendsDetailPanel({ portfolioCode }: TrendsDetailPanelProps) {
 
     result = buildAllocationRatioSeries(chartBuckets.chartPoints, activeSchemeCodeForHooks);
     return result;
-  }, [activeSchemeCodeForHooks, baselinePoint, displayTrendPoints, trendDisplayUnit]);
+  }, [activeSchemeCodeForHooks, baselinePoint, displayTrendPoints, mode, trendDisplayUnit]);
 
   const allCompositionKeys = useMemo(() => {
     let keys = resolveAllCompositionKeys(ratioSeriesForHooks);
@@ -226,17 +237,17 @@ export function TrendsDetailPanel({ portfolioCode }: TrendsDetailPanelProps) {
   const periodEndpoints = resolvePeriodEndpoints(displayTrendPoints, baselinePoint);
 
   const allocationSeries =
-    activeSchemeCodeForHooks !== ""
+    mode !== "portfolio" && activeSchemeCodeForHooks !== ""
       ? buildAllocationChartSeries(chartPoints, activeSchemeCodeForHooks)
       : [];
 
   const ratioSeries =
-    activeSchemeCodeForHooks !== ""
+    mode !== "portfolio" && activeSchemeCodeForHooks !== ""
       ? buildAllocationRatioSeries(chartPoints, activeSchemeCodeForHooks)
       : [];
 
   const periodChangeRows =
-    periodEndpoints && activeSchemeCodeForHooks !== ""
+    mode !== "portfolio" && periodEndpoints && activeSchemeCodeForHooks !== ""
       ? buildAllocationPeriodChangeRows(
           periodEndpoints.start,
           periodEndpoints.end,
@@ -244,6 +255,19 @@ export function TrendsDetailPanel({ portfolioCode }: TrendsDetailPanelProps) {
           activeSchemeCodeForHooks,
         )
       : [];
+
+  const largestShareChangeForSummary =
+    mode === "portfolio"
+      ? null
+      : findLargestAllocationShareChange(
+          periodChangeRows.map((row) => ({
+            key: row.key,
+            label: row.label,
+            startRatio: row.startRatio,
+            endRatio: row.endRatio,
+            deltaRatio: row.deltaRatio,
+          })),
+        );
 
   const endTrendSlices =
     periodEndpoints?.end.allocationsByScheme[activeSchemeCodeForHooks] ?? [];
@@ -261,16 +285,6 @@ export function TrendsDetailPanel({ portfolioCode }: TrendsDetailPanelProps) {
   const uncoveredMinor =
     endAssetTotalMinor > axisTotalMinor ? endAssetTotalMinor - axisTotalMinor : 0;
   const endAsOfDate = periodEndpoints?.end.sourceAsOfDate ?? null;
-
-  const largestShareChange = findLargestAllocationShareChange(
-    periodChangeRows.map((row) => ({
-      key: row.key,
-      label: row.label,
-      startRatio: row.startRatio,
-      endRatio: row.endRatio,
-      deltaRatio: row.deltaRatio,
-    })),
-  );
 
   const marketValueLevelValues = mapTrendChartLevelValues(
     chartPoints,
@@ -518,7 +532,7 @@ export function TrendsDetailPanel({ portfolioCode }: TrendsDetailPanelProps) {
         startMarketValueMinor={startMarketValue}
         endMarketValueMinor={endMarketValue}
         metricDeltas={metricDeltas}
-        largestShareChange={largestShareChange}
+        largestShareChange={largestShareChangeForSummary}
         sparseDataNote={sparseDataNote}
         singleBucketNote={singleBucketNote}
         baselineSummary={baselineSummary}
@@ -543,8 +557,11 @@ export function TrendsDetailPanel({ portfolioCode }: TrendsDetailPanelProps) {
         gainRateRelativeRateSeries={gainRateRelativeRateSeries}
         initialMetric={activeMetric}
         onMetricChange={setActiveMetric}
+        metricMode={mode === "all" ? "all" : mode}
         allocation={
-          schemeCodesList.length > 0 && allocationSeries.length > 0
+          mode !== "portfolio" &&
+          schemeCodesList.length > 0 &&
+          allocationSeries.length > 0
             ? {
                 schemeCodes: schemeCodesList,
                 activeSchemeCode: activeSchemeCodeForHooks,

@@ -1,35 +1,27 @@
 "use client";
 
-import {
-  computeSnapshotGainRate,
-  computeSnapshotPortfolioGainMinor,
-  resolveSnapshotTotalContributions,
-  sumSnapshotMarketValue,
-} from "@repo/shared";
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { LoadingSkeleton } from "@/components/loading-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
-import { StatCard } from "@/components/stat-card";
-import { OverviewTrendChart } from "@/features/trends/OverviewTrendChart";
+import { PortfolioOverviewSummary } from "@/features/portfolio/PortfolioOverviewSummary";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { sumSnapshotMarketValue } from "@repo/shared";
+import { BarChart3, PieChart } from "lucide-react";
 import {
   formatAsOfDateJa,
-  formatPercent,
   formatYen,
 } from "@/lib/format-yen";
-import { cn } from "@/lib/utils";
+import { buildPortfolioPath } from "@/lib/portfolio-path";
 
 type PortfolioOverviewViewProps = {
   portfolioCode: string;
 };
-
-const GAIN_RATE_ON_CONTRIBUTIONS_HINT = "損益 ÷ 拠出金累計";
-const GAIN_RATE_ON_ASSET_BALANCE_HINT = "損益 ÷ 資産残高";
 
 export function PortfolioOverviewView({
   portfolioCode,
@@ -81,29 +73,6 @@ export function PortfolioOverviewView({
   }
 
   const assetBalance = sumSnapshotMarketValue(snapshot.lines);
-  const totalContributions = resolveSnapshotTotalContributions(snapshot);
-  const portfolioGain = computeSnapshotPortfolioGainMinor(
-    assetBalance,
-    totalContributions,
-  );
-  const gainRateOnContributions = computeSnapshotGainRate(
-    portfolioGain,
-    totalContributions,
-  );
-  const gainRateOnAssetBalance = computeSnapshotGainRate(
-    portfolioGain,
-    assetBalance,
-  );
-  const gainRateOnContributionsLabel =
-    gainRateOnContributions === null
-      ? "—"
-      : formatPercent(gainRateOnContributions);
-  const gainRateOnAssetBalanceLabel =
-    gainRateOnAssetBalance === null
-      ? "—"
-      : formatPercent(gainRateOnAssetBalance);
-  const gainClassName = portfolioGain >= 0 ? "text-positive" : "text-negative";
-
   const latestPoint =
     trends?.points.find((point) => point.asOfDate === currentAsOfDate) ??
     trends?.points[trends.points.length - 1];
@@ -126,39 +95,21 @@ export function PortfolioOverviewView({
           </div>
         }
       />
-      {deltaHint ? (
-        <p className="-mt-4 mb-4 text-sm text-muted-foreground">{deltaHint}</p>
-      ) : null}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="資産残高" value={formatYen(assetBalance)} />
-        <StatCard label="拠出金累計" value={formatYen(totalContributions)} />
-        <StatCard
-          label="損益"
-          value={formatYen(portfolioGain)}
-          valueClassName={gainClassName}
-        />
-        <StatCard
-          label="損益率"
-          value={gainRateOnContributionsLabel}
-          hint={GAIN_RATE_ON_CONTRIBUTIONS_HINT}
-          valueClassName={gainClassName}
-        />
-        <StatCard
-          label="利益率"
-          value={gainRateOnAssetBalanceLabel}
-          hint={GAIN_RATE_ON_ASSET_BALANCE_HINT}
-          valueClassName={gainClassName}
-          className="sm:col-span-2 lg:col-span-1"
-        />
+      <PortfolioOverviewSummary snapshot={snapshot} deltaHint={deltaHint} className="mb-6" />
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" size="sm" asChild>
+          <Link href={`${buildPortfolioPath(portfolioCode, "portfolio-allocation")}?panel=trends`}>
+            <PieChart className="h-4 w-4" />
+            明細・推移を見る
+          </Link>
+        </Button>
+        <Button variant="outline" size="sm" asChild>
+          <Link href={buildPortfolioPath(portfolioCode, "analysis")}>
+            <BarChart3 className="h-4 w-4" />
+            資産配分を見る
+          </Link>
+        </Button>
       </div>
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle className="text-base">資産推移</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <OverviewTrendChart />
-        </CardContent>
-      </Card>
     </PageContainer>
   );
   return result;

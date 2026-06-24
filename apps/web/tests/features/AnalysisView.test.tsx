@@ -7,6 +7,16 @@ import {
   createPortfolioFetchMock,
   renderWithPortfolioTime,
 } from "../helpers/portfolio-time-test-utils";
+import { portfolioTimeNavigationState } from "../helpers/portfolio-time-navigation-state";
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    replace: vi.fn(),
+    push: vi.fn(),
+  }),
+  usePathname: () => portfolioTimeNavigationState.pathname,
+  useSearchParams: () => portfolioTimeNavigationState.searchParams,
+}));
 
 const snapshotFixture = {
   id: "snap-1",
@@ -82,6 +92,10 @@ describe("AnalysisView", () => {
 
     renderWithPortfolioTime(
       <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/analysis",
+        initialSearchParams: "view=allocation",
+      },
     );
 
     await waitFor(() => {
@@ -132,6 +146,10 @@ describe("AnalysisView", () => {
 
     renderWithPortfolioTime(
       <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/analysis",
+        initialSearchParams: "view=allocation",
+      },
     );
 
     await waitFor(() => {
@@ -159,6 +177,10 @@ describe("AnalysisView", () => {
 
     renderWithPortfolioTime(
       <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/analysis",
+        initialSearchParams: "view=allocation",
+      },
     );
 
     await waitFor(() => {
@@ -189,6 +211,10 @@ describe("AnalysisView", () => {
 
     renderWithPortfolioTime(
       <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/analysis",
+        initialSearchParams: "view=allocation",
+      },
     );
 
     await waitFor(() => {
@@ -211,6 +237,10 @@ describe("AnalysisView", () => {
 
     renderWithPortfolioTime(
       <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/analysis",
+        initialSearchParams: "view=allocation",
+      },
     );
 
     await waitFor(() => {
@@ -234,6 +264,10 @@ describe("AnalysisView", () => {
 
     renderWithPortfolioTime(
       <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/analysis",
+        initialSearchParams: "view=allocation",
+      },
     );
 
     await waitFor(() => {
@@ -256,6 +290,10 @@ describe("AnalysisView", () => {
 
     renderWithPortfolioTime(
       <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/analysis",
+        initialSearchParams: "view=allocation",
+      },
     );
 
     await waitFor(() => {
@@ -284,6 +322,10 @@ describe("AnalysisView", () => {
 
     renderWithPortfolioTime(
       <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/analysis",
+        initialSearchParams: "view=allocation",
+      },
     );
 
     await waitFor(() => {
@@ -301,6 +343,10 @@ describe("AnalysisView", () => {
 
     renderWithPortfolioTime(
       <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/analysis",
+        initialSearchParams: "view=allocation",
+      },
     );
 
     await waitFor(() => {
