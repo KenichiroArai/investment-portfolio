@@ -119,6 +119,12 @@ function readAnalysisMainView(viewParam: string | null): AnalysisMainView {
 }
 
 export function usePortfolioSubviewParam(
+  options: { page: "analysis" },
+): AnalysisSubview;
+export function usePortfolioSubviewParam(
+  options: { page: "portfolio-allocation" },
+): PortfolioAllocationSubview;
+export function usePortfolioSubviewParam(
   options: UsePortfolioSubviewParamOptions,
 ): UsePortfolioSubviewParamResult {
   const router = useRouter();

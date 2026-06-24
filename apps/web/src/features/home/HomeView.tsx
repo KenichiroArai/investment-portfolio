@@ -269,7 +269,9 @@ export function HomeView() {
                         <div>
                           <dt className="text-muted-foreground">基準日</dt>
                           <dd className="font-medium">
-                            {formatAsOfDateJa(card.asOfDate)}
+                            {card.asOfDate !== null
+                              ? formatAsOfDateJa(card.asOfDate)
+                              : "—"}
                           </dd>
                         </div>
                         <div>
