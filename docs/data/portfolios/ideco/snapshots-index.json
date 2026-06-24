@@ -6,6 +6,10 @@
       "isCurrent": true
     },
     {
+      "asOfDate": "2026-06-23",
+      "isCurrent": false
+    },
+    {
       "asOfDate": "2026-06-21",
       "isCurrent": false
     },

@@ -1,8 +1,8 @@
 {
-  "id": "dc29742c-dd2f-49b8-8493-4025632a747a",
+  "id": "2968fe9c-deee-4fb3-88d9-9267227117ad",
   "portfolioCode": "ideco",
   "portfolioName": "iDeCo",
-  "asOfDate": "2026-06-13",
+  "asOfDate": "2026-06-23",
   "analysisSchemes": [
     {
       "schemeCode": "ideco_product_type",
@@ -47,30 +47,30 @@
   ],
   "lines": [
     {
-      "id": "cd4272e3-34f1-447d-b433-eaf0d72c77c1",
+      "id": "36b30694-45bd-4517-9bf3-80b362c2316a",
       "instrumentId": "13462933-8a0b-48f4-912a-3bfd25762509",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 国内株式（ＴＯＰＩＸ）",
-      "sortOrder": 46,
-      "quantity": 41773,
-      "marketValueMinor": 129003,
-      "bookValueMinor": 128324,
+      "sortOrder": 123,
+      "quantity": 41772,
+      "marketValueMinor": 136080,
+      "bookValueMinor": 128321,
       "metrics": [
         {
           "code": "unit_price_per_10k_lots",
-          "integerValue": 30882,
+          "integerValue": 32577,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 679,
+          "integerValue": 7759,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.005,
+          "realValue": 0.06,
           "textValue": null
         }
       ],
@@ -158,30 +158,30 @@
       ]
     },
     {
-      "id": "a6445efc-6393-4600-b22b-148d1f980201",
+      "id": "d73cf7db-6e8b-4d40-891b-1a00f80e2d35",
       "instrumentId": "31275e89-c5aa-46ec-8108-bc56f6ea17b2",
       "instrumentName": "ＳＢＩ・全世界株式インデックス・ファンド",
-      "sortOrder": 47,
-      "quantity": 195420,
-      "marketValueMinor": 681683,
-      "bookValueMinor": 639296,
+      "sortOrder": 124,
+      "quantity": 195416,
+      "marketValueMinor": 699882,
+      "bookValueMinor": 639283,
       "metrics": [
         {
           "code": "unit_price_per_10k_lots",
-          "integerValue": 34883,
+          "integerValue": 35815,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 42387,
+          "integerValue": 60599,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.066,
+          "realValue": 0.095,
           "textValue": null
         }
       ],
@@ -269,30 +269,30 @@
       ]
     },
     {
-      "id": "6d874179-ad1d-4a0f-b198-1149fe8265e4",
+      "id": "34622959-2c3c-41ae-8ad7-7c15550836f9",
       "instrumentId": "362250ad-b3df-44b8-a221-a599b923e754",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 全世界株式（除く日本）",
-      "sortOrder": 48,
-      "quantity": 104130,
-      "marketValueMinor": 390539,
-      "bookValueMinor": 385705,
+      "sortOrder": 125,
+      "quantity": 104128,
+      "marketValueMinor": 401975,
+      "bookValueMinor": 385698,
       "metrics": [
         {
           "code": "unit_price_per_10k_lots",
-          "integerValue": 37505,
+          "integerValue": 38604,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 4834,
+          "integerValue": 16277,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.013,
+          "realValue": 0.042,
           "textValue": null
         }
       ],
@@ -380,30 +380,30 @@
       ]
     },
     {
-      "id": "81336091-5999-49b8-b439-33e1ec1145dd",
+      "id": "426a5d2f-87c1-4cc6-a415-e1ce86cc2fa7",
       "instrumentId": "e251ef8b-9dc7-443f-9a76-8ae44ba08faa",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 先進国株式インデックス",
-      "sortOrder": 49,
+      "sortOrder": 126,
       "quantity": 8789,
-      "marketValueMinor": 38867,
+      "marketValueMinor": 39735,
       "bookValueMinor": 38644,
       "metrics": [
         {
           "code": "unit_price_per_10k_lots",
-          "integerValue": 44223,
+          "integerValue": 45210,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 223,
+          "integerValue": 1091,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.006,
+          "realValue": 0.028,
           "textValue": null
         }
       ],
@@ -491,30 +491,30 @@
       ]
     },
     {
-      "id": "4b9f2ab3-d047-4336-9570-4a899d8360ba",
+      "id": "1e62b37a-f574-47f6-b52b-4d7dee777ee8",
       "instrumentId": "e6dc9d16-d6b0-4a65-ab00-e5c4d338df88",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 米国株式（Ｓ＆Ｐ５００）",
-      "sortOrder": 50,
+      "sortOrder": 127,
       "quantity": 12827,
-      "marketValueMinor": 55806,
+      "marketValueMinor": 57126,
       "bookValueMinor": 55330,
       "metrics": [
         {
           "code": "unit_price_per_10k_lots",
-          "integerValue": 43507,
+          "integerValue": 44536,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 476,
+          "integerValue": 1796,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.009,
+          "realValue": 0.032,
           "textValue": null
         }
       ],
@@ -602,30 +602,30 @@
       ]
     },
     {
-      "id": "ea4f4a06-0002-4f7d-b3ee-69d5a0dae04d",
+      "id": "e1df0273-6ec8-4016-8bf7-4e9c9b9003e6",
       "instrumentId": "a3028224-f890-4258-b8f9-417133d7cf6a",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 新興国株式インデックス",
-      "sortOrder": 51,
+      "sortOrder": 128,
       "quantity": 14501,
-      "marketValueMinor": 39058,
+      "marketValueMinor": 42083,
       "bookValueMinor": 38644,
       "metrics": [
         {
           "code": "unit_price_per_10k_lots",
-          "integerValue": 26935,
+          "integerValue": 29021,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 414,
+          "integerValue": 3439,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.011,
+          "realValue": 0.089,
           "textValue": null
         }
       ],
@@ -713,30 +713,30 @@
       ]
     },
     {
-      "id": "7add49bd-d958-4a15-83be-4d0eb29ac97d",
+      "id": "bcf24bc6-b817-46f8-b44b-113d4f85b2c0",
       "instrumentId": "bb25c6ee-a8d6-402d-b971-67f1e582c69a",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 国内債券インデックス",
-      "sortOrder": 52,
-      "quantity": 105743,
-      "marketValueMinor": 90473,
-      "bookValueMinor": 89678,
+      "sortOrder": 129,
+      "quantity": 105741,
+      "marketValueMinor": 90323,
+      "bookValueMinor": 89677,
       "metrics": [
         {
           "code": "unit_price_per_10k_lots",
-          "integerValue": 8556,
+          "integerValue": 8542,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 795,
+          "integerValue": 646,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.009,
+          "realValue": 0.007,
           "textValue": null
         }
       ],
@@ -830,30 +830,30 @@
       ]
     },
     {
-      "id": "1670313d-52f8-42a1-8d96-3cb0d37693bb",
+      "id": "de0be4ff-c844-43f3-8887-9d8fab7a7e36",
       "instrumentId": "f74a084e-8eee-45c3-abef-a9337b908b01",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 先進国債券インデックス",
-      "sortOrder": 53,
-      "quantity": 81733,
-      "marketValueMinor": 127814,
-      "bookValueMinor": 126175,
+      "sortOrder": 130,
+      "quantity": 81731,
+      "marketValueMinor": 128685,
+      "bookValueMinor": 126172,
       "metrics": [
         {
           "code": "unit_price_per_10k_lots",
-          "integerValue": 15638,
+          "integerValue": 15745,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 1639,
+          "integerValue": 2513,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.013,
+          "realValue": 0.02,
           "textValue": null
         }
       ],
@@ -941,30 +941,30 @@
       ]
     },
     {
-      "id": "660554e6-e6c7-484c-90fa-fe0d646ae825",
+      "id": "f41ec3c0-6493-4cf7-b27f-dc466add09b0",
       "instrumentId": "d642675f-5dd0-42df-8feb-63429b27ca60",
       "instrumentName": "ｉＦｒｅｅ 新興国債券インデックス",
-      "sortOrder": 54,
+      "sortOrder": 131,
       "quantity": 19345,
-      "marketValueMinor": 36618,
+      "marketValueMinor": 37119,
       "bookValueMinor": 36138,
       "metrics": [
         {
           "code": "unit_price_per_10k_lots",
-          "integerValue": 18929,
+          "integerValue": 19188,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 480,
+          "integerValue": 981,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.013,
+          "realValue": 0.027,
           "textValue": null
         }
       ],
@@ -1052,30 +1052,30 @@
       ]
     },
     {
-      "id": "d56f4602-0a2e-4364-9a67-b232e47cbb03",
+      "id": "363aa878-9121-484c-9a42-9de2cbf8d1ee",
       "instrumentId": "37996eea-0305-4a45-8400-996f1962292c",
       "instrumentName": "ニッセイＪリートインデックスファンド（購入・換金手数料なし）",
-      "sortOrder": 55,
+      "sortOrder": 132,
       "quantity": 24368,
-      "marketValueMinor": 52264,
+      "marketValueMinor": 51406,
       "bookValueMinor": 53181,
       "metrics": [
         {
           "code": "unit_price_per_10k_lots",
-          "integerValue": 21448,
+          "integerValue": 21096,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": -917,
+          "integerValue": -1775,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": -0.017,
+          "realValue": -0.033,
           "textValue": null
         }
       ],
@@ -1163,30 +1163,30 @@
       ]
     },
     {
-      "id": "e4b36ba5-ae87-4fc3-9f71-bf533c5a382b",
+      "id": "fe559b21-04da-4e62-8650-1d508e75a454",
       "instrumentId": "c991d741-dcd5-479f-abd9-7da4a97e7547",
       "instrumentName": "三井住友・ＤＣ外国リートインデックスファンド",
-      "sortOrder": 56,
+      "sortOrder": 133,
       "quantity": 22596,
-      "marketValueMinor": 54591,
+      "marketValueMinor": 54318,
       "bookValueMinor": 53181,
       "metrics": [
         {
           "code": "unit_price_per_10k_lots",
-          "integerValue": 24160,
+          "integerValue": 24039,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 1410,
+          "integerValue": 1137,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.027,
+          "realValue": 0.021,
           "textValue": null
         }
       ],
@@ -1274,30 +1274,30 @@
       ]
     },
     {
-      "id": "f3f0cdd5-059d-4cb0-a914-d325e256af3c",
+      "id": "972f068b-a55f-44f7-a3fe-60ad07dd095b",
       "instrumentId": "ba158649-918a-42c7-824b-021765191743",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ バランス（８資産均等型）",
-      "sortOrder": 57,
-      "quantity": 181645,
-      "marketValueMinor": 385323,
-      "bookValueMinor": 371859,
+      "sortOrder": 134,
+      "quantity": 181641,
+      "marketValueMinor": 392598,
+      "bookValueMinor": 371851,
       "metrics": [
         {
           "code": "unit_price_per_10k_lots",
-          "integerValue": 21213,
+          "integerValue": 21614,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 13464,
+          "integerValue": 20747,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.036,
+          "realValue": 0.056,
           "textValue": null
         }
       ],
@@ -1373,30 +1373,30 @@
       ]
     },
     {
-      "id": "886a0c57-2917-4a33-805c-158511dd1614",
+      "id": "2f4796aa-c686-4574-958f-a0ee9178c8d3",
       "instrumentId": "47ccafe2-9d8f-49a7-b922-cf2e484a7860",
       "instrumentName": "ｉＦｒｅｅ 年金バランス",
-      "sortOrder": 58,
-      "quantity": 124896,
-      "marketValueMinor": 242660,
-      "bookValueMinor": 239715,
+      "sortOrder": 135,
+      "quantity": 124894,
+      "marketValueMinor": 247589,
+      "bookValueMinor": 239712,
       "metrics": [
         {
           "code": "unit_price_per_10k_lots",
-          "integerValue": 19429,
+          "integerValue": 19824,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 2945,
+          "integerValue": 7877,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.012,
+          "realValue": 0.033,
           "textValue": null
         }
       ],
@@ -1472,30 +1472,30 @@
       ]
     },
     {
-      "id": "43fa19e1-abe7-4b52-ba86-f0d0d28251b3",
+      "id": "1d78b869-eb6f-432e-ae35-09295ea734b7",
       "instrumentId": "68b9b628-c237-4397-8530-c099d33c6658",
       "instrumentName": "三菱ＵＦＪ 純金ファンド（愛称：ファインゴールド）",
-      "sortOrder": 59,
-      "quantity": 183256,
-      "marketValueMinor": 921154,
-      "bookValueMinor": 626252,
+      "sortOrder": 136,
+      "quantity": 183252,
+      "marketValueMinor": 935244,
+      "bookValueMinor": 626239,
       "metrics": [
         {
           "code": "unit_price_per_10k_lots",
-          "integerValue": 50266,
+          "integerValue": 51036,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 294902,
+          "integerValue": 309005,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.471,
+          "realValue": 0.493,
           "textValue": null
         }
       ],
@@ -1571,30 +1571,30 @@
       ]
     },
     {
-      "id": "02029d5e-40de-493f-bd7e-438e0cdf75f1",
+      "id": "0d173ced-503e-4203-8b4d-4e4a6f93049a",
       "instrumentId": "53bdddb7-cab9-48eb-9f3e-9bf731df27b7",
       "instrumentName": "セレブライフ・ストーリー2045",
-      "sortOrder": 60,
-      "quantity": 41723,
-      "marketValueMinor": 99129,
-      "bookValueMinor": 100104,
+      "sortOrder": 137,
+      "quantity": 41722,
+      "marketValueMinor": 99874,
+      "bookValueMinor": 100102,
       "metrics": [
         {
           "code": "unit_price_per_10k_lots",
-          "integerValue": 23759,
+          "integerValue": 23938,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": -975,
+          "integerValue": -228,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": -0.01,
+          "realValue": -0.002,
           "textValue": null
         }
       ],
