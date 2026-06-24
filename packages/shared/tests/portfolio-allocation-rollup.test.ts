@@ -121,6 +121,30 @@ describe("aggregatePortfolioTargetsByScheme", () => {
     let result = aggregatePortfolioTargetsByScheme(lines, [], "asset");
     expect(result).toEqual([]);
   });
+
+  it("skips holdings with non-finite portfolio targets", () => {
+    const lines = [
+      makeLine(
+        100_000,
+        [
+          {
+            schemeCode: "asset",
+            schemeName: "資産",
+            valueCode: "stock",
+            valueName: "株式",
+          },
+        ],
+        { instrumentId: "a" },
+      ),
+    ];
+
+    let result = aggregatePortfolioTargetsByScheme(
+      lines,
+      [{ instrumentId: "a", targetRatio: Number.NaN }],
+      "asset",
+    );
+    expect(result).toEqual([]);
+  });
 });
 
 describe("normalizeImpliedAllocationTargets", () => {
@@ -139,6 +163,15 @@ describe("normalizeImpliedAllocationTargets", () => {
 
   it("returns empty array when total is zero", () => {
     let result = normalizeImpliedAllocationTargets([]);
+    expect(result).toEqual([]);
+  });
+
+  it("returns empty array when total is not finite", () => {
+    const rows = [
+      { valueCode: "a", valueName: "A", impliedTargetRatio: Number.NaN },
+    ];
+
+    let result = normalizeImpliedAllocationTargets(rows);
     expect(result).toEqual([]);
   });
 });
@@ -317,5 +350,106 @@ describe("buildPortfolioCompositionGapRows", () => {
     expect(compositeRow?.targetRatio).toBeCloseTo(0.42);
     expect(compositeRow?.currentRatio).toBeCloseTo(400_000 / 900_000);
     expect(compositeRow?.gapRatio).toBeCloseTo(400_000 / 900_000 - 0.42);
+  });
+
+  it("sorts rows with equal target ratio by current ratio descending", () => {
+    const slices: AllocationSlice[] = [
+      {
+        valueCode: "low",
+        valueName: "低",
+        marketValueMinor: 200_000,
+        weight: 0.2,
+      },
+      {
+        valueCode: "high",
+        valueName: "高",
+        marketValueMinor: 500_000,
+        weight: 0.5,
+      },
+      {
+        valueCode: "mid",
+        valueName: "中",
+        marketValueMinor: 300_000,
+        weight: 0.3,
+      },
+    ];
+    const impliedTargets = [
+      { valueCode: "low", valueName: "低", impliedTargetRatio: 0.25 },
+      { valueCode: "high", valueName: "高", impliedTargetRatio: 0.25 },
+      { valueCode: "mid", valueName: "中", impliedTargetRatio: 0.25 },
+    ];
+
+    let result = buildPortfolioCompositionGapRows(slices, impliedTargets);
+
+    expect(result.map((row) => row.valueCode)).toEqual(["high", "mid", "low"]);
+  });
+
+  it("leaves gap null when implied target ratio is not finite", () => {
+    const slices: AllocationSlice[] = [
+      {
+        valueCode: "stock",
+        valueName: "株式",
+        marketValueMinor: 500_000,
+        weight: 1,
+      },
+    ];
+    const impliedTargets = [
+      { valueCode: "stock", valueName: "株式", impliedTargetRatio: Number.NaN },
+    ];
+
+    let result = buildPortfolioCompositionGapRows(slices, impliedTargets);
+
+    expect(result).toEqual([
+      {
+        valueCode: "stock",
+        valueName: "株式",
+        currentRatio: 1,
+        targetRatio: Number.NaN,
+        gapRatio: null,
+        marketValueMinor: 500_000,
+      },
+    ]);
+  });
+
+  it("sorts rows with null target ratios by current ratio descending", () => {
+    const slices: AllocationSlice[] = [
+      {
+        valueCode: "low",
+        valueName: "低",
+        marketValueMinor: 200_000,
+        weight: 0.2,
+      },
+      {
+        valueCode: "high",
+        valueName: "高",
+        marketValueMinor: 500_000,
+        weight: 0.5,
+      },
+      {
+        valueCode: "mid",
+        valueName: "中",
+        marketValueMinor: 300_000,
+        weight: 0.3,
+      },
+    ];
+
+    let result = buildPortfolioCompositionGapRows(slices, []);
+
+    expect(result.map((row) => row.valueCode)).toEqual(["high", "mid", "low"]);
+  });
+
+  it("falls back to valueCode when slice and implied rows lack value names", () => {
+    const slices: AllocationSlice[] = [
+      {
+        valueCode: "fallback-code",
+        valueName: undefined as unknown as string,
+        marketValueMinor: 100_000,
+        weight: 1,
+      },
+    ];
+
+    let result = buildPortfolioCompositionGapRows(slices, []);
+
+    expect(result[0]?.valueName).toBe("fallback-code");
   });
 });
