@@ -14,7 +14,7 @@ function buildHoldingsRedirectUrl(
   portfolioCode: string,
   searchParams: URLSearchParams,
 ): string {
-  let result = `${buildPortfolioPath(portfolioCode, "portfolio-allocation")}?view=details&panel=holdings`;
+  let result = `${buildPortfolioPath(portfolioCode, "portfolio-allocation")}`;
   const params = new URLSearchParams();
 
   const legacyView = searchParams.get("view");
@@ -68,8 +68,7 @@ function buildTrendsRedirectUrl(
   }
 
   const params = new URLSearchParams();
-  params.set("view", "details");
-  params.set("panel", "trends");
+  params.set("view", "trends");
   if (metric) {
     params.set("metric", metric);
   }

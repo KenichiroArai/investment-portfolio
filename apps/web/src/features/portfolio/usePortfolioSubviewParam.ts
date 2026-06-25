@@ -3,17 +3,14 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 
-export type PortfolioAllocationMainView = "details" | "allocation";
+export type PortfolioAllocationMainView = "holdings" | "trends" | "allocation";
 export type AnalysisMainView = "trends" | "allocation" | "snapshot";
-export type DetailsPanel = "holdings" | "trends";
 export type HoldingsMode = "range" | "compare";
 
 type PortfolioAllocationSubview = {
   page: "portfolio-allocation";
   mainView: PortfolioAllocationMainView;
   setMainView: (view: PortfolioAllocationMainView) => void;
-  panel: DetailsPanel;
-  setPanel: (panel: DetailsPanel) => void;
   holdingsMode: HoldingsMode;
   setHoldingsMode: (mode: HoldingsMode) => void;
 };
@@ -30,45 +27,38 @@ type UsePortfolioSubviewParamOptions =
 
 type UsePortfolioSubviewParamResult = PortfolioAllocationSubview | AnalysisSubview;
 
-const PORTFOLIO_MAIN_VIEWS: PortfolioAllocationMainView[] = ["details", "allocation"];
+const PORTFOLIO_MAIN_VIEWS: PortfolioAllocationMainView[] = [
+  "holdings",
+  "trends",
+  "allocation",
+];
 const ANALYSIS_MAIN_VIEWS: AnalysisMainView[] = ["trends", "allocation", "snapshot"];
-const DETAILS_PANELS: DetailsPanel[] = ["holdings", "trends"];
-const HOLDINGS_MODES: HoldingsMode[] = ["range", "compare"];
 
 function readPortfolioMainView(
   viewParam: string | null,
   panelParam: string | null,
 ): PortfolioAllocationMainView {
-  let result: PortfolioAllocationMainView = "details";
+  let result: PortfolioAllocationMainView = "holdings";
 
   if (viewParam === "allocation") {
     result = "allocation";
     return result;
   }
 
-  if (viewParam === "holdings" || viewParam === "trends" || viewParam === "details") {
-    result = "details";
+  if (viewParam === "trends") {
+    result = "trends";
     return result;
   }
 
-  if (viewParam === "compare") {
-    result = "details";
+  if (viewParam === "holdings") {
+    result = "holdings";
     return result;
   }
 
-  if (panelParam && DETAILS_PANELS.includes(panelParam as DetailsPanel)) {
-    result = "details";
+  if (viewParam === "details" || viewParam === "compare") {
+    result = "holdings";
     return result;
   }
-
-  return result;
-}
-
-function readDetailsPanel(
-  viewParam: string | null,
-  panelParam: string | null,
-): DetailsPanel {
-  let result: DetailsPanel = "holdings";
 
   if (panelParam === "trends") {
     result = "trends";
@@ -77,11 +67,6 @@ function readDetailsPanel(
 
   if (panelParam === "holdings") {
     result = "holdings";
-    return result;
-  }
-
-  if (viewParam === "trends") {
-    result = "trends";
     return result;
   }
 
@@ -136,7 +121,6 @@ export function usePortfolioSubviewParam(
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [localMainView, setLocalMainView] = useState<string | null>(null);
-  const [localPanel, setLocalPanel] = useState<DetailsPanel | null>(null);
   const [localHoldingsMode, setLocalHoldingsMode] = useState<HoldingsMode | null>(null);
 
   const viewParam = searchParams.get("view");
@@ -193,7 +177,7 @@ export function usePortfolioSubviewParam(
   }
 
   const mainView = useMemo(() => {
-    let result: PortfolioAllocationMainView = "details";
+    let result: PortfolioAllocationMainView = "holdings";
 
     if (
       localMainView !== null &&
@@ -206,23 +190,6 @@ export function usePortfolioSubviewParam(
     result = readPortfolioMainView(viewParam, panelParam);
     return result;
   }, [localMainView, panelParam, viewParam]);
-
-  const panel = useMemo(() => {
-    let result: DetailsPanel = "holdings";
-
-    if (localPanel !== null) {
-      result = localPanel;
-      return result;
-    }
-
-    if (mainView === "allocation") {
-      result = "holdings";
-      return result;
-    }
-
-    result = readDetailsPanel(viewParam, panelParam);
-    return result;
-  }, [localPanel, mainView, panelParam, viewParam]);
 
   const holdingsMode = useMemo(() => {
     let result: HoldingsMode = "range";
@@ -241,47 +208,33 @@ export function usePortfolioSubviewParam(
       let result: void = undefined;
       setLocalMainView(view);
       replaceParams((params) => {
-        params.delete("view");
         params.delete("panel");
-        params.delete("holdingsMode");
-        if (view === "allocation") {
-          params.set("view", "allocation");
+        if (view === "holdings") {
+          params.delete("view");
+          if (holdingsMode === "compare") {
+            params.set("holdingsMode", "compare");
+          } else {
+            params.delete("holdingsMode");
+          }
           return;
         }
-        params.set("panel", panel === "trends" ? "trends" : "holdings");
-        if (holdingsMode === "compare") {
-          params.set("holdingsMode", "compare");
+        params.delete("holdingsMode");
+        if (view === "trends") {
+          params.set("view", "trends");
+          return;
         }
+        params.set("view", "allocation");
       });
       return result;
     },
-    [holdingsMode, panel, replaceParams],
-  );
-
-  const setPanel = useCallback(
-    (nextPanel: DetailsPanel) => {
-      let result: void = undefined;
-      setLocalPanel(nextPanel);
-      setLocalMainView("details");
-      replaceParams((params) => {
-        params.delete("view");
-        if (nextPanel === "holdings") {
-          params.delete("panel");
-        } else {
-          params.set("panel", nextPanel);
-        }
-      });
-      return result;
-    },
-    [replaceParams],
+    [holdingsMode, replaceParams],
   );
 
   const setHoldingsMode = useCallback(
     (mode: HoldingsMode) => {
       let result: void = undefined;
       setLocalHoldingsMode(mode);
-      setLocalPanel("holdings");
-      setLocalMainView("details");
+      setLocalMainView("holdings");
       replaceParams((params) => {
         params.delete("view");
         params.delete("panel");
@@ -300,8 +253,6 @@ export function usePortfolioSubviewParam(
     page: "portfolio-allocation",
     mainView,
     setMainView,
-    panel,
-    setPanel,
     holdingsMode,
     setHoldingsMode,
   };
@@ -318,9 +269,9 @@ export function isDetailsOrTrendsSubview(searchParams: URLSearchParams): boolean
   }
 
   if (
-    view === "details" ||
     view === "holdings" ||
     view === "trends" ||
+    view === "details" ||
     view === "compare" ||
     panel === "holdings" ||
     panel === "trends" ||

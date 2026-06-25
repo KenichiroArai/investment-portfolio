@@ -57,7 +57,7 @@ describe("OverviewTrendChart", () => {
       expect(screen.getByLabelText("推移折れ線グラフ")).toBeInTheDocument();
       expect(screen.getByRole("link", { name: "推移の詳細を見る →" })).toHaveAttribute(
         "href",
-        "/portfolios/ideco/portfolio-allocation?view=details&panel=trends",
+        "/portfolios/ideco/portfolio-allocation?view=trends",
       );
     });
   });

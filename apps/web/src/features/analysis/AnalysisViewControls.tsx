@@ -4,6 +4,10 @@ import type { ReactNode } from "react";
 
 import { AnalysisSchemeSelector } from "@/features/allocation/AnalysisSchemeSelector";
 import type { AllocationSchemeTabItem } from "@/features/allocation/AllocationSchemeTabs";
+import {
+  prominentTabsListClassName,
+  prominentTabsTriggerClassName,
+} from "@/components/ui/prominent-tab-styles";
 import { Separator } from "@/components/ui/separator";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
@@ -41,24 +45,15 @@ export function AnalysisViewControls({
         </h2>
         <TabsList
           aria-label="資産配分の表示"
-          className="grid h-11 w-full grid-cols-3 gap-1 rounded-lg bg-muted p-1"
+          className={prominentTabsListClassName}
         >
-          <TabsTrigger
-            value="trends"
-            className="h-full rounded-md text-sm font-medium text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
-          >
+          <TabsTrigger value="trends" className={prominentTabsTriggerClassName}>
             推移
           </TabsTrigger>
-          <TabsTrigger
-            value="allocation"
-            className="h-full rounded-md text-sm font-medium text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
-          >
+          <TabsTrigger value="allocation" className={prominentTabsTriggerClassName}>
             配分（リバランス）
           </TabsTrigger>
-          <TabsTrigger
-            value="snapshot"
-            className="h-full rounded-md text-sm font-medium text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
-          >
+          <TabsTrigger value="snapshot" className={prominentTabsTriggerClassName}>
             資産配分
           </TabsTrigger>
         </TabsList>

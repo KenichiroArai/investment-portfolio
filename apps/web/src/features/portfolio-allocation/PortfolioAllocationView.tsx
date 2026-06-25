@@ -11,18 +11,25 @@ import { PageContainer } from "@/components/layout/page-container";
 import { WritableOnly } from "@/components/WritableOnly";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { RebalanceSettingsCard } from "@/features/allocation/RebalanceSettingsCard";
 import { RebalanceTradesSummary } from "@/features/allocation/RebalanceTradesSummary";
 import { useRebalanceDeposit } from "@/features/allocation/useRebalanceDeposit";
 import { PortfolioAllocationPanel } from "@/features/portfolio-allocation/PortfolioAllocationPanel";
+import { PortfolioAllocationViewControls } from "@/features/portfolio-allocation/PortfolioAllocationViewControls";
 import { TargetPortfolioSettingsCard } from "@/features/portfolio-allocation/TargetPortfolioSettingsCard";
 import { usePortfolioRebalanceResult } from "@/features/portfolio-allocation/usePortfolioRebalanceResult";
 import { useTargetPortfolioWeights } from "@/features/portfolio-allocation/useTargetPortfolioWeights";
-import { PortfolioDetailsPanel } from "@/features/portfolio/PortfolioDetailsPanel";
+import { HoldingsDetailPanel } from "@/features/portfolio/HoldingsDetailPanel";
 import { PortfolioOverviewSummary } from "@/features/portfolio/PortfolioOverviewSummary";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
-import { usePortfolioSubviewParam } from "@/features/portfolio/usePortfolioSubviewParam";
+import {
+  usePortfolioSubviewParam,
+  type PortfolioAllocationMainView,
+} from "@/features/portfolio/usePortfolioSubviewParam";
+import { TrendsDetailPanel } from "@/features/trends/TrendsDetailPanel";
+import { TrendPeriodSummary } from "@/features/trends/TrendPeriodSummary";
+import { useTrendPeriodSummaryData } from "@/features/trends/useTrendPeriodSummaryData";
 import { formatYen } from "@/lib/format-yen";
 
 type PortfolioAllocationViewProps = {
@@ -32,7 +39,7 @@ type PortfolioAllocationViewProps = {
 
 export function PortfolioAllocationView({
   portfolioCode,
-  portfolioKind,
+  portfolioKind: _portfolioKind,
 }: PortfolioAllocationViewProps) {
   const {
     snapshot,
@@ -49,10 +56,10 @@ export function PortfolioAllocationView({
   const subview = usePortfolioSubviewParam({ page: "portfolio-allocation" });
   const mainView = subview.mainView;
   const setMainView = subview.setMainView;
-  const panel = subview.panel;
-  const setPanel = subview.setPanel;
   const holdingsMode = subview.holdingsMode;
   const setHoldingsMode = subview.setHoldingsMode;
+
+  const trendPeriodSummaryData = useTrendPeriodSummaryData({ mode: "portfolio" });
 
   const allocationRows = useMemo(() => {
     let result = snapshot
@@ -152,39 +159,75 @@ export function PortfolioAllocationView({
     </div>
   );
 
-  result = (
-    <PageContainer>
-      <PortfolioOverviewSummary
-        snapshot={snapshot}
-        deltaHint={deltaHint}
-        className="mb-6"
+  const renderTrendsOverview = (): ReactNode => {
+    let overview: ReactNode = null;
+
+    if (!trendPeriodSummaryData) {
+      return overview;
+    }
+
+    overview = (
+      <TrendPeriodSummary
+        startDateLabel={trendPeriodSummaryData.startDateLabel}
+        endDateLabel={trendPeriodSummaryData.endDateLabel}
+        startMarketValueMinor={trendPeriodSummaryData.startMarketValueMinor}
+        endMarketValueMinor={trendPeriodSummaryData.endMarketValueMinor}
+        metricDeltas={trendPeriodSummaryData.metricDeltas}
+        largestShareChange={null}
+        sparseDataNote={trendPeriodSummaryData.sparseDataNote}
+        singleBucketNote={trendPeriodSummaryData.singleBucketNote}
+        baselineSummary={trendPeriodSummaryData.baselineSummary}
       />
-      {mainView === "allocation" ? (
-        <p className="mb-4 text-sm text-muted-foreground">
+    );
+    return overview;
+  };
+
+  const renderAllocationOverview = (): ReactNode => {
+    let overview = (
+      <div className="space-y-1">
+        <p className="text-sm font-medium">評価額合計: {formatYen(assetBalance)}</p>
+        <p className="text-sm text-muted-foreground">
           目標設定済み: {targetCount} / {allocationRows.length} 銘柄
         </p>
-      ) : null}
+      </div>
+    );
+    return overview;
+  };
+
+  result = (
+    <PageContainer>
       <Tabs
         value={mainView}
         onValueChange={(value) => {
-          setMainView(value as "details" | "allocation");
+          setMainView(value as PortfolioAllocationMainView);
         }}
       >
-        <TabsList aria-label="ポートフォリオ配分の表示">
-          <TabsTrigger value="details">明細・推移</TabsTrigger>
-          <TabsTrigger value="allocation">配分（リバランス）</TabsTrigger>
-        </TabsList>
-        <TabsContent value="details" className="mt-4">
-          <PortfolioDetailsPanel
-            portfolioCode={portfolioCode}
-            panel={panel}
-            onPanelChange={setPanel}
-            holdingsMode={holdingsMode}
-            onHoldingsModeChange={setHoldingsMode}
-          />
+        <PortfolioAllocationViewControls />
+        <TabsContent value="holdings" className="mt-4">
+          <div className="space-y-4">
+            <PortfolioOverviewSummary snapshot={snapshot} deltaHint={deltaHint} />
+            <HoldingsDetailPanel
+              portfolioCode={portfolioCode}
+              holdingsMode={holdingsMode}
+              onHoldingsModeChange={setHoldingsMode}
+            />
+          </div>
+        </TabsContent>
+        <TabsContent value="trends" className="mt-4">
+          <div className="space-y-4">
+            {renderTrendsOverview()}
+            <TrendsDetailPanel
+              portfolioCode={portfolioCode}
+              mode="portfolio"
+              renderPeriodSummary={false}
+            />
+          </div>
         </TabsContent>
         <TabsContent value="allocation" className="mt-4">
-          {allocationTabContent}
+          <div className="space-y-4">
+            {renderAllocationOverview()}
+            {allocationTabContent}
+          </div>
         </TabsContent>
       </Tabs>
     </PageContainer>

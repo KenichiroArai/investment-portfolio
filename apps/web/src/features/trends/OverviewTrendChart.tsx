@@ -130,7 +130,7 @@ export function OverviewTrendChart() {
       />
       <p className="overview-trend__link">
         <Link
-          href={`${buildPortfolioPath(portfolioCode, "portfolio-allocation")}?view=details&panel=trends`}
+          href={`${buildPortfolioPath(portfolioCode, "portfolio-allocation")}?view=trends`}
         >
           推移の詳細を見る →
         </Link>

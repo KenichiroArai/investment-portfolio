@@ -299,7 +299,7 @@ export function HomeView() {
                     <div className="flex flex-wrap gap-2">
                       <Button variant="outline" size="sm" asChild>
                         <Link
-                          href={`${buildPortfolioPath(card.code, "portfolio-allocation")}?view=details&panel=holdings`}
+                          href={`${buildPortfolioPath(card.code, "portfolio-allocation")}`}
                         >
                           <List className="h-3.5 w-3.5" />
                           明細

@@ -130,7 +130,7 @@ export function AllocationTable({
             );
             const holdingsHref =
               portfolioCode && schemeCode
-                ? `${buildPortfolioPath(portfolioCode, "portfolio-allocation")}?view=details&panel=holdings&scheme=${encodeURIComponent(schemeCode)}&value=${encodeURIComponent(slice.valueCode)}${asOfDate ? `&asOf=${encodeURIComponent(asOfDate)}` : ""}`
+                ? `${buildPortfolioPath(portfolioCode, "portfolio-allocation")}?scheme=${encodeURIComponent(schemeCode)}&value=${encodeURIComponent(slice.valueCode)}${asOfDate ? `&asOf=${encodeURIComponent(asOfDate)}` : ""}`
                 : null;
 
             let rows = (

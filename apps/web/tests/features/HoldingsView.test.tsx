@@ -206,6 +206,46 @@ describe("HoldingsDetailPanel", () => {
     expect(screen.queryByText(/保有銘柄がありません/)).not.toBeInTheDocument();
   });
 
+  it("switches holdings mode with buttons", async () => {
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        snapshot: {
+          id: "s1",
+          portfolioCode: "ideco",
+          portfolioName: "iDeCo",
+          asOfDate: "2026-06-01",
+          analysisSchemes: [],
+          metrics: [],
+          lines: [
+            {
+              id: "l1",
+              instrumentId: "i1",
+              instrumentName: "テストファンド",
+              sortOrder: 0,
+              quantity: 10,
+              marketValueMinor: 10000,
+              bookValueMinor: null,
+              metrics: [],
+              instrumentAttributes: [],
+              tags: [],
+            },
+          ],
+        },
+      }),
+    );
+
+    const { onHoldingsModeChange } = renderPanel("range");
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "期間明細一覧" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "スナップショット比較" })).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "スナップショット比較" }));
+    expect(onHoldingsModeChange).toHaveBeenCalledWith("compare");
+  });
+
   it("shows period range and comparison deltas in compare tab", async () => {
     vi.stubGlobal(
       "fetch",

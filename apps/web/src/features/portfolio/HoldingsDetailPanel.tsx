@@ -29,7 +29,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   getSnapshotByDateFetchUrl,
   getSnapshotLoadErrorMessage,
@@ -447,23 +446,25 @@ export function HoldingsDetailPanel({
         )}
         {isHistoricalView ? <Badge variant="secondary">履歴表示中</Badge> : null}
       </div>
-      <Tabs
-        value={holdingsMode}
-        onValueChange={(value) => {
-          onHoldingsModeChange(value as HoldingsMode);
-        }}
-      >
-        <TabsList>
-          {(Object.keys(HOLDINGS_MODE_LABELS) as HoldingsMode[]).map((mode) => {
-            let trigger = (
-              <TabsTrigger key={mode} value={mode}>
-                {HOLDINGS_MODE_LABELS[mode]}
-              </TabsTrigger>
-            );
-            return trigger;
-          })}
-        </TabsList>
-        <TabsContent value="range">
+      <div className="flex flex-wrap items-center gap-2">
+        {(Object.keys(HOLDINGS_MODE_LABELS) as HoldingsMode[]).map((mode) => {
+          let button = (
+            <Button
+              key={mode}
+              type="button"
+              size="sm"
+              variant={holdingsMode === mode ? "default" : "outline"}
+              onClick={() => {
+                onHoldingsModeChange(mode);
+              }}
+            >
+              {HOLDINGS_MODE_LABELS[mode]}
+            </Button>
+          );
+          return button;
+        })}
+      </div>
+      {holdingsMode === "range" ? (
           <Card>
             <CardContent className="p-0 pt-4">
               {loadingRangeSnapshots ? (
@@ -524,8 +525,8 @@ export function HoldingsDetailPanel({
               )}
             </CardContent>
           </Card>
-        </TabsContent>
-        <TabsContent value="compare">
+      ) : (
+        <>
           <div className="mb-4 space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               {(Object.keys(COMPARISON_MODE_LABELS) as HoldingComparisonMode[]).map(
@@ -579,8 +580,8 @@ export function HoldingsDetailPanel({
               )}
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+        </>
+      )}
     </div>
   );
   return result;

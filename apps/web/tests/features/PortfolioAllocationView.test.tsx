@@ -131,4 +131,32 @@ describe("PortfolioAllocationView", () => {
       ).toBeInTheDocument();
     });
   });
+
+  it("renders prominent three-tab controls and summary below tabs", async () => {
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        snapshot: snapshotFixture,
+        targetPortfolioWeights: [{ instrumentId: "inst-1", targetRatio: 0.5 }],
+      }),
+    );
+
+    renderWithPortfolioTime(
+      <PortfolioAllocationView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/portfolio-allocation",
+      },
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("tablist", { name: "ポートフォリオ配分の表示" })).toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: "明細" })).toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: "推移" })).toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: "配分（リバランス）" })).toBeInTheDocument();
+      expect(screen.getByText("資産残高")).toBeInTheDocument();
+    });
+
+    const activeTab = screen.getByRole("tab", { name: "明細" });
+    expect(activeTab.className).toContain("data-[state=active]:bg-primary");
+  });
 });
