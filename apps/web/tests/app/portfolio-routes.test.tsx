@@ -166,28 +166,12 @@ describe("portfolio routes", () => {
     });
   });
 
-  it("hides portfolio analysis sub navigation in static mode", async () => {
+  it("renders portfolio analysis layout with children only", async () => {
     const layout = await PortfolioAnalysisLayout({
-      params: Promise.resolve({ code: "ideco" }),
       children: <p>analysis-body</p>,
     });
     const { container } = render(layout);
     expect(container.querySelector('[aria-label="分析メニュー"]')).toBeNull();
-    expect(screen.getByText("analysis-body")).toBeInTheDocument();
-  });
-
-  it("renders portfolio analysis layout with sub navigation in api mode", async () => {
-    process.env.NEXT_PUBLIC_DATA_SOURCE = "api";
-    const layout = await PortfolioAnalysisLayout({
-      params: Promise.resolve({ code: "ideco" }),
-      children: <p>analysis-body</p>,
-    });
-    render(layout);
-    expect(screen.getByRole("navigation", { name: "分析メニュー" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "表示" })).toHaveAttribute(
-      "href",
-      "/portfolios/ideco/analysis",
-    );
     expect(screen.getByText("analysis-body")).toBeInTheDocument();
   });
 
