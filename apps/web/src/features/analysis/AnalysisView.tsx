@@ -16,8 +16,8 @@ import { Settings } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 
 import { AnalysisTabPanel } from "@/features/analysis/AnalysisTabPanel";
+import { AnalysisViewControls } from "@/features/analysis/AnalysisViewControls";
 import { AnalysisPanelSummary } from "@/features/analysis/AnalysisPanelSummary";
-import { AnalysisSchemeSelector } from "@/features/allocation/AnalysisSchemeSelector";
 import { AllocationPeriodShareSummary } from "@/features/allocation/AllocationPeriodShareSummary";
 import { AllocationSnapshotPanel } from "@/features/allocation/AllocationSnapshotPanel";
 import { buildAllocationRebalanceDisplayRows } from "@/features/allocation/build-allocation-rebalance-display-rows";
@@ -43,7 +43,7 @@ import { WritableOnly } from "@/components/WritableOnly";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { fetchClassificationSchemes } from "@/lib/api-client";
 import { isWritableDataSource } from "@/lib/data-source";
 import { formatAsOfDateJa, formatYen } from "@/lib/format-yen";
@@ -405,23 +405,17 @@ export function AnalysisView({
           </div>
         }
       />
-      <AnalysisSchemeSelector
-        schemes={schemeConfigs}
-        activeSchemeCode={activeSchemeCode}
-        onSchemeChange={setActiveSchemeCode}
-        className="mb-4"
-      />
       <Tabs
         value={mainView}
         onValueChange={(value) => {
           setMainView(value as AnalysisMainView);
         }}
       >
-        <TabsList aria-label="資産配分の表示">
-          <TabsTrigger value="trends">推移</TabsTrigger>
-          <TabsTrigger value="allocation">配分（リバランス）</TabsTrigger>
-          <TabsTrigger value="snapshot">資産配分</TabsTrigger>
-        </TabsList>
+        <AnalysisViewControls
+          schemes={schemeConfigs}
+          activeSchemeCode={activeSchemeCode}
+          onSchemeChange={setActiveSchemeCode}
+        />
         <TabsContent value="trends" className="mt-4">
           <AnalysisTabPanel
             activeScheme={activeScheme}

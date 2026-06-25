@@ -132,6 +132,53 @@ describe("AnalysisView", () => {
     ).toBeTruthy();
   });
 
+  it("renders section labels for axis and view controls", async () => {
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        snapshot: snapshotFixture,
+      }),
+    );
+
+    renderWithPortfolioTime(
+      <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/analysis",
+      },
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "分析軸" })).toBeInTheDocument();
+    });
+
+    expect(screen.getByRole("heading", { name: "表示" })).toBeInTheDocument();
+  });
+
+  it("highlights active main tab with primary styles", async () => {
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        snapshot: snapshotFixture,
+      }),
+    );
+
+    renderWithPortfolioTime(
+      <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/analysis",
+      },
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("tab", { name: "推移" })).toHaveAttribute(
+        "data-state",
+        "active",
+      );
+    });
+
+    expect(screen.getByRole("tab", { name: "推移" }).className).toContain("data-[state=active]:bg-primary");
+  });
+
   it("updates snapshot content immediately when scheme changes", async () => {
     const user = userEvent.setup();
     vi.stubGlobal(
