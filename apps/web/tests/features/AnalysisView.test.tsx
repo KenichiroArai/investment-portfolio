@@ -82,7 +82,7 @@ describe("AnalysisView", () => {
     delete process.env.NEXT_PUBLIC_DATA_SOURCE;
   });
 
-  it("renders allocation by active scheme", async () => {
+  it("renders three main tabs", async () => {
     vi.stubGlobal(
       "fetch",
       createPortfolioFetchMock({
@@ -94,15 +94,93 @@ describe("AnalysisView", () => {
       <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
       {
         pathname: "/portfolios/ideco/analysis",
-        initialSearchParams: "view=allocation",
       },
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/評価額合計/)).toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: "推移" })).toBeInTheDocument();
     });
 
-    expect(screen.getByText(/分類対象額/)).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "配分（リバランス）" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "資産配分" })).toBeInTheDocument();
+  });
+
+  it("renders analysis axis above main tabs", async () => {
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        snapshot: snapshotFixture,
+      }),
+    );
+
+    renderWithPortfolioTime(
+      <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/analysis",
+      },
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("tablist", { name: "分析軸" })).toBeInTheDocument();
+    });
+
+    const axisTablist = screen.getByRole("tablist", { name: "分析軸" });
+    const mainTablist = screen.getByRole("tablist", { name: "資産配分の表示" });
+    expect(
+      axisTablist.compareDocumentPosition(mainTablist) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it("updates snapshot content immediately when scheme changes", async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        snapshot: snapshotFixture,
+      }),
+    );
+
+    renderWithPortfolioTime(
+      <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/analysis",
+        initialSearchParams: "view=snapshot",
+      },
+    );
+
+    await waitFor(() => {
+      expect(screen.getAllByText("国内").length).toBeGreaterThanOrEqual(1);
+    });
+
+    await user.click(screen.getByRole("tab", { name: "資産分類" }));
+    expect(screen.getByRole("tab", { name: "資産分類" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    expect(screen.getAllByText("株式").length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("renders snapshot by active scheme", async () => {
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        snapshot: snapshotFixture,
+      }),
+    );
+
+    renderWithPortfolioTime(
+      <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/analysis",
+        initialSearchParams: "view=snapshot",
+      },
+    );
+
+    await waitFor(() => {
+      expect(screen.getAllByText(/分類対象額/).length).toBeGreaterThanOrEqual(1);
+    });
+
     expect(screen.queryByText(/未分類/)).not.toBeInTheDocument();
 
     expect(screen.getByRole("tab", { name: "地域分類" })).toBeInTheDocument();
@@ -148,19 +226,64 @@ describe("AnalysisView", () => {
       <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
       {
         pathname: "/portfolios/ideco/analysis",
+        initialSearchParams: "view=snapshot",
+      },
+    );
+
+    await waitFor(() => {
+      expect(screen.getAllByText(/分類対象額/).length).toBeGreaterThanOrEqual(1);
+    });
+
+    expect(screen.getAllByText(/資産全体の 66\.67%/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/未分類:.*50,000/).length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText(/差分はタグ付き銘柄内で目標を100%に正規化して比較/).length,
+    ).toBeGreaterThanOrEqual(1);
+  });
+
+  it("shows rebalance uncovered note on allocation tab", async () => {
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        snapshot: {
+          ...snapshotFixture,
+          lines: [
+            ...snapshotFixture.lines,
+            {
+              id: "line-2",
+              instrumentId: "inst-2",
+              instrumentName: "未分類銘柄",
+              sortOrder: 1,
+              quantity: 1,
+              marketValueMinor: 50_000,
+              bookValueMinor: null,
+              metrics: [],
+              instrumentAttributes: [],
+              tags: [],
+            },
+          ],
+        },
+        targetAllocations: {
+          ideco_region: [
+            { valueCode: "domestic", targetRatio: 0.4 },
+            { valueCode: "foreign", targetRatio: 0.59 },
+          ],
+        },
+      }),
+    );
+
+    renderWithPortfolioTime(
+      <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/analysis",
         initialSearchParams: "view=allocation",
       },
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/分類対象額/)).toBeInTheDocument();
+      expect(screen.getByText(/評価額合計/)).toBeInTheDocument();
     });
 
-    expect(screen.getByText(/資産全体の 66\.67%/)).toBeInTheDocument();
-    expect(screen.getByText(/未分類:.*50,000/)).toBeInTheDocument();
-    expect(
-      screen.getByText(/差分はタグ付き銘柄内で目標を100%に正規化して比較/),
-    ).toBeInTheDocument();
     expect(
       screen.getByText(/未分類の銘柄は売買対象外です/),
     ).toBeInTheDocument();
@@ -179,7 +302,7 @@ describe("AnalysisView", () => {
       <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
       {
         pathname: "/portfolios/ideco/analysis",
-        initialSearchParams: "view=allocation",
+        initialSearchParams: "view=snapshot",
       },
     );
 
@@ -189,8 +312,8 @@ describe("AnalysisView", () => {
 
     await user.click(screen.getByRole("tab", { name: "資産分類" }));
     expect(screen.getByRole("tab", { name: "資産分類" })).toHaveAttribute(
-      "data-state",
-      "active",
+      "aria-selected",
+      "true",
     );
     expect(screen.getAllByText("株式").length).toBeGreaterThanOrEqual(1);
 
@@ -271,11 +394,10 @@ describe("AnalysisView", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("目標配分")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "目標配分を保存" })).toBeInTheDocument();
     });
 
-    expect(screen.getByRole("button", { name: "目標配分を保存" })).toBeInTheDocument();
-    expect(screen.getByText("目標設定済み: 0 / 2 分類")).toBeInTheDocument();
+    expect(screen.getAllByText("目標設定済み: 0 / 2 分類").length).toBeGreaterThanOrEqual(1);
   });
 
   it("hides target allocation edit card in static mode", async () => {

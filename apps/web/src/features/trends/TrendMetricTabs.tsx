@@ -81,6 +81,7 @@ type TrendMetricTabsProps = {
   initialMetric?: TrendMetricTab;
   onMetricChange?: (metric: TrendMetricTab) => void;
   metricMode?: "portfolio" | "allocation" | "all";
+  hideSchemeTabs?: boolean;
 };
 
 function resolveInitialMetric(
@@ -139,6 +140,7 @@ export function TrendMetricTabs({
   initialMetric,
   onMetricChange,
   metricMode = "all",
+  hideSchemeTabs = false,
 }: TrendMetricTabsProps) {
   const hasAllocation =
     metricMode !== "portfolio" &&
@@ -207,113 +209,119 @@ export function TrendMetricTabs({
   let chartPanel: ReactNode = null;
 
   if (activeMetricResolved === "allocation" && allocation && hasAllocation) {
+    const allocationPanelContent = (
+      <>
+        {allocation.periodChangeRows.length > 0 ? (
+          <AllocationPeriodChangeTable
+            rows={allocation.periodChangeRows}
+            selectedKeys={allocation.selectedCompositionKeys}
+            startDateLabel={allocation.startDateLabel}
+            endDateLabel={allocation.endDateLabel}
+            onToggleRow={allocation.onCompositionToggle}
+          />
+        ) : null}
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,18rem)_1fr] lg:items-start">
+          <AllocationSnapshotCompact
+            slices={allocation.endSnapshotSlices}
+            asOfDateLabel={allocation.endDateLabel}
+            uncoveredMinor={allocation.uncoveredMinor}
+          />
+          <AllocationCrossLink
+            portfolioCode={allocation.portfolioCode}
+            target="analysis"
+            schemeCode={allocation.activeSchemeCode}
+            asOfDate={allocation.endAsOfDate}
+            label="断面の詳細・銘柄内訳は資産配分で見る"
+          />
+        </div>
+        <CompositionSelectionToolbar
+          selectedCount={allocation.selectedCompositionKeys.length}
+          totalCount={allocation.ratioSeries.length}
+          onSelectAll={allocation.onSelectAllCompositions}
+          onClearSelection={allocation.onClearCompositionSelection}
+        />
+        <div
+          className="analysis-axis-tabs trend-metric-tabs__subtabs"
+          role="tablist"
+          aria-label="構成比グラフの表示"
+        >
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeAllocationView === "level"}
+            className={activeAllocationView === "level" ? "is-active" : undefined}
+            onClick={() => {
+              setActiveAllocationView("level");
+            }}
+          >
+            推移
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeAllocationView === "delta"}
+            className={activeAllocationView === "delta" ? "is-active" : undefined}
+            onClick={() => {
+              setActiveAllocationView("delta");
+            }}
+          >
+            増減
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeAllocationView === "relative-rate"}
+            className={activeAllocationView === "relative-rate" ? "is-active" : undefined}
+            onClick={() => {
+              setActiveAllocationView("relative-rate");
+            }}
+          >
+            変化率
+          </button>
+        </div>
+        {activeAllocationView === "level" ? (
+          <TrendStackedAreaChart
+            title="構成比の推移"
+            caption={trendDisplayUnitLabel}
+            labels={labels}
+            sourceDates={sourceDates}
+            sourceDateLabels={sourceDateLabels}
+            series={allocation.allocationSeries.map((item) => ({
+              ...item,
+              formatValue: (value) => formatPercent(value),
+            }))}
+            height={300}
+            selectedSeriesKeys={allocation.selectedCompositionKeys}
+            onSeriesToggle={allocation.onCompositionToggle}
+          />
+        ) : null}
+        {allocation.ratioSeries.length > 0 ? (
+          <CompositionRatioLineChart
+            labels={labels}
+            sourceDates={sourceDates}
+            sourceDateLabels={sourceDateLabels}
+            ratioSeries={allocation.ratioSeries}
+            selectedKeys={allocation.selectedCompositionKeys}
+            view={activeAllocationView}
+            caption={trendDisplayUnitLabel}
+          />
+        ) : null}
+      </>
+    );
+
     chartPanel = (
       <div className="trend-metric-tabs__allocation-panel space-y-4">
-        <AllocationSchemeTabs
-          variant="buttons"
-          schemes={allocation.schemeCodes}
-          activeSchemeCode={allocation.activeSchemeCode}
-          onSchemeChange={allocation.onSchemeChange}
-          renderPanel={() => (
-            <>
-              {allocation.periodChangeRows.length > 0 ? (
-                <AllocationPeriodChangeTable
-                  rows={allocation.periodChangeRows}
-                  selectedKeys={allocation.selectedCompositionKeys}
-                  startDateLabel={allocation.startDateLabel}
-                  endDateLabel={allocation.endDateLabel}
-                  onToggleRow={allocation.onCompositionToggle}
-                />
-              ) : null}
-              <div className="grid gap-4 lg:grid-cols-[minmax(0,18rem)_1fr] lg:items-start">
-                <AllocationSnapshotCompact
-                  slices={allocation.endSnapshotSlices}
-                  asOfDateLabel={allocation.endDateLabel}
-                  uncoveredMinor={allocation.uncoveredMinor}
-                />
-                <AllocationCrossLink
-                  portfolioCode={allocation.portfolioCode}
-                  target="analysis"
-                  schemeCode={allocation.activeSchemeCode}
-                  asOfDate={allocation.endAsOfDate}
-                  label="断面の詳細・銘柄内訳は資産配分で見る"
-                />
-              </div>
-              <CompositionSelectionToolbar
-                selectedCount={allocation.selectedCompositionKeys.length}
-                totalCount={allocation.ratioSeries.length}
-                onSelectAll={allocation.onSelectAllCompositions}
-                onClearSelection={allocation.onClearCompositionSelection}
-              />
-              <div
-                className="analysis-axis-tabs trend-metric-tabs__subtabs"
-                role="tablist"
-                aria-label="構成比グラフの表示"
-              >
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={activeAllocationView === "level"}
-                  className={activeAllocationView === "level" ? "is-active" : undefined}
-                  onClick={() => {
-                    setActiveAllocationView("level");
-                  }}
-                >
-                  推移
-                </button>
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={activeAllocationView === "delta"}
-                  className={activeAllocationView === "delta" ? "is-active" : undefined}
-                  onClick={() => {
-                    setActiveAllocationView("delta");
-                  }}
-                >
-                  増減
-                </button>
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={activeAllocationView === "relative-rate"}
-                  className={activeAllocationView === "relative-rate" ? "is-active" : undefined}
-                  onClick={() => {
-                    setActiveAllocationView("relative-rate");
-                  }}
-                >
-                  変化率
-                </button>
-              </div>
-              {activeAllocationView === "level" ? (
-                <TrendStackedAreaChart
-                  title="構成比の推移"
-                  caption={trendDisplayUnitLabel}
-                  labels={labels}
-                  sourceDates={sourceDates}
-                  sourceDateLabels={sourceDateLabels}
-                  series={allocation.allocationSeries.map((item) => ({
-                    ...item,
-                    formatValue: (value) => formatPercent(value),
-                  }))}
-                  height={300}
-                  selectedSeriesKeys={allocation.selectedCompositionKeys}
-                  onSeriesToggle={allocation.onCompositionToggle}
-                />
-              ) : null}
-              {allocation.ratioSeries.length > 0 ? (
-                <CompositionRatioLineChart
-                  labels={labels}
-                  sourceDates={sourceDates}
-                  sourceDateLabels={sourceDateLabels}
-                  ratioSeries={allocation.ratioSeries}
-                  selectedKeys={allocation.selectedCompositionKeys}
-                  view={activeAllocationView}
-                  caption={trendDisplayUnitLabel}
-                />
-              ) : null}
-            </>
-          )}
-        />
+        {hideSchemeTabs ? (
+          allocationPanelContent
+        ) : (
+          <AllocationSchemeTabs
+            variant="buttons"
+            schemes={allocation.schemeCodes}
+            activeSchemeCode={allocation.activeSchemeCode}
+            onSchemeChange={allocation.onSchemeChange}
+            renderPanel={() => allocationPanelContent}
+          />
+        )}
       </div>
     );
   }

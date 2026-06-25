@@ -4,7 +4,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 
 export type PortfolioAllocationMainView = "details" | "allocation";
-export type AnalysisMainView = "trends" | "allocation";
+export type AnalysisMainView = "trends" | "allocation" | "snapshot";
 export type DetailsPanel = "holdings" | "trends";
 export type HoldingsMode = "range" | "compare";
 
@@ -31,7 +31,7 @@ type UsePortfolioSubviewParamOptions =
 type UsePortfolioSubviewParamResult = PortfolioAllocationSubview | AnalysisSubview;
 
 const PORTFOLIO_MAIN_VIEWS: PortfolioAllocationMainView[] = ["details", "allocation"];
-const ANALYSIS_MAIN_VIEWS: AnalysisMainView[] = ["trends", "allocation"];
+const ANALYSIS_MAIN_VIEWS: AnalysisMainView[] = ["trends", "allocation", "snapshot"];
 const DETAILS_PANELS: DetailsPanel[] = ["holdings", "trends"];
 const HOLDINGS_MODES: HoldingsMode[] = ["range", "compare"];
 
@@ -112,6 +112,11 @@ function readAnalysisMainView(viewParam: string | null): AnalysisMainView {
 
   if (viewParam === "allocation") {
     result = "allocation";
+    return result;
+  }
+
+  if (viewParam === "snapshot") {
+    result = "snapshot";
     return result;
   }
 

@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 
+import { AnalysisSchemeSelector } from "@/features/allocation/AnalysisSchemeSelector";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +18,7 @@ type AllocationSchemeTabsProps = {
   renderPanel: (scheme: AllocationSchemeTabItem) => ReactNode;
   className?: string;
   variant?: "tabs" | "buttons";
+  axisAriaLabel?: string;
 };
 
 export function AllocationSchemeTabs({
@@ -26,6 +28,7 @@ export function AllocationSchemeTabs({
   renderPanel,
   className,
   variant = "tabs",
+  axisAriaLabel = "構成比の分析軸",
 }: AllocationSchemeTabsProps) {
   let result: ReactNode = null;
 
@@ -39,31 +42,12 @@ export function AllocationSchemeTabs({
 
     result = (
       <div className={cn("space-y-4", className)}>
-        <div
-          className="analysis-axis-tabs trend-metric-tabs__subtabs"
-          role="tablist"
-          aria-label="構成比の分析軸"
-        >
-          {schemes.map((scheme) => {
-            let schemeTab = (
-              <button
-                key={scheme.schemeCode}
-                type="button"
-                role="tab"
-                aria-selected={scheme.schemeCode === activeSchemeCode}
-                className={
-                  scheme.schemeCode === activeSchemeCode ? "is-active" : undefined
-                }
-                onClick={() => {
-                  onSchemeChange(scheme.schemeCode);
-                }}
-              >
-                {scheme.schemeName}
-              </button>
-            );
-            return schemeTab;
-          })}
-        </div>
+        <AnalysisSchemeSelector
+          schemes={schemes}
+          activeSchemeCode={activeSchemeCode}
+          onSchemeChange={onSchemeChange}
+          axisAriaLabel={axisAriaLabel}
+        />
         {renderPanel(activeScheme)}
       </div>
     );

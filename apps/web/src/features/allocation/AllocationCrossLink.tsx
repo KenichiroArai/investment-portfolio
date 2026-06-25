@@ -36,7 +36,7 @@ function buildHref({
 
   if (target === "analysis") {
     result = buildPortfolioPath(portfolioCode, "analysis");
-    params.set("view", "allocation");
+    params.set("view", "snapshot");
   } else if (target === "analysis-trends") {
     result = buildPortfolioPath(portfolioCode, "analysis");
     params.set("view", "trends");

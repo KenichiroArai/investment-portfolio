@@ -6,7 +6,6 @@ import {
   buildTrendPeriodMetricDeltas,
   findLargestAllocationShareChange,
   formatTrendSparseDataNote,
-  type AggregatedTrendPoint,
   type AllocationSeriesInput,
 } from "@repo/shared";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
@@ -16,6 +15,7 @@ import { TrendMetricTabs } from "@/features/trends/TrendMetricTabs";
 import { useAllocationMetricParam } from "@/features/allocation/useAllocationMetricParam";
 import { useAllocationSchemeParam } from "@/features/allocation/useAllocationSchemeParam";
 import { TrendPeriodSummary } from "@/features/trends/TrendPeriodSummary";
+import { resolvePeriodEndpoints } from "@/features/trends/trends-detail-utils";
 import {
   buildTrendChartBuckets,
   computeTrendChartDeltas,
@@ -34,33 +34,14 @@ import {
 } from "@/lib/format-yen";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
 
-function resolvePeriodEndpoints(
-  displayPoints: AggregatedTrendPoint[],
-  baselinePoint: AggregatedTrendPoint | null,
-): { start: AggregatedTrendPoint; end: AggregatedTrendPoint } | null {
-  let result: { start: AggregatedTrendPoint; end: AggregatedTrendPoint } | null = null;
+type TrendsPanelMode = "portfolio" | "allocation" | "all";
 
-  if (displayPoints.length === 0) {
-    return result;
-  }
-
-  if (displayPoints.length === 1) {
-    if (!baselinePoint) {
-      return result;
-    }
-    result = {
-      start: baselinePoint,
-      end: displayPoints[0],
-    };
-    return result;
-  }
-
-  result = {
-    start: displayPoints[0],
-    end: displayPoints[displayPoints.length - 1],
-  };
-  return result;
-}
+type TrendsDetailPanelProps = {
+  portfolioCode: string;
+  mode?: TrendsPanelMode;
+  hideSchemeTabs?: boolean;
+  renderPeriodSummary?: boolean;
+};
 
 function resolveAllCompositionKeys(ratioSeries: AllocationSeriesInput[]): string[] {
   let result = ratioSeries.map((item) => item.key);
@@ -79,16 +60,11 @@ function toggleCompositionKey(keys: string[], key: string): string[] {
   return result;
 }
 
-type TrendsPanelMode = "portfolio" | "allocation" | "all";
-
-type TrendsDetailPanelProps = {
-  portfolioCode: string;
-  mode?: TrendsPanelMode;
-};
-
 export function TrendsDetailPanel({
   portfolioCode,
   mode = "all",
+  hideSchemeTabs = false,
+  renderPeriodSummary = true,
 }: TrendsDetailPanelProps) {
   const {
     displayTrendPoints,
@@ -526,17 +502,19 @@ export function TrendsDetailPanel({
 
   result = (
     <div className="trends-detail">
-      <TrendPeriodSummary
-        startDateLabel={startDateLabel}
-        endDateLabel={endDateLabel}
-        startMarketValueMinor={startMarketValue}
-        endMarketValueMinor={endMarketValue}
-        metricDeltas={metricDeltas}
-        largestShareChange={largestShareChangeForSummary}
-        sparseDataNote={sparseDataNote}
-        singleBucketNote={singleBucketNote}
-        baselineSummary={baselineSummary}
-      />
+      {renderPeriodSummary ? (
+        <TrendPeriodSummary
+          startDateLabel={startDateLabel}
+          endDateLabel={endDateLabel}
+          startMarketValueMinor={startMarketValue}
+          endMarketValueMinor={endMarketValue}
+          metricDeltas={metricDeltas}
+          largestShareChange={largestShareChangeForSummary}
+          sparseDataNote={sparseDataNote}
+          singleBucketNote={singleBucketNote}
+          baselineSummary={baselineSummary}
+        />
+      ) : null}
 
       <TrendMetricTabs
         key={snapshot?.asOfDate ?? "pending"}
@@ -558,6 +536,7 @@ export function TrendsDetailPanel({
         initialMetric={activeMetric}
         onMetricChange={setActiveMetric}
         metricMode={mode === "all" ? "all" : mode}
+        hideSchemeTabs={hideSchemeTabs}
         allocation={
           mode !== "portfolio" &&
           schemeCodesList.length > 0 &&

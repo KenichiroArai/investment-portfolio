@@ -53,15 +53,12 @@ describe("PortfolioAllocationView", () => {
     vi.unstubAllGlobals();
   });
 
-  it("renders allocation panel and composition target card", async () => {
+  it("renders allocation panel without analysis axis", async () => {
     vi.stubGlobal(
       "fetch",
       createPortfolioFetchMock({
         snapshot: snapshotFixture,
         targetPortfolioWeights: [{ instrumentId: "inst-1", targetRatio: 0.5 }],
-        targetAllocations: {
-          ideco_region: [{ valueCode: "domestic", targetRatio: 0.4 }],
-        },
       }),
     );
 
@@ -80,101 +77,10 @@ describe("PortfolioAllocationView", () => {
     expect(screen.getByText("リバランス設定")).toBeInTheDocument();
     expect(screen.getByText("売買提案")).toBeInTheDocument();
     expect(screen.getByText(/合計買い/)).toBeInTheDocument();
-    expect(screen.getByRole("columnheader", { name: "資産配分目標" })).toBeInTheDocument();
-    expect(screen.getByText("国内")).toBeInTheDocument();
-  });
-
-  it("excludes untagged holdings from composition targets and normalizes tagged targets", async () => {
-    const multiLineSnapshot = {
-      ...snapshotFixture,
-      analysisSchemes: [{ schemeCode: "other", schemeName: "その他" }],
-      lines: [
-        {
-          id: "line-1",
-          instrumentId: "inst-1",
-          instrumentName: "国内銘柄",
-          sortOrder: 0,
-          quantity: 1,
-          marketValueMinor: 500_000,
-          bookValueMinor: null,
-          metrics: [],
-          instrumentAttributes: [],
-          tags: [
-            {
-              schemeCode: "other",
-              schemeName: "その他",
-              valueCode: "domestic_other",
-              valueName: "国内その他資産",
-            },
-          ],
-        },
-        {
-          id: "line-2",
-          instrumentId: "inst-2",
-          instrumentName: "複合銘柄",
-          sortOrder: 1,
-          quantity: 1,
-          marketValueMinor: 400_000,
-          bookValueMinor: null,
-          metrics: [],
-          instrumentAttributes: [],
-          tags: [
-            {
-              schemeCode: "other",
-              schemeName: "その他",
-              valueCode: "composite",
-              valueName: "内外資産複合",
-            },
-          ],
-        },
-        {
-          id: "line-3",
-          instrumentId: "inst-3",
-          instrumentName: "タグなし銘柄",
-          sortOrder: 2,
-          quantity: 1,
-          marketValueMinor: 100_000,
-          bookValueMinor: null,
-          metrics: [],
-          instrumentAttributes: [],
-          tags: [],
-        },
-      ],
-    };
-
-    vi.stubGlobal(
-      "fetch",
-      createPortfolioFetchMock({
-        snapshot: multiLineSnapshot,
-        targetPortfolioWeights: [
-          { instrumentId: "inst-1", targetRatio: 0.29 },
-          { instrumentId: "inst-2", targetRatio: 0.21 },
-          { instrumentId: "inst-3", targetRatio: 0.5 },
-        ],
-        targetAllocations: {
-          other: [
-            { valueCode: "domestic_other", targetRatio: 0.6 },
-            { valueCode: "composite", targetRatio: 0.4 },
-          ],
-        },
-      }),
-    );
-
-    renderWithPortfolioTime(
-      <PortfolioAllocationView portfolioCode="ideco" portfolioKind="ideco" />,
-      {
-        pathname: "/portfolios/ideco/portfolio-allocation",
-        initialSearchParams: "view=allocation",
-      },
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText("国内その他資産")).toBeInTheDocument();
-    });
-    expect(screen.getByText("内外資産複合")).toBeInTheDocument();
-    expect(screen.queryByText("未分類")).not.toBeInTheDocument();
-    expect(screen.getByText("58.00%")).toBeInTheDocument();
-    expect(screen.getByText("42.00%")).toBeInTheDocument();
+    expect(screen.queryByRole("tablist", { name: "分析軸" })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("columnheader", { name: "資産配分目標" }),
+    ).not.toBeInTheDocument();
   });
 
   it("shows rebalance section in static mode", async () => {
