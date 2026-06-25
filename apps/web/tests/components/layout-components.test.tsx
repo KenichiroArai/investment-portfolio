@@ -2,7 +2,6 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { AnalysisSubNav } from "@/components/AnalysisSubNav";
 import { SettingsSidebar } from "@/components/layout/settings-sidebar";
 import { PortfolioContextBar } from "@/components/PortfolioContextBar";
 
@@ -55,12 +54,6 @@ describe("layout components", () => {
       process.env.NEXT_PUBLIC_DATA_SOURCE = "static";
     });
 
-    it("hides analysis sub navigation", () => {
-      usePathname.mockReturnValue("/portfolios/ideco/analysis/");
-      const { container } = render(<AnalysisSubNav portfolioCode="ideco" />);
-      expect(container).toBeEmptyDOMElement();
-    });
-
     it("hides settings link in portfolio context bar", async () => {
       usePathname.mockReturnValue("/portfolios/ideco/");
       render(<PortfolioContextBar portfolioCode="ideco" />);
@@ -79,29 +72,6 @@ describe("layout components", () => {
   describe("api mode", () => {
     beforeEach(() => {
       process.env.NEXT_PUBLIC_DATA_SOURCE = "api";
-    });
-
-    it("renders analysis sub navigation with active view link", () => {
-      usePathname.mockReturnValue("/portfolios/ideco/analysis/");
-      render(<AnalysisSubNav portfolioCode="ideco" />);
-
-      const viewLink = screen.getByRole("link", { name: "表示" });
-      expect(viewLink).toHaveAttribute("href", "/portfolios/ideco/analysis");
-      expect(viewLink).toHaveAttribute("aria-current", "page");
-      expect(screen.getByRole("link", { name: "分類設定" })).toHaveAttribute(
-        "href",
-        "/portfolios/ideco/settings/classification",
-      );
-    });
-
-    it("marks classification settings as active on settings route", () => {
-      usePathname.mockReturnValue("/portfolios/ideco/settings/classification/");
-      render(<AnalysisSubNav portfolioCode="ideco" />);
-
-      expect(screen.getByRole("link", { name: "分類設定" })).toHaveAttribute(
-        "aria-current",
-        "page",
-      );
     });
 
     it("renders portfolio context bar tabs and settings link", async () => {

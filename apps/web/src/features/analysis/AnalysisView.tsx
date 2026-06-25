@@ -1,7 +1,6 @@
 "use client";
 
 import type { ClassificationSchemeWithValuesDto } from "@repo/shared";
-import Link from "next/link";
 import {
   buildAllocationBySchemeWithLines,
   buildAllocationGapRows,
@@ -12,7 +11,6 @@ import {
   sumSnapshotMarketValue,
   type AnalysisSchemeConfig,
 } from "@repo/shared";
-import { Settings } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 
 import { AnalysisTabPanel } from "@/features/analysis/AnalysisTabPanel";
@@ -38,16 +36,12 @@ import { buildTrendChartBuckets } from "@/features/trends/trend-chart-buckets";
 import { useTrendPeriodSummaryData } from "@/features/trends/useTrendPeriodSummaryData";
 import { LoadingSkeleton } from "@/components/loading-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
-import { PageHeader } from "@/components/layout/page-header";
 import { WritableOnly } from "@/components/WritableOnly";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { fetchClassificationSchemes } from "@/lib/api-client";
 import { isWritableDataSource } from "@/lib/data-source";
-import { formatAsOfDateJa, formatYen } from "@/lib/format-yen";
-import { buildPortfolioPath } from "@/lib/portfolio-path";
+import { formatYen } from "@/lib/format-yen";
 
 type AnalysisViewProps = {
   portfolioCode: string;
@@ -205,7 +199,6 @@ export function AnalysisView({
   if (error) {
     result = (
       <PageContainer>
-        <PageHeader title="資産配分" />
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
@@ -217,7 +210,6 @@ export function AnalysisView({
   if (!snapshot) {
     result = (
       <PageContainer>
-        <PageHeader title="資産配分" />
         <Alert variant="destructive">
           <AlertDescription>資産配分の対象となる明細がありません。</AlertDescription>
         </Alert>
@@ -229,7 +221,6 @@ export function AnalysisView({
   if (schemeConfigs.length === 0) {
     result = (
       <PageContainer>
-        <PageHeader title="資産配分" />
         <p className="text-sm text-muted-foreground">
           この口座種別の資産配分軸はまだ定義されていません。
         </p>
@@ -387,24 +378,6 @@ export function AnalysisView({
 
   result = (
     <PageContainer>
-      <PageHeader
-        title="資産配分"
-        description={`${snapshot.portfolioName}（${snapshot.portfolioCode}）`}
-        actions={
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="outline">{formatAsOfDateJa(asOfDate)}</Badge>
-            {isHistoricalView ? <Badge variant="secondary">履歴</Badge> : null}
-            <WritableOnly>
-              <Button variant="outline" size="sm" asChild>
-                <Link href={buildPortfolioPath(portfolioCode, "settings", "classification")}>
-                  <Settings className="h-4 w-4" />
-                  分類設定
-                </Link>
-              </Button>
-            </WritableOnly>
-          </div>
-        }
-      />
       <Tabs
         value={mainView}
         onValueChange={(value) => {

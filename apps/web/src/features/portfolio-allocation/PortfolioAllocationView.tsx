@@ -8,10 +8,8 @@ import { useMemo, type ReactNode } from "react";
 
 import { LoadingSkeleton } from "@/components/loading-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
-import { PageHeader } from "@/components/layout/page-header";
 import { WritableOnly } from "@/components/WritableOnly";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RebalanceSettingsCard } from "@/features/allocation/RebalanceSettingsCard";
@@ -25,7 +23,7 @@ import { PortfolioDetailsPanel } from "@/features/portfolio/PortfolioDetailsPane
 import { PortfolioOverviewSummary } from "@/features/portfolio/PortfolioOverviewSummary";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
 import { usePortfolioSubviewParam } from "@/features/portfolio/usePortfolioSubviewParam";
-import { formatAsOfDateJa, formatYen } from "@/lib/format-yen";
+import { formatYen } from "@/lib/format-yen";
 
 type PortfolioAllocationViewProps = {
   portfolioCode: string;
@@ -41,7 +39,6 @@ export function PortfolioAllocationView({
     loadingSnapshot,
     loadingDates,
     error,
-    selectedAsOfDate,
     isHistoricalView,
     currentAsOfDate,
     trends,
@@ -91,7 +88,6 @@ export function PortfolioAllocationView({
   if (error) {
     result = (
       <PageContainer>
-        <PageHeader title="ポートフォリオ配分" />
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
@@ -103,7 +99,6 @@ export function PortfolioAllocationView({
   if (!snapshot) {
     result = (
       <PageContainer>
-        <PageHeader title="ポートフォリオ配分" />
         <Alert variant="destructive">
           <AlertDescription>ポートフォリオ配分の対象となる明細がありません。</AlertDescription>
         </Alert>
@@ -112,7 +107,6 @@ export function PortfolioAllocationView({
     return result;
   }
 
-  const asOfDate = selectedAsOfDate ?? snapshot.asOfDate;
   const assetBalance = sumSnapshotMarketValue(snapshot.lines);
   const latestPoint =
     trends?.points.find((point) => point.asOfDate === currentAsOfDate) ??
@@ -160,16 +154,6 @@ export function PortfolioAllocationView({
 
   result = (
     <PageContainer>
-      <PageHeader
-        title="ポートフォリオ配分"
-        description={`${snapshot.portfolioName}（${snapshot.portfolioCode}）`}
-        actions={
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="outline">{formatAsOfDateJa(asOfDate)}</Badge>
-            {isHistoricalView ? <Badge variant="secondary">履歴</Badge> : null}
-          </div>
-        }
-      />
       <PortfolioOverviewSummary
         snapshot={snapshot}
         deltaHint={deltaHint}
