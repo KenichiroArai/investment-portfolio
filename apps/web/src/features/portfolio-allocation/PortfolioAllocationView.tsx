@@ -130,11 +130,7 @@ export function PortfolioAllocationView({
       : null;
 
   const holdingsSummarySegments = buildHoldingsTabSummarySegments(snapshot);
-  const compositionSummarySegments = buildCompositionTabSummarySegments(
-    allocationRows,
-    weights,
-    assetBalance,
-  );
+  const compositionSummarySegments = buildCompositionTabSummarySegments(allocationRows);
   const trendsSummarySegments = buildTrendsTabSummarySegments(
     trendPeriodSummaryData
       ? {
@@ -207,9 +203,7 @@ export function PortfolioAllocationView({
   };
 
   const renderAllocationOverview = (): ReactNode => {
-    let overview = (
-      <TabSummaryBar segments={compositionSummarySegments} note={deltaHint} />
-    );
+    let overview = <TabSummaryBar segments={compositionSummarySegments} />;
     return overview;
   };
 

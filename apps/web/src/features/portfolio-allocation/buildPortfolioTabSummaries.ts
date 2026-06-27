@@ -2,19 +2,15 @@ import {
   computeSnapshotGainRate,
   computeSnapshotPortfolioGainMinor,
   findLargestAllocationGap,
-  pickTopAllocationHoldings,
   resolveSnapshotTotalContributions,
   sumSnapshotMarketValue,
-  sumTargetPortfolioRatio,
   type CurrentSnapshotDto,
   type PortfolioAllocationRow,
-  type TargetPortfolioWeight,
   type TrendPeriodMetricDelta,
 } from "@repo/shared";
 
 import type { TabSummarySegment } from "@/features/portfolio-allocation/TabSummaryBar";
 import {
-  formatAllocationPercent,
   formatAllocationPercentPoint,
   formatPercent,
   formatYen,
@@ -62,38 +58,6 @@ function resolveSignedValueClassName(value: number): string | undefined {
   return result;
 }
 
-function formatTopHoldingsLabel(rows: PortfolioAllocationRow[]): string {
-  let result = "—";
-
-  if (rows.length === 0) {
-    return result;
-  }
-
-  if (rows.length <= 3) {
-    result = pickTopAllocationHoldings(rows, rows.length)
-      .map((holding) => `${holding.instrumentName} ${formatAllocationPercent(holding.currentRatio)}`)
-      .join(" / ");
-    return result;
-  }
-
-  const topHoldings = pickTopAllocationHoldings(rows, 2);
-  const otherRatio = rows.reduce((sum, row) => {
-    const isTop = topHoldings.some((holding) => holding.instrumentId === row.instrumentId);
-    if (isTop) {
-      return sum;
-    }
-    return sum + row.currentRatio;
-  }, 0);
-
-  result = [
-    ...topHoldings.map(
-      (holding) => `${holding.instrumentName} ${formatAllocationPercent(holding.currentRatio)}`,
-    ),
-    `その他 ${formatAllocationPercent(otherRatio)}`,
-  ].join(" / ");
-  return result;
-}
-
 export function buildHoldingsTabSummarySegments(
   snapshot: CurrentSnapshotDto,
 ): TabSummarySegment[] {
@@ -138,49 +102,23 @@ export function buildHoldingsTabSummarySegments(
 
 export function buildCompositionTabSummarySegments(
   allocationRows: PortfolioAllocationRow[],
-  weights: TargetPortfolioWeight[],
-  assetBalance: number,
 ): TabSummarySegment[] {
   let result: TabSummarySegment[] = [];
 
-  const targetCount = allocationRows.filter((row) => row.targetRatio !== null).length;
-  const targetTotalRatio = weights.length > 0 ? sumTargetPortfolioRatio(weights) : null;
   const largestGap = findLargestAllocationGap(allocationRows);
+
+  if (largestGap === null) {
+    return result;
+  }
 
   result = [
     {
-      label: "評価額",
-      value: formatYen(assetBalance),
-    },
-    {
-      label: "目標",
-      value: `${targetCount} / ${allocationRows.length} 銘柄`,
-    },
-  ];
-
-  if (targetTotalRatio !== null && Number.isFinite(targetTotalRatio) && targetCount > 0) {
-    result.push({
-      label: "目標合計",
-      value: formatAllocationPercent(targetTotalRatio),
-    });
-  }
-
-  if (allocationRows.length > 0) {
-    result.push({
-      label: "上位",
-      value: formatTopHoldingsLabel(allocationRows),
-      valueSize: "compact",
-    });
-  }
-
-  if (largestGap !== null) {
-    result.push({
       label: "最大乖離",
       value: `${largestGap.instrumentName} ${formatAllocationPercentPoint(largestGap.gapRatio)}`,
       valueClassName: resolveSignedValueClassName(largestGap.gapRatio),
-      valueSize: "compact",
-    });
-  }
+      valueSize: "primary",
+    },
+  ];
 
   return result;
 }
