@@ -225,7 +225,12 @@ export function PortfolioTimeProvider({
       return result;
     }
 
-    if (onPortfolioAllocation && view !== "allocation") {
+    if (
+      onPortfolioAllocation &&
+      view !== "composition" &&
+      view !== "rebalance" &&
+      view !== "allocation"
+    ) {
       result = true;
       return result;
     }

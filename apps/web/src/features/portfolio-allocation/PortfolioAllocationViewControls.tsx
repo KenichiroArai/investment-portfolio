@@ -23,16 +23,19 @@ export function PortfolioAllocationViewControls({
       </h2>
       <TabsList
         aria-label="ポートフォリオ配分の表示"
-        className={prominentTabsListClassName}
+        className={cn(prominentTabsListClassName, "grid-cols-4")}
       >
         <TabsTrigger value="holdings" className={prominentTabsTriggerClassName}>
           明細
         </TabsTrigger>
+        <TabsTrigger value="composition" className={prominentTabsTriggerClassName}>
+          構成比
+        </TabsTrigger>
         <TabsTrigger value="trends" className={prominentTabsTriggerClassName}>
           推移
         </TabsTrigger>
-        <TabsTrigger value="allocation" className={prominentTabsTriggerClassName}>
-          配分（リバランス）
+        <TabsTrigger value="rebalance" className={prominentTabsTriggerClassName}>
+          リバランス
         </TabsTrigger>
       </TabsList>
     </div>

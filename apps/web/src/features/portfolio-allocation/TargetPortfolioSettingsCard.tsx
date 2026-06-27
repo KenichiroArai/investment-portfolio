@@ -1,6 +1,7 @@
 "use client";
 
 import type { HoldingLineDto } from "@repo/shared";
+import { sumSnapshotMarketValue } from "@repo/shared";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -74,6 +75,23 @@ export function TargetPortfolioSettingsCard({
     return result;
   }, [loading, sortedLines, weights]);
 
+  const assetTotalMinor = useMemo(() => {
+    let result = sumSnapshotMarketValue(lines);
+    return result;
+  }, [lines]);
+
+  const currentRatioByInstrumentId = useMemo(() => {
+    let result = new Map<string, number>();
+
+    for (const line of sortedLines) {
+      const currentRatio =
+        assetTotalMinor > 0 ? line.marketValueMinor / assetTotalMinor : 0;
+      result.set(line.instrumentId, currentRatio);
+    }
+
+    return result;
+  }, [assetTotalMinor, sortedLines]);
+
   const handleSave = async (): Promise<void> => {
     let result: void = undefined;
 
@@ -143,14 +161,19 @@ export function TargetPortfolioSettingsCard({
               <TableHeader>
                 <TableRow>
                   <TableHead>銘柄</TableHead>
+                  <TableHead className="w-[6rem] text-right">現状（%）</TableHead>
                   <TableHead className="w-[8rem]">目標（%）</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {sortedLines.map((line) => {
+                  const currentRatio = currentRatioByInstrumentId.get(line.instrumentId) ?? 0;
                   let row = (
                     <TableRow key={line.instrumentId}>
                       <TableCell>{line.instrumentName}</TableCell>
+                      <TableCell className="text-right tabular-nums text-muted-foreground">
+                        {formatAllocationPercent(currentRatio)}
+                      </TableCell>
                       <TableCell>
                         <Input
                           type="number"

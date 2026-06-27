@@ -123,17 +123,19 @@ export function PortfolioAllocationView({
       ? `最新比 評価額 ${formatYen(latestPoint.totalMarketValueMinor - assetBalance)}`
       : null;
 
-  const allocationTabContent = (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">銘柄別構成比</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <PortfolioAllocationPanel rows={allocationRows} />
-        </CardContent>
-      </Card>
+  const compositionTabContent = (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">銘柄別構成比</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <PortfolioAllocationPanel rows={allocationRows} />
+      </CardContent>
+    </Card>
+  );
 
+  const rebalanceTabContent = (
+    <div className="space-y-6">
       <WritableOnly>
         <TargetPortfolioSettingsCard
           portfolioCode={portfolioCode}
@@ -213,6 +215,12 @@ export function PortfolioAllocationView({
             />
           </div>
         </TabsContent>
+        <TabsContent value="composition" className="mt-4">
+          <div className="space-y-4">
+            {renderAllocationOverview()}
+            {compositionTabContent}
+          </div>
+        </TabsContent>
         <TabsContent value="trends" className="mt-4">
           <div className="space-y-4">
             {renderTrendsOverview()}
@@ -223,11 +231,8 @@ export function PortfolioAllocationView({
             />
           </div>
         </TabsContent>
-        <TabsContent value="allocation" className="mt-4">
-          <div className="space-y-4">
-            {renderAllocationOverview()}
-            {allocationTabContent}
-          </div>
+        <TabsContent value="rebalance" className="mt-4">
+          <div className="space-y-4">{rebalanceTabContent}</div>
         </TabsContent>
       </Tabs>
     </PageContainer>

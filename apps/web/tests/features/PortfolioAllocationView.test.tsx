@@ -53,7 +53,38 @@ describe("PortfolioAllocationView", () => {
     vi.unstubAllGlobals();
   });
 
-  it("renders allocation panel without analysis axis", async () => {
+  it("renders composition tab without rebalance or analysis axis", async () => {
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        snapshot: snapshotFixture,
+        targetPortfolioWeights: [{ instrumentId: "inst-1", targetRatio: 0.5 }],
+      }),
+    );
+
+    renderWithPortfolioTime(
+      <PortfolioAllocationView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/portfolio-allocation",
+        initialSearchParams: "view=composition",
+      },
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("銘柄別構成比")).toBeInTheDocument();
+    });
+
+    expect(screen.getByText(/評価額合計/)).toBeInTheDocument();
+    expect(screen.queryByText("銘柄目標配分")).not.toBeInTheDocument();
+    expect(screen.queryByText("リバランス設定")).not.toBeInTheDocument();
+    expect(screen.queryByText("売買提案")).not.toBeInTheDocument();
+    expect(screen.queryByRole("tablist", { name: "分析軸" })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("columnheader", { name: "資産配分目標" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("maps legacy view=allocation to composition tab", async () => {
     vi.stubGlobal(
       "fetch",
       createPortfolioFetchMock({
@@ -74,13 +105,36 @@ describe("PortfolioAllocationView", () => {
       expect(screen.getByText("銘柄別構成比")).toBeInTheDocument();
     });
 
+    expect(screen.getByRole("tab", { name: "構成比", selected: true })).toBeInTheDocument();
+    expect(screen.queryByText("リバランス設定")).not.toBeInTheDocument();
+  });
+
+  it("renders rebalance tab with target settings and trades summary", async () => {
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        snapshot: snapshotFixture,
+        targetPortfolioWeights: [{ instrumentId: "inst-1", targetRatio: 0.5 }],
+      }),
+    );
+
+    renderWithPortfolioTime(
+      <PortfolioAllocationView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/portfolio-allocation",
+        initialSearchParams: "view=rebalance",
+      },
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("銘柄目標配分")).toBeInTheDocument();
+    });
+
+    expect(screen.getByRole("columnheader", { name: "現状（%）" })).toBeInTheDocument();
     expect(screen.getByText("リバランス設定")).toBeInTheDocument();
     expect(screen.getByText("売買提案")).toBeInTheDocument();
     expect(screen.getByText(/合計買い/)).toBeInTheDocument();
-    expect(screen.queryByRole("tablist", { name: "分析軸" })).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole("columnheader", { name: "資産配分目標" }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText("銘柄別構成比")).not.toBeInTheDocument();
   });
 
   it("shows rebalance section in static mode", async () => {
@@ -96,15 +150,15 @@ describe("PortfolioAllocationView", () => {
       <PortfolioAllocationView portfolioCode="ideco" portfolioKind="ideco" />,
       {
         pathname: "/portfolios/ideco/portfolio-allocation",
-        initialSearchParams: "view=allocation",
+        initialSearchParams: "view=rebalance",
       },
     );
 
     await waitFor(() => {
-      expect(screen.getByText("銘柄別構成比")).toBeInTheDocument();
+      expect(screen.getByText("リバランス設定")).toBeInTheDocument();
     });
 
-    expect(screen.getByText("リバランス設定")).toBeInTheDocument();
+    expect(screen.queryByText("銘柄目標配分")).not.toBeInTheDocument();
     expect(screen.getByText("売買提案")).toBeInTheDocument();
     expect(screen.getByText(/合計買い/)).toBeInTheDocument();
   });
@@ -132,7 +186,7 @@ describe("PortfolioAllocationView", () => {
     });
   });
 
-  it("renders prominent three-tab controls and summary below tabs", async () => {
+  it("renders prominent four-tab controls in order with holdings selected by default", async () => {
     vi.stubGlobal(
       "fetch",
       createPortfolioFetchMock({
@@ -150,11 +204,11 @@ describe("PortfolioAllocationView", () => {
 
     await waitFor(() => {
       expect(screen.getByRole("tablist", { name: "ポートフォリオ配分の表示" })).toBeInTheDocument();
-      expect(screen.getByRole("tab", { name: "明細" })).toBeInTheDocument();
-      expect(screen.getByRole("tab", { name: "推移" })).toBeInTheDocument();
-      expect(screen.getByRole("tab", { name: "配分（リバランス）" })).toBeInTheDocument();
       expect(screen.getByText("資産残高")).toBeInTheDocument();
     });
+
+    const tabs = screen.getAllByRole("tab");
+    expect(tabs.map((tab) => tab.textContent)).toEqual(["明細", "構成比", "推移", "リバランス"]);
 
     const activeTab = screen.getByRole("tab", { name: "明細" });
     expect(activeTab.className).toContain("data-[state=active]:bg-primary");

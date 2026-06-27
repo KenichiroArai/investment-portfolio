@@ -3,7 +3,11 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 
-export type PortfolioAllocationMainView = "holdings" | "trends" | "allocation";
+export type PortfolioAllocationMainView =
+  | "holdings"
+  | "composition"
+  | "trends"
+  | "rebalance";
 export type AnalysisMainView = "trends" | "allocation" | "snapshot";
 export type HoldingsMode = "range" | "compare";
 
@@ -29,8 +33,9 @@ type UsePortfolioSubviewParamResult = PortfolioAllocationSubview | AnalysisSubvi
 
 const PORTFOLIO_MAIN_VIEWS: PortfolioAllocationMainView[] = [
   "holdings",
+  "composition",
   "trends",
-  "allocation",
+  "rebalance",
 ];
 const ANALYSIS_MAIN_VIEWS: AnalysisMainView[] = ["trends", "allocation", "snapshot"];
 
@@ -40,8 +45,13 @@ function readPortfolioMainView(
 ): PortfolioAllocationMainView {
   let result: PortfolioAllocationMainView = "holdings";
 
-  if (viewParam === "allocation") {
-    result = "allocation";
+  if (viewParam === "composition" || viewParam === "allocation") {
+    result = "composition";
+    return result;
+  }
+
+  if (viewParam === "rebalance") {
+    result = "rebalance";
     return result;
   }
 
@@ -219,11 +229,7 @@ export function usePortfolioSubviewParam(
           return;
         }
         params.delete("holdingsMode");
-        if (view === "trends") {
-          params.set("view", "trends");
-          return;
-        }
-        params.set("view", "allocation");
+        params.set("view", view);
       });
       return result;
     },
@@ -264,7 +270,11 @@ export function isDetailsOrTrendsSubview(searchParams: URLSearchParams): boolean
   const view = searchParams.get("view");
   const panel = searchParams.get("panel");
 
-  if (view === "allocation") {
+  if (
+    view === "composition" ||
+    view === "rebalance" ||
+    view === "allocation"
+  ) {
     return result;
   }
 
@@ -293,7 +303,11 @@ export function isTrendsSubview(searchParams: URLSearchParams): boolean {
     return result;
   }
 
-  if (view === "allocation") {
+  if (
+    view === "composition" ||
+    view === "rebalance" ||
+    view === "allocation"
+  ) {
     return result;
   }
 
