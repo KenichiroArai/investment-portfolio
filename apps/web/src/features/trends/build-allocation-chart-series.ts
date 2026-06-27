@@ -1,4 +1,8 @@
-import type { AggregatedTrendPoint } from "@repo/shared";
+import {
+  comparePortfolioInstrumentOrder,
+  PORTFOLIO_INSTRUMENT_SCHEME_CODE,
+  type AggregatedTrendPoint,
+} from "@repo/shared";
 
 import { getAllocationChartColor } from "@/features/analysis/chart-colors";
 import type { TrendStackedAreaSeries } from "@/features/trends/TrendStackedAreaChart";
@@ -17,7 +21,32 @@ export function buildAllocationChartSeries(
     }
   }
 
-  result = [...valueCodes].map((valueCode, index) => {
+  const orderedValueCodes =
+    schemeCode === PORTFOLIO_INSTRUMENT_SCHEME_CODE
+      ? [...valueCodes].sort((left, right) => {
+          const leftSlice = chartPoints
+            .flatMap((point) => point.allocationsByScheme[schemeCode] ?? [])
+            .find((slice) => slice.valueCode === left);
+          const rightSlice = chartPoints
+            .flatMap((point) => point.allocationsByScheme[schemeCode] ?? [])
+            .find((slice) => slice.valueCode === right);
+          let cmp = comparePortfolioInstrumentOrder(
+            {
+              sortOrder: leftSlice?.sortOrder ?? null,
+              instrumentName: leftSlice?.valueName ?? left,
+              instrumentId: left,
+            },
+            {
+              sortOrder: rightSlice?.sortOrder ?? null,
+              instrumentName: rightSlice?.valueName ?? right,
+              instrumentId: right,
+            },
+          );
+          return cmp;
+        })
+      : [...valueCodes];
+
+  result = orderedValueCodes.map((valueCode, index) => {
     const firstSlice = chartPoints
       .flatMap((point) => point.allocationsByScheme[schemeCode] ?? [])
       .find((slice) => slice.valueCode === valueCode);

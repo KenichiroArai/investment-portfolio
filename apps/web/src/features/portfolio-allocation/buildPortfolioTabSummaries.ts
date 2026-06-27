@@ -4,6 +4,7 @@ import {
   findLargestAllocationDivergence,
   resolveSnapshotTotalContributions,
   sumSnapshotMarketValue,
+  type AllocationShareChange,
   type CurrentSnapshotDto,
   type PortfolioAllocationRow,
   type TrendPeriodMetricDelta,
@@ -12,6 +13,7 @@ import {
 import type { TabSummarySegment } from "@/features/portfolio-allocation/TabSummaryBar";
 import {
   formatAllocationDivergenceRatio,
+  formatAllocationPercentPoint,
   formatPercent,
   formatYen,
 } from "@/lib/format-yen";
@@ -28,6 +30,7 @@ type PortfolioTrendSummaryInput = {
   startMarketValueMinor: number;
   endMarketValueMinor: number;
   metricDeltas: TrendPeriodMetricDelta[];
+  largestShareChange?: AllocationShareChange | null;
 };
 
 function formatSignedYen(value: number): string {
@@ -144,7 +147,17 @@ export function buildTrendsTabSummarySegments(
     input.metricDeltas[0] ??
     null;
 
+  if (input.largestShareChange) {
+    result.push({
+      label: "最大シェア変動",
+      value: `${input.largestShareChange.label} ${formatAllocationPercentPoint(input.largestShareChange.deltaRatio)}`,
+      valueClassName: resolveSignedValueClassName(input.largestShareChange.deltaRatio),
+      valueSize: "primary",
+    });
+  }
+
   result = [
+    ...result,
     {
       label: "期首",
       value: `${input.startDateLabel} ${formatYen(input.startMarketValueMinor)}`,

@@ -9,7 +9,7 @@ import { buildPortfolioPath } from "@/lib/portfolio-path";
 
 type AllocationCrossLinkProps = {
   portfolioCode: string;
-  target: "analysis" | "analysis-trends" | "portfolio-trends" | "holdings";
+  target: "analysis" | "analysis-trends" | "portfolio-trends" | "portfolio-composition" | "holdings";
   schemeCode: string;
   asOfDate?: string | null;
   metric?: "allocation" | "market-value" | "gain" | "gain-rate";
@@ -49,6 +49,12 @@ function buildHref({
     params.set("panel", "trends");
     if (metric) {
       params.set("metric", metric);
+    }
+  } else if (target === "portfolio-composition") {
+    result = buildPortfolioPath(portfolioCode, "portfolio-allocation");
+    params.set("view", "composition");
+    if (asOfDate) {
+      params.set("asOf", asOfDate);
     }
   } else {
     result = buildPortfolioPath(portfolioCode, "portfolio-allocation");

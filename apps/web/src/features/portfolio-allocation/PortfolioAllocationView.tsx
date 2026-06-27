@@ -139,6 +139,7 @@ export function PortfolioAllocationView({
           startMarketValueMinor: trendPeriodSummaryData.startMarketValueMinor,
           endMarketValueMinor: trendPeriodSummaryData.endMarketValueMinor,
           metricDeltas: trendPeriodSummaryData.metricDeltas,
+          largestShareChange: trendPeriodSummaryData.largestShareChange,
         }
       : null,
   );

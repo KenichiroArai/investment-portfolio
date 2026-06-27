@@ -1,5 +1,7 @@
 import type { AllocationSeriesInput } from "./allocation-series";
+import { comparePortfolioInstrumentOrder } from "./portfolio-allocation";
 import type { AggregatedTrendPoint } from "./snapshot-trend-aggregation";
+import { PORTFOLIO_INSTRUMENT_SCHEME_CODE } from "./portfolio-instrument-scheme";
 import { computePeriodRelativeRate } from "./trend-period-summary";
 import {
   compareNullableNumbers,
@@ -18,10 +20,12 @@ export type AllocationPeriodChangeRow = {
   endMarketValueMinor: number;
   deltaMarketValueMinor: number;
   ratioSeries: Array<number | null>;
+  sortOrder?: number | null;
 };
 
 export type AllocationPeriodChangeSortColumn =
   | "label"
+  | "sortOrder"
   | "startRatio"
   | "endRatio"
   | "deltaRatio"
@@ -51,6 +55,63 @@ function resolveSliceValue(
     ratio: slice.ratio,
     marketValueMinor: slice.marketValueMinor,
   };
+  return result;
+}
+
+function resolveSliceSortOrder(
+  point: AggregatedTrendPoint,
+  schemeCode: string,
+  valueCode: string,
+): number | null {
+  let result: number | null = null;
+  const slice = (point.allocationsByScheme[schemeCode] ?? []).find(
+    (item) => item.valueCode === valueCode,
+  );
+  if (slice?.sortOrder !== undefined && slice.sortOrder !== null) {
+    result = slice.sortOrder;
+  }
+  return result;
+}
+
+function sortRatioSeriesByPortfolioInstrumentOrder(
+  series: AllocationSeriesInput[],
+  chartPoints: AggregatedTrendPoint[],
+  schemeCode: string,
+): AllocationSeriesInput[] {
+  let result = [...series];
+  const metaByKey = new Map<
+    string,
+    { sortOrder: number | null; instrumentName: string; instrumentId: string }
+  >();
+
+  for (const point of chartPoints) {
+    for (const slice of point.allocationsByScheme[schemeCode] ?? []) {
+      if (metaByKey.has(slice.valueCode)) {
+        continue;
+      }
+      metaByKey.set(slice.valueCode, {
+        sortOrder: slice.sortOrder ?? null,
+        instrumentName: slice.valueName,
+        instrumentId: slice.valueCode,
+      });
+    }
+  }
+
+  result.sort((left, right) => {
+    const leftMeta = metaByKey.get(left.key) ?? {
+      sortOrder: null,
+      instrumentName: left.label,
+      instrumentId: left.key,
+    };
+    const rightMeta = metaByKey.get(right.key) ?? {
+      sortOrder: null,
+      instrumentName: right.label,
+      instrumentId: right.key,
+    };
+    let cmp = comparePortfolioInstrumentOrder(leftMeta, rightMeta);
+    return cmp;
+  });
+
   return result;
 }
 
@@ -84,6 +145,10 @@ export function buildAllocationRatioSeries(
     };
     return item;
   });
+
+  if (schemeCode === PORTFOLIO_INSTRUMENT_SCHEME_CODE) {
+    result = sortRatioSeriesByPortfolioInstrumentOrder(result, chartPoints, schemeCode);
+  }
 
   return result;
 }
@@ -121,6 +186,9 @@ export function buildAllocationPeriodChangeRows(
 
     const seriesItem = ratioSeries.find((item) => item.key === valueCode);
     const label = seriesItem?.label ?? valueCode;
+    const sortOrder =
+      resolveSliceSortOrder(end, schemeCode, valueCode) ??
+      resolveSliceSortOrder(start, schemeCode, valueCode);
 
     result.push({
       key: valueCode,
@@ -133,7 +201,13 @@ export function buildAllocationPeriodChangeRows(
       endMarketValueMinor: safeEndMarketValue,
       deltaMarketValueMinor: safeEndMarketValue - safeStartMarketValue,
       ratioSeries: seriesItem?.values ?? [],
+      sortOrder,
     });
+  }
+
+  if (schemeCode === PORTFOLIO_INSTRUMENT_SCHEME_CODE) {
+    result = sortAllocationPeriodChangeRows(result, "sortOrder", "asc");
+    return result;
   }
 
   result = sortAllocationPeriodChangeRows(result, "deltaRatio", "desc", true);
@@ -150,6 +224,28 @@ export function sortAllocationPeriodChangeRows(
 
   if (column === "label") {
     result.sort((left, right) => compareStrings(left.label, right.label, direction));
+    return result;
+  }
+
+  if (column === "sortOrder") {
+    result.sort((left, right) => {
+      let cmp = comparePortfolioInstrumentOrder(
+        {
+          sortOrder: left.sortOrder ?? null,
+          instrumentName: left.label,
+          instrumentId: left.key,
+        },
+        {
+          sortOrder: right.sortOrder ?? null,
+          instrumentName: right.label,
+          instrumentId: right.key,
+        },
+      );
+      if (direction === "desc") {
+        cmp = -cmp;
+      }
+      return cmp;
+    });
     return result;
   }
 

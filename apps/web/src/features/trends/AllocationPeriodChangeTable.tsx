@@ -4,6 +4,7 @@ import {
   sortAllocationPeriodChangeRows,
   type AllocationPeriodChangeRow,
   type AllocationPeriodChangeSortColumn,
+  type SortDirection,
 } from "@repo/shared";
 import { useMemo, type ReactNode } from "react";
 
@@ -25,6 +26,10 @@ type AllocationPeriodChangeTableProps = {
   endDateLabel: string;
   onToggleRow: (key: string) => void;
   className?: string;
+  title?: string;
+  entityColumnLabel?: string;
+  defaultSortColumn?: AllocationPeriodChangeSortColumn;
+  defaultSortDirection?: SortDirection;
 };
 
 function formatSignedYen(value: number): string {
@@ -45,9 +50,16 @@ export function AllocationPeriodChangeTable({
   endDateLabel,
   onToggleRow,
   className,
+  title = "期間内の構成変化",
+  entityColumnLabel = "分類",
+  defaultSortColumn = "deltaRatio",
+  defaultSortDirection = "desc",
 }: AllocationPeriodChangeTableProps) {
   const { sortColumn, sortDirection, toggleSort } =
-    useTableSort<AllocationPeriodChangeSortColumn>("deltaRatio", "desc");
+    useTableSort<AllocationPeriodChangeSortColumn>(
+      defaultSortColumn,
+      defaultSortDirection,
+    );
 
   const sortedRows = useMemo(() => {
     let result = sortAllocationPeriodChangeRows(
@@ -75,7 +87,7 @@ export function AllocationPeriodChangeTable({
       }
     >
       <TrendChartHeader
-        title="期間内の構成変化"
+        title={title}
         titleLevel="h2"
         caption={`${startDateLabel} → ${endDateLabel}`}
       />
@@ -84,7 +96,7 @@ export function AllocationPeriodChangeTable({
           <thead>
             <tr>
               <SortableTableHeader
-                label="分類"
+                label={entityColumnLabel}
                 column="label"
                 activeColumn={sortColumn}
                 direction={sortDirection}

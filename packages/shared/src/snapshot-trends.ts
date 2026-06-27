@@ -3,18 +3,26 @@ import {
   computeSnapshotPortfolioGainMinor,
   resolveSnapshotTotalContributions,
 } from "./portfolio-snapshot-metrics";
+import { comparePortfolioInstrumentOrder } from "./portfolio-allocation";
 import {
   buildAllocationBySchemeWithLines,
   sumSnapshotBookValue,
   sumSnapshotMarketValue,
 } from "./snapshot-allocation";
+import {
+  PORTFOLIO_INSTRUMENT_SCHEME_CODE,
+  PORTFOLIO_INSTRUMENT_SCHEME_NAME,
+} from "./portfolio-instrument-scheme";
 import type { CurrentSnapshotDto } from "./types";
+
+export { PORTFOLIO_INSTRUMENT_SCHEME_CODE, PORTFOLIO_INSTRUMENT_SCHEME_NAME } from "./portfolio-instrument-scheme";
 
 export type SnapshotTrendAllocationSlice = {
   valueCode: string;
   valueName: string;
   marketValueMinor: number;
   ratio: number;
+  sortOrder?: number | null;
 };
 
 export type SnapshotTrendPointDto = {
@@ -65,6 +73,30 @@ function buildAllocationSlicesForScheme(
   return result;
 }
 
+export function buildInstrumentAllocationSlices(
+  snapshot: CurrentSnapshotDto,
+): SnapshotTrendAllocationSlice[] {
+  let result: SnapshotTrendAllocationSlice[] = [];
+
+  const totalMarketValueMinor = sumSnapshotMarketValue(snapshot.lines);
+  const sortedLines = [...snapshot.lines].sort(comparePortfolioInstrumentOrder);
+
+  for (const line of sortedLines) {
+    const ratio =
+      totalMarketValueMinor > 0 ? line.marketValueMinor / totalMarketValueMinor : 0;
+    let slice: SnapshotTrendAllocationSlice = {
+      valueCode: line.instrumentId,
+      valueName: line.instrumentName,
+      marketValueMinor: line.marketValueMinor,
+      ratio,
+      sortOrder: line.sortOrder,
+    };
+    result.push(slice);
+  }
+
+  return result;
+}
+
 export function buildSnapshotTrendPoint(
   snapshot: CurrentSnapshotDto,
   options?: BuildSnapshotTrendPointOptions,
@@ -98,6 +130,8 @@ export function buildSnapshotTrendPoint(
       schemeCode,
     );
   }
+  allocationsByScheme[PORTFOLIO_INSTRUMENT_SCHEME_CODE] =
+    buildInstrumentAllocationSlices(snapshot);
 
   result = {
     asOfDate: snapshot.asOfDate,

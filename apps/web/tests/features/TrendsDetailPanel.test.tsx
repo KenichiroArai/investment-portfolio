@@ -293,4 +293,28 @@ describe("TrendsDetailPanel", () => {
     await user.click(gainRateViews.getByRole("tab", { name: "拠出金ベース" }));
     expect(gainRateViews.getByRole("tab", { name: "拠出金ベース", selected: true })).toBeInTheDocument();
   });
+
+  it("renders portfolio instrument allocation trends at the front in portfolio mode", async () => {
+    stubTrendsFetch();
+    renderWithPortfolioTime(
+      <TrendsDetailPanel portfolioCode="ideco" mode="portfolio" />,
+      {
+        initialSearchParams: "from=2026-05-01&to=2026-07-31&unit=1m",
+      },
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "銘柄全体の変化" })).toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: "構成比", selected: true })).toBeInTheDocument();
+      expect(screen.getByRole("columnheader", { name: "銘柄" })).toBeInTheDocument();
+    });
+
+    const rowButtons = screen.getAllByRole("button", { name: /の推移を/ });
+    expect(rowButtons[0]).toHaveAccessibleName(/銘柄A の推移を/);
+    expect(rowButtons[1]).toHaveAccessibleName(/銘柄B の推移を/);
+
+    expect(
+      screen.queryByRole("tablist", { name: "構成比の分析軸" }),
+    ).not.toBeInTheDocument();
+  });
 });

@@ -430,6 +430,7 @@ function averageAllocationsByScheme(
       const ratios: number[] = [];
       const marketValues: number[] = [];
       let valueName = valueCode;
+      let sortOrder: number | null | undefined = undefined;
 
       for (const point of points) {
         const slice = (point.allocationsByScheme[schemeCode] ?? []).find(
@@ -439,6 +440,9 @@ function averageAllocationsByScheme(
           continue;
         }
         valueName = slice.valueName;
+        if (sortOrder === undefined && slice.sortOrder !== undefined) {
+          sortOrder = slice.sortOrder;
+        }
         ratios.push(slice.ratio);
         marketValues.push(slice.marketValueMinor);
       }
@@ -451,6 +455,7 @@ function averageAllocationsByScheme(
         valueName,
         marketValueMinor: avgMarketValue,
         ratio: avgRatio,
+        sortOrder,
       });
     }
 

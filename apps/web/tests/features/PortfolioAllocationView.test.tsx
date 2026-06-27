@@ -7,6 +7,7 @@ import {
   renderWithPortfolioTime,
 } from "../helpers/portfolio-time-test-utils";
 import { portfolioTimeNavigationState } from "../helpers/portfolio-time-navigation-state";
+import { trendsPointsFixture } from "./trends-fixtures";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
@@ -216,5 +217,33 @@ describe("PortfolioAllocationView", () => {
 
     const activeTab = screen.getByRole("tab", { name: "明細" });
     expect(activeTab.className).toContain("data-[state=active]:bg-primary");
+  });
+
+  it("renders instrument composition trends on the trends tab", async () => {
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        snapshot: snapshotFixture,
+        targetPortfolioWeights: [{ instrumentId: "inst-1", targetRatio: 0.5 }],
+        dates: [
+          { asOfDate: "2026-05-31", isCurrent: false },
+          { asOfDate: "2026-06-07", isCurrent: true },
+        ],
+        trendsPoints: trendsPointsFixture,
+      }),
+    );
+
+    renderWithPortfolioTime(
+      <PortfolioAllocationView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/portfolio-allocation",
+        initialSearchParams: "view=trends&from=2026-05-01&to=2026-07-31&unit=1m",
+      },
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "銘柄全体の変化" })).toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: "構成比", selected: true })).toBeInTheDocument();
+    });
   });
 });

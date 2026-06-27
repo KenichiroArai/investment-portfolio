@@ -1,3 +1,40 @@
+import { PORTFOLIO_INSTRUMENT_SCHEME_CODE } from "@repo/shared";
+
+export const portfolioInstrumentTrendSlicesFixture = {
+  may: [
+    {
+      valueCode: "inst-a",
+      valueName: "銘柄A",
+      marketValueMinor: 2_000_000,
+      ratio: 0.6,
+      sortOrder: 1,
+    },
+    {
+      valueCode: "inst-b",
+      valueName: "銘柄B",
+      marketValueMinor: 1_400_000,
+      ratio: 0.4,
+      sortOrder: 2,
+    },
+  ],
+  june: [
+    {
+      valueCode: "inst-a",
+      valueName: "銘柄A",
+      marketValueMinor: 2_100_000,
+      ratio: 0.61,
+      sortOrder: 1,
+    },
+    {
+      valueCode: "inst-b",
+      valueName: "銘柄B",
+      marketValueMinor: 1_341_347,
+      ratio: 0.39,
+      sortOrder: 2,
+    },
+  ],
+};
+
 export const trendsPointsFixture = [
   {
     asOfDate: "2026-05-31",
@@ -30,6 +67,7 @@ export const trendsPointsFixture = [
           ratio: 0.7,
         },
       ],
+      [PORTFOLIO_INSTRUMENT_SCHEME_CODE]: portfolioInstrumentTrendSlicesFixture.may,
     },
   },
   {
@@ -63,6 +101,7 @@ export const trendsPointsFixture = [
           ratio: 0.75,
         },
       ],
+      [PORTFOLIO_INSTRUMENT_SCHEME_CODE]: portfolioInstrumentTrendSlicesFixture.june,
     },
   },
 ];

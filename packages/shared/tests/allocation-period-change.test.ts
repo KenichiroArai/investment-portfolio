@@ -7,6 +7,7 @@ import {
   sortAllocationPeriodChangeRows,
   type AllocationPeriodChangeRow,
 } from "../src/allocation-period-change";
+import { PORTFOLIO_INSTRUMENT_SCHEME_CODE } from "../src/portfolio-instrument-scheme";
 import type { AggregatedTrendPoint } from "../src/snapshot-trend-aggregation";
 
 function makePoint(
@@ -17,6 +18,7 @@ function makePoint(
     valueName: string;
     marketValueMinor: number;
     ratio: number;
+    sortOrder?: number | null;
   }>,
 ): AggregatedTrendPoint {
   let result: AggregatedTrendPoint = {
@@ -318,5 +320,57 @@ describe("allocation-period-change", () => {
     const rows = buildAllocationPeriodChangeRows(start, end, [], schemeCode);
     expect(rows).toHaveLength(2);
     expect(rows.every((row) => row.ratioSeries.length === 0)).toBe(true);
+  });
+
+  it("sorts portfolio instrument rows by sortOrder ascending", () => {
+    const instrumentStart = makePoint("2026-05-31", PORTFOLIO_INSTRUMENT_SCHEME_CODE, [
+      {
+        valueCode: "inst-b",
+        valueName: "銘柄B",
+        marketValueMinor: 1_400_000,
+        ratio: 0.4,
+        sortOrder: 2,
+      },
+      {
+        valueCode: "inst-a",
+        valueName: "銘柄A",
+        marketValueMinor: 2_000_000,
+        ratio: 0.6,
+        sortOrder: 1,
+      },
+    ]);
+    const instrumentEnd = makePoint("2026-06-07", PORTFOLIO_INSTRUMENT_SCHEME_CODE, [
+      {
+        valueCode: "inst-b",
+        valueName: "銘柄B",
+        marketValueMinor: 1_341_347,
+        ratio: 0.39,
+        sortOrder: 2,
+      },
+      {
+        valueCode: "inst-a",
+        valueName: "銘柄A",
+        marketValueMinor: 2_100_000,
+        ratio: 0.61,
+        sortOrder: 1,
+      },
+    ]);
+    const instrumentChartPoints = [instrumentStart, instrumentEnd];
+
+    const rows = buildAllocationPeriodChangeRows(
+      instrumentStart,
+      instrumentEnd,
+      instrumentChartPoints,
+      PORTFOLIO_INSTRUMENT_SCHEME_CODE,
+    );
+
+    expect(rows.map((row) => row.key)).toEqual(["inst-a", "inst-b"]);
+    expect(rows[0]?.sortOrder).toBe(1);
+
+    const series = buildAllocationRatioSeries(
+      instrumentChartPoints,
+      PORTFOLIO_INSTRUMENT_SCHEME_CODE,
+    );
+    expect(series.map((item) => item.key)).toEqual(["inst-a", "inst-b"]);
   });
 });

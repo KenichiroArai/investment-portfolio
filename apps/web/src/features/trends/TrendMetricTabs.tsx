@@ -59,6 +59,7 @@ type TrendMetricTabsAllocation = {
   endAsOfDate: string | null;
   uncoveredMinor: number | null;
   portfolioCode: string;
+  isPortfolioInstrumentMode?: boolean;
 };
 
 type TrendMetricTabsProps = {
@@ -90,7 +91,7 @@ function resolveInitialMetric(
 ): TrendMetricTab {
   let result: TrendMetricTab = "market-value";
 
-  if (metricMode === "allocation") {
+  if (metricMode === "allocation" || metricMode === "portfolio") {
     result = "allocation";
     return result;
   }
@@ -143,10 +144,7 @@ export function TrendMetricTabs({
   hideSchemeTabs = false,
 }: TrendMetricTabsProps) {
   const hasAllocation =
-    metricMode !== "portfolio" &&
-    allocation !== null &&
-    allocation.schemeCodes.length > 0 &&
-    allocation.allocationSeries.length > 0;
+    allocation !== null && allocation.allocationSeries.length > 0;
 
   const defaultMetric = resolveInitialMetric(hasAllocation, metricMode);
   const [activeMetric, setActiveMetricState] = useState<TrendMetricTab>(
@@ -218,6 +216,20 @@ export function TrendMetricTabs({
             startDateLabel={allocation.startDateLabel}
             endDateLabel={allocation.endDateLabel}
             onToggleRow={allocation.onCompositionToggle}
+            title={
+              allocation.isPortfolioInstrumentMode
+                ? "銘柄全体の変化"
+                : "期間内の構成変化"
+            }
+            entityColumnLabel={
+              allocation.isPortfolioInstrumentMode ? "銘柄" : "分類"
+            }
+            defaultSortColumn={
+              allocation.isPortfolioInstrumentMode ? "sortOrder" : "deltaRatio"
+            }
+            defaultSortDirection={
+              allocation.isPortfolioInstrumentMode ? "asc" : "desc"
+            }
           />
         ) : null}
         <div className="grid gap-4 lg:grid-cols-[minmax(0,18rem)_1fr] lg:items-start">
@@ -226,13 +238,23 @@ export function TrendMetricTabs({
             asOfDateLabel={allocation.endDateLabel}
             uncoveredMinor={allocation.uncoveredMinor}
           />
-          <AllocationCrossLink
-            portfolioCode={allocation.portfolioCode}
-            target="analysis"
-            schemeCode={allocation.activeSchemeCode}
-            asOfDate={allocation.endAsOfDate}
-            label="断面の詳細・銘柄内訳は資産配分で見る"
-          />
+          {allocation.isPortfolioInstrumentMode ? (
+            <AllocationCrossLink
+              portfolioCode={allocation.portfolioCode}
+              target="portfolio-composition"
+              schemeCode=""
+              asOfDate={allocation.endAsOfDate}
+              label="期末断面の詳細は構成比タブで見る"
+            />
+          ) : (
+            <AllocationCrossLink
+              portfolioCode={allocation.portfolioCode}
+              target="analysis"
+              schemeCode={allocation.activeSchemeCode}
+              asOfDate={allocation.endAsOfDate}
+              label="断面の詳細・銘柄内訳は資産配分で見る"
+            />
+          )}
         </div>
         <CompositionSelectionToolbar
           selectedCount={allocation.selectedCompositionKeys.length}

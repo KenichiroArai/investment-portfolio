@@ -25,6 +25,7 @@ type PortfolioFetchMockOptions = {
   classificationSchemes?: unknown[];
   targetAllocations?: Record<string, unknown[]>;
   targetPortfolioWeights?: unknown[];
+  trendsPoints?: unknown[];
 };
 
 export function createPortfolioFetchMock(options: PortfolioFetchMockOptions = {}) {
@@ -67,14 +68,17 @@ export function createPortfolioFetchMock(options: PortfolioFetchMockOptions = {}
     }
 
     if (url.includes("trends")) {
+      const trendPoints = options.trendsPoints ?? [];
+      const from = dates[0]?.asOfDate ?? "";
+      const to = dates[dates.length - 1]?.asOfDate ?? "";
       return {
         ok: true,
         status: 200,
         json: async () => ({
           portfolioCode: "ideco",
-          from: dates[0]?.asOfDate ?? "",
-          to: dates[dates.length - 1]?.asOfDate ?? "",
-          points: [],
+          from,
+          to,
+          points: trendPoints,
         }),
       };
     }

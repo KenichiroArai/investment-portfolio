@@ -5,6 +5,7 @@ import {
   buildTrendPeriodMetricDeltas,
   findLargestAllocationShareChange,
   formatTrendSparseDataNote,
+  PORTFOLIO_INSTRUMENT_SCHEME_CODE,
 } from "@repo/shared";
 import { useMemo } from "react";
 
@@ -83,28 +84,28 @@ export function useTrendPeriodSummaryData({
 
     const periodEndpoints = resolvePeriodEndpoints(displayTrendPoints, baselinePoint);
 
+    const activeSchemeCodeForSummary =
+      mode === "portfolio" ? PORTFOLIO_INSTRUMENT_SCHEME_CODE : schemeCode;
+
     const periodChangeRows =
-      mode !== "portfolio" && periodEndpoints && schemeCode !== ""
+      periodEndpoints && activeSchemeCodeForSummary !== ""
         ? buildAllocationPeriodChangeRows(
             periodEndpoints.start,
             periodEndpoints.end,
             chartPoints,
-            schemeCode,
+            activeSchemeCodeForSummary,
           )
         : [];
 
-    const largestShareChange =
-      mode === "portfolio"
-        ? null
-        : findLargestAllocationShareChange(
-            periodChangeRows.map((row) => ({
-              key: row.key,
-              label: row.label,
-              startRatio: row.startRatio,
-              endRatio: row.endRatio,
-              deltaRatio: row.deltaRatio,
-            })),
-          );
+    const largestShareChange = findLargestAllocationShareChange(
+      periodChangeRows.map((row) => ({
+        key: row.key,
+        label: row.label,
+        startRatio: row.startRatio,
+        endRatio: row.endRatio,
+        deltaRatio: row.deltaRatio,
+      })),
+    );
 
     const startMarketValue =
       periodEndpoints?.start.totalMarketValueMinor ??
