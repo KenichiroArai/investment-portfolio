@@ -40,6 +40,17 @@ export function formatAllocationPercent(ratio: number): string {
   return result;
 }
 
+export function formatAllocationDivergenceRatio(ratio: number): string {
+  let result = "—";
+
+  if (!Number.isFinite(ratio)) {
+    return result;
+  }
+
+  result = `${(ratio * 100).toFixed(1)}%`;
+  return result;
+}
+
 export function formatPercentAxis(ratio: number): string {
   let result = "0%";
 

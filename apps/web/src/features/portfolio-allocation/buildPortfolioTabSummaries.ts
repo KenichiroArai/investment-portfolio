@@ -1,7 +1,7 @@
 import {
   computeSnapshotGainRate,
   computeSnapshotPortfolioGainMinor,
-  findLargestAllocationGap,
+  findLargestAllocationDivergence,
   resolveSnapshotTotalContributions,
   sumSnapshotMarketValue,
   type CurrentSnapshotDto,
@@ -11,7 +11,7 @@ import {
 
 import type { TabSummarySegment } from "@/features/portfolio-allocation/TabSummaryBar";
 import {
-  formatAllocationPercentPoint,
+  formatAllocationDivergenceRatio,
   formatPercent,
   formatYen,
 } from "@/lib/format-yen";
@@ -105,17 +105,22 @@ export function buildCompositionTabSummarySegments(
 ): TabSummarySegment[] {
   let result: TabSummarySegment[] = [];
 
-  const largestGap = findLargestAllocationGap(allocationRows);
+  const largestDivergence = findLargestAllocationDivergence(allocationRows);
 
-  if (largestGap === null) {
+  if (largestDivergence === null) {
     return result;
   }
 
   result = [
     {
-      label: "最大乖離",
-      value: `${largestGap.instrumentName} ${formatAllocationPercentPoint(largestGap.gapRatio)}`,
-      valueClassName: resolveSignedValueClassName(largestGap.gapRatio),
+      label: "最大乖離銘柄",
+      value: largestDivergence.instrumentName,
+      valueSize: "default",
+    },
+    {
+      label: "乖離率",
+      value: formatAllocationDivergenceRatio(largestDivergence.gapDivergenceRatio),
+      valueClassName: resolveSignedValueClassName(largestDivergence.gapRatio),
       valueSize: "primary",
     },
   ];

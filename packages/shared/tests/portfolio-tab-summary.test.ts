@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { buildPortfolioAllocationRows } from "../src/portfolio-allocation";
 import {
+  findLargestAllocationDivergence,
   findLargestAllocationGap,
   pickTopAllocationHoldings,
   sumTargetPortfolioRatio,
@@ -94,6 +95,31 @@ describe("findLargestAllocationGap", () => {
   it("returns null when no targets are set", () => {
     const rows = buildPortfolioAllocationRows(lines, [], 1_000_000);
     let result = findLargestAllocationGap(rows);
+    expect(result).toBeNull();
+  });
+});
+
+describe("findLargestAllocationDivergence", () => {
+  it("returns the row with the largest divergence ratio", () => {
+    const rows = buildPortfolioAllocationRows(
+      lines,
+      [
+        { instrumentId: "inst-a", targetRatio: 0.5 },
+        { instrumentId: "inst-b", targetRatio: 0.05 },
+        { instrumentId: "inst-c", targetRatio: 0.25 },
+      ],
+      1_000_000,
+    );
+    let result = findLargestAllocationDivergence(rows);
+
+    expect(result?.instrumentId).toBe("inst-b");
+    expect(result?.gapDivergenceRatio).toBeCloseTo(5);
+    expect(result?.gapRatio).toBeCloseTo(0.25);
+  });
+
+  it("returns null when no targets are set", () => {
+    const rows = buildPortfolioAllocationRows(lines, [], 1_000_000);
+    let result = findLargestAllocationDivergence(rows);
     expect(result).toBeNull();
   });
 });

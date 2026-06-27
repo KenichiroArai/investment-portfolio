@@ -1,10 +1,12 @@
 "use client";
 
-import type { AllocationSliceWithLines, PortfolioAllocationRow } from "@repo/shared";
+import type { AllocationSliceWithLines, PortfolioAllocationRow, PortfolioAllocationSortColumn } from "@repo/shared";
+import { sortPortfolioAllocationRows } from "@repo/shared";
 import { useMemo, useState } from "react";
 
 import { AllocationChart } from "@/features/analysis/AllocationChart";
 import { PortfolioAllocationTable } from "@/features/portfolio-allocation/PortfolioAllocationTable";
+import { useTableSort } from "@/hooks/useTableSort";
 import { formatAllocationPercent, formatYen } from "@/lib/format-yen";
 
 type PortfolioAllocationTooltipState = {
@@ -38,10 +40,20 @@ export function PortfolioAllocationPanel({ rows }: PortfolioAllocationPanelProps
     null,
   );
   const [tooltip, setTooltip] = useState<PortfolioAllocationTooltipState | null>(null);
-  const chartSlices = useMemo(() => {
-    let result = toChartSlices(rows);
+  const { sortColumn, sortDirection, toggleSort } = useTableSort<PortfolioAllocationSortColumn>(
+    "sortOrder",
+    "asc",
+  );
+
+  const sortedRows = useMemo(() => {
+    let result = sortPortfolioAllocationRows(rows, sortColumn, sortDirection);
     return result;
-  }, [rows]);
+  }, [rows, sortColumn, sortDirection]);
+
+  const chartSlices = useMemo(() => {
+    let result = toChartSlices(sortedRows);
+    return result;
+  }, [sortedRows]);
 
   function handleSliceHover(
     instrumentId: string,
@@ -49,7 +61,7 @@ export function PortfolioAllocationPanel({ rows }: PortfolioAllocationPanelProps
     clientY: number,
   ): void {
     let result: void = undefined;
-    const row = rows.find((item) => item.instrumentId === instrumentId);
+    const row = sortedRows.find((item) => item.instrumentId === instrumentId);
 
     if (!row) {
       return result;
@@ -99,7 +111,10 @@ export function PortfolioAllocationPanel({ rows }: PortfolioAllocationPanelProps
         ) : null}
       </div>
       <PortfolioAllocationTable
-        rows={rows}
+        rows={sortedRows}
+        sortColumn={sortColumn}
+        sortDirection={sortDirection}
+        onSort={toggleSort}
         highlightedInstrumentId={highlightedInstrumentId}
         onRowHover={(instrumentId) => {
           setHighlightedInstrumentId(instrumentId);

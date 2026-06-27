@@ -1,7 +1,7 @@
 "use client";
 
 import type { HoldingLineDto } from "@repo/shared";
-import { sumSnapshotMarketValue } from "@repo/shared";
+import { sortHoldingLinesByPortfolioInstrumentOrder, sumSnapshotMarketValue } from "@repo/shared";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -36,14 +36,7 @@ export function TargetPortfolioSettingsCard({
   const [saving, setSaving] = useState(false);
 
   const sortedLines = useMemo(() => {
-    let result = [...lines].sort((left, right) => {
-      const leftOrder = left.sortOrder ?? Number.MAX_SAFE_INTEGER;
-      const rightOrder = right.sortOrder ?? Number.MAX_SAFE_INTEGER;
-      if (leftOrder !== rightOrder) {
-        return leftOrder - rightOrder;
-      }
-      return left.instrumentName.localeCompare(right.instrumentName, "ja");
-    });
+    let result = sortHoldingLinesByPortfolioInstrumentOrder(lines);
     return result;
   }, [lines]);
 

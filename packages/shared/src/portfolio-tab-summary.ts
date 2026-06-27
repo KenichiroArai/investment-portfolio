@@ -12,6 +12,13 @@ export type LargestAllocationGap = {
   gapRatio: number;
 };
 
+export type LargestAllocationDivergence = {
+  instrumentId: string;
+  instrumentName: string;
+  gapDivergenceRatio: number;
+  gapRatio: number;
+};
+
 export function pickTopAllocationHoldings(
   rows: PortfolioAllocationRow[],
   limit: number,
@@ -56,6 +63,37 @@ export function findLargestAllocationGap(
     result = {
       instrumentId: row.instrumentId,
       instrumentName: row.instrumentName,
+      gapRatio: row.gapRatio,
+    };
+  }
+
+  return result;
+}
+
+export function findLargestAllocationDivergence(
+  rows: PortfolioAllocationRow[],
+): LargestAllocationDivergence | null {
+  let result: LargestAllocationDivergence | null = null;
+  let largestDivergence = -1;
+
+  for (const row of rows) {
+    if (row.gapDivergenceRatio === null || !Number.isFinite(row.gapDivergenceRatio)) {
+      continue;
+    }
+
+    if (row.gapRatio === null || !Number.isFinite(row.gapRatio)) {
+      continue;
+    }
+
+    if (row.gapDivergenceRatio <= largestDivergence) {
+      continue;
+    }
+
+    largestDivergence = row.gapDivergenceRatio;
+    result = {
+      instrumentId: row.instrumentId,
+      instrumentName: row.instrumentName,
+      gapDivergenceRatio: row.gapDivergenceRatio,
       gapRatio: row.gapRatio,
     };
   }
