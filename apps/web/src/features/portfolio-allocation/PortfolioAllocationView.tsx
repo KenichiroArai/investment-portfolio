@@ -15,20 +15,26 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { RebalanceSettingsCard } from "@/features/allocation/RebalanceSettingsCard";
 import { RebalanceTradesSummary } from "@/features/allocation/RebalanceTradesSummary";
 import { useRebalanceDeposit } from "@/features/allocation/useRebalanceDeposit";
+import {
+  buildCompositionTabSummarySegments,
+  buildHoldingsTabSummarySegments,
+  buildRebalanceTabSummarySegments,
+  buildTrendsTabSummaryNote,
+  buildTrendsTabSummarySegments,
+} from "@/features/portfolio-allocation/buildPortfolioTabSummaries";
 import { PortfolioAllocationPanel } from "@/features/portfolio-allocation/PortfolioAllocationPanel";
 import { PortfolioAllocationViewControls } from "@/features/portfolio-allocation/PortfolioAllocationViewControls";
+import { TabSummaryBar } from "@/features/portfolio-allocation/TabSummaryBar";
 import { TargetPortfolioSettingsCard } from "@/features/portfolio-allocation/TargetPortfolioSettingsCard";
 import { usePortfolioRebalanceResult } from "@/features/portfolio-allocation/usePortfolioRebalanceResult";
 import { useTargetPortfolioWeights } from "@/features/portfolio-allocation/useTargetPortfolioWeights";
 import { HoldingsDetailPanel } from "@/features/portfolio/HoldingsDetailPanel";
-import { PortfolioOverviewSummary } from "@/features/portfolio/PortfolioOverviewSummary";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
 import {
   usePortfolioSubviewParam,
   type PortfolioAllocationMainView,
 } from "@/features/portfolio/usePortfolioSubviewParam";
 import { TrendsDetailPanel } from "@/features/trends/TrendsDetailPanel";
-import { TrendPeriodSummary } from "@/features/trends/TrendPeriodSummary";
 import { useTrendPeriodSummaryData } from "@/features/trends/useTrendPeriodSummaryData";
 import { formatYen } from "@/lib/format-yen";
 
@@ -123,6 +129,38 @@ export function PortfolioAllocationView({
       ? `最新比 評価額 ${formatYen(latestPoint.totalMarketValueMinor - assetBalance)}`
       : null;
 
+  const holdingsSummarySegments = buildHoldingsTabSummarySegments(snapshot);
+  const compositionSummarySegments = buildCompositionTabSummarySegments(
+    allocationRows,
+    weights,
+    assetBalance,
+  );
+  const trendsSummarySegments = buildTrendsTabSummarySegments(
+    trendPeriodSummaryData
+      ? {
+          startDateLabel: trendPeriodSummaryData.startDateLabel,
+          endDateLabel: trendPeriodSummaryData.endDateLabel,
+          startMarketValueMinor: trendPeriodSummaryData.startMarketValueMinor,
+          endMarketValueMinor: trendPeriodSummaryData.endMarketValueMinor,
+          metricDeltas: trendPeriodSummaryData.metricDeltas,
+        }
+      : null,
+  );
+  const trendsSummaryNote = buildTrendsTabSummaryNote(
+    trendPeriodSummaryData?.sparseDataNote,
+    trendPeriodSummaryData?.singleBucketNote,
+    trendPeriodSummaryData?.baselineSummary,
+  );
+  const rebalanceSummarySegments = buildRebalanceTabSummarySegments(
+    targetCount,
+    allocationRows.length,
+    {
+      totalBuyMinor: rebalanceResult.totalBuyMinor,
+      totalSellMinor: rebalanceResult.totalSellMinor,
+      unallocatedDepositMinor: rebalanceResult.unallocatedDepositMinor,
+    },
+  );
+
   const compositionTabContent = (
     <Card>
       <CardHeader>
@@ -162,36 +200,15 @@ export function PortfolioAllocationView({
   );
 
   const renderTrendsOverview = (): ReactNode => {
-    let overview: ReactNode = null;
-
-    if (!trendPeriodSummaryData) {
-      return overview;
-    }
-
-    overview = (
-      <TrendPeriodSummary
-        startDateLabel={trendPeriodSummaryData.startDateLabel}
-        endDateLabel={trendPeriodSummaryData.endDateLabel}
-        startMarketValueMinor={trendPeriodSummaryData.startMarketValueMinor}
-        endMarketValueMinor={trendPeriodSummaryData.endMarketValueMinor}
-        metricDeltas={trendPeriodSummaryData.metricDeltas}
-        largestShareChange={null}
-        sparseDataNote={trendPeriodSummaryData.sparseDataNote}
-        singleBucketNote={trendPeriodSummaryData.singleBucketNote}
-        baselineSummary={trendPeriodSummaryData.baselineSummary}
-      />
+    let overview: ReactNode = (
+      <TabSummaryBar segments={trendsSummarySegments} note={trendsSummaryNote} />
     );
     return overview;
   };
 
   const renderAllocationOverview = (): ReactNode => {
     let overview = (
-      <div className="space-y-1">
-        <p className="text-sm font-medium">評価額合計: {formatYen(assetBalance)}</p>
-        <p className="text-sm text-muted-foreground">
-          目標設定済み: {targetCount} / {allocationRows.length} 銘柄
-        </p>
-      </div>
+      <TabSummaryBar segments={compositionSummarySegments} note={deltaHint} />
     );
     return overview;
   };
@@ -207,7 +224,7 @@ export function PortfolioAllocationView({
         <PortfolioAllocationViewControls />
         <TabsContent value="holdings" className="mt-4">
           <div className="space-y-4">
-            <PortfolioOverviewSummary snapshot={snapshot} deltaHint={deltaHint} />
+            <TabSummaryBar segments={holdingsSummarySegments} note={deltaHint} />
             <HoldingsDetailPanel
               portfolioCode={portfolioCode}
               holdingsMode={holdingsMode}
@@ -232,7 +249,10 @@ export function PortfolioAllocationView({
           </div>
         </TabsContent>
         <TabsContent value="rebalance" className="mt-4">
-          <div className="space-y-4">{rebalanceTabContent}</div>
+          <div className="space-y-4">
+            <TabSummaryBar segments={rebalanceSummarySegments} />
+            {rebalanceTabContent}
+          </div>
         </TabsContent>
       </Tabs>
     </PageContainer>

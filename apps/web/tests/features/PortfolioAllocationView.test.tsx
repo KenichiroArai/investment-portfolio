@@ -74,7 +74,8 @@ describe("PortfolioAllocationView", () => {
       expect(screen.getByText("銘柄別構成比")).toBeInTheDocument();
     });
 
-    expect(screen.getByText(/評価額合計/)).toBeInTheDocument();
+    expect(screen.getByText("1 / 1 銘柄")).toBeInTheDocument();
+    expect(screen.getByText(/テスト銘柄 100\.00%/)).toBeInTheDocument();
     expect(screen.queryByText("銘柄目標配分")).not.toBeInTheDocument();
     expect(screen.queryByText("リバランス設定")).not.toBeInTheDocument();
     expect(screen.queryByText("売買提案")).not.toBeInTheDocument();
@@ -130,10 +131,11 @@ describe("PortfolioAllocationView", () => {
       expect(screen.getByText("銘柄目標配分")).toBeInTheDocument();
     });
 
+    expect(screen.getByText("1 / 1 銘柄")).toBeInTheDocument();
     expect(screen.getByRole("columnheader", { name: "現状（%）" })).toBeInTheDocument();
     expect(screen.getByText("リバランス設定")).toBeInTheDocument();
     expect(screen.getByText("売買提案")).toBeInTheDocument();
-    expect(screen.getByText(/合計買い/)).toBeInTheDocument();
+    expect(screen.getAllByText(/合計買い/).length).toBeGreaterThanOrEqual(1);
     expect(screen.queryByText("銘柄別構成比")).not.toBeInTheDocument();
   });
 
@@ -160,7 +162,7 @@ describe("PortfolioAllocationView", () => {
 
     expect(screen.queryByText("銘柄目標配分")).not.toBeInTheDocument();
     expect(screen.getByText("売買提案")).toBeInTheDocument();
-    expect(screen.getByText(/合計買い/)).toBeInTheDocument();
+    expect(screen.getAllByText(/合計買い/).length).toBeGreaterThanOrEqual(1);
   });
 
   it("shows empty message when snapshot is missing", async () => {
