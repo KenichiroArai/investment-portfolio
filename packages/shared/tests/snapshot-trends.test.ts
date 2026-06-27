@@ -135,6 +135,42 @@ describe("snapshot-trends", () => {
     expect(instrumentSlices.reduce((sum, slice) => sum + slice.ratio, 0)).toBeCloseTo(1);
   });
 
+  it("includes instrument allocation on every buildSnapshotTrends point", () => {
+    const first = createSnapshot("2026-06-02", 100_000, 90_000);
+    first.lines = [
+      {
+        ...first.lines[0],
+        id: "line-a",
+        instrumentId: "inst-a",
+        instrumentName: "銘柄A",
+        sortOrder: 1,
+        marketValueMinor: 60_000,
+      },
+      {
+        ...first.lines[0],
+        id: "line-b",
+        instrumentId: "inst-b",
+        instrumentName: "銘柄B",
+        sortOrder: 2,
+        marketValueMinor: 40_000,
+      },
+    ];
+
+    const second = createSnapshot("2026-06-07", 110_000, 90_000);
+    second.lines = [...first.lines];
+    second.lines[0] = { ...second.lines[0], marketValueMinor: 66_000 };
+    second.lines[1] = { ...second.lines[1], marketValueMinor: 44_000 };
+
+    const trends = buildSnapshotTrends("ideco", [first, second], "2026-06-02", "2026-06-07");
+
+    expect(trends.points).toHaveLength(2);
+    for (const point of trends.points) {
+      const instrumentSlices = point.allocationsByScheme[PORTFOLIO_INSTRUMENT_SCHEME_CODE];
+      expect(instrumentSlices.length).toBeGreaterThan(0);
+      expect(instrumentSlices.reduce((sum, slice) => sum + slice.ratio, 0)).toBeCloseTo(1);
+    }
+  });
+
   it("handles instrument additions and removals across trend points", () => {
     const first = createSnapshot("2026-06-02", 100_000, 90_000);
     first.lines = [
