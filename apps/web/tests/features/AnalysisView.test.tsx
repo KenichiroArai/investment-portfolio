@@ -82,7 +82,7 @@ describe("AnalysisView", () => {
     delete process.env.NEXT_PUBLIC_DATA_SOURCE;
   });
 
-  it("renders three main tabs", async () => {
+  it("renders four main tabs", async () => {
     vi.stubGlobal(
       "fetch",
       createPortfolioFetchMock({
@@ -98,15 +98,17 @@ describe("AnalysisView", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByRole("tab", { name: "構成比" })).toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: "明細" })).toBeInTheDocument();
     });
 
+    expect(screen.getByRole("tab", { name: "構成比" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "推移" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "リバランス" })).toBeInTheDocument();
 
     const mainTablist = screen.getByRole("tablist", { name: "資産配分の表示" });
     const mainTabs = within(mainTablist).getAllByRole("tab");
     expect(mainTabs.map((tab) => tab.textContent)).toEqual([
+      "明細",
       "構成比",
       "推移",
       "リバランス",
@@ -178,13 +180,95 @@ describe("AnalysisView", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByRole("tab", { name: "構成比" })).toHaveAttribute(
+      expect(screen.getByRole("tab", { name: "明細" })).toHaveAttribute(
         "data-state",
         "active",
       );
     });
 
-    expect(screen.getByRole("tab", { name: "構成比" }).className).toContain("data-[state=active]:bg-primary");
+    expect(screen.getByRole("tab", { name: "明細" }).className).toContain("data-[state=active]:bg-primary");
+  });
+
+  it("activates holdings tab when view=holdings", async () => {
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        snapshot: snapshotFixture,
+      }),
+    );
+
+    renderWithPortfolioTime(
+      <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/analysis",
+        initialSearchParams: "view=holdings",
+      },
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("tab", { name: "明細" })).toHaveAttribute(
+        "data-state",
+        "active",
+      );
+    });
+  });
+
+  it("renders holdings detail rows for active scheme", async () => {
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        snapshot: snapshotFixture,
+      }),
+    );
+
+    renderWithPortfolioTime(
+      <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/analysis",
+        initialSearchParams: "view=holdings",
+      },
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("テスト銘柄")).toBeInTheDocument();
+    });
+
+    expect(screen.getByRole("columnheader", { name: "基準日" })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "地域分類" })).toBeInTheDocument();
+    expect(screen.getByText("国内")).toBeInTheDocument();
+    expect(screen.getByText(/分析軸: 地域分類/)).toBeInTheDocument();
+  });
+
+  it("updates holdings detail classification column when scheme changes", async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal(
+      "fetch",
+      createPortfolioFetchMock({
+        snapshot: snapshotFixture,
+      }),
+    );
+
+    renderWithPortfolioTime(
+      <AnalysisView portfolioCode="ideco" portfolioKind="ideco" />,
+      {
+        pathname: "/portfolios/ideco/analysis",
+        initialSearchParams: "view=holdings",
+      },
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("columnheader", { name: "地域分類" })).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole("tab", { name: "資産分類" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("columnheader", { name: "資産分類" })).toBeInTheDocument();
+    });
+
+    expect(screen.queryByRole("columnheader", { name: "地域分類" })).not.toBeInTheDocument();
+    expect(screen.getByText("株式")).toBeInTheDocument();
+    expect(screen.getByText(/分析軸: 資産分類/)).toBeInTheDocument();
   });
 
   it("updates snapshot content immediately when scheme changes", async () => {

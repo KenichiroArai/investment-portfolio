@@ -16,6 +16,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { AnalysisTabPanel } from "@/features/analysis/AnalysisTabPanel";
 import { AnalysisViewControls } from "@/features/analysis/AnalysisViewControls";
 import { AnalysisPanelSummary } from "@/features/analysis/AnalysisPanelSummary";
+import { AllocationDetailPanel } from "@/features/allocation/AllocationDetailPanel";
 import { AllocationPeriodShareSummary } from "@/features/allocation/AllocationPeriodShareSummary";
 import { AllocationSnapshotPanel } from "@/features/allocation/AllocationSnapshotPanel";
 import { buildAllocationRebalanceDisplayRows } from "@/features/allocation/build-allocation-rebalance-display-rows";
@@ -41,7 +42,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { fetchClassificationSchemes } from "@/lib/api-client";
 import { isWritableDataSource } from "@/lib/data-source";
-import { formatYen } from "@/lib/format-yen";
+import { formatAsOfDateJa, formatYen } from "@/lib/format-yen";
 
 type AnalysisViewProps = {
   portfolioCode: string;
@@ -119,6 +120,7 @@ export function AnalysisView({
     error,
     selectedAsOfDate,
     isHistoricalView,
+    periodBounds,
     displayTrendPoints,
     baselinePoint,
     trendDisplayUnit,
@@ -234,6 +236,32 @@ export function AnalysisView({
   const activeScheme =
     schemeConfigs.find((scheme) => scheme.schemeCode === activeSchemeCode) ??
     schemeConfigs[0];
+
+  const renderHoldingsOverview = (scheme: AnalysisSchemeConfig): ReactNode => {
+    const periodLabel =
+      periodBounds !== null
+        ? `${formatAsOfDateJa(periodBounds.from)} 〜 ${formatAsOfDateJa(periodBounds.to)}`
+        : formatAsOfDateJa(asOfDate);
+
+    let overview = (
+      <div className="space-y-1">
+        <p className="text-sm font-medium">分析軸: {scheme.schemeName}</p>
+        <p className="text-sm text-muted-foreground">期間: {periodLabel}</p>
+      </div>
+    );
+    return overview;
+  };
+
+  const renderHoldingsContent = (scheme: AnalysisSchemeConfig): ReactNode => {
+    let content = (
+      <AllocationDetailPanel
+        portfolioCode={portfolioCode}
+        schemeCode={scheme.schemeCode}
+        schemeName={scheme.schemeName}
+      />
+    );
+    return content;
+  };
 
   const renderAllocationOverview = (scheme: AnalysisSchemeConfig): ReactNode => {
     const classificationScheme =
@@ -386,6 +414,13 @@ export function AnalysisView({
           activeSchemeCode={activeSchemeCode}
           onSchemeChange={setActiveSchemeCode}
         />
+        <TabsContent value="holdings" className="mt-4">
+          <AnalysisTabPanel
+            activeScheme={activeScheme}
+            renderOverview={renderHoldingsOverview}
+            renderContent={renderHoldingsContent}
+          />
+        </TabsContent>
         <TabsContent value="trends" className="mt-4">
           <AnalysisTabPanel
             activeScheme={activeScheme}

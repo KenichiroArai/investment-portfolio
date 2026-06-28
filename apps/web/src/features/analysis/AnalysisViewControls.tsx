@@ -45,8 +45,11 @@ export function AnalysisViewControls({
         </h2>
         <TabsList
           aria-label="資産配分の表示"
-          className={prominentTabsListClassName}
+          className={cn(prominentTabsListClassName, "grid-cols-4")}
         >
+          <TabsTrigger value="holdings" className={prominentTabsTriggerClassName}>
+            明細
+          </TabsTrigger>
           <TabsTrigger value="snapshot" className={prominentTabsTriggerClassName}>
             構成比
           </TabsTrigger>

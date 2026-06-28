@@ -8,7 +8,7 @@ export type PortfolioAllocationMainView =
   | "composition"
   | "trends"
   | "rebalance";
-export type AnalysisMainView = "trends" | "allocation" | "snapshot";
+export type AnalysisMainView = "holdings" | "trends" | "allocation" | "snapshot";
 export type HoldingsMode = "range" | "compare";
 
 type PortfolioAllocationSubview = {
@@ -37,7 +37,12 @@ const PORTFOLIO_MAIN_VIEWS: PortfolioAllocationMainView[] = [
   "trends",
   "rebalance",
 ];
-const ANALYSIS_MAIN_VIEWS: AnalysisMainView[] = ["trends", "allocation", "snapshot"];
+const ANALYSIS_MAIN_VIEWS: AnalysisMainView[] = [
+  "holdings",
+  "trends",
+  "allocation",
+  "snapshot",
+];
 
 function readPortfolioMainView(
   viewParam: string | null,
@@ -103,7 +108,17 @@ function readHoldingsMode(
 }
 
 function readAnalysisMainView(viewParam: string | null): AnalysisMainView {
-  let result: AnalysisMainView = "snapshot";
+  let result: AnalysisMainView = "holdings";
+
+  if (viewParam === "snapshot") {
+    result = "snapshot";
+    return result;
+  }
+
+  if (viewParam === "holdings") {
+    result = "holdings";
+    return result;
+  }
 
   if (viewParam === "trends") {
     result = "trends";
@@ -151,7 +166,7 @@ export function usePortfolioSubviewParam(
 
   if (options.page === "analysis") {
     const mainView = useMemo(() => {
-      let result: AnalysisMainView = "snapshot";
+      let result: AnalysisMainView = "holdings";
 
       if (localMainView !== null && ANALYSIS_MAIN_VIEWS.includes(localMainView as AnalysisMainView)) {
         result = localMainView as AnalysisMainView;
@@ -167,7 +182,7 @@ export function usePortfolioSubviewParam(
         let result: void = undefined;
         setLocalMainView(view);
         replaceParams((params) => {
-          if (view === "snapshot") {
+          if (view === "holdings") {
             params.delete("view");
             return;
           }
@@ -273,7 +288,8 @@ export function isDetailsOrTrendsSubview(searchParams: URLSearchParams): boolean
   if (
     view === "composition" ||
     view === "rebalance" ||
-    view === "allocation"
+    view === "allocation" ||
+    view === "snapshot"
   ) {
     return result;
   }
@@ -306,7 +322,8 @@ export function isTrendsSubview(searchParams: URLSearchParams): boolean {
   if (
     view === "composition" ||
     view === "rebalance" ||
-    view === "allocation"
+    view === "allocation" ||
+    view === "snapshot"
   ) {
     return result;
   }

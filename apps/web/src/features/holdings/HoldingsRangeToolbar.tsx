@@ -38,6 +38,8 @@ type HoldingsRangeToolbarProps = {
   rangeLabel: string;
   portfolioCode?: string;
   analysisHref?: string;
+  hideSchemeSelector?: boolean;
+  hideAnalysisLink?: boolean;
 };
 
 export function HoldingsRangeToolbar({
@@ -59,6 +61,8 @@ export function HoldingsRangeToolbar({
   totalPages,
   rangeLabel,
   analysisHref,
+  hideSchemeSelector = false,
+  hideAnalysisLink = false,
 }: HoldingsRangeToolbarProps) {
   const sortedDates = [...availableDates].sort((left, right) =>
     right.localeCompare(left),
@@ -95,24 +99,26 @@ export function HoldingsRangeToolbar({
         </Select>
         {classificationSchemes.length > 0 ? (
           <>
-            <Select
-              value={classificationSchemeCode}
-              onValueChange={onClassificationSchemeChange}
-            >
-              <SelectTrigger className="w-[9rem]" aria-label="分類で絞り込み">
-                <SelectValue placeholder="分類" />
-              </SelectTrigger>
-              <SelectContent>
-                {classificationSchemes.map((scheme) => {
-                  let item = (
-                    <SelectItem key={scheme.schemeCode} value={scheme.schemeCode}>
-                      {scheme.schemeName}
-                    </SelectItem>
-                  );
-                  return item;
-                })}
-              </SelectContent>
-            </Select>
+            {!hideSchemeSelector ? (
+              <Select
+                value={classificationSchemeCode}
+                onValueChange={onClassificationSchemeChange}
+              >
+                <SelectTrigger className="w-[9rem]" aria-label="分類で絞り込み">
+                  <SelectValue placeholder="分類" />
+                </SelectTrigger>
+                <SelectContent>
+                  {classificationSchemes.map((scheme) => {
+                    let item = (
+                      <SelectItem key={scheme.schemeCode} value={scheme.schemeCode}>
+                        {scheme.schemeName}
+                      </SelectItem>
+                    );
+                    return item;
+                  })}
+                </SelectContent>
+              </Select>
+            ) : null}
             <Select
               value={classificationValue}
               onValueChange={onClassificationValueChange}
@@ -134,7 +140,7 @@ export function HoldingsRangeToolbar({
             </Select>
           </>
         ) : null}
-        {analysisHref ? (
+        {!hideAnalysisLink && analysisHref ? (
           <Button variant="outline" size="sm" asChild>
             <Link href={analysisHref}>資産配分で見る</Link>
           </Button>
