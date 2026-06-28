@@ -302,7 +302,7 @@ export function HomeView() {
                           href={`${buildPortfolioPath(card.code, "portfolio-allocation")}`}
                         >
                           <List className="h-3.5 w-3.5" />
-                          明細
+                          ポートフォリオ配分
                         </Link>
                       </Button>
                       <Button variant="outline" size="sm" asChild>

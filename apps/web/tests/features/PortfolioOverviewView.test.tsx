@@ -57,8 +57,14 @@ describe("PortfolioOverviewView", () => {
     expect(screen.getByText("資産残高")).toBeInTheDocument();
     expect(screen.getByText("拠出金累計")).toBeInTheDocument();
     expect(screen.getByText("損益")).toBeInTheDocument();
-    expect(screen.getByText("明細・推移を見る")).toBeInTheDocument();
-    expect(screen.getByText("資産配分を見る")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "ポートフォリオ配分" })).toHaveAttribute(
+      "href",
+      "/portfolios/ideco/portfolio-allocation",
+    );
+    expect(screen.getByRole("link", { name: "資産配分" })).toHaveAttribute(
+      "href",
+      "/portfolios/ideco/analysis",
+    );
   });
 
   it("shows error when fetch fails", async () => {

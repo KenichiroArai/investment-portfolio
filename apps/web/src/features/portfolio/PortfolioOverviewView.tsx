@@ -98,15 +98,15 @@ export function PortfolioOverviewView({
       <PortfolioOverviewSummary snapshot={snapshot} deltaHint={deltaHint} className="mb-6" />
       <div className="flex flex-wrap gap-2">
         <Button variant="outline" size="sm" asChild>
-          <Link href={`${buildPortfolioPath(portfolioCode, "portfolio-allocation")}?panel=trends`}>
+          <Link href={buildPortfolioPath(portfolioCode, "portfolio-allocation")}>
             <PieChart className="h-4 w-4" />
-            明細・推移を見る
+            ポートフォリオ配分
           </Link>
         </Button>
         <Button variant="outline" size="sm" asChild>
           <Link href={buildPortfolioPath(portfolioCode, "analysis")}>
             <BarChart3 className="h-4 w-4" />
-            資産配分を見る
+            資産配分
           </Link>
         </Button>
       </div>
