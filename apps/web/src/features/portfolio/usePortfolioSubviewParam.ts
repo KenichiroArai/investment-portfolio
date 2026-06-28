@@ -103,15 +103,15 @@ function readHoldingsMode(
 }
 
 function readAnalysisMainView(viewParam: string | null): AnalysisMainView {
-  let result: AnalysisMainView = "trends";
+  let result: AnalysisMainView = "snapshot";
 
-  if (viewParam === "allocation") {
-    result = "allocation";
+  if (viewParam === "trends") {
+    result = "trends";
     return result;
   }
 
-  if (viewParam === "snapshot") {
-    result = "snapshot";
+  if (viewParam === "allocation") {
+    result = "allocation";
     return result;
   }
 
@@ -151,7 +151,7 @@ export function usePortfolioSubviewParam(
 
   if (options.page === "analysis") {
     const mainView = useMemo(() => {
-      let result: AnalysisMainView = "trends";
+      let result: AnalysisMainView = "snapshot";
 
       if (localMainView !== null && ANALYSIS_MAIN_VIEWS.includes(localMainView as AnalysisMainView)) {
         result = localMainView as AnalysisMainView;
@@ -167,7 +167,7 @@ export function usePortfolioSubviewParam(
         let result: void = undefined;
         setLocalMainView(view);
         replaceParams((params) => {
-          if (view === "trends") {
+          if (view === "snapshot") {
             params.delete("view");
             return;
           }

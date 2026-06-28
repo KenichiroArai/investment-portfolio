@@ -1,4 +1,4 @@
-import { cleanup, screen, waitFor } from "@testing-library/react";
+import { cleanup, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -98,11 +98,19 @@ describe("AnalysisView", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByRole("tab", { name: "推移" })).toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: "構成比" })).toBeInTheDocument();
     });
 
-    expect(screen.getByRole("tab", { name: "配分（リバランス）" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "資産配分" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "推移" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "リバランス" })).toBeInTheDocument();
+
+    const mainTablist = screen.getByRole("tablist", { name: "資産配分の表示" });
+    const mainTabs = within(mainTablist).getAllByRole("tab");
+    expect(mainTabs.map((tab) => tab.textContent)).toEqual([
+      "構成比",
+      "推移",
+      "リバランス",
+    ]);
   });
 
   it("renders analysis axis above main tabs", async () => {
@@ -170,13 +178,13 @@ describe("AnalysisView", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByRole("tab", { name: "推移" })).toHaveAttribute(
+      expect(screen.getByRole("tab", { name: "構成比" })).toHaveAttribute(
         "data-state",
         "active",
       );
     });
 
-    expect(screen.getByRole("tab", { name: "推移" }).className).toContain("data-[state=active]:bg-primary");
+    expect(screen.getByRole("tab", { name: "構成比" }).className).toContain("data-[state=active]:bg-primary");
   });
 
   it("updates snapshot content immediately when scheme changes", async () => {
