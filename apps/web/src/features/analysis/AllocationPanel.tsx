@@ -1,6 +1,5 @@
 "use client";
 
-import type { AllocationSliceWithLines } from "@repo/shared";
 import { useState } from "react";
 
 import { AllocationChart } from "@/features/analysis/AllocationChart";
@@ -8,7 +7,7 @@ import {
   AllocationTable,
   type AllocationSliceTableRow,
 } from "@/features/analysis/AllocationTable";
-import { formatAllocationPercent, formatAllocationPercentPoint, formatYen } from "@/lib/format-yen";
+import { formatAllocationPercent, formatAllocationPercentPoint, formatPercent, formatYen } from "@/lib/format-yen";
 
 type AllocationTooltipState = {
   x: number;
@@ -23,6 +22,26 @@ type AllocationPanelProps = {
   schemeCode?: string;
   asOfDate?: string | null;
 };
+
+function formatNullableYen(value: number | null): string {
+  let result = "—";
+
+  if (value !== null && Number.isFinite(value)) {
+    result = formatYen(value);
+  }
+
+  return result;
+}
+
+function formatNullableRate(value: number | null): string {
+  let result = "—";
+
+  if (value !== null && Number.isFinite(value)) {
+    result = formatPercent(value);
+  }
+
+  return result;
+}
 
 export function AllocationPanel({
   slices,
@@ -109,6 +128,12 @@ export function AllocationPanel({
             <strong>{tooltip.slice.valueName}</strong>
             <span>評価額: {formatYen(tooltip.slice.marketValueMinor)}</span>
             <span>構成比: {formatAllocationPercent(tooltip.slice.weight)}</span>
+            {tooltip.slice.unrealizedGainMinor !== null ? (
+              <span>損益: {formatNullableYen(tooltip.slice.unrealizedGainMinor)}</span>
+            ) : null}
+            {tooltip.slice.unrealizedGainRate !== null ? (
+              <span>損益率: {formatNullableRate(tooltip.slice.unrealizedGainRate)}</span>
+            ) : null}
             {tooltip.slice.targetRatio !== null &&
             tooltip.slice.targetRatio !== undefined ? (
               <span>目標: {formatAllocationPercent(tooltip.slice.targetRatio)}</span>

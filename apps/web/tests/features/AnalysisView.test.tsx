@@ -235,6 +235,11 @@ describe("AnalysisView", () => {
 
     expect(screen.getByRole("columnheader", { name: "基準日" })).toBeInTheDocument();
     expect(screen.getByRole("columnheader", { name: "分類" })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "損益" })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "損益率" })).toBeInTheDocument();
+    expect(
+      screen.queryByRole("columnheader", { name: "資産全体比" }),
+    ).not.toBeInTheDocument();
     expect(screen.queryByText("テスト銘柄")).not.toBeInTheDocument();
     expect(screen.getByText(/分析軸: 地域分類/)).toBeInTheDocument();
   });
@@ -327,6 +332,8 @@ describe("AnalysisView", () => {
     expect(
       screen.getByRole("button", { name: "国内 の内訳を開く" }),
     ).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "損益" })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "損益率" })).toBeInTheDocument();
   });
 
   it("shows uncovered amount when lines lack tags for the active scheme", async () => {

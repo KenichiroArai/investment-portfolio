@@ -12,6 +12,7 @@ import {
   buildAllocationByScheme,
   buildAllocationBySchemeWithLines,
   buildAllocationBySchemeWithLinesFromSnapshots,
+  computeSliceGainMetrics,
   computeSnapshotUnrealizedGainRate,
   groupSnapshotLinesByTag,
   groupSnapshotLinesByTagWithLines,
@@ -132,6 +133,47 @@ describe("snapshot-allocation", () => {
       30_000 / 230_000,
     );
     expect(computeSnapshotUnrealizedGainRate(30_000, 0)).toBeNull();
+  });
+
+  it("computes slice gain metrics from line metrics", () => {
+    const lines = [
+      makeLine(100_000, [], {
+        bookValueMinor: 80_000,
+        metrics: [
+          {
+            code: IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor,
+            integerValue: 10_000,
+            realValue: null,
+            textValue: null,
+          },
+        ],
+      }),
+      makeLine(200_000, [], {
+        bookValueMinor: 150_000,
+        metrics: [
+          {
+            code: IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor,
+            integerValue: 20_000,
+            realValue: null,
+            textValue: null,
+          },
+        ],
+      }),
+    ];
+
+    const metrics = computeSliceGainMetrics(lines);
+
+    expect(metrics.unrealizedGainMinor).toBe(30_000);
+    expect(metrics.unrealizedGainRate).toBeCloseTo(30_000 / 230_000);
+  });
+
+  it("returns null gain metrics when no line has gain metric", () => {
+    const metrics = computeSliceGainMetrics([
+      makeLine(100_000, [], { bookValueMinor: 80_000 }),
+    ]);
+
+    expect(metrics.unrealizedGainMinor).toBeNull();
+    expect(metrics.unrealizedGainRate).toBeNull();
   });
 
   it("computes portfolio gain from asset balance and contributions", () => {

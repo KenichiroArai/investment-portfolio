@@ -9,6 +9,8 @@ export function makeAllocationSlice(
     valueName: overrides.valueName,
     marketValueMinor: overrides.marketValueMinor ?? 100_000,
     weight: overrides.weight ?? 0.6,
+    unrealizedGainMinor: overrides.unrealizedGainMinor ?? null,
+    unrealizedGainRate: overrides.unrealizedGainRate ?? null,
     lines: overrides.lines ?? [],
   };
   return result;

@@ -213,6 +213,18 @@ export function compareAllocationSlices(
     result = compareNullableNumbers(left.targetRatio, right.targetRatio, direction);
   } else if (column === "gapRatio") {
     result = compareNullableNumbers(left.gapRatio, right.gapRatio, direction);
+  } else if (column === "unrealizedGain") {
+    result = compareNullableNumbers(
+      left.unrealizedGainMinor,
+      right.unrealizedGainMinor,
+      direction,
+    );
+  } else if (column === "unrealizedGainRate") {
+    result = compareNullableNumbers(
+      left.unrealizedGainRate,
+      right.unrealizedGainRate,
+      direction,
+    );
   }
 
   if (result !== 0) {

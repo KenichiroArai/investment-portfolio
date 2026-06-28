@@ -16,11 +16,27 @@ function getLineMetricIntegerValue(
   return result;
 }
 
+function getLineMetricIntegerValueOrNull(
+  metrics: HoldingLineMetricDto[],
+  code: string,
+): number | null {
+  let result: number | null = null;
+  const metric = metrics.find((item) => item.code === code);
+
+  if (metric?.integerValue !== null && metric?.integerValue !== undefined) {
+    result = metric.integerValue;
+  }
+
+  return result;
+}
+
 export type AllocationSlice = {
   valueCode: string;
   valueName: string;
   marketValueMinor: number;
   weight: number;
+  unrealizedGainMinor: number | null;
+  unrealizedGainRate: number | null;
 };
 
 export type AllocationLineInSlice = {
@@ -111,6 +127,43 @@ export function computeSnapshotUnrealizedGainRate(
   return result;
 }
 
+export function computeSliceGainMetrics(lines: HoldingLineDto[]): {
+  unrealizedGainMinor: number | null;
+  unrealizedGainRate: number | null;
+} {
+  let result = {
+    unrealizedGainMinor: null as number | null,
+    unrealizedGainRate: null as number | null,
+  };
+
+  let gainSum = 0;
+  let hasGainData = false;
+
+  for (const line of lines) {
+    const gain = getLineMetricIntegerValueOrNull(
+      line.metrics,
+      IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor,
+    );
+    if (gain === null) {
+      continue;
+    }
+
+    gainSum += gain;
+    hasGainData = true;
+  }
+
+  if (!hasGainData) {
+    return result;
+  }
+
+  result.unrealizedGainMinor = gainSum;
+  result.unrealizedGainRate = computeSnapshotUnrealizedGainRate(
+    gainSum,
+    sumSnapshotBookValue(lines),
+  );
+  return result;
+}
+
 export function groupSnapshotLinesByTag(
   lines: HoldingLineDto[],
   schemeCode: string,
@@ -118,7 +171,7 @@ export function groupSnapshotLinesByTag(
   let result: AllocationSlice[] = [];
   const totals = new Map<
     string,
-    { valueName: string; marketValueMinor: number }
+    { valueName: string; marketValueMinor: number; lines: HoldingLineDto[] }
   >();
   let taggedTotal = 0;
 
@@ -132,21 +185,26 @@ export function groupSnapshotLinesByTag(
     const existing = totals.get(tag.valueCode);
     if (existing) {
       existing.marketValueMinor += line.marketValueMinor;
+      existing.lines.push(line);
       continue;
     }
 
     totals.set(tag.valueCode, {
       valueName: tag.valueName,
       marketValueMinor: line.marketValueMinor,
+      lines: [line],
     });
   }
 
   for (const [valueCode, item] of totals) {
+    const gainMetrics = computeSliceGainMetrics(item.lines);
     let slice: AllocationSlice = {
       valueCode,
       valueName: item.valueName,
       marketValueMinor: item.marketValueMinor,
       weight: taggedTotal > 0 ? item.marketValueMinor / taggedTotal : 0,
+      unrealizedGainMinor: gainMetrics.unrealizedGainMinor,
+      unrealizedGainRate: gainMetrics.unrealizedGainRate,
     };
     result.push(slice);
   }
@@ -221,11 +279,16 @@ function groupTaggedLinesByTagWithLines(
         right.line.marketValueMinor - left.line.marketValueMinor,
     );
 
+    const gainMetrics = computeSliceGainMetrics(
+      item.lines.map((lineInSlice) => lineInSlice.line),
+    );
     let slice: AllocationSliceWithLines = {
       valueCode,
       valueName: item.valueName,
       marketValueMinor: sliceMarketValueMinor,
       weight: taggedTotal > 0 ? sliceMarketValueMinor / taggedTotal : 0,
+      unrealizedGainMinor: gainMetrics.unrealizedGainMinor,
+      unrealizedGainRate: gainMetrics.unrealizedGainRate,
       lines: item.lines,
     };
     result.push(slice);

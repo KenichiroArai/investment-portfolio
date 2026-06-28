@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/table";
 import { useTableSort } from "@/hooks/useTableSort";
 import { formatAsOfDateJa, formatPercent, formatYen } from "@/lib/format-yen";
+import { cn } from "@/lib/utils";
 
 type AllocationDetailTableProps = {
   rows: AllocationDetailRow[];
@@ -26,6 +27,16 @@ type AllocationDetailTableProps = {
   onSort?: (column: AllocationDetailSortColumn) => void;
 };
 
+function formatNullableYen(value: number | null): string {
+  let result = "—";
+
+  if (value !== null && Number.isFinite(value)) {
+    result = formatYen(value);
+  }
+
+  return result;
+}
+
 function formatNullableRate(value: number | null): string {
   let result = "—";
 
@@ -33,6 +44,17 @@ function formatNullableRate(value: number | null): string {
     result = formatPercent(value);
   }
 
+  return result;
+}
+
+function getToneClass(value: number | null): string | undefined {
+  let result: string | undefined = undefined;
+
+  if (value === null || value === 0) {
+    return result;
+  }
+
+  result = value > 0 ? "text-positive" : "text-negative";
   return result;
 }
 
@@ -95,8 +117,15 @@ export function AllocationDetailTable({
               onSort={toggleSort}
             />
             <SortableTableHeader
-              label="資産全体比"
-              column="portfolioWeight"
+              label="損益"
+              column="unrealizedGain"
+              activeColumn={sortColumn}
+              direction={sortDirection}
+              onSort={toggleSort}
+            />
+            <SortableTableHeader
+              label="損益率"
+              column="unrealizedGainRate"
               activeColumn={sortColumn}
               direction={sortDirection}
               onSort={toggleSort}
@@ -107,7 +136,7 @@ export function AllocationDetailTable({
           {displayRows.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={5}
+                colSpan={6}
                 className="py-8 text-center text-sm text-muted-foreground"
               >
                 条件に一致する明細がありません。
@@ -125,7 +154,12 @@ export function AllocationDetailTable({
                   </TableCell>
                   <TableCell>{formatYen(row.marketValueMinor)}</TableCell>
                   <TableCell>{formatPercent(row.weight)}</TableCell>
-                  <TableCell>{formatNullableRate(row.portfolioWeight)}</TableCell>
+                  <TableCell className={cn(getToneClass(row.unrealizedGainMinor))}>
+                    {formatNullableYen(row.unrealizedGainMinor)}
+                  </TableCell>
+                  <TableCell className={cn(getToneClass(row.unrealizedGainRate))}>
+                    {formatNullableRate(row.unrealizedGainRate)}
+                  </TableCell>
                 </TableRow>
               );
               return bodyRow;

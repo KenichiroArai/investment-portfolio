@@ -9,7 +9,7 @@ import { Fragment, useMemo } from "react";
 import { SortableTableHeader } from "@/components/SortableTableHeader";
 import { AllocationLineBreakdown } from "@/features/analysis/AllocationLineBreakdown";
 import { useTableSort } from "@/hooks/useTableSort";
-import { formatAllocationPercent, formatAllocationPercentPoint, formatYen } from "@/lib/format-yen";
+import { formatAllocationPercent, formatAllocationPercentPoint, formatPercent, formatYen } from "@/lib/format-yen";
 import { buildPortfolioPath } from "@/lib/portfolio-path";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +17,8 @@ type AllocationSortColumn =
   | "valueName"
   | "marketValue"
   | "weight"
+  | "unrealizedGain"
+  | "unrealizedGainRate"
   | "targetRatio"
   | "gapRatio";
 
@@ -38,6 +40,37 @@ type AllocationTableProps = {
   onSliceLeave: () => void;
   onToggleExpand: (valueCode: string) => void;
 };
+
+function formatNullableYen(value: number | null): string {
+  let result = "—";
+
+  if (value !== null && Number.isFinite(value)) {
+    result = formatYen(value);
+  }
+
+  return result;
+}
+
+function formatNullableRate(value: number | null): string {
+  let result = "—";
+
+  if (value !== null && Number.isFinite(value)) {
+    result = formatPercent(value);
+  }
+
+  return result;
+}
+
+function getToneClass(value: number | null): string | undefined {
+  let result: string | undefined = undefined;
+
+  if (value === null || value === 0) {
+    return result;
+  }
+
+  result = value > 0 ? "text-positive" : "text-negative";
+  return result;
+}
 
 export function AllocationTable({
   slices,
@@ -61,7 +94,7 @@ export function AllocationTable({
     return result;
   }, [slices, sortColumn, sortDirection]);
 
-  const columnCount = 4 + (showGapColumns ? 2 : 0);
+  const columnCount = 6 + (showGapColumns ? 2 : 0);
 
   let result = (
     <table className="data-table allocation-table">
@@ -86,6 +119,22 @@ export function AllocationTable({
           <SortableTableHeader
             label="構成比"
             column="weight"
+            activeColumn={sortColumn}
+            direction={sortDirection}
+            onSort={toggleSort}
+            className="data-table__cell-numeric"
+          />
+          <SortableTableHeader
+            label="損益"
+            column="unrealizedGain"
+            activeColumn={sortColumn}
+            direction={sortDirection}
+            onSort={toggleSort}
+            className="data-table__cell-numeric"
+          />
+          <SortableTableHeader
+            label="損益率"
+            column="unrealizedGainRate"
             activeColumn={sortColumn}
             direction={sortDirection}
             onSort={toggleSort}
@@ -178,6 +227,22 @@ export function AllocationTable({
                   </td>
                   <td className="data-table__cell-numeric">
                     {formatAllocationPercent(slice.weight)}
+                  </td>
+                  <td
+                    className={cn(
+                      "data-table__cell-numeric",
+                      getToneClass(slice.unrealizedGainMinor),
+                    )}
+                  >
+                    {formatNullableYen(slice.unrealizedGainMinor)}
+                  </td>
+                  <td
+                    className={cn(
+                      "data-table__cell-numeric",
+                      getToneClass(slice.unrealizedGainRate),
+                    )}
+                  >
+                    {formatNullableRate(slice.unrealizedGainRate)}
                   </td>
                   {showGapColumns ? (
                     <>

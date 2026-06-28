@@ -1,7 +1,4 @@
-import {
-  buildAllocationByScheme,
-  sumSnapshotMarketValue,
-} from "./snapshot-allocation";
+import { buildAllocationBySchemeWithLines } from "./snapshot-allocation";
 import {
   compareNullableNumbers,
   compareStrings,
@@ -18,7 +15,8 @@ export type AllocationDetailRow = {
   valueName: string;
   marketValueMinor: number;
   weight: number;
-  portfolioWeight: number | null;
+  unrealizedGainMinor: number | null;
+  unrealizedGainRate: number | null;
 };
 
 export type AllocationDetailFilter = {
@@ -32,7 +30,8 @@ export type AllocationDetailSortColumn =
   | "valueName"
   | "marketValue"
   | "weight"
-  | "portfolioWeight";
+  | "unrealizedGain"
+  | "unrealizedGainRate";
 
 export function flattenAllocationInRange(
   snapshots: CurrentSnapshotDto[],
@@ -46,16 +45,13 @@ export function flattenAllocationInRange(
   );
 
   for (const snapshot of sortedSnapshots) {
-    const totalMarketValue = sumSnapshotMarketValue(snapshot.lines);
-    const allocation = buildAllocationByScheme(
+    const allocation = buildAllocationBySchemeWithLines(
       snapshot.lines,
       schemeCode,
       schemeName,
     );
 
     for (const slice of allocation.slices) {
-      const portfolioWeight =
-        totalMarketValue > 0 ? slice.marketValueMinor / totalMarketValue : null;
       let row: AllocationDetailRow = {
         rowId: `${snapshot.asOfDate}:${schemeCode}:${slice.valueCode}`,
         asOfDate: snapshot.asOfDate,
@@ -65,7 +61,8 @@ export function flattenAllocationInRange(
         valueName: slice.valueName,
         marketValueMinor: slice.marketValueMinor,
         weight: slice.weight,
-        portfolioWeight,
+        unrealizedGainMinor: slice.unrealizedGainMinor,
+        unrealizedGainRate: slice.unrealizedGainRate,
       };
       result.push(row);
     }
@@ -152,10 +149,16 @@ export function compareAllocationDetailRows(
     );
   } else if (column === "weight") {
     result = compareNullableNumbers(left.weight, right.weight, direction);
-  } else if (column === "portfolioWeight") {
+  } else if (column === "unrealizedGain") {
     result = compareNullableNumbers(
-      left.portfolioWeight,
-      right.portfolioWeight,
+      left.unrealizedGainMinor,
+      right.unrealizedGainMinor,
+      direction,
+    );
+  } else if (column === "unrealizedGainRate") {
+    result = compareNullableNumbers(
+      left.unrealizedGainRate,
+      right.unrealizedGainRate,
       direction,
     );
   }

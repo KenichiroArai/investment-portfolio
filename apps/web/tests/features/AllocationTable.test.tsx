@@ -25,6 +25,22 @@ describe("AllocationTable", () => {
     expect(screen.getByText("該当する分類タグがありません。")).toBeInTheDocument();
   });
 
+  it("renders gain and gain rate column headers", () => {
+    render(
+      <AllocationTable
+        slices={sampleAllocationSlices}
+        highlightedValueCode={null}
+        expandedValueCodes={[]}
+        onSliceHover={vi.fn()}
+        onSliceLeave={vi.fn()}
+        onToggleExpand={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole("columnheader", { name: "損益" })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "損益率" })).toBeInTheDocument();
+  });
+
   it("sorts slices and toggles expand", async () => {
     const user = userEvent.setup();
     const onToggleExpand = vi.fn();

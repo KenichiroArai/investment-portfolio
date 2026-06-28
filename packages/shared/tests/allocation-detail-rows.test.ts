@@ -5,6 +5,7 @@ import {
   flattenAllocationInRange,
   sortAllocationDetailRows,
 } from "../src/allocation-detail-rows";
+import { IDECO_KAKEIBO_METRIC_CODES } from "../src/holding-line-metrics";
 import type { CurrentSnapshotDto, HoldingLineDto } from "../src/types";
 
 function makeLine(
@@ -142,6 +143,112 @@ describe("allocation-detail-rows", () => {
     );
 
     const sorted = sortAllocationDetailRows(rows, "marketValue", "desc");
+
+    expect(sorted.map((row) => row.valueName)).toEqual(["国内", "海外"]);
+  });
+
+  it("includes unrealized gain fields aggregated per classification slice", () => {
+    const rows = flattenAllocationInRange(
+      [
+        makeSnapshot("2026-06-01", [
+          makeLine(60_000, [
+            {
+              schemeCode: "ideco_region",
+              schemeName: "地域分類",
+              valueCode: "domestic",
+              valueName: "国内",
+            },
+          ], {
+            bookValueMinor: 50_000,
+            metrics: [
+              {
+                code: IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor,
+                integerValue: 10_000,
+                realValue: null,
+                textValue: null,
+              },
+            ],
+          }),
+          makeLine(40_000, [
+            {
+              schemeCode: "ideco_region",
+              schemeName: "地域分類",
+              valueCode: "foreign",
+              valueName: "海外",
+            },
+          ], {
+            bookValueMinor: 30_000,
+            metrics: [
+              {
+                code: IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor,
+                integerValue: 5_000,
+                realValue: null,
+                textValue: null,
+              },
+            ],
+          }),
+        ]),
+      ],
+      "ideco_region",
+      "地域分類",
+    );
+
+    const domestic = rows.find((row) => row.valueName === "国内");
+    const foreign = rows.find((row) => row.valueName === "海外");
+
+    expect(domestic?.unrealizedGainMinor).toBe(10_000);
+    expect(domestic?.unrealizedGainRate).toBeCloseTo(10_000 / 50_000);
+    expect(foreign?.unrealizedGainMinor).toBe(5_000);
+    expect(foreign?.unrealizedGainRate).toBeCloseTo(5_000 / 30_000);
+  });
+
+  it("sorts rows by unrealized gain", () => {
+    const rows = flattenAllocationInRange(
+      [
+        makeSnapshot("2026-06-01", [
+          makeLine(40_000, [
+            {
+              schemeCode: "ideco_region",
+              schemeName: "地域分類",
+              valueCode: "foreign",
+              valueName: "海外",
+            },
+          ], {
+            bookValueMinor: 30_000,
+            metrics: [
+              {
+                code: IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor,
+                integerValue: 5_000,
+                realValue: null,
+                textValue: null,
+              },
+            ],
+          }),
+          makeLine(60_000, [
+            {
+              schemeCode: "ideco_region",
+              schemeName: "地域分類",
+              valueCode: "domestic",
+              valueName: "国内",
+            },
+          ], {
+            bookValueMinor: 50_000,
+            metrics: [
+              {
+                code: IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor,
+                integerValue: 10_000,
+                realValue: null,
+                textValue: null,
+              },
+            ],
+          }),
+        ]),
+      ],
+      "ideco_region",
+      "地域分類",
+    );
+
+    const sorted = sortAllocationDetailRows(rows, "unrealizedGain", "desc");
 
     expect(sorted.map((row) => row.valueName)).toEqual(["国内", "海外"]);
   });
