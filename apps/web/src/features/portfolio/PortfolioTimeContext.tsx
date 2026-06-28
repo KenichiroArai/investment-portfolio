@@ -135,6 +135,23 @@ function serializeTrendDisplayUnit(unit: TrendDisplayUnit): string | null {
   return result;
 }
 
+function isMainPortfolioTab(pathname: string, portfolioCode: string): boolean {
+  let result = false;
+  const base = `/portfolios/${portfolioCode}`;
+
+  if (
+    pathname === base ||
+    pathname === `${base}/` ||
+    pathname.startsWith(`${base}/portfolio-allocation`) ||
+    (pathname.startsWith(`${base}/analysis`) &&
+      !pathname.startsWith(`${base}/analysis/settings`))
+  ) {
+    result = true;
+  }
+
+  return result;
+}
+
 export function PortfolioTimeProvider({
   portfolioCode,
   children,
@@ -178,24 +195,12 @@ export function PortfolioTimeProvider({
 
   const emphasizeAsOf = (() => {
     let result = true;
-    const view = searchParams.get("view");
-    const panel = searchParams.get("panel");
-    const onPortfolioAllocation = pathname.includes(
-      `/portfolios/${portfolioCode}/portfolio-allocation`,
-    );
-    const onAnalysis = pathname.includes(`/portfolios/${portfolioCode}/analysis`);
+
+    if (isMainPortfolioTab(pathname, portfolioCode)) {
+      return result;
+    }
 
     if (pathname.includes("/trends")) {
-      result = false;
-      return result;
-    }
-
-    if (onPortfolioAllocation && panel === "trends") {
-      result = false;
-      return result;
-    }
-
-    if (onAnalysis && view === "trends") {
       result = false;
       return result;
     }
@@ -205,12 +210,11 @@ export function PortfolioTimeProvider({
 
   const emphasizePeriod = (() => {
     let result = false;
-    const view = searchParams.get("view");
-    const panel = searchParams.get("panel");
-    const onPortfolioAllocation = pathname.includes(
-      `/portfolios/${portfolioCode}/portfolio-allocation`,
-    );
-    const onAnalysis = pathname.includes(`/portfolios/${portfolioCode}/analysis`);
+
+    if (isMainPortfolioTab(pathname, portfolioCode)) {
+      result = true;
+      return result;
+    }
 
     if (pathname.includes("/trends") || pathname.includes("/holdings")) {
       result = true;
@@ -223,30 +227,6 @@ export function PortfolioTimeProvider({
     ) {
       result = true;
       return result;
-    }
-
-    if (
-      onPortfolioAllocation &&
-      view !== "composition" &&
-      view !== "rebalance" &&
-      view !== "allocation"
-    ) {
-      result = true;
-      return result;
-    }
-
-    if (onAnalysis && view === "trends") {
-      result = true;
-      return result;
-    }
-
-    if (onPortfolioAllocation && view === null && panel === null) {
-      result = true;
-      return result;
-    }
-
-    if (onPortfolioAllocation && panel === "holdings") {
-      result = true;
     }
 
     return result;

@@ -40,6 +40,8 @@ function PortfolioTimeConsumer() {
     snapshot,
     trends,
     displayTrendPoints,
+    emphasizeAsOf,
+    emphasizePeriod,
     setSelectedAsOfDate,
     jumpToLatest,
     setPeriodPreset,
@@ -58,6 +60,8 @@ function PortfolioTimeConsumer() {
       <span data-testid="display-points">
         {displayTrendPoints.map((point) => point.sourceAsOfDate).join(",")}
       </span>
+      <span data-testid="emphasize-as-of">{String(emphasizeAsOf)}</span>
+      <span data-testid="emphasize-period">{String(emphasizePeriod)}</span>
       <button type="button" onClick={() => setSelectedAsOfDate("2026-05-31")}>
         過去日を選択
       </button>
@@ -272,4 +276,67 @@ describe("PortfolioTimeContext", () => {
     expect(screen.getByTestId("dates")).toHaveTextContent("");
     expect(screen.getByTestId("selected")).toHaveTextContent("");
   });
+
+  it.each([
+    {
+      pathname: "/portfolios/ideco",
+      searchParams: "",
+      emphasizeAsOf: "true",
+      emphasizePeriod: "true",
+    },
+    {
+      pathname: "/portfolios/ideco/portfolio-allocation",
+      searchParams: "view=composition",
+      emphasizeAsOf: "true",
+      emphasizePeriod: "true",
+    },
+    {
+      pathname: "/portfolios/ideco/portfolio-allocation",
+      searchParams: "panel=trends",
+      emphasizeAsOf: "true",
+      emphasizePeriod: "true",
+    },
+    {
+      pathname: "/portfolios/ideco/analysis",
+      searchParams: "",
+      emphasizeAsOf: "true",
+      emphasizePeriod: "true",
+    },
+    {
+      pathname: "/portfolios/ideco/analysis",
+      searchParams: "view=trends",
+      emphasizeAsOf: "true",
+      emphasizePeriod: "true",
+    },
+    {
+      pathname: "/portfolios/ideco/trends",
+      searchParams: "",
+      emphasizeAsOf: "false",
+      emphasizePeriod: "true",
+    },
+    {
+      pathname: "/portfolios/ideco/holdings",
+      searchParams: "",
+      emphasizeAsOf: "true",
+      emphasizePeriod: "true",
+    },
+  ])(
+    "sets emphasize flags for $pathname with $searchParams",
+    async ({ pathname, searchParams, emphasizeAsOf, emphasizePeriod }) => {
+      usePathname.mockReturnValue(pathname);
+      searchParamsRef.current = new URLSearchParams(searchParams);
+      stubPortfolioFetch();
+
+      render(
+        <PortfolioTimeProvider portfolioCode="ideco">
+          <PortfolioTimeConsumer />
+        </PortfolioTimeProvider>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("emphasize-as-of")).toHaveTextContent(emphasizeAsOf);
+        expect(screen.getByTestId("emphasize-period")).toHaveTextContent(emphasizePeriod);
+      });
+    },
+  );
 });
