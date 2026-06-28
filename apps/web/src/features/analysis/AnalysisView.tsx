@@ -365,9 +365,6 @@ export function AnalysisView({
     let content = (
       <AllocationSnapshotPanel
         slices={slicesWithGap}
-        axisTotalMinor={schemeAllocation.totalMarketValueMinor}
-        assetTotalMinor={totalValue}
-        targetTotalRatio={targetTotalRatio}
         portfolioCode={portfolioCode}
         schemeCode={scheme.schemeCode}
         asOfDate={asOfDate}

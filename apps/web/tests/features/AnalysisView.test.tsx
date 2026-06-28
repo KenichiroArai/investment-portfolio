@@ -233,7 +233,7 @@ describe("AnalysisView", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getAllByText(/分類対象額/).length).toBeGreaterThanOrEqual(1);
+      expect(screen.getByText(/分類対象額/)).toBeInTheDocument();
     });
 
     expect(screen.queryByText(/未分類/)).not.toBeInTheDocument();
@@ -286,14 +286,14 @@ describe("AnalysisView", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getAllByText(/分類対象額/).length).toBeGreaterThanOrEqual(1);
+      expect(screen.getByText(/分類対象額/)).toBeInTheDocument();
     });
 
-    expect(screen.getAllByText(/資産全体の 66\.67%/).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText(/未分類:.*50,000/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText(/資産全体の 66\.67%/)).toBeInTheDocument();
+    expect(screen.getByText(/未分類:.*50,000/)).toBeInTheDocument();
     expect(
-      screen.getAllByText(/差分はタグ付き銘柄内で目標を100%に正規化して比較/).length,
-    ).toBeGreaterThanOrEqual(1);
+      screen.getByText(/差分はタグ付き銘柄内で目標を100%に正規化して比較/),
+    ).toBeInTheDocument();
   });
 
   it("shows rebalance uncovered note on allocation tab", async () => {
