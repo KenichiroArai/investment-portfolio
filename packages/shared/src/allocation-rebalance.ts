@@ -40,6 +40,8 @@ function buildSliceRowsWithTargets(
       valueName: target.valueCode,
       marketValueMinor: 0,
       weight: 0,
+      unrealizedGainMinor: null,
+      unrealizedGainRate: null,
       lines: [],
     });
   }

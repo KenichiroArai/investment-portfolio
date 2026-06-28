@@ -259,6 +259,8 @@ export function TrendsDetailPanel({
     valueName: slice.valueName,
     marketValueMinor: slice.marketValueMinor,
     weight: slice.ratio,
+    unrealizedGainMinor: null,
+    unrealizedGainRate: null,
   }));
   const axisTotalMinor = endTrendSlices.reduce(
     (sum, slice) => sum + slice.marketValueMinor,

@@ -28,6 +28,8 @@ function toChartSlices(rows: PortfolioAllocationRow[]): AllocationSliceWithLines
       valueName: row.instrumentName,
       marketValueMinor: row.marketValueMinor,
       weight: row.currentRatio,
+      unrealizedGainMinor: null,
+      unrealizedGainRate: null,
       lines: [],
     });
   }
