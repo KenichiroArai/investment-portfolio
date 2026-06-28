@@ -214,6 +214,31 @@ export function buildAllocationPeriodChangeRows(
   return result;
 }
 
+function compareAllocationPeriodChangeBySortOrder(
+  left: AllocationPeriodChangeRow,
+  right: AllocationPeriodChangeRow,
+  direction: SortDirection,
+): number {
+  let result = 0;
+  let cmp = comparePortfolioInstrumentOrder(
+    {
+      sortOrder: left.sortOrder ?? null,
+      instrumentName: left.label,
+      instrumentId: left.key,
+    },
+    {
+      sortOrder: right.sortOrder ?? null,
+      instrumentName: right.label,
+      instrumentId: right.key,
+    },
+  );
+  if (direction === "desc") {
+    cmp = -cmp;
+  }
+  result = cmp;
+  return result;
+}
+
 export function sortAllocationPeriodChangeRows(
   rows: AllocationPeriodChangeRow[],
   column: AllocationPeriodChangeSortColumn,
@@ -228,24 +253,9 @@ export function sortAllocationPeriodChangeRows(
   }
 
   if (column === "sortOrder") {
-    result.sort((left, right) => {
-      let cmp = comparePortfolioInstrumentOrder(
-        {
-          sortOrder: left.sortOrder ?? null,
-          instrumentName: left.label,
-          instrumentId: left.key,
-        },
-        {
-          sortOrder: right.sortOrder ?? null,
-          instrumentName: right.label,
-          instrumentId: right.key,
-        },
-      );
-      if (direction === "desc") {
-        cmp = -cmp;
-      }
-      return cmp;
-    });
+    result.sort((left, right) =>
+      compareAllocationPeriodChangeBySortOrder(left, right, direction),
+    );
     return result;
   }
 
@@ -311,4 +321,7 @@ export function sortAllocationPeriodChangeRows(
 
 export const __allocationPeriodChangeTesting = {
   resolveSliceValue,
+  resolveSliceSortOrder,
+  sortRatioSeriesByPortfolioInstrumentOrder,
+  compareAllocationPeriodChangeBySortOrder,
 };

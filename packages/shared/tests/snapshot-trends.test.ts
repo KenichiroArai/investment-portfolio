@@ -218,4 +218,23 @@ describe("snapshot-trends", () => {
       },
     ]);
   });
+
+  it("uses zero ratio when total market value is zero", () => {
+    const snapshot = createSnapshot("2026-06-02", 0, 0);
+    snapshot.lines = [
+      {
+        ...snapshot.lines[0],
+        id: "line-a",
+        instrumentId: "inst-a",
+        instrumentName: "銘柄A",
+        sortOrder: 1,
+        marketValueMinor: 0,
+      },
+    ];
+
+    const point = buildSnapshotTrendPoint(snapshot);
+    const instrumentSlices = point.allocationsByScheme[PORTFOLIO_INSTRUMENT_SCHEME_CODE];
+
+    expect(instrumentSlices[0]?.ratio).toBe(0);
+  });
 });

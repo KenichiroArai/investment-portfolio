@@ -411,6 +411,34 @@ describe("sortAllocationSlices", () => {
     expect(sortAllocationSlices(slices, "targetRatio", "desc")[0]?.valueCode).toBe("high");
     expect(sortAllocationSlices(slices, "gapRatio", "desc")[0]?.valueCode).toBe("high");
   });
+
+  it("sorts slices by unrealized gain metrics", () => {
+    const slices: AllocationSliceWithLines[] = [
+      {
+        valueCode: "low",
+        valueName: "低",
+        marketValueMinor: 100,
+        weight: 0.2,
+        unrealizedGainMinor: 10,
+        unrealizedGainRate: 0.1,
+        lines: [],
+      },
+      {
+        valueCode: "high",
+        valueName: "高",
+        marketValueMinor: 400,
+        weight: 0.8,
+        unrealizedGainMinor: 40,
+        unrealizedGainRate: 0.4,
+        lines: [],
+      },
+    ];
+
+    expect(sortAllocationSlices(slices, "unrealizedGain", "desc")[0]?.valueCode).toBe("high");
+    expect(sortAllocationSlices(slices, "unrealizedGainRate", "desc")[0]?.valueCode).toBe(
+      "high",
+    );
+  });
 });
 
 describe("sortHoldingLineDetailRows", () => {

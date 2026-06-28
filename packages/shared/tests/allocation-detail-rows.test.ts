@@ -4,6 +4,7 @@ import {
   filterAllocationDetailRows,
   flattenAllocationInRange,
   sortAllocationDetailRows,
+  type AllocationDetailRow,
 } from "../src/allocation-detail-rows";
 import { IDECO_KAKEIBO_METRIC_CODES } from "../src/holding-line-metrics";
 import type { CurrentSnapshotDto, HoldingLineDto } from "../src/types";
@@ -251,5 +252,120 @@ describe("allocation-detail-rows", () => {
     const sorted = sortAllocationDetailRows(rows, "unrealizedGain", "desc");
 
     expect(sorted.map((row) => row.valueName)).toEqual(["国内", "海外"]);
+  });
+
+  it("filters rows by asOfDate, empty query, and classification sentinels", () => {
+    const rows: AllocationDetailRow[] = [
+      {
+        rowId: "2026-05-01:ideco_region:domestic",
+        asOfDate: "2026-05-01",
+        schemeCode: "ideco_region",
+        schemeName: "地域分類",
+        valueCode: "domestic",
+        valueName: "国内",
+        marketValueMinor: 60_000,
+        weight: 0.6,
+        unrealizedGainMinor: null,
+        unrealizedGainRate: null,
+      },
+      {
+        rowId: "2026-06-01:ideco_region:foreign",
+        asOfDate: "2026-06-01",
+        schemeCode: "ideco_region",
+        schemeName: "地域分類",
+        valueCode: "foreign",
+        valueName: "海外",
+        marketValueMinor: 40_000,
+        weight: 0.4,
+        unrealizedGainMinor: null,
+        unrealizedGainRate: null,
+      },
+    ];
+
+    expect(filterAllocationDetailRows(rows, { asOfDate: "2026-05-01" })).toHaveLength(1);
+    expect(filterAllocationDetailRows(rows, { asOfDate: "__all__" })).toHaveLength(2);
+    expect(filterAllocationDetailRows(rows, { query: "" })).toHaveLength(2);
+    expect(
+      filterAllocationDetailRows(rows, { classificationValue: "__all__" }),
+    ).toHaveLength(2);
+    expect(
+      filterAllocationDetailRows(rows, { classificationValue: "foreign" }),
+    ).toEqual([rows[1]]);
+    expect(
+      filterAllocationDetailRows(rows, { query: "海外", classificationValue: null }),
+    ).toEqual([rows[1]]);
+  });
+
+  it("sorts rows by all columns and uses tie-breakers", () => {
+    const rowA: AllocationDetailRow = {
+      rowId: "2026-06-01:ideco_region:domestic",
+      asOfDate: "2026-06-01",
+      schemeCode: "ideco_region",
+      schemeName: "地域分類",
+      valueCode: "domestic",
+      valueName: "国内",
+      marketValueMinor: 100,
+      weight: 0.6,
+      unrealizedGainMinor: 10,
+      unrealizedGainRate: 0.1,
+    };
+    const rowB: AllocationDetailRow = {
+      rowId: "2026-05-01:ideco_region:foreign",
+      asOfDate: "2026-05-01",
+      schemeCode: "ideco_region",
+      schemeName: "地域分類",
+      valueCode: "foreign",
+      valueName: "海外",
+      marketValueMinor: 100,
+      weight: 0.4,
+      unrealizedGainMinor: 20,
+      unrealizedGainRate: 0.2,
+    };
+
+    expect(sortAllocationDetailRows([rowA, rowB], "asOfDate", "asc")[0]?.valueName).toBe(
+      "海外",
+    );
+    expect(sortAllocationDetailRows([rowA, rowB], "valueName", "asc")[0]?.valueName).toBe(
+      "海外",
+    );
+    expect(sortAllocationDetailRows([rowA, rowB], "weight", "desc")[0]?.valueName).toBe(
+      "国内",
+    );
+    expect(
+      sortAllocationDetailRows([rowA, rowB], "unrealizedGainRate", "desc")[0]?.valueName,
+    ).toBe("海外");
+    expect(sortAllocationDetailRows([rowA, rowB], "marketValue", "asc")).toEqual([
+      rowA,
+      rowB,
+    ]);
+
+    const tieRowA: AllocationDetailRow = {
+      ...rowA,
+      rowId: "2026-06-01:ideco_region:domestic-a",
+    };
+    const tieRowB: AllocationDetailRow = {
+      ...rowA,
+      rowId: "2026-06-01:ideco_region:domestic-b",
+    };
+    expect(sortAllocationDetailRows([tieRowB, tieRowA], "marketValue", "asc")).toEqual([
+      tieRowA,
+      tieRowB,
+    ]);
+
+    const sameDateA: AllocationDetailRow = {
+      ...rowA,
+      valueName: "国内",
+      valueCode: "domestic",
+    };
+    const sameDateB: AllocationDetailRow = {
+      ...rowA,
+      valueName: "海外",
+      valueCode: "foreign",
+      rowId: "2026-06-01:ideco_region:foreign",
+    };
+    expect(sortAllocationDetailRows([sameDateB, sameDateA], "marketValue", "asc")).toEqual([
+      sameDateB,
+      sameDateA,
+    ]);
   });
 });

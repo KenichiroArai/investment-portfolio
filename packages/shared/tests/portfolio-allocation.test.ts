@@ -2,9 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildPortfolioAllocationRows,
+  comparePortfolioAllocationRows,
   comparePortfolioInstrumentOrder,
   computePortfolioGapDivergenceRatio,
+  sortHoldingLinesByPortfolioInstrumentOrder,
   sortPortfolioAllocationRows,
+  type PortfolioAllocationRow,
   type TargetPortfolioWeight,
 } from "../src/portfolio-allocation";
 import type { HoldingLineDto } from "../src/types";
@@ -86,6 +89,12 @@ describe("comparePortfolioInstrumentOrder", () => {
     const right = { sortOrder: 2, instrumentName: "銘柄A", instrumentId: "inst-a" };
     expect(comparePortfolioInstrumentOrder(left, right)).toBeLessThan(0);
   });
+
+  it("sorts by instrument id when sort order and name match", () => {
+    const left = { sortOrder: 1, instrumentName: "銘柄A", instrumentId: "inst-a" };
+    const right = { sortOrder: 1, instrumentName: "銘柄A", instrumentId: "inst-b" };
+    expect(comparePortfolioInstrumentOrder(left, right)).toBeLessThan(0);
+  });
 });
 
 describe("sortPortfolioAllocationRows", () => {
@@ -113,5 +122,106 @@ describe("computePortfolioGapDivergenceRatio", () => {
 
   it("returns null when current is positive but target is zero", () => {
     expect(computePortfolioGapDivergenceRatio(0.1, 0)).toBeNull();
+  });
+
+  it("returns null when inputs are not finite", () => {
+    expect(computePortfolioGapDivergenceRatio(Number.NaN, 0.5)).toBeNull();
+    expect(computePortfolioGapDivergenceRatio(0.5, Number.POSITIVE_INFINITY)).toBeNull();
+  });
+});
+
+describe("sortHoldingLinesByPortfolioInstrumentOrder", () => {
+  it("sorts holding lines by portfolio instrument order", () => {
+    let result = sortHoldingLinesByPortfolioInstrumentOrder([
+      { ...lines[1]! },
+      { ...lines[0]! },
+    ]);
+    expect(result.map((line) => line.instrumentId)).toEqual(["inst-a", "inst-b"]);
+  });
+});
+
+describe("comparePortfolioAllocationRows columns", () => {
+  const baseRows: PortfolioAllocationRow[] = [
+    {
+      instrumentId: "inst-a",
+      instrumentName: "銘柄A",
+      sortOrder: 1,
+      marketValueMinor: 500_000,
+      currentRatio: 0.5,
+      targetRatio: 0.4,
+      gapRatio: 0.1,
+      gapDivergenceRatio: 0.25,
+      gapMarketValueMinor: 100_000,
+    },
+    {
+      instrumentId: "inst-b",
+      instrumentName: "銘柄B",
+      sortOrder: 2,
+      marketValueMinor: 500_000,
+      currentRatio: 0.5,
+      targetRatio: 0.6,
+      gapRatio: -0.1,
+      gapDivergenceRatio: 0.166,
+      gapMarketValueMinor: -100_000,
+    },
+  ];
+
+  it("sorts by each column and falls back to instrument order on ties", () => {
+    expect(sortPortfolioAllocationRows(baseRows, "instrumentName", "asc")[0]?.instrumentId).toBe(
+      "inst-a",
+    );
+    expect(sortPortfolioAllocationRows(baseRows, "sortOrder", "asc")[0]?.instrumentId).toBe(
+      "inst-a",
+    );
+    expect(sortPortfolioAllocationRows(baseRows, "currentRatio", "desc")[0]?.instrumentId).toBe(
+      "inst-a",
+    );
+    expect(sortPortfolioAllocationRows(baseRows, "targetRatio", "asc")[0]?.instrumentId).toBe(
+      "inst-a",
+    );
+    expect(sortPortfolioAllocationRows(baseRows, "gapRatio", "desc")[0]?.instrumentId).toBe(
+      "inst-a",
+    );
+    expect(
+      sortPortfolioAllocationRows(baseRows, "gapDivergenceRatio", "desc")[0]?.instrumentId,
+    ).toBe("inst-a");
+    expect(sortPortfolioAllocationRows(baseRows, "marketValue", "desc")[0]?.instrumentId).toBe(
+      "inst-a",
+    );
+
+    const rowsWithNullSortOrder: PortfolioAllocationRow[] = [
+      { ...baseRows[0]!, sortOrder: null },
+      { ...baseRows[1]!, sortOrder: 1 },
+    ];
+    expect(
+      sortPortfolioAllocationRows(rowsWithNullSortOrder, "sortOrder", "asc")[0]?.instrumentId,
+    ).toBe("inst-b");
+
+    const rowsWithZeroSortOrder: PortfolioAllocationRow[] = [
+      { ...baseRows[0]!, sortOrder: 0 },
+      { ...baseRows[1]!, sortOrder: 1 },
+    ];
+    expect(
+      sortPortfolioAllocationRows(rowsWithZeroSortOrder, "sortOrder", "asc")[0]?.instrumentId,
+    ).toBe("inst-a");
+  });
+
+  it("compares sort order with defined and null values directly", () => {
+    expect(
+      comparePortfolioAllocationRows(
+        { ...baseRows[0]!, sortOrder: 1 },
+        { ...baseRows[1]!, sortOrder: null },
+        "sortOrder",
+        "asc",
+      ),
+    ).toBeLessThan(0);
+    expect(
+      comparePortfolioAllocationRows(
+        { ...baseRows[0]!, sortOrder: null },
+        { ...baseRows[1]!, sortOrder: 2 },
+        "sortOrder",
+        "asc",
+      ),
+    ).toBeGreaterThan(0);
   });
 });

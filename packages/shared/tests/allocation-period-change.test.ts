@@ -373,4 +373,242 @@ describe("allocation-period-change", () => {
     );
     expect(series.map((item) => item.key)).toEqual(["inst-a", "inst-b"]);
   });
+
+  it("sorts portfolio instrument rows by sortOrder descending", () => {
+    const rows: AllocationPeriodChangeRow[] = [
+      {
+        key: "inst-a",
+        label: "銘柄A",
+        startRatio: 0.6,
+        endRatio: 0.61,
+        deltaRatio: 0.01,
+        relativeRate: 0.01 / 0.6,
+        startMarketValueMinor: 2_000_000,
+        endMarketValueMinor: 2_100_000,
+        deltaMarketValueMinor: 100_000,
+        ratioSeries: [0.6, 0.61],
+        sortOrder: 1,
+      },
+      {
+        key: "inst-b",
+        label: "銘柄B",
+        startRatio: 0.4,
+        endRatio: 0.39,
+        deltaRatio: -0.01,
+        relativeRate: -0.025,
+        startMarketValueMinor: 1_400_000,
+        endMarketValueMinor: 1_341_347,
+        deltaMarketValueMinor: -58_653,
+        ratioSeries: [0.4, 0.39],
+        sortOrder: 2,
+      },
+    ];
+
+    const sorted = sortAllocationPeriodChangeRows(rows, "sortOrder", "desc");
+    expect(sorted.map((row) => row.key)).toEqual(["inst-b", "inst-a"]);
+  });
+
+  it("falls back when portfolio instrument meta is missing from chart points", () => {
+    const { sortRatioSeriesByPortfolioInstrumentOrder } = __allocationPeriodChangeTesting;
+    const series = [
+      { key: "orphan", label: "孤立", values: [0.5, 0.6] },
+      { key: "inst-a", label: "銘柄A", values: [0.5, 0.4] },
+    ];
+    const chartPoints = [
+      makePoint("2026-06-01", PORTFOLIO_INSTRUMENT_SCHEME_CODE, [
+        {
+          valueCode: "inst-a",
+          valueName: "銘柄A",
+          marketValueMinor: 100,
+          ratio: 0.5,
+          sortOrder: 1,
+        },
+      ]),
+    ];
+
+    const sorted = sortRatioSeriesByPortfolioInstrumentOrder(
+      series,
+      chartPoints,
+      PORTFOLIO_INSTRUMENT_SCHEME_CODE,
+    );
+    expect(sorted.map((item) => item.key)).toEqual(["inst-a", "orphan"]);
+  });
+
+  it("falls back for both sides when chart points have no instrument meta", () => {
+    const { sortRatioSeriesByPortfolioInstrumentOrder } = __allocationPeriodChangeTesting;
+    const series = [
+      { key: "orphan-b", label: "孤立B", values: [0.4] },
+      { key: "orphan-a", label: "孤立A", values: [0.6] },
+    ];
+
+    const sorted = sortRatioSeriesByPortfolioInstrumentOrder(
+      series,
+      [],
+      PORTFOLIO_INSTRUMENT_SCHEME_CODE,
+    );
+    expect(sorted.map((item) => item.key)).toEqual(["orphan-a", "orphan-b"]);
+  });
+
+  it("handles missing scheme and sort order metadata", () => {
+    const { resolveSliceSortOrder } = __allocationPeriodChangeTesting;
+    const pointWithoutScheme = makePoint("2026-06-01", schemeCode, []);
+    pointWithoutScheme.allocationsByScheme = {};
+
+    expect(resolveSliceSortOrder(pointWithoutScheme, schemeCode, "domestic")).toBeNull();
+
+    const rows: AllocationPeriodChangeRow[] = [
+      {
+        key: "inst-a",
+        label: "銘柄A",
+        startRatio: 0.6,
+        endRatio: 0.61,
+        deltaRatio: 0.01,
+        relativeRate: 0.01 / 0.6,
+        startMarketValueMinor: 2_000_000,
+        endMarketValueMinor: 2_100_000,
+        deltaMarketValueMinor: 100_000,
+        ratioSeries: [0.6, 0.61],
+      },
+      {
+        key: "inst-b",
+        label: "銘柄B",
+        startRatio: 0.4,
+        endRatio: 0.39,
+        deltaRatio: -0.01,
+        relativeRate: -0.025,
+        startMarketValueMinor: 1_400_000,
+        endMarketValueMinor: 1_341_347,
+        deltaMarketValueMinor: -58_653,
+        ratioSeries: [0.4, 0.39],
+        sortOrder: 2,
+      },
+    ];
+
+    expect(sortAllocationPeriodChangeRows(rows, "sortOrder", "asc").map((row) => row.key)).toEqual([
+      "inst-b",
+      "inst-a",
+    ]);
+
+    const instrumentChart = [
+      makePoint("2026-06-01", PORTFOLIO_INSTRUMENT_SCHEME_CODE, [
+        {
+          valueCode: "inst-a",
+          valueName: "銘柄A",
+          marketValueMinor: 100,
+          ratio: 0.5,
+        },
+      ]),
+    ];
+    const instrumentSeries = buildAllocationRatioSeries(
+      instrumentChart,
+      PORTFOLIO_INSTRUMENT_SCHEME_CODE,
+    );
+    expect(instrumentSeries.map((item) => item.key)).toEqual(["inst-a"]);
+  });
+
+  it("skips chart points without portfolio scheme and reuses instrument meta", () => {
+    const chartPoints = [
+      makePoint("2026-06-01", PORTFOLIO_INSTRUMENT_SCHEME_CODE, [
+        {
+          valueCode: "inst-a",
+          valueName: "銘柄A",
+          marketValueMinor: 100,
+          ratio: 0.5,
+          sortOrder: 1,
+        },
+      ]),
+      makePoint("2026-06-02", PORTFOLIO_INSTRUMENT_SCHEME_CODE, [
+        {
+          valueCode: "inst-a",
+          valueName: "銘柄A",
+          marketValueMinor: 120,
+          ratio: 0.55,
+          sortOrder: 1,
+        },
+      ]),
+    ];
+    chartPoints[1]!.allocationsByScheme = {};
+
+    const series = buildAllocationRatioSeries(
+      chartPoints,
+      PORTFOLIO_INSTRUMENT_SCHEME_CODE,
+    );
+    expect(series).toHaveLength(1);
+    expect(series[0]?.values).toEqual([0.5, null]);
+  });
+
+  it("sorts rows with explicit zero sort order", () => {
+    const rows: AllocationPeriodChangeRow[] = [
+      {
+        key: "inst-a",
+        label: "銘柄A",
+        startRatio: 0.6,
+        endRatio: 0.61,
+        deltaRatio: 0.01,
+        relativeRate: 0.01 / 0.6,
+        startMarketValueMinor: 2_000_000,
+        endMarketValueMinor: 2_100_000,
+        deltaMarketValueMinor: 100_000,
+        ratioSeries: [0.6, 0.61],
+        sortOrder: 0,
+      },
+      {
+        key: "inst-b",
+        label: "銘柄B",
+        startRatio: 0.4,
+        endRatio: 0.39,
+        deltaRatio: -0.01,
+        relativeRate: -0.025,
+        startMarketValueMinor: 1_400_000,
+        endMarketValueMinor: 1_341_347,
+        deltaMarketValueMinor: -58_653,
+        ratioSeries: [0.4, 0.39],
+        sortOrder: 2,
+      },
+    ];
+
+    expect(sortAllocationPeriodChangeRows(rows, "sortOrder", "asc").map((row) => row.key)).toEqual([
+      "inst-a",
+      "inst-b",
+    ]);
+  });
+
+  it("compares sort order rows directly for all branch paths", () => {
+    const { compareAllocationPeriodChangeBySortOrder } = __allocationPeriodChangeTesting;
+    const definedLeft: AllocationPeriodChangeRow = {
+      key: "inst-a",
+      label: "銘柄A",
+      startRatio: 0.6,
+      endRatio: 0.61,
+      deltaRatio: 0.01,
+      relativeRate: 0.01 / 0.6,
+      startMarketValueMinor: 2_000_000,
+      endMarketValueMinor: 2_100_000,
+      deltaMarketValueMinor: 100_000,
+      ratioSeries: [0.6, 0.61],
+      sortOrder: 1,
+    };
+    const definedRight: AllocationPeriodChangeRow = {
+      ...definedLeft,
+      key: "inst-b",
+      label: "銘柄B",
+      sortOrder: 2,
+    };
+    const undefinedSortOrder: AllocationPeriodChangeRow = {
+      ...definedLeft,
+      key: "inst-c",
+      label: "銘柄C",
+    };
+    delete undefinedSortOrder.sortOrder;
+
+    expect(
+      compareAllocationPeriodChangeBySortOrder(definedLeft, definedRight, "asc"),
+    ).toBeLessThan(0);
+    expect(
+      compareAllocationPeriodChangeBySortOrder(definedRight, definedLeft, "desc"),
+    ).toBeLessThan(0);
+    expect(
+      compareAllocationPeriodChangeBySortOrder(undefinedSortOrder, definedRight, "asc"),
+    ).toBeGreaterThan(0);
+  });
 });

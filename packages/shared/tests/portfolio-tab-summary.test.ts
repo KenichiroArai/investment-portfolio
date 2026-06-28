@@ -137,4 +137,34 @@ describe("sumTargetPortfolioRatio", () => {
     let result = sumTargetPortfolioRatio([]);
     expect(result).toBe(0);
   });
+
+  it("ignores non-finite target ratios", () => {
+    let result = sumTargetPortfolioRatio([
+      { instrumentId: "inst-a", targetRatio: 0.4 },
+      { instrumentId: "inst-b", targetRatio: Number.NaN },
+      { instrumentId: "inst-c", targetRatio: Number.POSITIVE_INFINITY },
+    ]);
+    expect(result).toBeCloseTo(0.4);
+  });
+});
+
+describe("findLargestAllocationDivergence edge cases", () => {
+  it("skips rows with null gap ratio even when divergence is set", () => {
+    const rows = buildPortfolioAllocationRows(lines, [], 1_000_000);
+    rows[0] = {
+      ...rows[0]!,
+      targetRatio: 0.5,
+      gapRatio: null,
+      gapDivergenceRatio: 0.9,
+    };
+    rows[1] = {
+      ...rows[1]!,
+      targetRatio: 0.3,
+      gapRatio: 0.1,
+      gapDivergenceRatio: 0.2,
+    };
+
+    let result = findLargestAllocationDivergence(rows);
+    expect(result?.instrumentId).toBe("inst-b");
+  });
 });

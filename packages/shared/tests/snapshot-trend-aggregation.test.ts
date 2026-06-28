@@ -12,6 +12,7 @@ import {
   TREND_MIN_MAX_FIELD_LABELS,
   TREND_MIN_MAX_FIELDS,
 } from "../src/snapshot-trend-aggregation";
+import { PORTFOLIO_INSTRUMENT_SCHEME_CODE } from "../src/portfolio-instrument-scheme";
 import type { SnapshotTrendPointDto } from "../src/snapshot-trends";
 
 function createPoint(
@@ -675,6 +676,58 @@ describe("snapshot-trend-aggregation", () => {
     const slices = aggregated[0]?.allocationsByScheme.asset ?? [];
     expect(slices.some((slice) => slice.valueCode === "bond")).toBe(true);
     expect(slices.some((slice) => slice.valueCode === "stock")).toBe(true);
+  });
+
+  it("preserves sortOrder when averaging allocation slices", () => {
+    const points = [
+      createPoint("2026-06-02", 100, {
+        allocationsByScheme: {
+          [PORTFOLIO_INSTRUMENT_SCHEME_CODE]: [
+            {
+              valueCode: "inst-a",
+              valueName: "銘柄A",
+              marketValueMinor: 60_000,
+              ratio: 0.6,
+              sortOrder: 1,
+            },
+            {
+              valueCode: "inst-b",
+              valueName: "銘柄B",
+              marketValueMinor: 40_000,
+              ratio: 0.4,
+              sortOrder: 2,
+            },
+          ],
+        },
+      }),
+      createPoint("2026-06-05", 100, {
+        allocationsByScheme: {
+          [PORTFOLIO_INSTRUMENT_SCHEME_CODE]: [
+            {
+              valueCode: "inst-a",
+              valueName: "銘柄A",
+              marketValueMinor: 50_000,
+              ratio: 0.5,
+              sortOrder: 1,
+            },
+            {
+              valueCode: "inst-b",
+              valueName: "銘柄B",
+              marketValueMinor: 50_000,
+              ratio: 0.5,
+              sortOrder: 2,
+            },
+          ],
+        },
+      }),
+    ];
+    const aggregated = aggregateTrendPoints(points, "week", "2026-06-01", "2026-06-30", {
+      pick: "average",
+    });
+    const slices =
+      aggregated[0]?.allocationsByScheme[PORTFOLIO_INSTRUMENT_SCHEME_CODE] ?? [];
+    expect(slices.find((slice) => slice.valueCode === "inst-a")?.sortOrder).toBe(1);
+    expect(slices.find((slice) => slice.valueCode === "inst-b")?.sortOrder).toBe(2);
   });
 
   it("skips buckets when rolling end date cannot be resolved", () => {
