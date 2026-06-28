@@ -1,21 +1,20 @@
 "use client";
 
 import {
-  filterHoldingDetailRows,
-  findClassificationTagValue,
-  flattenHoldingsInRange,
+  filterAllocationDetailRows,
+  flattenAllocationInRange,
   paginateRows,
-  sortHoldingDetailRows,
-  type HoldingDetailSortColumn,
+  sortAllocationDetailRows,
+  type AllocationDetailSortColumn,
 } from "@repo/shared";
 import type { CurrentSnapshotDto } from "@repo/shared";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
-import { HoldingsRangeDetailTable } from "@/features/holdings/HoldingsRangeDetailTable";
+import { AllocationDetailTable } from "@/features/allocation/AllocationDetailTable";
 import {
-  HOLDINGS_RANGE_DEFAULT_PAGE_SIZE,
-  HoldingsRangeToolbar,
-} from "@/features/holdings/HoldingsRangeToolbar";
+  ALLOCATION_DETAIL_DEFAULT_PAGE_SIZE,
+  AllocationDetailToolbar,
+} from "@/features/allocation/AllocationDetailToolbar";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
 import { LoadingSkeleton } from "@/components/loading-skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -60,15 +59,11 @@ export function AllocationDetailPanel({
   const [asOfDateFilter, setAsOfDateFilter] = useState("__all__");
   const [classificationValue, setClassificationValue] = useState("__all__");
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(HOLDINGS_RANGE_DEFAULT_PAGE_SIZE);
+  const [pageSize, setPageSize] = useState(ALLOCATION_DETAIL_DEFAULT_PAGE_SIZE);
   const { sortColumn, sortDirection, toggleSort } =
-    useTableSort<HoldingDetailSortColumn>("asOfDate", "desc");
+    useTableSort<AllocationDetailSortColumn>("asOfDate", "desc");
 
   const rangeDatesKey = rangeDates.join(",");
-  const classificationSchemes = useMemo(
-    () => [{ schemeCode, schemeName }],
-    [schemeCode, schemeName],
-  );
 
   useEffect(() => {
     let result: () => void = () => {};
@@ -166,7 +161,7 @@ export function AllocationDetailPanel({
     return result;
   }, [schemeCode]);
 
-  const handleDetailSort = (column: HoldingDetailSortColumn): void => {
+  const handleDetailSort = (column: AllocationDetailSortColumn): void => {
     let result: void = undefined;
     toggleSort(column);
     setPage(1);
@@ -174,37 +169,33 @@ export function AllocationDetailPanel({
   };
 
   const allDetailRows = useMemo(() => {
-    let result = flattenHoldingsInRange(rangeSnapshots);
+    let result = flattenAllocationInRange(rangeSnapshots, schemeCode, schemeName);
     return result;
-  }, [rangeSnapshots]);
+  }, [rangeSnapshots, schemeCode, schemeName]);
 
   const classificationValues = useMemo(() => {
     let result: string[] = [];
     const values = new Set<string>();
 
     for (const row of allDetailRows) {
-      const value = findClassificationTagValue(row.tags, schemeCode);
-      if (value) {
-        values.add(value);
-      }
+      values.add(row.valueName);
     }
 
     result = [...values].sort((left, right) => left.localeCompare(right, "ja"));
     return result;
-  }, [allDetailRows, schemeCode]);
+  }, [allDetailRows]);
 
   const filteredDetailRows = useMemo(() => {
-    let result = filterHoldingDetailRows(allDetailRows, {
+    let result = filterAllocationDetailRows(allDetailRows, {
       query,
       asOfDate: asOfDateFilter,
-      classificationSchemeCode: schemeCode,
       classificationValue,
     });
     return result;
-  }, [allDetailRows, query, asOfDateFilter, schemeCode, classificationValue]);
+  }, [allDetailRows, query, asOfDateFilter, classificationValue]);
 
   const sortedDetailRows = useMemo(() => {
-    let result = sortHoldingDetailRows(
+    let result = sortAllocationDetailRows(
       filteredDetailRows,
       sortColumn,
       sortDirection,
@@ -275,16 +266,13 @@ export function AllocationDetailPanel({
                   <AlertDescription>{partialFetchWarning}</AlertDescription>
                 </Alert>
               ) : null}
-              <HoldingsRangeToolbar
+              <AllocationDetailToolbar
                 query={query}
                 onQueryChange={setQuery}
                 asOfDateFilter={asOfDateFilter}
                 onAsOfDateFilterChange={setAsOfDateFilter}
                 availableDates={rangeDates}
-                classificationSchemes={classificationSchemes}
-                classificationSchemeCode={schemeCode}
                 classificationValue={classificationValue}
-                onClassificationSchemeChange={() => {}}
                 onClassificationValueChange={setClassificationValue}
                 classificationValues={classificationValues}
                 page={paginatedDetailRows.page}
@@ -295,12 +283,9 @@ export function AllocationDetailPanel({
                 }}
                 totalPages={paginatedDetailRows.totalPages}
                 rangeLabel={paginatedDetailRows.rangeLabel}
-                hideSchemeSelector
-                hideAnalysisLink
               />
-              <HoldingsRangeDetailTable
+              <AllocationDetailTable
                 rows={paginatedDetailRows.pageRows}
-                classificationSchemes={classificationSchemes}
                 sortColumn={sortColumn}
                 sortDirection={sortDirection}
                 onSort={handleDetailSort}

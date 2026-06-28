@@ -230,16 +230,16 @@ describe("AnalysisView", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("テスト銘柄")).toBeInTheDocument();
+      expect(screen.getByText("国内")).toBeInTheDocument();
     });
 
     expect(screen.getByRole("columnheader", { name: "基準日" })).toBeInTheDocument();
-    expect(screen.getByRole("columnheader", { name: "地域分類" })).toBeInTheDocument();
-    expect(screen.getByText("国内")).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "分類" })).toBeInTheDocument();
+    expect(screen.queryByText("テスト銘柄")).not.toBeInTheDocument();
     expect(screen.getByText(/分析軸: 地域分類/)).toBeInTheDocument();
   });
 
-  it("updates holdings detail classification column when scheme changes", async () => {
+  it("updates holdings detail classification values when scheme changes", async () => {
     const user = userEvent.setup();
     vi.stubGlobal(
       "fetch",
@@ -257,17 +257,16 @@ describe("AnalysisView", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByRole("columnheader", { name: "地域分類" })).toBeInTheDocument();
+      expect(screen.getByText("国内")).toBeInTheDocument();
     });
 
     await user.click(screen.getByRole("tab", { name: "資産分類" }));
 
     await waitFor(() => {
-      expect(screen.getByRole("columnheader", { name: "資産分類" })).toBeInTheDocument();
+      expect(screen.getByText("株式")).toBeInTheDocument();
     });
 
-    expect(screen.queryByRole("columnheader", { name: "地域分類" })).not.toBeInTheDocument();
-    expect(screen.getByText("株式")).toBeInTheDocument();
+    expect(screen.queryByText("国内")).not.toBeInTheDocument();
     expect(screen.getByText(/分析軸: 資産分類/)).toBeInTheDocument();
   });
 
