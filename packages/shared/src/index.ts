@@ -26,6 +26,8 @@ export * from "./ideco-analysis-csv";
 export * from "./ideco-csv-utils";
 export * from "./ideco-generic-csv";
 export * from "./ideco-holdings-csv";
+export * from "./ideco-holdings-paste";
+export * from "./ideco-instrument-match";
 export * from "./ideco-instrument-attributes";
 export * from "./ideco-instruments-csv";
 export * from "./ideco-portfolio-metrics";

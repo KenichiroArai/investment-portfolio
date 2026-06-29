@@ -16,6 +16,7 @@ import {
   getSnapshotsInDateRange,
   listInstrumentClassificationValueIds,
   listInstruments,
+  listIdecoInstrumentsForPaste,
   listPortfolios,
   listSchemesWithValuesForPortfolio,
   listSnapshotDates,
@@ -629,6 +630,15 @@ export function createApp(options?: CreateAppOptions) {
     }
 
     result = c.json(snapshot);
+    return result;
+  });
+
+  app.get("/portfolios/ideco/instruments-for-paste", async (c) => {
+    let result!: Response;
+
+    const db = resolveDb();
+    const rows = await listIdecoInstrumentsForPaste(db);
+    result = c.json(rows);
     return result;
   });
 

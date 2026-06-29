@@ -268,3 +268,30 @@ export async function getAttributesForInstruments(
 
   return result;
 }
+
+export type IdecoPasteInstrumentRow = {
+  id: string;
+  name: string;
+  shortName: string | null;
+};
+
+export async function listIdecoInstrumentsForPaste(db: AppDatabase) {
+  let result: IdecoPasteInstrumentRow[] = [];
+
+  const rows = await db.select().from(instruments).orderBy(instruments.name);
+  const instrumentIds = rows.map((row) => row.id);
+  const attributesByInstrumentId = await getAttributesForInstruments(db, instrumentIds);
+
+  for (const row of rows) {
+    const attributes = attributesByInstrumentId.get(row.id) ?? [];
+    const shortNameAttribute = attributes.find((attribute) => attribute.code === "short_name");
+    let item: IdecoPasteInstrumentRow = {
+      id: row.id,
+      name: row.name,
+      shortName: shortNameAttribute?.textValue ?? null,
+    };
+    result.push(item);
+  }
+
+  return result;
+}

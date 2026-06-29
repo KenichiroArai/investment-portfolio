@@ -152,6 +152,16 @@ export function createManageFetchMock(options: ManageFetchMockOptions = {}) {
       return okResponse(state.instruments);
     }
 
+    if (url.includes("/portfolios/ideco/instruments-for-paste") && method === "GET") {
+      return okResponse(
+        state.instruments.map((item) => ({
+          id: item.id,
+          name: item.name,
+          shortName: null,
+        })),
+      );
+    }
+
     if (url.endsWith("/instruments") && method === "POST") {
       const mutate = options.mutate?.createInstrument;
       if (mutate && !mutate.ok) {

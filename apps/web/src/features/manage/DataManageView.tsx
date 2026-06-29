@@ -19,7 +19,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -55,6 +54,8 @@ import {
   upsertMetric,
 } from "@/features/manage/snapshot-input";
 import { WritableGuard } from "@/features/manage/WritableGuard";
+import { HoldingTableRow } from "@/features/manage/HoldingTableRow";
+import { IdecoHoldingsDataTab } from "@/features/ideco/holdings-paste/IdecoHoldingsDataTab";
 import {
   createInstrument,
   deleteInstrument,
@@ -506,6 +507,14 @@ export function DataManageView({ portfolioCode, initialTab }: DataManageViewProp
             </TabsContent>
 
             <TabsContent value="holding" className="space-y-6">
+              {portfolioCode === "ideco" ? (
+                <IdecoHoldingsDataTab
+                  asOfDate={asOfDate}
+                  disabled={loading || submitting}
+                  onReload={load}
+                />
+              ) : (
+                <>
               <Card>
                 <CardHeader>
                   <CardTitle>保有明細を登録</CardTitle>
@@ -617,6 +626,8 @@ export function DataManageView({ portfolioCode, initialTab }: DataManageViewProp
                   )}
                 </CardContent>
               </Card>
+                </>
+              )}
             </TabsContent>
 
             <TabsContent value="generic" className="space-y-6">
@@ -844,63 +855,7 @@ function InstrumentTableRow({
   return result;
 }
 
-type HoldingTableRowProps = {
-  line: CurrentSnapshotDto["lines"][number];
-  disabled: boolean;
-  onSave: (quantity: number, marketValueMinor: number) => void;
-  onDelete: () => void;
-};
-
-function HoldingTableRow({ line, disabled, onSave, onDelete }: HoldingTableRowProps) {
-  const [quantity, setQuantity] = useState(String(line.quantity));
-  const [marketValueMinor, setMarketValueMinor] = useState(String(line.marketValueMinor));
-
-  let result = (
-    <TableRow>
-      <TableCell className="font-medium">{line.instrumentName}</TableCell>
-      <TableCell>
-        <Input
-          type="number"
-          step="any"
-          value={quantity}
-          onChange={(event) => {
-            setQuantity(event.target.value);
-          }}
-        />
-      </TableCell>
-      <TableCell>
-        <Input
-          type="number"
-          value={marketValueMinor}
-          onChange={(event) => {
-            setMarketValueMinor(event.target.value);
-          }}
-        />
-      </TableCell>
-      <TableCell className="text-right">
-        <div className="flex justify-end gap-2">
-          <Button
-            type="button"
-            size="sm"
-            variant="secondary"
-            disabled={disabled}
-            onClick={() => {
-              onSave(Number.parseFloat(quantity), Number.parseInt(marketValueMinor, 10));
-            }}
-          >
-            更新
-          </Button>
-          <Button type="button" size="sm" variant="destructive" disabled={disabled} onClick={onDelete}>
-            削除
-          </Button>
-        </div>
-      </TableCell>
-    </TableRow>
-  );
-  return result;
-}
-
-type MetricTableRowProps = {
+type InstrumentTableRowProps = {
   metricCode: string;
   label: string;
   initialValue: number;

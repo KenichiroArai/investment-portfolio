@@ -6,8 +6,6 @@ import { DataManageView } from "@/features/manage/DataManageView";
 import { ManageAsOfDateField } from "@/features/manage/ManageAsOfDateField";
 import {
   createManageFetchMock,
-  MANAGE_INSTRUMENT,
-  MANAGE_SCHEME,
   MANAGE_SNAPSHOT,
 } from "../helpers/manage-api-test-utils";
 
@@ -59,10 +57,13 @@ describe("DataManageView", () => {
       "fetch",
       createManageFetchMock({ snapshot: null }),
     );
-    render(<DataManageView portfolioCode="ideco" />);
+    render(<DataManageView portfolioCode="ideco" initialTab="holding" />);
     await waitForLoaded();
-    await userEvent.setup().click(screen.getByRole("tab", { name: "保有明細" }));
-    expect(screen.getByText("保有明細がありません")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByText("コピペ取り込みまたは個別登録で明細を追加してください。"),
+      ).toBeInTheDocument();
+    });
   });
 
   it("shows toast when snapshot load fails", async () => {
@@ -161,11 +162,48 @@ describe("DataManageView", () => {
     expect(screen.getByText("銘柄がありません")).toBeInTheDocument();
   });
 
-  it("adds holding with validation and success", async () => {
+  it("imports ideco holdings paste and registers draft", async () => {
     const user = userEvent.setup();
-    render(<DataManageView portfolioCode="ideco" />);
+    render(<DataManageView portfolioCode="ideco" initialTab="holding" />);
     await waitForLoaded();
-    await user.click(screen.getByRole("tab", { name: "保有明細" }));
+
+    const pasteText = `国内株式
+テスト銘柄	31,530円	41,772口	131,707円	128,321円	3,386円
+2.6％`;
+
+    await user.type(
+      screen.getByPlaceholderText("運用サイトの保有明細表をここに貼り付けてください"),
+      pasteText,
+    );
+    await user.click(screen.getByRole("button", { name: "取り込み" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("取り込み下書き一覧")).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole("button", { name: "一括登録" }));
+    await waitFor(() => {
+      expect(toastSuccess).toHaveBeenCalledWith("保有明細を登録しました。");
+    });
+  });
+
+  it("adds ideco holding individually", async () => {
+    const user = userEvent.setup();
+    render(<DataManageView portfolioCode="ideco" initialTab="holding" />);
+    await waitForLoaded();
+
+    await user.type(screen.getByLabelText("数量"), "2");
+    await user.type(screen.getByLabelText("評価額（円）"), "50000");
+    await user.click(screen.getByRole("button", { name: "明細行を追加" }));
+    await waitFor(() => {
+      expect(toastSuccess).toHaveBeenCalledWith("保有明細を登録しました。");
+    });
+  });
+
+  it("adds holding with validation and success for non-ideco portfolio", async () => {
+    const user = userEvent.setup();
+    render(<DataManageView portfolioCode="taxable" initialTab="holding" />);
+    await waitForLoaded();
 
     await user.type(screen.getByLabelText("数量"), "0");
     await user.type(screen.getByLabelText("評価額（円）"), "1000");
@@ -199,9 +237,8 @@ describe("DataManageView", () => {
       "fetch",
       createManageFetchMock({ snapshot: null }),
     );
-    render(<DataManageView portfolioCode="ideco" />);
+    render(<DataManageView portfolioCode="ideco" initialTab="generic" />);
     await waitForLoaded();
-    await user.click(screen.getByRole("tab", { name: "汎用指標" }));
     const metricForm = screen
       .getByRole("button", { name: "汎用指標を登録" })
       .closest("form")!;
@@ -216,11 +253,31 @@ describe("DataManageView", () => {
     });
   });
 
-  it("updates and deletes holdings", async () => {
+  it("updates and deletes ideco holdings individually", async () => {
     const user = userEvent.setup();
-    render(<DataManageView portfolioCode="ideco" />);
+    render(<DataManageView portfolioCode="ideco" initialTab="holding" />);
     await waitForLoaded();
-    await user.click(screen.getByRole("tab", { name: "保有明細" }));
+
+    const quantityInput = screen.getByDisplayValue("10");
+    await user.clear(quantityInput);
+    await user.type(quantityInput, "20");
+    await user.click(screen.getAllByRole("button", { name: "更新" })[0]!);
+    await waitFor(() => {
+      expect(toastSuccess).toHaveBeenCalledWith("保有明細を更新しました。");
+    });
+
+    await user.click(screen.getAllByRole("button", { name: "削除" })[0]!);
+    const alert = await screen.findByRole("alertdialog", { name: "明細行を削除" });
+    await user.click(within(alert).getByRole("button", { name: "削除" }));
+    await waitFor(() => {
+      expect(toastSuccess).toHaveBeenCalledWith("保有明細を削除しました。");
+    });
+  });
+
+  it("updates and deletes holdings for non-ideco portfolio", async () => {
+    const user = userEvent.setup();
+    render(<DataManageView portfolioCode="taxable" initialTab="holding" />);
+    await waitForLoaded();
 
     const quantityInput = screen.getAllByRole("spinbutton")[0]!;
     await user.clear(quantityInput);
@@ -240,9 +297,8 @@ describe("DataManageView", () => {
 
   it("manages generic metrics", async () => {
     const user = userEvent.setup();
-    render(<DataManageView portfolioCode="ideco" />);
+    render(<DataManageView portfolioCode="ideco" initialTab="generic" />);
     await waitForLoaded();
-    await user.click(screen.getByRole("tab", { name: "汎用指標" }));
 
     const metricForm = screen
       .getByRole("button", { name: "汎用指標を登録" })
@@ -291,9 +347,8 @@ describe("DataManageView", () => {
         snapshot: { ...MANAGE_SNAPSHOT, metrics: [] },
       }),
     );
-    render(<DataManageView portfolioCode="ideco" />);
+    render(<DataManageView portfolioCode="ideco" initialTab="generic" />);
     await waitForLoaded();
-    await user.click(screen.getByRole("tab", { name: "汎用指標" }));
     expect(screen.getByText("汎用指標がありません")).toBeInTheDocument();
   });
 
@@ -307,9 +362,8 @@ describe("DataManageView", () => {
         },
       }),
     );
-    render(<DataManageView portfolioCode="ideco" />);
+    render(<DataManageView portfolioCode="ideco" initialTab="generic" />);
     await waitForLoaded();
-    await user.click(screen.getByRole("tab", { name: "汎用指標" }));
     await user.type(screen.getByLabelText(/値（/i), "100");
     await user.click(screen.getByRole("button", { name: "汎用指標を登録" }));
     await waitFor(() => {

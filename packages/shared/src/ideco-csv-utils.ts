@@ -42,11 +42,16 @@ export function parseJapanesePercentRate(value: string): number {
   let result = Number.NaN;
 
   const trimmed = value.trim();
-  if (!trimmed.endsWith("%")) {
+  let withoutSuffix = trimmed;
+  if (trimmed.endsWith("％")) {
+    withoutSuffix = trimmed.slice(0, -1).trim();
+  } else if (trimmed.endsWith("%")) {
+    withoutSuffix = trimmed.slice(0, -1).trim();
+  } else {
     return result;
   }
 
-  const normalized = trimmed.slice(0, -1).trim().replace(/,/g, "");
+  const normalized = withoutSuffix.replace(/,/g, "");
   if (normalized === "" || normalized === "-") {
     return result;
   }
