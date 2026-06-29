@@ -2,11 +2,18 @@
 
 import { Settings } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import { WritableOnly } from "@/components/WritableOnly";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Select,
   SelectContent,
@@ -17,6 +24,11 @@ import {
 import { cn } from "@/lib/utils";
 import { findPortfolioByCode } from "@/lib/portfolio-catalog";
 import { buildPortfolioPath } from "@/lib/portfolio-path";
+import {
+  SETTINGS_CATEGORIES,
+  resolveActiveCategory,
+  resolveSettingsViewMode,
+} from "@/lib/settings-navigation";
 import {
   getPortfoliosFetchUrl,
   getSnapshotLoadErrorMessage,
@@ -78,12 +90,15 @@ function isSettingsActive(pathname: string, portfolioCode: string): boolean {
 
 export function PortfolioContextBar({ portfolioCode }: PortfolioContextBarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [portfolios, setPortfolios] = useState<PortfolioListItem[]>([]);
   const catalogPortfolio = findPortfolioByCode(portfolioCode);
   const [portfolioName, setPortfolioName] = useState(
     catalogPortfolio?.name ?? portfolioCode,
   );
   const settingsActive = isSettingsActive(pathname, portfolioCode);
+  const activeSettingsCategory = resolveActiveCategory(pathname);
+  const settingsViewMode = resolveSettingsViewMode(pathname);
 
   useEffect(() => {
     let result: () => void = () => {};
@@ -154,16 +169,48 @@ export function PortfolioContextBar({ portfolioCode }: PortfolioContextBarProps)
             )}
           </div>
           <WritableOnly>
-            <Button
-              variant={settingsActive ? "secondary" : "outline"}
-              size="sm"
-              asChild
-            >
-              <Link href={buildPortfolioPath(portfolioCode, "settings", "data")}>
-                <Settings className="h-4 w-4" />
-                設定
-              </Link>
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant={settingsActive ? "secondary" : "outline"} size="sm">
+                  <Settings className="h-4 w-4" />
+                  設定
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-64">
+                {SETTINGS_CATEGORIES.map((category) => {
+                  const active =
+                    activeSettingsCategory === category.segment && settingsViewMode === "category";
+                  let item = (
+                    <DropdownMenuItem
+                      key={category.segment}
+                      onSelect={() => {
+                        router.push(buildPortfolioPath(portfolioCode, "settings", category.segment));
+                      }}
+                      className="flex items-start gap-2 py-2"
+                    >
+                      <category.icon className="mt-0.5 h-4 w-4 shrink-0" />
+                      <span className="flex min-w-0 flex-col">
+                        <span className="font-medium">
+                          {category.label}
+                          {active ? " (現在)" : ""}
+                        </span>
+                        <span className="text-xs text-muted-foreground">{category.description}</span>
+                      </span>
+                    </DropdownMenuItem>
+                  );
+                  return item;
+                })}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={() => {
+                    router.push(buildPortfolioPath(portfolioCode, "settings"));
+                  }}
+                >
+                  設定一覧
+                  {settingsViewMode === "overview" ? " (現在)" : ""}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </WritableOnly>
         </div>
         {!settingsActive ? (

@@ -1,6 +1,7 @@
 "use client";
 
 import type { CurrentSnapshotDto, InstrumentListItemDto } from "@repo/shared";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -68,10 +69,25 @@ import { formatYen } from "@/lib/format-yen";
 
 type DataManageViewProps = {
   portfolioCode: string;
+  initialTab?: string;
 };
 
-export function DataManageView({ portfolioCode }: DataManageViewProps) {
-  const [activeTab, setActiveTab] = useState("instrument");
+function resolveTab(tab: string | null | undefined): string {
+  let result = "instrument";
+
+  if (tab === "holding" || tab === "generic" || tab === "instrument") {
+    result = tab;
+  }
+
+  return result;
+}
+
+export function DataManageView({ portfolioCode, initialTab }: DataManageViewProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const resolvedInitialTab = resolveTab(initialTab);
+  const activeTab = resolveTab(searchParams.get("tab") ?? resolvedInitialTab);
   const [snapshot, setSnapshot] = useState<CurrentSnapshotDto | null>(null);
   const [instruments, setInstruments] = useState<InstrumentListItemDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -156,6 +172,19 @@ export function DataManageView({ portfolioCode }: DataManageViewProps) {
     };
     return result;
   }, [load]);
+
+  const onTabValueChange = useCallback(
+    (nextTab: string) => {
+      let result: void = undefined;
+      const resolvedTab = resolveTab(nextTab);
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("tab", resolvedTab);
+      const query = params.toString();
+      router.replace(query === "" ? pathname : `${pathname}?${query}`);
+      return result;
+    },
+    [pathname, router, searchParams],
+  );
 
   async function saveSnapshot(
     lines: ReturnType<typeof snapshotToHoldingInputs>,
@@ -366,7 +395,7 @@ export function DataManageView({ portfolioCode }: DataManageViewProps) {
 
       <WritableGuard>
         {!loading ? (
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <Tabs value={activeTab} onValueChange={onTabValueChange}>
             <TabsList>
               <TabsTrigger value="instrument">銘柄</TabsTrigger>
               <TabsTrigger value="holding">保有明細</TabsTrigger>

@@ -1,69 +1,128 @@
 "use client";
 
-import { Database, Tags } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { buildPortfolioPath } from "@/lib/portfolio-path";
+import {
+  SETTINGS_CATEGORIES,
+  type SettingsCategory,
+  type SettingsSubItem,
+  resolveActiveCategory,
+  resolveSettingsViewMode,
+} from "@/lib/settings-navigation";
 import { cn } from "@/lib/utils";
 
 type SettingsSidebarProps = {
   portfolioCode: string;
 };
 
-const SETTINGS_ITEMS = [
-  {
-    segment: "data",
-    label: "データ管理",
-    description: "銘柄・明細・指標",
-    icon: Database,
-  },
-  {
-    segment: "classification",
-    label: "分類設定",
-    description: "分析軸・タグ",
-    icon: Tags,
-  },
-];
+function buildSettingsSubItemHref(
+  portfolioCode: string,
+  category: SettingsCategory,
+  item: SettingsSubItem,
+): string {
+  let result = buildPortfolioPath(portfolioCode, "settings", category.segment);
+
+  if (item.tab) {
+    result = `${result}?tab=${item.tab}`;
+    return result;
+  }
+
+  return result;
+}
+
+function isSubItemActive(
+  pathname: string,
+  queryTab: string,
+  category: SettingsCategory,
+  item: SettingsSubItem,
+): boolean {
+  let result = false;
+
+  if (category.segment === "data") {
+    if (!pathname.includes("/settings/data")) {
+      return result;
+    }
+
+    result = queryTab === "" ? item.tab === "instrument" : queryTab === item.tab;
+    return result;
+  }
+
+  if (category.segment === "classification") {
+    if (!pathname.includes("/settings/classification")) {
+      return result;
+    }
+    result = queryTab === "" ? item.tab === "scheme" : queryTab === item.tab;
+  }
+
+  return result;
+}
 
 function SettingsNavLinks({
   portfolioCode,
   pathname,
+  queryTab,
+  mode,
+  activeCategory,
   onNavigate,
 }: {
   portfolioCode: string;
   pathname: string;
+  queryTab: string;
+  mode: "category" | "overview";
+  activeCategory: SettingsCategory["segment"] | undefined;
   onNavigate?: () => void;
 }) {
+  const categories =
+    mode === "category" && activeCategory
+      ? SETTINGS_CATEGORIES.filter((category) => category.segment === activeCategory)
+      : SETTINGS_CATEGORIES;
+
   let result = (
     <nav className="grid gap-1" aria-label="設定メニュー">
-      {SETTINGS_ITEMS.map((item) => {
-        const href = buildPortfolioPath(portfolioCode, "settings", item.segment);
-        const active = pathname.startsWith(href);
-        const Icon = item.icon;
+      {categories.map((category) => {
+        let group = (
+          <div key={category.segment} className="grid gap-1">
+            {mode === "overview" ? (
+              <>
+                <p className="px-3 pt-2 text-xs font-semibold text-muted-foreground">{category.label}</p>
+                <p className="px-3 text-xs text-muted-foreground">{category.description}</p>
+              </>
+            ) : null}
+            {category.children.map((child) => {
+              const href = buildSettingsSubItemHref(portfolioCode, category, child);
+              const active = isSubItemActive(pathname, queryTab, category, child);
 
-        let link = (
-          <Link
-            key={item.segment}
-            href={href}
-            onClick={onNavigate}
-            className={cn(
-              "flex items-start gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
-              active
-                ? "bg-accent text-accent-foreground"
-                : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-            )}
-          >
-            <Icon className="mt-0.5 h-4 w-4 shrink-0" />
-            <span>
-              <span className="block font-medium">{item.label}</span>
-              <span className="block text-xs opacity-80">{item.description}</span>
-            </span>
-          </Link>
+              let childLink = (
+                <Link
+                  key={child.id}
+                  href={href}
+                  onClick={onNavigate}
+                  className={cn(
+                    "flex items-start rounded-lg px-3 py-2 text-sm transition-colors",
+                    active
+                      ? "bg-accent text-accent-foreground"
+                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                  )}
+                >
+                  <span className="block">
+                    <span className="block font-medium">{child.label}</span>
+                    {mode === "overview" ? (
+                      <span className="block text-xs opacity-80">{category.label}</span>
+                    ) : null}
+                  </span>
+                </Link>
+              );
+              return childLink;
+            })}
+            {mode === "overview" ? <Separator className="my-2" /> : null}
+          </div>
         );
-        return link;
+        return group;
       })}
     </nav>
   );
@@ -72,6 +131,15 @@ function SettingsNavLinks({
 
 export function SettingsSidebar({ portfolioCode }: SettingsSidebarProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const mode = resolveSettingsViewMode(pathname);
+  const activeCategory = resolveActiveCategory(pathname);
+  const queryTab = searchParams.get("tab") ?? "";
+  const desktopTitle =
+    mode === "category"
+      ? SETTINGS_CATEGORIES.find((category) => category.segment === activeCategory)?.label ?? "設定"
+      : "設定一覧";
+  const overviewHref = buildPortfolioPath(portfolioCode, "settings");
 
   let result = (
     <>
@@ -84,19 +152,47 @@ export function SettingsSidebar({ portfolioCode }: SettingsSidebarProps) {
           </SheetTrigger>
           <SheetContent side="left" className="w-72">
             <SheetHeader>
-              <SheetTitle>設定</SheetTitle>
+              <SheetTitle>{desktopTitle}</SheetTitle>
             </SheetHeader>
             <div className="mt-4">
-              <SettingsNavLinks portfolioCode={portfolioCode} pathname={pathname} />
+              {mode === "category" ? (
+                <Link
+                  href={overviewHref}
+                  className="mb-3 inline-flex px-1 text-xs text-muted-foreground hover:text-foreground"
+                >
+                  設定一覧へ
+                </Link>
+              ) : null}
+              <SettingsNavLinks
+                portfolioCode={portfolioCode}
+                pathname={pathname}
+                queryTab={queryTab}
+                mode={mode}
+                activeCategory={activeCategory}
+              />
             </div>
           </SheetContent>
         </Sheet>
       </div>
       <aside className="hidden w-56 shrink-0 md:block">
         <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          設定
+          {desktopTitle}
         </p>
-        <SettingsNavLinks portfolioCode={portfolioCode} pathname={pathname} />
+        {mode === "category" ? (
+          <Link
+            href={overviewHref}
+            className="mb-3 inline-flex px-1 text-xs text-muted-foreground hover:text-foreground"
+          >
+            設定一覧へ
+          </Link>
+        ) : null}
+        <SettingsNavLinks
+          portfolioCode={portfolioCode}
+          pathname={pathname}
+          queryTab={queryTab}
+          mode={mode}
+          activeCategory={activeCategory}
+        />
       </aside>
     </>
   );

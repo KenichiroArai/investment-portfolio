@@ -5,6 +5,7 @@ import type {
   InstrumentListItemDto,
 } from "@repo/shared";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -40,6 +41,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WritableGuard } from "@/features/manage/WritableGuard";
 import {
   createClassificationScheme,
@@ -57,9 +59,25 @@ import { buildPortfolioPath } from "@/lib/portfolio-path";
 
 type AnalysisSettingsViewProps = {
   portfolioCode: string;
+  initialTab?: string;
 };
 
-export function AnalysisSettingsView({ portfolioCode }: AnalysisSettingsViewProps) {
+function resolveClassificationTab(tab: string | null | undefined): string {
+  let result = "scheme";
+
+  if (tab === "scheme" || tab === "value" || tab === "tag") {
+    result = tab;
+  }
+
+  return result;
+}
+
+export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSettingsViewProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const resolvedInitialTab = resolveClassificationTab(initialTab);
+  const activeTab = resolveClassificationTab(searchParams.get("tab") ?? resolvedInitialTab);
   const [schemes, setSchemes] = useState<ClassificationSchemeWithValuesDto[]>([]);
   const [instruments, setInstruments] = useState<InstrumentListItemDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -74,6 +92,19 @@ export function AnalysisSettingsView({ portfolioCode }: AnalysisSettingsViewProp
   const [tagValueIds, setTagValueIds] = useState<string[]>([]);
   const [deleteSchemeId, setDeleteSchemeId] = useState<string | null>(null);
   const [deleteValueId, setDeleteValueId] = useState<string | null>(null);
+
+  const onTabValueChange = useCallback(
+    (nextTab: string) => {
+      let result: void = undefined;
+      const resolvedTab = resolveClassificationTab(nextTab);
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("tab", resolvedTab);
+      const query = params.toString();
+      router.replace(query === "" ? pathname : `${pathname}?${query}`);
+      return result;
+    },
+    [pathname, router, searchParams],
+  );
 
   const load = useCallback(async () => {
     let result: void = undefined;
@@ -355,7 +386,14 @@ export function AnalysisSettingsView({ portfolioCode }: AnalysisSettingsViewProp
       <WritableGuard>
         {!loading ? (
           <div className="space-y-6">
-            <Card>
+            <Tabs value={activeTab} onValueChange={onTabValueChange}>
+              <TabsList>
+                <TabsTrigger value="scheme">分析軸</TabsTrigger>
+                <TabsTrigger value="value">カテゴリ値</TabsTrigger>
+                <TabsTrigger value="tag">銘柄タグ</TabsTrigger>
+              </TabsList>
+              <TabsContent value="scheme" className="space-y-6">
+                <Card>
               <CardHeader>
                 <CardTitle>分析軸</CardTitle>
                 <CardDescription>資産配分の集計軸を追加・編集します。</CardDescription>
@@ -419,13 +457,15 @@ export function AnalysisSettingsView({ portfolioCode }: AnalysisSettingsViewProp
                   </Table>
                 )}
               </CardContent>
-            </Card>
+                </Card>
+              </TabsContent>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>カテゴリ値</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
+              <TabsContent value="value" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>カテゴリ値</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
                 <form className="grid max-w-lg gap-4" onSubmit={handleCreateValue}>
                   <FormField label="分析軸" htmlFor="value-scheme">
                     <Select value={valueSchemeId} onValueChange={setValueSchemeId}>
@@ -521,15 +561,17 @@ export function AnalysisSettingsView({ portfolioCode }: AnalysisSettingsViewProp
                   );
                   return block;
                 })}
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>銘柄タグ</CardTitle>
-                <CardDescription>銘柄に分類値を複数付与できます。</CardDescription>
-              </CardHeader>
-              <CardContent>
+              <TabsContent value="tag" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>銘柄タグ</CardTitle>
+                    <CardDescription>銘柄に分類値を複数付与できます。</CardDescription>
+                  </CardHeader>
+                  <CardContent>
                 <form className="grid max-w-lg gap-4" onSubmit={handleSetTags}>
                   <FormField label="銘柄" htmlFor="tag-instrument">
                     <Select value={tagInstrumentId} onValueChange={setTagInstrumentId}>
@@ -589,8 +631,10 @@ export function AnalysisSettingsView({ portfolioCode }: AnalysisSettingsViewProp
                     タグを保存
                   </Button>
                 </form>
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
 
             <AlertDialog
               open={deleteSchemeId !== null}
