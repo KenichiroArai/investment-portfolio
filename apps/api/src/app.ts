@@ -633,10 +633,22 @@ export function createApp(options?: CreateAppOptions) {
     return result;
   });
 
-  app.get("/portfolios/ideco/instruments-for-paste", async (c) => {
+  app.get("/portfolios/:code/instruments-for-paste", async (c) => {
     let result!: Response;
 
+    const portfolioCode = c.req.param("code");
     const db = resolveDb();
+    const portfolio = await findPortfolioByCode(db, portfolioCode);
+    if (!portfolio) {
+      result = c.json({ error: "Portfolio not found" }, 404);
+      return result;
+    }
+
+    if (portfolio.kind !== "ideco") {
+      result = c.json({ error: "Not supported for this portfolio kind" }, 404);
+      return result;
+    }
+
     const rows = await listIdecoInstrumentsForPaste(db);
     result = c.json(rows);
     return result;

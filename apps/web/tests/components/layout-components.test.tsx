@@ -145,16 +145,20 @@ describe("layout components", () => {
 
     it("renders settings sidebar navigation links", () => {
       usePathname.mockReturnValue("/portfolios/ideco/settings/data/");
-      render(<SettingsSidebar portfolioCode="ideco" />);
+      render(<SettingsSidebar portfolioCode="ideco" portfolioKind="ideco" />);
 
       expect(screen.getByRole("navigation", { name: "設定メニュー" })).toBeInTheDocument();
-      expect(screen.getByRole("link", { name: /データ管理/ })).toHaveAttribute(
+      expect(screen.getByRole("link", { name: "銘柄" })).toHaveAttribute(
         "href",
-        "/portfolios/ideco/settings/data",
+        "/portfolios/ideco/settings/data?tab=instrument",
       );
-      expect(screen.getByRole("link", { name: /分類設定/ })).toHaveAttribute(
+      expect(screen.getByRole("link", { name: "保有明細" })).toHaveAttribute(
         "href",
-        "/portfolios/ideco/settings/classification",
+        "/portfolios/ideco/settings/data?tab=holding",
+      );
+      expect(screen.getByRole("link", { name: "iDeCo一括取り込み" })).toHaveAttribute(
+        "href",
+        "/portfolios/ideco/settings/data?tab=ideco-bulk-import",
       );
       expect(screen.getByRole("button", { name: "設定メニュー" })).toBeInTheDocument();
     });

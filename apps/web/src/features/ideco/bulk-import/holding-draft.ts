@@ -5,16 +5,16 @@ import {
   type IdecoHoldingsPasteRow,
 } from "@repo/shared";
 
-import type { IdecoHoldingDraftRow, IdecoPasteInstrumentDto } from "./types";
+import type { IdecoHoldingDraftRow, PasteInstrumentDto } from "./types";
 
-export function createIdecoHoldingDraftId(): string {
+export function createHoldingDraftId(): string {
   let result = `draft-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
   return result;
 }
 
 export function pasteRowsToDrafts(
   rows: IdecoHoldingsPasteRow[],
-  instruments: IdecoPasteInstrumentDto[],
+  instruments: PasteInstrumentDto[],
 ): IdecoHoldingDraftRow[] {
   let result: IdecoHoldingDraftRow[] = [];
 
@@ -22,7 +22,7 @@ export function pasteRowsToDrafts(
     const instrumentId = matchIdecoInstrumentId(instruments, row.instrumentName);
     result.push({
       ...row,
-      draftId: createIdecoHoldingDraftId(),
+      draftId: createHoldingDraftId(),
       instrumentId,
     });
   }
@@ -56,7 +56,7 @@ export function draftRowsToHoldingInputs(drafts: IdecoHoldingDraftRow[]): Holdin
   return result;
 }
 
-export function hasUnmatchedIdecoDraftRows(drafts: IdecoHoldingDraftRow[]): boolean {
+export function hasUnmatchedDraftRows(drafts: IdecoHoldingDraftRow[]): boolean {
   let result = false;
 
   for (const draft of drafts) {
@@ -69,7 +69,7 @@ export function hasUnmatchedIdecoDraftRows(drafts: IdecoHoldingDraftRow[]): bool
   return result;
 }
 
-export function updateIdecoDraftRowAtIndex(
+export function updateDraftRowAtIndex(
   drafts: IdecoHoldingDraftRow[],
   index: number,
   updated: IdecoHoldingDraftRow,
@@ -83,7 +83,7 @@ export function updateIdecoDraftRowAtIndex(
   return result;
 }
 
-export function removeIdecoDraftRowAtIndex(
+export function removeDraftRowAtIndex(
   drafts: IdecoHoldingDraftRow[],
   index: number,
 ): IdecoHoldingDraftRow[] {

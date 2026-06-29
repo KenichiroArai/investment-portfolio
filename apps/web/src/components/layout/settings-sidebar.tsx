@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { buildPortfolioPath } from "@/lib/portfolio-path";
 import {
-  SETTINGS_CATEGORIES,
+  buildSettingsCategories,
   type SettingsCategory,
   type SettingsSubItem,
   resolveActiveCategory,
@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 
 type SettingsSidebarProps = {
   portfolioCode: string;
+  portfolioKind: string;
 };
 
 function buildSettingsSubItemHref(
@@ -64,6 +65,7 @@ function isSubItemActive(
 
 function SettingsNavLinks({
   portfolioCode,
+  portfolioKind,
   pathname,
   queryTab,
   mode,
@@ -71,6 +73,7 @@ function SettingsNavLinks({
   onNavigate,
 }: {
   portfolioCode: string;
+  portfolioKind: string;
   pathname: string;
   queryTab: string;
   mode: "category" | "overview";
@@ -79,8 +82,10 @@ function SettingsNavLinks({
 }) {
   const categories =
     mode === "category" && activeCategory
-      ? SETTINGS_CATEGORIES.filter((category) => category.segment === activeCategory)
-      : SETTINGS_CATEGORIES;
+      ? buildSettingsCategories(portfolioKind).filter(
+          (category) => category.segment === activeCategory,
+        )
+      : buildSettingsCategories(portfolioKind);
 
   let result = (
     <nav className="grid gap-1" aria-label="設定メニュー">
@@ -129,15 +134,16 @@ function SettingsNavLinks({
   return result;
 }
 
-export function SettingsSidebar({ portfolioCode }: SettingsSidebarProps) {
+export function SettingsSidebar({ portfolioCode, portfolioKind }: SettingsSidebarProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const mode = resolveSettingsViewMode(pathname);
   const activeCategory = resolveActiveCategory(pathname);
   const queryTab = searchParams.get("tab") ?? "";
+  const settingsCategories = buildSettingsCategories(portfolioKind);
   const desktopTitle =
     mode === "category"
-      ? SETTINGS_CATEGORIES.find((category) => category.segment === activeCategory)?.label ?? "設定"
+      ? settingsCategories.find((category) => category.segment === activeCategory)?.label ?? "設定"
       : "設定一覧";
   const overviewHref = buildPortfolioPath(portfolioCode, "settings");
 
@@ -165,6 +171,7 @@ export function SettingsSidebar({ portfolioCode }: SettingsSidebarProps) {
               ) : null}
               <SettingsNavLinks
                 portfolioCode={portfolioCode}
+                portfolioKind={portfolioKind}
                 pathname={pathname}
                 queryTab={queryTab}
                 mode={mode}
@@ -188,6 +195,7 @@ export function SettingsSidebar({ portfolioCode }: SettingsSidebarProps) {
         ) : null}
         <SettingsNavLinks
           portfolioCode={portfolioCode}
+          portfolioKind={portfolioKind}
           pathname={pathname}
           queryTab={queryTab}
           mode={mode}

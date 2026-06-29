@@ -1,5 +1,7 @@
 import { Database, Tags, type LucideIcon } from "lucide-react";
 
+import { listDataSettingsChildren } from "@/lib/portfolio-data-tabs";
+
 export type SettingsSubItem = {
   id: string;
   label: string;
@@ -64,6 +66,28 @@ export const SETTINGS_CATEGORIES: SettingsCategory[] = [
     ],
   },
 ];
+
+export function buildSettingsCategories(portfolioKind: string): SettingsCategory[] {
+  let result: SettingsCategory[] = [];
+
+  for (const category of SETTINGS_CATEGORIES) {
+    if (category.segment !== "data") {
+      result.push(category);
+      continue;
+    }
+
+    result.push({
+      ...category,
+      children: listDataSettingsChildren(portfolioKind).map((tab) => ({
+        id: tab.id,
+        label: tab.label,
+        tab: tab.id,
+      })),
+    });
+  }
+
+  return result;
+}
 
 export type SettingsViewMode = "category" | "overview";
 

@@ -1,5 +1,6 @@
 "use client";
 
+import type { InstrumentListItemDto } from "@repo/shared";
 import { useEffect, useState } from "react";
 
 import { FormField } from "@/components/form-field";
@@ -14,10 +15,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import type { IdecoPasteInstrumentDto } from "./types";
-
-type IdecoHoldingManualAddCardProps = {
-  instruments: IdecoPasteInstrumentDto[];
+type HoldingManualAddCardProps = {
+  instruments: InstrumentListItemDto[];
   disabled: boolean;
   onAdd: (params: {
     instrumentId: string;
@@ -26,11 +25,11 @@ type IdecoHoldingManualAddCardProps = {
   }) => Promise<boolean>;
 };
 
-export function IdecoHoldingManualAddCard({
+export function HoldingManualAddCard({
   instruments,
   disabled,
   onAdd,
-}: IdecoHoldingManualAddCardProps) {
+}: HoldingManualAddCardProps) {
   const [instrumentId, setInstrumentId] = useState(instruments[0]?.id ?? "");
   const [quantity, setQuantity] = useState("");
   const [marketValueMinor, setMarketValueMinor] = useState("");
@@ -47,8 +46,8 @@ export function IdecoHoldingManualAddCard({
   let result = (
     <Card>
       <CardHeader>
-        <CardTitle>個別に登録</CardTitle>
-        <CardDescription>銘柄ごとの数量と評価額を1件ずつ追加します。</CardDescription>
+        <CardTitle>保有明細を登録</CardTitle>
+        <CardDescription>銘柄ごとの数量と評価額を追加します。</CardDescription>
       </CardHeader>
       <CardContent>
         <form
@@ -72,13 +71,9 @@ export function IdecoHoldingManualAddCard({
             })();
           }}
         >
-          <FormField label="銘柄" htmlFor="ideco-holding-instrument">
-            <Select
-              value={instrumentId}
-              disabled={disabled}
-              onValueChange={setInstrumentId}
-            >
-              <SelectTrigger id="ideco-holding-instrument">
+          <FormField label="銘柄" htmlFor="holding-instrument">
+            <Select value={instrumentId} disabled={disabled} onValueChange={setInstrumentId}>
+              <SelectTrigger id="holding-instrument">
                 <SelectValue placeholder="銘柄を選択" />
               </SelectTrigger>
               <SelectContent>
@@ -93,9 +88,9 @@ export function IdecoHoldingManualAddCard({
               </SelectContent>
             </Select>
           </FormField>
-          <FormField label="数量" htmlFor="ideco-holding-quantity">
+          <FormField label="数量" htmlFor="holding-quantity">
             <Input
-              id="ideco-holding-quantity"
+              id="holding-quantity"
               type="number"
               step="any"
               value={quantity}
@@ -106,9 +101,9 @@ export function IdecoHoldingManualAddCard({
               required
             />
           </FormField>
-          <FormField label="評価額（円）" htmlFor="ideco-holding-value">
+          <FormField label="評価額（円）" htmlFor="holding-value">
             <Input
-              id="ideco-holding-value"
+              id="holding-value"
               type="number"
               value={marketValueMinor}
               disabled={disabled}

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { PageContainer } from "@/components/layout/page-container";
 import { SettingsSidebar } from "@/components/layout/settings-sidebar";
 import { isWritableDataSource } from "@/lib/data-source";
+import { findPortfolioByCode } from "@/lib/portfolio-catalog";
 import { buildPortfolioPath, resolvePortfolioCodeParam } from "@/lib/portfolio-path";
 
 type SettingsLayoutProps = {
@@ -13,6 +14,7 @@ type SettingsLayoutProps = {
 
 export default async function SettingsLayout({ children, params }: SettingsLayoutProps) {
   const code = await resolvePortfolioCodeParam(params);
+  const portfolioKind = findPortfolioByCode(code)?.kind ?? "";
 
   if (!isWritableDataSource()) {
     let result: never = redirect(buildPortfolioPath(code)) as never;
@@ -22,7 +24,7 @@ export default async function SettingsLayout({ children, params }: SettingsLayou
   let result = (
     <PageContainer>
       <div className="flex flex-col gap-6 md:flex-row md:items-start">
-        <SettingsSidebar portfolioCode={code} />
+        <SettingsSidebar portfolioCode={code} portfolioKind={portfolioKind} />
         <div className="min-w-0 flex-1">{children}</div>
       </div>
     </PageContainer>

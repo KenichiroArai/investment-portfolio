@@ -61,7 +61,7 @@ describe("DataManageView", () => {
     await waitForLoaded();
     await waitFor(() => {
       expect(
-        screen.getByText("コピペ取り込みまたは個別登録で明細を追加してください。"),
+        screen.getByText("上のフォームから明細を追加してください。"),
       ).toBeInTheDocument();
     });
   });
@@ -164,8 +164,10 @@ describe("DataManageView", () => {
 
   it("imports ideco holdings paste and registers draft", async () => {
     const user = userEvent.setup();
-    render(<DataManageView portfolioCode="ideco" initialTab="holding" />);
+    render(<DataManageView portfolioCode="ideco" initialTab="ideco-bulk-import" />);
     await waitForLoaded();
+
+    await user.click(screen.getByRole("tab", { name: "iDeCo一括取り込み" }));
 
     const pasteText = `国内株式
 テスト銘柄	31,530円	41,772口	131,707円	128,321円	3,386円

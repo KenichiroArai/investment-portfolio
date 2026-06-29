@@ -20,14 +20,14 @@ import {
 import { cn } from "@/lib/utils";
 
 import {
-  removeIdecoDraftRowAtIndex,
-  updateIdecoDraftRowAtIndex,
-} from "./ideco-holding-draft";
-import type { IdecoHoldingDraftRow, IdecoPasteInstrumentDto } from "./types";
+  removeDraftRowAtIndex,
+  updateDraftRowAtIndex,
+} from "./holding-draft";
+import type { IdecoHoldingDraftRow, PasteInstrumentDto } from "./types";
 
-type IdecoHoldingsDraftTableProps = {
+type IdecoBulkImportDraftTableProps = {
   drafts: IdecoHoldingDraftRow[];
-  instruments: IdecoPasteInstrumentDto[];
+  instruments: PasteInstrumentDto[];
   disabled: boolean;
   onChange: (drafts: IdecoHoldingDraftRow[]) => void;
 };
@@ -42,12 +42,12 @@ function parseDraftInteger(value: string): number {
   return result;
 }
 
-export function IdecoHoldingsDraftTable({
+export function IdecoBulkImportDraftTable({
   drafts,
   instruments,
   disabled,
   onChange,
-}: IdecoHoldingsDraftTableProps) {
+}: IdecoBulkImportDraftTableProps) {
   let result = (
     <Table>
       <TableHeader>
@@ -82,7 +82,7 @@ export function IdecoHoldingsDraftTable({
                     disabled={disabled}
                     onValueChange={(instrumentId) => {
                       onChange(
-                        updateIdecoDraftRowAtIndex(drafts, index, {
+                        updateDraftRowAtIndex(drafts, index, {
                           ...draft,
                           instrumentId,
                         }),
@@ -113,7 +113,7 @@ export function IdecoHoldingsDraftTable({
                   value={draft.unitPricePerTenThousandLots}
                   onChange={(event) => {
                     onChange(
-                      updateIdecoDraftRowAtIndex(drafts, index, {
+                      updateDraftRowAtIndex(drafts, index, {
                         ...draft,
                         unitPricePerTenThousandLots: parseDraftInteger(event.target.value),
                       }),
@@ -129,7 +129,7 @@ export function IdecoHoldingsDraftTable({
                   value={draft.quantity}
                   onChange={(event) => {
                     onChange(
-                      updateIdecoDraftRowAtIndex(drafts, index, {
+                      updateDraftRowAtIndex(drafts, index, {
                         ...draft,
                         quantity: parseDraftInteger(event.target.value),
                       }),
@@ -145,7 +145,7 @@ export function IdecoHoldingsDraftTable({
                   value={draft.marketValueMinor}
                   onChange={(event) => {
                     onChange(
-                      updateIdecoDraftRowAtIndex(drafts, index, {
+                      updateDraftRowAtIndex(drafts, index, {
                         ...draft,
                         marketValueMinor: parseDraftInteger(event.target.value),
                       }),
@@ -161,7 +161,7 @@ export function IdecoHoldingsDraftTable({
                   value={draft.bookValueMinor}
                   onChange={(event) => {
                     onChange(
-                      updateIdecoDraftRowAtIndex(drafts, index, {
+                      updateDraftRowAtIndex(drafts, index, {
                         ...draft,
                         bookValueMinor: parseDraftInteger(event.target.value),
                       }),
@@ -177,7 +177,7 @@ export function IdecoHoldingsDraftTable({
                   value={draft.unrealizedGainMinor}
                   onChange={(event) => {
                     onChange(
-                      updateIdecoDraftRowAtIndex(drafts, index, {
+                      updateDraftRowAtIndex(drafts, index, {
                         ...draft,
                         unrealizedGainMinor: parseDraftInteger(event.target.value),
                       }),
@@ -194,7 +194,7 @@ export function IdecoHoldingsDraftTable({
                   value={draft.unrealizedGainRate}
                   onChange={(event) => {
                     onChange(
-                      updateIdecoDraftRowAtIndex(drafts, index, {
+                      updateDraftRowAtIndex(drafts, index, {
                         ...draft,
                         unrealizedGainRate: parseDraftNumber(event.target.value),
                       }),
@@ -209,7 +209,7 @@ export function IdecoHoldingsDraftTable({
                   variant="destructive"
                   disabled={disabled}
                   onClick={() => {
-                    onChange(removeIdecoDraftRowAtIndex(drafts, index));
+                    onChange(removeDraftRowAtIndex(drafts, index));
                   }}
                 >
                   削除

@@ -1,12 +1,14 @@
 import { getApiBaseUrl } from "@/lib/api-base";
 
-import type { IdecoPasteInstrumentDto } from "./types";
+import type { PasteInstrumentDto } from "./types";
 
-export async function fetchIdecoPasteInstruments(): Promise<
-  { ok: true; data: IdecoPasteInstrumentDto[] } | { ok: false; status: number; message: string }
+export async function fetchPasteInstruments(
+  portfolioCode: string,
+): Promise<
+  { ok: true; data: PasteInstrumentDto[] } | { ok: false; status: number; message: string }
 > {
   let result:
-    | { ok: true; data: IdecoPasteInstrumentDto[] }
+    | { ok: true; data: PasteInstrumentDto[] }
     | { ok: false; status: number; message: string } = {
     ok: false,
     status: 0,
@@ -14,7 +16,9 @@ export async function fetchIdecoPasteInstruments(): Promise<
   };
 
   try {
-    const response = await fetch(`${getApiBaseUrl()}/portfolios/ideco/instruments-for-paste`);
+    const response = await fetch(
+      `${getApiBaseUrl()}/portfolios/${encodeURIComponent(portfolioCode)}/instruments-for-paste`,
+    );
     if (!response.ok) {
       result = {
         ok: false,
@@ -24,7 +28,7 @@ export async function fetchIdecoPasteInstruments(): Promise<
       return result;
     }
 
-    const data = (await response.json()) as IdecoPasteInstrumentDto[];
+    const data = (await response.json()) as PasteInstrumentDto[];
     result = { ok: true, data };
     return result;
   } catch {

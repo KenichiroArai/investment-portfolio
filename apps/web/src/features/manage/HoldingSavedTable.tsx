@@ -25,9 +25,10 @@ import {
 } from "@/components/ui/table";
 import { HoldingTableRow } from "@/features/manage/HoldingTableRow";
 
-type IdecoHoldingSavedTableProps = {
+type HoldingSavedTableProps = {
   snapshot: CurrentSnapshotDto | null;
   disabled: boolean;
+  emptyDescription?: string;
   onSaveLine: (
     index: number,
     quantity: number,
@@ -36,26 +37,24 @@ type IdecoHoldingSavedTableProps = {
   onDeleteLine: (index: number) => Promise<boolean>;
 };
 
-export function IdecoHoldingSavedTable({
+export function HoldingSavedTable({
   snapshot,
   disabled,
+  emptyDescription = "上のフォームから明細を追加してください。",
   onSaveLine,
   onDeleteLine,
-}: IdecoHoldingSavedTableProps) {
+}: HoldingSavedTableProps) {
   const [deleteLineIndex, setDeleteLineIndex] = useState<number | null>(null);
 
   let result = (
     <>
       <Card>
         <CardHeader>
-          <CardTitle>登録済み保有明細</CardTitle>
+          <CardTitle>保有明細一覧</CardTitle>
         </CardHeader>
         <CardContent>
           {!snapshot || snapshot.lines.length === 0 ? (
-            <EmptyState
-              title="保有明細がありません"
-              description="コピペ取り込みまたは個別登録で明細を追加してください。"
-            />
+            <EmptyState title="保有明細がありません" description={emptyDescription} />
           ) : (
             <Table>
               <TableHeader>

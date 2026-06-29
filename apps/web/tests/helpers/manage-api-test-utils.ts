@@ -152,7 +152,7 @@ export function createManageFetchMock(options: ManageFetchMockOptions = {}) {
       return okResponse(state.instruments);
     }
 
-    if (url.includes("/portfolios/ideco/instruments-for-paste") && method === "GET") {
+    if (url.includes("/instruments-for-paste") && method === "GET") {
       return okResponse(
         state.instruments.map((item) => ({
           id: item.id,

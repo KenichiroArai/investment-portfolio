@@ -1,6 +1,6 @@
 import type { IdecoHoldingsPasteRow } from "@repo/shared";
 
-export type IdecoPasteInstrumentDto = {
+export type PasteInstrumentDto = {
   id: string;
   name: string;
   shortName: string | null;

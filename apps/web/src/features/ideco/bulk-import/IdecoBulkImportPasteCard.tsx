@@ -6,12 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-type IdecoHoldingsPasteCardProps = {
+type IdecoBulkImportPasteCardProps = {
   disabled: boolean;
   onImport: (pasteText: string) => void;
 };
 
-export function IdecoHoldingsPasteCard({ disabled, onImport }: IdecoHoldingsPasteCardProps) {
+export function IdecoBulkImportPasteCard({ disabled, onImport }: IdecoBulkImportPasteCardProps) {
   const [pasteText, setPasteText] = useState("");
 
   let result = (
@@ -19,7 +19,7 @@ export function IdecoHoldingsPasteCard({ disabled, onImport }: IdecoHoldingsPast
       <CardHeader>
         <CardTitle>運用サイトから一括取り込み</CardTitle>
         <CardDescription>
-          iDeCo 運用サイトの保有明細表をコピーして貼り付け、「取り込み」で下書きに反映します。登録時は登録済み明細をすべて置き換えます。
+          iDeCo 運用サイトの保有明細表をコピーして貼り付け、「取り込み」で下書きに反映します。一括登録時は登録済み明細をすべて置き換えます。
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

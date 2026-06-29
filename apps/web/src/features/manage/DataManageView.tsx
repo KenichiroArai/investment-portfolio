@@ -43,19 +43,16 @@ import {
   listGenericMetricOptions,
   resolveGenericMetricLabel,
 } from "@/features/manage/generic-metric-options";
+import { HoldingsDataTab } from "@/features/manage/HoldingsDataTab";
 import {
   buildReplaceSnapshotInput,
-  mergeHoldingLine,
-  removeHoldingLineAtIndex,
   removeMetricByCode,
   snapshotToHoldingInputs,
   snapshotToMetricInputs,
-  updateHoldingLineAtIndex,
   upsertMetric,
 } from "@/features/manage/snapshot-input";
 import { WritableGuard } from "@/features/manage/WritableGuard";
-import { HoldingTableRow } from "@/features/manage/HoldingTableRow";
-import { IdecoHoldingsDataTab } from "@/features/ideco/holdings-paste/IdecoHoldingsDataTab";
+import { PortfolioExtraDataTabContent } from "@/features/portfolios/PortfolioExtraDataTabContent";
 import {
   createInstrument,
   deleteInstrument,
@@ -67,28 +64,35 @@ import {
   updateInstrument,
 } from "@/lib/api-client";
 import { formatYen } from "@/lib/format-yen";
+import { findPortfolioByCode } from "@/lib/portfolio-catalog";
+import {
+  BASE_DATA_MANAGE_TABS,
+  buildDataManageTabs,
+  resolveDataManageTab,
+} from "@/lib/portfolio-data-tabs";
 
 type DataManageViewProps = {
   portfolioCode: string;
+  portfolioKind?: string;
   initialTab?: string;
 };
 
-function resolveTab(tab: string | null | undefined): string {
-  let result = "instrument";
-
-  if (tab === "holding" || tab === "generic" || tab === "instrument") {
-    result = tab;
-  }
-
-  return result;
-}
-
-export function DataManageView({ portfolioCode, initialTab }: DataManageViewProps) {
+export function DataManageView({
+  portfolioCode,
+  portfolioKind: portfolioKindProp,
+  initialTab,
+}: DataManageViewProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const resolvedInitialTab = resolveTab(initialTab);
-  const activeTab = resolveTab(searchParams.get("tab") ?? resolvedInitialTab);
+  const portfolioKind = portfolioKindProp ?? findPortfolioByCode(portfolioCode)?.kind ?? "";
+  const dataTabs = buildDataManageTabs(portfolioKind);
+  const resolvedInitialTab = resolveDataManageTab(initialTab, portfolioKind);
+  const activeTab = resolveDataManageTab(
+    searchParams.get("tab") ?? resolvedInitialTab,
+    portfolioKind,
+    resolvedInitialTab,
+  );
   const [snapshot, setSnapshot] = useState<CurrentSnapshotDto | null>(null);
   const [instruments, setInstruments] = useState<InstrumentListItemDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -100,15 +104,11 @@ export function DataManageView({ portfolioCode, initialTab }: DataManageViewProp
   const [asOfDate, setAsOfDate] = useState("");
   const [instrumentName, setInstrumentName] = useState("");
   const [tagValueIds, setTagValueIds] = useState<string[]>([]);
-  const [holdingInstrumentId, setHoldingInstrumentId] = useState("");
-  const [holdingQuantity, setHoldingQuantity] = useState("");
-  const [holdingMarketValue, setHoldingMarketValue] = useState("");
   const [metricCode, setMetricCode] = useState(
     listGenericMetricOptions()[0]?.code ?? "",
   );
   const [metricValue, setMetricValue] = useState("");
 
-  const [deleteLineIndex, setDeleteLineIndex] = useState<number | null>(null);
   const [deleteInstrumentId, setDeleteInstrumentId] = useState<string | null>(null);
   const [deleteMetricCode, setDeleteMetricCode] = useState<string | null>(null);
 
@@ -133,9 +133,6 @@ export function DataManageView({ portfolioCode, initialTab }: DataManageViewProp
 
     if (instrumentResponse.ok) {
       setInstruments(instrumentResponse.data);
-      if (!holdingInstrumentId && instrumentResponse.data.length > 0) {
-        setHoldingInstrumentId(instrumentResponse.data[0].id);
-      }
     }
 
     if (schemeResponse.ok) {
@@ -152,7 +149,7 @@ export function DataManageView({ portfolioCode, initialTab }: DataManageViewProp
 
     setLoading(false);
     return result;
-  }, [holdingInstrumentId, portfolioCode]);
+  }, [portfolioCode]);
 
   useEffect(() => {
     let result: () => void = () => {};
@@ -177,14 +174,14 @@ export function DataManageView({ portfolioCode, initialTab }: DataManageViewProp
   const onTabValueChange = useCallback(
     (nextTab: string) => {
       let result: void = undefined;
-      const resolvedTab = resolveTab(nextTab);
+      const resolvedTab = resolveDataManageTab(nextTab, portfolioKind);
       const params = new URLSearchParams(searchParams.toString());
       params.set("tab", resolvedTab);
       const query = params.toString();
       router.replace(query === "" ? pathname : `${pathname}?${query}`);
       return result;
     },
-    [pathname, router, searchParams],
+    [pathname, portfolioKind, router, searchParams],
   );
 
   async function saveSnapshot(
@@ -254,37 +251,6 @@ export function DataManageView({ portfolioCode, initialTab }: DataManageViewProp
     return result;
   }
 
-  async function handleAddHolding(event: React.FormEvent) {
-    let result: void = undefined;
-    event.preventDefault();
-
-    const quantity = Number.parseFloat(holdingQuantity);
-    const marketValueMinor = Number.parseInt(holdingMarketValue, 10);
-    if (!Number.isFinite(quantity) || quantity <= 0) {
-      toast.error("数量は正の数で入力してください。");
-      return result;
-    }
-    if (!Number.isInteger(marketValueMinor) || marketValueMinor < 0) {
-      toast.error("評価額は 0 以上の整数で入力してください。");
-      return result;
-    }
-
-    const existingLines = snapshot ? snapshotToHoldingInputs(snapshot) : [];
-    const existingMetrics = snapshot ? snapshotToMetricInputs(snapshot) : [];
-    const lines = mergeHoldingLine(existingLines, {
-      instrumentId: holdingInstrumentId,
-      quantity,
-      marketValueMinor,
-    });
-
-    const saved = await saveSnapshot(lines, existingMetrics, "保有明細を登録しました。");
-    if (saved) {
-      setHoldingQuantity("");
-      setHoldingMarketValue("");
-    }
-    return result;
-  }
-
   async function handleAddMetric(event: React.FormEvent) {
     let result: void = undefined;
     event.preventDefault();
@@ -344,23 +310,6 @@ export function DataManageView({ portfolioCode, initialTab }: DataManageViewProp
     return result;
   }
 
-  async function handleDeleteLine() {
-    let result: void = undefined;
-    if (!snapshot || deleteLineIndex === null) {
-      return result;
-    }
-
-    const lines = removeHoldingLineAtIndex(
-      snapshotToHoldingInputs(snapshot),
-      deleteLineIndex,
-    );
-    const saved = await saveSnapshot(lines, snapshotToMetricInputs(snapshot), "保有明細を削除しました。");
-    if (saved) {
-      setDeleteLineIndex(null);
-    }
-    return result;
-  }
-
   async function handleDeleteMetric() {
     let result: void = undefined;
     if (!snapshot || !deleteMetricCode) {
@@ -398,9 +347,14 @@ export function DataManageView({ portfolioCode, initialTab }: DataManageViewProp
         {!loading ? (
           <Tabs value={activeTab} onValueChange={onTabValueChange}>
             <TabsList>
-              <TabsTrigger value="instrument">銘柄</TabsTrigger>
-              <TabsTrigger value="holding">保有明細</TabsTrigger>
-              <TabsTrigger value="generic">汎用指標</TabsTrigger>
+              {dataTabs.map((tab) => {
+                let trigger = (
+                  <TabsTrigger key={tab.id} value={tab.id}>
+                    {tab.label}
+                  </TabsTrigger>
+                );
+                return trigger;
+              })}
             </TabsList>
 
             <TabsContent value="instrument" className="space-y-6">
@@ -507,128 +461,30 @@ export function DataManageView({ portfolioCode, initialTab }: DataManageViewProp
             </TabsContent>
 
             <TabsContent value="holding" className="space-y-6">
-              {portfolioCode === "ideco" ? (
-                <IdecoHoldingsDataTab
-                  asOfDate={asOfDate}
-                  disabled={loading || submitting}
-                  onReload={load}
-                />
-              ) : (
-                <>
-              <Card>
-                <CardHeader>
-                  <CardTitle>保有明細を登録</CardTitle>
-                  <CardDescription>銘柄ごとの数量と評価額を追加します。</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form className="grid max-w-lg gap-4" onSubmit={handleAddHolding}>
-                    <FormField label="銘柄" htmlFor="holding-instrument">
-                      <Select
-                        value={holdingInstrumentId}
-                        onValueChange={setHoldingInstrumentId}
-                      >
-                        <SelectTrigger id="holding-instrument">
-                          <SelectValue placeholder="銘柄を選択" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {instruments.map((instrument) => {
-                            let item = (
-                              <SelectItem key={instrument.id} value={instrument.id}>
-                                {instrument.name}
-                              </SelectItem>
-                            );
-                            return item;
-                          })}
-                        </SelectContent>
-                      </Select>
-                    </FormField>
-                    <FormField label="数量" htmlFor="holding-quantity">
-                      <Input
-                        id="holding-quantity"
-                        type="number"
-                        step="any"
-                        value={holdingQuantity}
-                        onChange={(event) => {
-                          setHoldingQuantity(event.target.value);
-                        }}
-                        required
-                      />
-                    </FormField>
-                    <FormField label="評価額（円）" htmlFor="holding-value">
-                      <Input
-                        id="holding-value"
-                        type="number"
-                        value={holdingMarketValue}
-                        onChange={(event) => {
-                          setHoldingMarketValue(event.target.value);
-                        }}
-                        required
-                      />
-                    </FormField>
-                    <Button type="submit" disabled={submitting || !holdingInstrumentId}>
-                      明細行を追加
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>保有明細一覧</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {!snapshot || snapshot.lines.length === 0 ? (
-                    <EmptyState title="保有明細がありません" />
-                  ) : (
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>銘柄</TableHead>
-                          <TableHead>数量</TableHead>
-                          <TableHead>評価額</TableHead>
-                          <TableHead className="text-right">操作</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {snapshot.lines.map((line, index) => {
-                          let row = (
-                            <HoldingTableRow
-                              key={line.id}
-                              line={line}
-                              disabled={submitting}
-                              onSave={async (quantity, marketValueMinor) => {
-                                const lines = updateHoldingLineAtIndex(
-                                  snapshotToHoldingInputs(snapshot),
-                                  index,
-                                  {
-                                    instrumentId: line.instrumentId,
-                                    quantity,
-                                    marketValueMinor,
-                                    bookValueMinor: line.bookValueMinor,
-                                    sortOrder: line.sortOrder,
-                                  },
-                                );
-                                await saveSnapshot(
-                                  lines,
-                                  snapshotToMetricInputs(snapshot),
-                                  "保有明細を更新しました。",
-                                );
-                              }}
-                              onDelete={() => {
-                                setDeleteLineIndex(index);
-                              }}
-                            />
-                          );
-                          return row;
-                        })}
-                      </TableBody>
-                    </Table>
-                  )}
-                </CardContent>
-              </Card>
-                </>
-              )}
+              <HoldingsDataTab
+                snapshot={snapshot}
+                instruments={instruments}
+                disabled={loading || submitting}
+                onSaveSnapshot={saveSnapshot}
+              />
             </TabsContent>
+
+            {dataTabs
+              .filter((tab) => !BASE_DATA_MANAGE_TABS.some((baseTab) => baseTab.id === tab.id))
+              .map((tab) => {
+                let content = (
+                  <TabsContent key={tab.id} value={tab.id} className="space-y-6">
+                    <PortfolioExtraDataTabContent
+                      tabId={tab.id}
+                      portfolioCode={portfolioCode}
+                      asOfDate={asOfDate}
+                      disabled={loading || submitting}
+                      onReload={load}
+                    />
+                  </TabsContent>
+                );
+                return content;
+              })}
 
             <TabsContent value="generic" className="space-y-6">
               <Card>
@@ -726,30 +582,6 @@ export function DataManageView({ portfolioCode, initialTab }: DataManageViewProp
             </TabsContent>
           </Tabs>
         ) : null}
-
-        <AlertDialog open={deleteLineIndex !== null} onOpenChange={(open) => {
-          if (!open) {
-            setDeleteLineIndex(null);
-          }
-        }}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>明細行を削除</AlertDialogTitle>
-              <AlertDialogDescription>この保有明細行を削除します。</AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>キャンセル</AlertDialogCancel>
-              <AlertDialogAction
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                onClick={() => {
-                  void handleDeleteLine();
-                }}
-              >
-                削除
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
 
         <AlertDialog open={deleteInstrumentId !== null} onOpenChange={(open) => {
           if (!open) {
