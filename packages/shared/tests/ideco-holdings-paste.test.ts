@@ -6,7 +6,11 @@ import {
   parseIdecoLotQuantity,
   parseIdecoYenValue,
 } from "../src/ideco-holdings-paste";
-import { matchIdecoInstrumentId } from "../src/ideco-instrument-match";
+import {
+  matchIdecoInstrumentId,
+  normalizeIdecoInstrumentMatchKey,
+  stripIdecoPasteDuplicateSuffix,
+} from "../src/ideco-instrument-match";
 
 const SAMPLE_PASTE = `商品タイプ	運用商品名（略称）	時価単価
 (1万口当り)	残高数量	資産残高	購入金額	損益
@@ -111,18 +115,18 @@ describe("matchIdecoInstrumentId", () => {
   const candidates = [
     {
       id: "inst-1",
-      name: "ｅＭＡＸＩＳ　Ｓｌｉｍ　国内株式（ＴＯＰＩＸ）",
+      name: "ｅＭＡＸＩＳ Ｓｌｉｍ 国内株式（ＴＯＰＩＸ）",
       shortName: "eMAXIS Slim 国内株式(TOPIX)",
     },
     {
       id: "inst-2",
       name: "ＳＢＩ・全世界株式インデックス・ファンド",
-      shortName: "SBI･全世界株式ｲﾝﾃﾞｯｸｽ･ﾌｧﾝﾄﾞ",
+      shortName: "SBI・全世界株式インデックス・ファンド",
     },
   ];
 
-  it("matches by exact name", () => {
-    expect(matchIdecoInstrumentId(candidates, "ｅＭＡＸＩＳ　Ｓｌｉｍ　国内株式（ＴＯＰＩＸ）")).toBe(
+  it("matches by exact name with half-width spaces in DB", () => {
+    expect(matchIdecoInstrumentId(candidates, "ｅＭＡＸＩＳ Ｓｌｉｍ 国内株式（ＴＯＰＩＸ）")).toBe(
       "inst-1",
     );
   });
@@ -131,7 +135,7 @@ describe("matchIdecoInstrumentId", () => {
     expect(matchIdecoInstrumentId(candidates, "SBI･全世界株式ｲﾝﾃﾞｯｸｽ･ﾌｧﾝﾄﾞ")).toBe("inst-2");
   });
 
-  it("matches by trailing ascii short name in paste text", () => {
+  it("matches paste with full-width spaces and duplicate suffix from iDeCo site", () => {
     expect(
       matchIdecoInstrumentId(
         candidates,
@@ -140,7 +144,41 @@ describe("matchIdecoInstrumentId", () => {
     ).toBe("inst-1");
   });
 
-  it("matches by name prefix", () => {
+  it("matches worldwide equity paste against DB-style candidate", () => {
+    const worldwideCandidates = [
+      {
+        id: "inst-world",
+        name: "ｅＭＡＸＩＳ Ｓｌｉｍ 全世界株式（除く日本）",
+        shortName: "eMAXIS Slim 全世界株式(除く日本)",
+      },
+    ];
+
+    expect(
+      matchIdecoInstrumentId(
+        worldwideCandidates,
+        "ｅＭＡＸＩＳ　Ｓｌｉｍ　全世界株式（除く日本）（eMAXIS Slim 全世界株式(除く日本)）",
+      ),
+    ).toBe("inst-world");
+  });
+
+  it("matches developed equity index paste against DB-style candidate", () => {
+    const developedCandidates = [
+      {
+        id: "inst-developed",
+        name: "ｅＭＡＸＩＳ Ｓｌｉｍ 先進国株式インデックス",
+        shortName: "eMAXIS Slim 先進国株式インデックス",
+      },
+    ];
+
+    expect(
+      matchIdecoInstrumentId(
+        developedCandidates,
+        "ｅＭＡＸＩＳ　Ｓｌｉｍ　先進国株式インデックス（eMAXIS Slim 先進国株式ｲﾝﾃﾞｯｸｽ）",
+      ),
+    ).toBe("inst-developed");
+  });
+
+  it("matches by name prefix after duplicate suffix removal", () => {
     expect(
       matchIdecoInstrumentId(
         candidates,
@@ -151,5 +189,124 @@ describe("matchIdecoInstrumentId", () => {
 
   it("returns null when no match", () => {
     expect(matchIdecoInstrumentId(candidates, "存在しない銘柄")).toBeNull();
+  });
+});
+
+describe("normalizeIdecoInstrumentMatchKey", () => {
+  it("normalizes full-width spaces and NFKC characters", () => {
+    expect(normalizeIdecoInstrumentMatchKey("ｅＭＡＸＩＳ　Ｓｌｉｍ")).toBe("eMAXIS Slim");
+  });
+
+  it("normalizes half-width katakana to full-width", () => {
+    expect(normalizeIdecoInstrumentMatchKey("SBI･全世界株式ｲﾝﾃﾞｯｸｽ･ﾌｧﾝﾄﾞ")).toBe(
+      "SBI・全世界株式インデックス・ファンド",
+    );
+  });
+});
+
+describe("stripIdecoPasteDuplicateSuffix", () => {
+  it("removes duplicate trailing parenthetical when preceded by closing paren", () => {
+    expect(
+      stripIdecoPasteDuplicateSuffix(
+        "ｅＭＡＸＩＳ　Ｓｌｉｍ　国内株式（ＴＯＰＩＸ）（eMAXIS Slim 国内株式(TOPIX)）",
+      ),
+    ).toBe("ｅＭＡＸＩＳ　Ｓｌｉｍ　国内株式（ＴＯＰＩＸ）");
+  });
+
+  it("keeps single trailing parenthetical in official name", () => {
+    expect(stripIdecoPasteDuplicateSuffix("ＳＢＩ・全世界株式インデックス・ファンド（SBI･全世界株式ｲﾝﾃﾞｯｸｽ･ﾌｧﾝﾄﾞ）")).toBe(
+      "ＳＢＩ・全世界株式インデックス・ファンド（SBI･全世界株式ｲﾝﾃﾞｯｸｽ･ﾌｧﾝﾄﾞ）",
+    );
+  });
+});
+
+const CURRENT_JSON_CANDIDATES = [
+  {
+    id: "13462933-8a0b-48f4-912a-3bfd25762509",
+    name: "ｅＭＡＸＩＳ Ｓｌｉｍ 国内株式（ＴＯＰＩＸ）",
+    shortName: "eMAXIS Slim 国内株式(TOPIX)",
+  },
+  {
+    id: "31275e89-c5aa-46ec-8108-bc56f6ea17b2",
+    name: "ＳＢＩ・全世界株式インデックス・ファンド",
+    shortName: "SBI・全世界株式インデックス・ファンド",
+  },
+  {
+    id: "362250ad-b3df-44b8-a221-a599b923e754",
+    name: "ｅＭＡＸＩＳ Ｓｌｉｍ 全世界株式（除く日本）",
+    shortName: "eMAXIS Slim 全世界株式(除く日本)",
+  },
+  {
+    id: "e251ef8b-9dc7-443f-9a76-8ae44ba08faa",
+    name: "ｅＭＡＸＩＳ Ｓｌｉｍ 先進国株式インデックス",
+    shortName: "eMAXIS Slim 先進国株式インデックス",
+  },
+  {
+    id: "e6dc9d16-d6b0-4a65-ab00-e5c4d338df88",
+    name: "ｅＭＡＸＩＳ Ｓｌｉｍ 米国株式（Ｓ＆Ｐ５００）",
+    shortName: "eMAXIS Slim 米国株式(S&P500)",
+  },
+  {
+    id: "a3028224-f890-4258-b8f9-417133d7cf6a",
+    name: "ｅＭＡＸＩＳ Ｓｌｉｍ 新興国株式インデックス",
+    shortName: "eMAXIS Slim 新興国株式インデックス",
+  },
+  {
+    id: "bb25c6ee-a8d6-402d-b971-67f1e582c69a",
+    name: "ｅＭＡＸＩＳ Ｓｌｉｍ 国内債券インデックス",
+    shortName: "eMAXIS Slim 国内債券インデックス",
+  },
+  {
+    id: "f74a084e-8eee-45c3-abef-a9337b908b01",
+    name: "ｅＭＡＸＩＳ Ｓｌｉｍ 先進国債券インデックス",
+    shortName: "eMAXIS Slim 先進国債券インデックス",
+  },
+  {
+    id: "d642675f-5dd0-42df-8feb-63429b27ca60",
+    name: "ｉＦｒｅｅ 新興国債券インデックス",
+    shortName: "iFree 新興国債券インデックス",
+  },
+  {
+    id: "37996eea-0305-4a45-8400-996f1962292c",
+    name: "ニッセイＪリートインデックスファンド（購入・換金手数料なし）",
+    shortName: "ニッセイJリートインデックス(購入・換金手数料なし)",
+  },
+  {
+    id: "c991d741-dcd5-479f-abd9-7da4a97e7547",
+    name: "三井住友・ＤＣ外国リートインデックスファンド",
+    shortName: "三井住友・DC外国リートインデックスファンド",
+  },
+  {
+    id: "ba158649-918a-42c7-824b-021765191743",
+    name: "ｅＭＡＸＩＳ Ｓｌｉｍ バランス（８資産均等型）",
+    shortName: "eMAXIS Slim ﾊﾞﾗﾝｽ(8資産均等型)",
+  },
+  {
+    id: "47ccafe2-9d8f-49a7-b922-cf2e484a7860",
+    name: "ｉＦｒｅｅ 年金バランス",
+    shortName: "iFree 年金ﾊﾞﾗﾝｽ",
+  },
+  {
+    id: "68b9b628-c237-4397-8530-c099d33c6658",
+    name: "三菱ＵＦＪ 純金ファンド（愛称：ファインゴールド）",
+    shortName: "三菱UFJ純金ﾌｧﾝﾄﾞ",
+  },
+  {
+    id: "53bdddb7-cab9-48eb-9f3e-9bf731df27b7",
+    name: "セレブライフ・ストーリー2045",
+    shortName: "セレブライフ・ストーリー2045",
+  },
+];
+
+describe("matchIdecoInstrumentId with SAMPLE_PASTE and current.json candidates", () => {
+  it("matches all 15 paste rows to existing instruments", () => {
+    const parsed = parseIdecoHoldingsPaste(SAMPLE_PASTE);
+
+    expect(parsed.rows).toHaveLength(15);
+
+    for (const row of parsed.rows) {
+      const instrumentId = matchIdecoInstrumentId(CURRENT_JSON_CANDIDATES, row.instrumentName);
+      expect(instrumentId).not.toBeNull();
+    }
   });
 });

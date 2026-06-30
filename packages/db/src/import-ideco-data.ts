@@ -20,7 +20,9 @@ import {
   type IdecoInstrumentCsvRow,
   type ParseIdecoAnalysisCsvResult,
   type ParseIdecoGenericCsvResult,
+  matchIdecoInstrumentId,
   type IdecoHoldingsCsvRow,
+  type IdecoInstrumentMatchCandidate,
   type ParseIdecoHoldingsCsvByDateResult,
 } from "@repo/shared";
 
@@ -40,32 +42,32 @@ import {
 import {
   findInstrumentByAttributeTextValue,
   findInstrumentByName,
+  listIdecoInstrumentsForPaste,
   setInstrumentAttributes,
   upsertInstrument,
 } from "./repositories/instruments";
 
-async function resolveHoldingInstrumentId(
-  db: AppDatabase,
+function resolveHoldingInstrumentIdFromCandidates(
+  candidates: IdecoInstrumentMatchCandidate[],
   instrumentLookupName: string,
 ) {
   let result: string | null = null;
 
-  const byName = await findInstrumentByName(db, instrumentLookupName);
+  const byName = candidates.find((candidate) => candidate.name === instrumentLookupName);
   if (byName) {
     result = byName.id;
     return result;
   }
 
-  const byShortName = await findInstrumentByAttributeTextValue(
-    db,
-    IDECO_INSTRUMENT_ATTRIBUTE_CODES.shortName,
-    instrumentLookupName,
+  const byShortName = candidates.find(
+    (candidate) => candidate.shortName === instrumentLookupName,
   );
   if (byShortName) {
     result = byShortName.id;
     return result;
   }
 
+  result = matchIdecoInstrumentId(candidates, instrumentLookupName);
   return result;
 }
 import {
@@ -495,9 +497,13 @@ async function buildHoldingLinesFromRows(db: AppDatabase, rows: IdecoHoldingsCsv
   }> | null = [];
 
   const instrumentNameById = new Map<string, string>();
+  const matchCandidates = await listIdecoInstrumentsForPaste(db);
 
   for (const row of rows) {
-    const instrumentId = await resolveHoldingInstrumentId(db, row.instrumentName);
+    const instrumentId = resolveHoldingInstrumentIdFromCandidates(
+      matchCandidates,
+      row.instrumentName,
+    );
     if (!instrumentId) {
       result = null;
       return result;
