@@ -93,10 +93,7 @@ describe("layout components", () => {
         "href",
         "/portfolios/ideco/analysis",
       );
-      expect(screen.getByRole("link", { name: "設定" })).toHaveAttribute(
-        "href",
-        "/portfolios/ideco/settings/data",
-      );
+      expect(screen.getByRole("button", { name: "設定" })).toBeInTheDocument();
     });
 
     it("hides context tabs on settings route", () => {
@@ -104,7 +101,7 @@ describe("layout components", () => {
       render(<PortfolioContextBar portfolioCode="ideco" />);
 
       expect(screen.queryByRole("navigation", { name: "口座メニュー" })).not.toBeInTheDocument();
-      expect(screen.getByRole("link", { name: "設定" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "設定" })).toBeInTheDocument();
     });
 
     it("renders portfolio selector when multiple portfolios exist", async () => {

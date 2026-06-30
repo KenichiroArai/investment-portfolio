@@ -131,11 +131,10 @@ describe("PortfolioAllocationView", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("銘柄目標配分")).toBeInTheDocument();
+      expect(screen.getByRole("columnheader", { name: "現状（%）" })).toBeInTheDocument();
     });
 
     expect(screen.getByText("1 / 1 銘柄")).toBeInTheDocument();
-    expect(screen.getByRole("columnheader", { name: "現状（%）" })).toBeInTheDocument();
     expect(screen.getByText("リバランス設定")).toBeInTheDocument();
     expect(screen.getByText("売買提案")).toBeInTheDocument();
     expect(screen.getAllByText(/合計買い/).length).toBeGreaterThanOrEqual(1);

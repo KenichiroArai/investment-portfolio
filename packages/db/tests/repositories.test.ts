@@ -29,6 +29,7 @@ import {
   findInstrumentByName,
   getAttributesForInstruments,
   listInstruments,
+  listIdecoInstrumentsForPaste,
   setInstrumentAttributes,
   updateInstrument,
   upsertInstrument,
@@ -559,6 +560,22 @@ describe("portfolio repositories", () => {
 
     const schemes = await listClassificationSchemesByPortfolioCode(db, "missing");
     expect(schemes).toEqual([]);
+  });
+
+  it("lists ideco paste instruments with and without short name attributes", async () => {
+    const db = setup();
+    const withShortName = await createInstrument(db, { name: "Alpha Fund" });
+    await createInstrument(db, { name: "Beta Fund" });
+    await setInstrumentAttributes(db, withShortName.id, [
+      { code: "short_name", textValue: "Alpha" },
+    ]);
+
+    const rows = await listIdecoInstrumentsForPaste(db);
+
+    expect(rows).toEqual([
+      { id: withShortName.id, name: "Alpha Fund", shortName: "Alpha" },
+      expect.objectContaining({ name: "Beta Fund", shortName: null }),
+    ]);
   });
 
   it("supports instrument search, upsert, update, attributes, and delete guards", async () => {

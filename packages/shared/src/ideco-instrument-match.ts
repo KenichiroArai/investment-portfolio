@@ -60,7 +60,7 @@ function addPasteMatchKey(keys: Set<string>, raw: string): void {
   return result;
 }
 
-function buildPasteMatchKeys(pasteName: string): string[] {
+export function buildIdecoPasteMatchKeys(pasteName: string): string[] {
   let result: string[] = [];
 
   const keys = new Set<string>();
@@ -78,6 +78,7 @@ function buildPasteMatchKeys(pasteName: string): string[] {
 export function matchIdecoInstrumentId(
   candidates: IdecoInstrumentMatchCandidate[],
   pasteName: string,
+  buildKeys: (name: string) => string[] = buildIdecoPasteMatchKeys,
 ): string | null {
   let result: string | null = null;
 
@@ -86,7 +87,7 @@ export function matchIdecoInstrumentId(
     return result;
   }
 
-  const pasteKeys = buildPasteMatchKeys(trimmedPasteName);
+  const pasteKeys = buildKeys(trimmedPasteName);
   if (pasteKeys.length === 0) {
     return result;
   }

@@ -31,6 +31,7 @@ import {
   createPortfolioFetchMock,
   renderWithPortfolioTime,
 } from "../helpers/portfolio-time-test-utils";
+import { createManageFetchMock } from "../helpers/manage-api-test-utils";
 import { portfolioTimeNavigationState } from "../helpers/portfolio-time-navigation-state";
 
 const mockRedirect = vi.hoisted(() => vi.fn());
@@ -238,20 +239,24 @@ describe("portfolio routes", () => {
     });
     render(layout);
     expect(screen.getByRole("navigation", { name: "設定メニュー" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /データ管理/ })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "銘柄 データ管理" })).toHaveAttribute(
       "href",
-      "/portfolios/ideco/settings/data",
+      "/portfolios/ideco/settings/data?tab=instrument",
     );
     expect(screen.getByText("settings-body")).toBeInTheDocument();
   });
 
-  it("redirects settings index page to data settings", async () => {
-    await expect(
-      SettingsPage({
-        params: Promise.resolve({ code: "ideco" }),
-      }),
-    ).rejects.toThrow("NEXT_REDIRECT");
-    expect(mockRedirect).toHaveBeenCalledWith("/portfolios/ideco/settings/data/");
+  it("renders settings index page with data manage view", async () => {
+    process.env.NEXT_PUBLIC_DATA_SOURCE = "api";
+    vi.stubGlobal("fetch", createManageFetchMock());
+    const page = await SettingsPage({
+      params: Promise.resolve({ code: "ideco" }),
+      searchParams: Promise.resolve({}),
+    });
+    render(page);
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "データ管理" })).toBeInTheDocument();
+    });
   });
 
   it("renders trends redirect page", async () => {

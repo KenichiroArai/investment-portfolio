@@ -7,9 +7,11 @@ import {
   parseIdecoYenValue,
 } from "../src/ideco-holdings-paste";
 import {
+  buildIdecoPasteMatchKeys,
   matchIdecoInstrumentId,
   normalizeIdecoInstrumentMatchKey,
   stripIdecoPasteDuplicateSuffix,
+  extractTrailingParentheticalContent,
 } from "../src/ideco-instrument-match";
 
 const SAMPLE_PASTE = `商品タイプ	運用商品名（略称）	時価単価
@@ -109,6 +111,102 @@ describe("parseIdecoHoldingsPaste", () => {
 ｅＭＡＸＩＳ	31,530円	41,772口	131,707円	128,321円	3,386円`),
     ).toThrow(/3 行単位/);
   });
+
+  it("rejects paste with only header lines", () => {
+    expect(() =>
+      parseIdecoHoldingsPaste(`商品タイプ	運用商品名（略称）
+(1万口当り)	残高数量	資産残高	購入金額	損益
+損益率`),
+    ).toThrow(/保有明細行がありません/);
+  });
+
+  it("rejects invalid product type lines", () => {
+    expect(() =>
+      parseIdecoHoldingsPaste(`	31,530円	41,772口	131,707円	128,321円	3,386円
+ｅＭＡＸＩＳ	31,530円	41,772口	131,707円	128,321円	3,386円
+2.6％`),
+    ).toThrow(/商品タイプが不正です/);
+
+    expect(() =>
+      parseIdecoHoldingsPaste(`ｅＭＡＸＩＳ	31,530円	41,772口	131,707円	128,321円	3,386円
+2.6％
+国内株式`),
+    ).toThrow(/商品タイプが不正です/);
+  });
+
+  it("rejects malformed data and gain rate lines", () => {
+    expect(() =>
+      parseIdecoHoldingsPaste(`国内株式
+alpha\tbeta\tgamma
+2.6％`),
+    ).toThrow(/データ行の形式が不正です/);
+
+    expect(() =>
+      parseIdecoHoldingsPaste(`国内株式
+invalid data line without tabs
+2.6％`),
+    ).toThrow(/データ行の形式が不正です/);
+
+    expect(() =>
+      parseIdecoHoldingsPaste(`国内株式
+ｅＭＡＸＩＳ	31,530円	41,772口	131,707円	128,321円	3,386円
+invalid gain rate`),
+    ).toThrow(/損益率が不正です/);
+  });
+
+  it("rejects too few columns, empty names, invalid numbers, and zero quantity", () => {
+    expect(() =>
+      parseIdecoHoldingsPaste(`国内株式
+ｅＭＡＸＩＳ	31,530円	41,772口
+2.6％`),
+    ).toThrow(/列数が不正です/);
+
+    expect(() =>
+      parseIdecoHoldingsPaste(
+        "国内株式\n\t31,530円\t41,772口\t131,707円\t128,321円\t3,386円\n2.6％",
+      ),
+    ).toThrow(/運用商品名が空です/);
+
+    expect(() =>
+      parseIdecoHoldingsPaste(`国内株式
+ｅＭＡＸＩＳ	-	0口	131,707円	128,321円	3,386円
+2.6％`),
+    ).toThrow(/数値が不正です/);
+
+    expect(() =>
+      parseIdecoHoldingsPaste(`国内株式
+ｅＭＡＸＩＳ	31,530円	0口	131,707円	128,321円	3,386円
+2.6％`),
+    ).toThrow(/残高数量が不正です/);
+  });
+
+  it("rejects duplicate instrument names", () => {
+    expect(() =>
+      parseIdecoHoldingsPaste(`国内株式
+重複銘柄	31,530円	41,772口	131,707円	128,321円	3,386円
+2.6％
+海外株式
+重複銘柄	35,235円	195,416口	688,548円	639,283円	49,265円
+7.7％`),
+    ).toThrow(/重複しています/);
+  });
+
+  it("returns NaN for empty yen and lot values", () => {
+    expect(parseIdecoYenValue("")).toBeNaN();
+    expect(parseIdecoYenValue("-")).toBeNaN();
+    expect(parseIdecoLotQuantity("")).toBeNaN();
+    expect(parseIdecoLotQuantity("-")).toBeNaN();
+  });
+
+  it("skips blank lines between records", () => {
+    const parsed = parseIdecoHoldingsPaste(`国内株式
+
+ｅＭＡＸＩＳ　テスト	31,530円	41,772口	131,707円	128,321円	3,386円
+2.6％`);
+
+    expect(parsed.rows).toHaveLength(1);
+    expect(parsed.rows[0].instrumentName).toBe("ｅＭＡＸＩＳ　テスト");
+  });
 });
 
 describe("matchIdecoInstrumentId", () => {
@@ -189,6 +287,40 @@ describe("matchIdecoInstrumentId", () => {
 
   it("returns null when no match", () => {
     expect(matchIdecoInstrumentId(candidates, "存在しない銘柄")).toBeNull();
+  });
+
+  it("returns null for whitespace-only paste keys", () => {
+    expect(matchIdecoInstrumentId(candidates, "\u3164\u3164")).toBeNull();
+  });
+
+  it("returns null when paste match keys are empty", () => {
+    expect(matchIdecoInstrumentId(candidates, "テスト銘柄", () => [])).toBeNull();
+  });
+
+  it("returns null for empty paste name", () => {
+    expect(matchIdecoInstrumentId(candidates, "   ")).toBeNull();
+  });
+
+  it("matches by normalized name prefix when exact keys do not match", () => {
+    expect(
+      matchIdecoInstrumentId(
+        [{ id: "inst-prefix", name: "ｅＭＡＸＩＳ Ｓｌｉｍ 国内株式", shortName: null }],
+        "ｅＭＡＸＩＳ Ｓｌｉｍ 国内株式（ＴＯＰＩＸ）拡張サフィックス",
+      ),
+    ).toBe("inst-prefix");
+  });
+});
+
+describe("extractTrailingParentheticalContent", () => {
+  it("returns null when trailing parenthetical is empty", () => {
+    expect(extractTrailingParentheticalContent("テスト（）")).toBeNull();
+    expect(extractTrailingParentheticalContent("テスト")).toBeNull();
+  });
+});
+
+describe("buildIdecoPasteMatchKeys", () => {
+  it("builds normalized keys from paste name and stripped suffix", () => {
+    expect(buildIdecoPasteMatchKeys("ｅＭＡＸＩＳ　Ｓｌｉｍ")).toContain("eMAXIS Slim");
   });
 });
 

@@ -44,11 +44,15 @@ describe("AnalysisSettingsView", () => {
     });
   }
 
+  function renderView(initialTab?: string) {
+    render(<AnalysisSettingsView portfolioCode="ideco" initialTab={initialTab} />);
+  }
+
   it("shows loading then analysis settings content", async () => {
     render(<AnalysisSettingsView portfolioCode="ideco" />);
     expect(document.querySelector(".animate-pulse")).toBeTruthy();
     await waitForLoaded();
-    expect(screen.getAllByText("地域").length).toBeGreaterThan(0);
+    expect(screen.getByDisplayValue("地域")).toBeInTheDocument();
     expect(screen.queryByText("目標配分")).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "資産配分へ" })).toHaveAttribute(
       "href",
@@ -125,18 +129,23 @@ describe("AnalysisSettingsView", () => {
       "fetch",
       createManageFetchMock({ schemes: [] }),
     );
-    render(<AnalysisSettingsView portfolioCode="ideco" />);
+    renderView();
     await waitFor(() => {
       expect(screen.getByText("分析軸が未登録です")).toBeInTheDocument();
     });
-    expect(screen.getByRole("button", { name: "値を追加" })).toBeDisabled();
+    cleanup();
+    renderView("value");
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "値を追加" })).toBeDisabled();
+    });
   });
 
   it("creates category value", async () => {
     const user = userEvent.setup();
-    render(<AnalysisSettingsView portfolioCode="ideco" />);
-    await waitForLoaded();
-
+    renderView("value");
+    await waitFor(() => {
+      expect(screen.getByLabelText("値コード")).toBeInTheDocument();
+    });
     await user.type(screen.getByLabelText("値コード"), "us");
     await user.type(screen.getByLabelText("値名"), "米国");
     await user.clear(screen.getByLabelText("表示順"));
@@ -150,18 +159,19 @@ describe("AnalysisSettingsView", () => {
 
   it("updates and deletes category value", async () => {
     const user = userEvent.setup();
-    render(<AnalysisSettingsView portfolioCode="ideco" />);
-    await waitForLoaded();
-
+    renderView("value");
+    await waitFor(() => {
+      expect(screen.getByDisplayValue("日本")).toBeInTheDocument();
+    });
     const valueName = screen.getByDisplayValue("日本");
     await user.clear(valueName);
     await user.type(valueName, "日本株");
-    await user.click(screen.getAllByRole("button", { name: "更新" })[1]!);
+    await user.click(screen.getAllByRole("button", { name: "更新" })[0]!);
     await waitFor(() => {
       expect(toastSuccess).toHaveBeenCalledWith("カテゴリ値を更新しました。");
     });
 
-    await user.click(screen.getAllByRole("button", { name: "削除" })[1]!);
+    await user.click(screen.getAllByRole("button", { name: "削除" })[0]!);
     const alert = await screen.findByRole("alertdialog", { name: "カテゴリ値を削除" });
     await user.click(within(alert).getByRole("button", { name: "削除" }));
     await waitFor(() => {
@@ -176,7 +186,7 @@ describe("AnalysisSettingsView", () => {
         schemes: [{ ...MANAGE_SCHEME, values: [] }],
       }),
     );
-    render(<AnalysisSettingsView portfolioCode="ideco" />);
+    renderView("value");
     await waitFor(() => {
       expect(screen.getByText("値がありません")).toBeInTheDocument();
     });
@@ -184,9 +194,7 @@ describe("AnalysisSettingsView", () => {
 
   it("loads and saves instrument tags", async () => {
     const user = userEvent.setup();
-    render(<AnalysisSettingsView portfolioCode="ideco" />);
-    await waitForLoaded();
-
+    renderView("tag");
     await waitFor(() => {
       expect(screen.getByRole("checkbox", { name: "日本" })).toBeChecked();
     });
@@ -223,8 +231,10 @@ describe("AnalysisSettingsView", () => {
       }),
     );
     const user = userEvent.setup();
-    render(<AnalysisSettingsView portfolioCode="ideco" />);
-    await waitForLoaded();
+    renderView("tag");
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "タグを保存" })).toBeInTheDocument();
+    });
     await user.click(screen.getByRole("button", { name: "タグを保存" }));
     await waitFor(() => {
       expect(toastError).toHaveBeenCalledWith("タグ保存失敗");
@@ -260,6 +270,11 @@ describe("AnalysisSettingsView", () => {
       expect(toastError).toHaveBeenCalledWith("軸削除失敗");
     });
 
+    cleanup();
+    renderView("value");
+    await waitFor(() => {
+      expect(screen.getByLabelText("値コード")).toBeInTheDocument();
+    });
     await user.type(screen.getByLabelText("値コード"), "x");
     await user.type(screen.getByLabelText("値名"), "X");
     await user.click(screen.getByRole("button", { name: "値を追加" }));
@@ -267,12 +282,12 @@ describe("AnalysisSettingsView", () => {
       expect(toastError).toHaveBeenCalledWith("値追加失敗");
     });
 
-    await user.click(screen.getAllByRole("button", { name: "更新" })[1]!);
+    await user.click(screen.getAllByRole("button", { name: "更新" })[0]!);
     await waitFor(() => {
       expect(toastError).toHaveBeenCalledWith("値更新失敗");
     });
 
-    await user.click(screen.getAllByRole("button", { name: "削除" })[1]!);
+    await user.click(screen.getAllByRole("button", { name: "削除" })[0]!);
     alert = await screen.findByRole("alertdialog");
     await user.click(within(alert).getByRole("button", { name: "削除" }));
     await waitFor(() => {
@@ -285,8 +300,9 @@ describe("AnalysisSettingsView", () => {
       "fetch",
       createManageFetchMock({ instruments: [] }),
     );
-    render(<AnalysisSettingsView portfolioCode="ideco" />);
-    await waitForLoaded();
-    expect(screen.getByRole("button", { name: "タグを保存" })).toBeDisabled();
+    renderView("tag");
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "タグを保存" })).toBeDisabled();
+    });
   });
 });

@@ -36,6 +36,7 @@ describe("settings pages", () => {
   it("renders classification settings page", async () => {
     const page = await ClassificationSettingsPage({
       params: Promise.resolve({ code: "ideco" }),
+      searchParams: Promise.resolve({}),
     });
     render(page);
     expect(

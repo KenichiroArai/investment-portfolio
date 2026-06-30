@@ -26,11 +26,10 @@ function splitPasteLines(content: string): string[] {
   const normalized = content.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
   const rawLines = normalized.split("\n");
   for (const line of rawLines) {
-    const trimmed = line.trim();
-    if (trimmed === "") {
+    if (line.trim() === "") {
       continue;
     }
-    result.push(trimmed);
+    result.push(line.trimEnd());
   }
 
   return result;
