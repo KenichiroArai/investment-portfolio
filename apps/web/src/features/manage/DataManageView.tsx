@@ -687,7 +687,7 @@ function InstrumentTableRow({
   return result;
 }
 
-type InstrumentTableRowProps = {
+type MetricTableRowProps = {
   metricCode: string;
   label: string;
   initialValue: number;
