@@ -16,7 +16,6 @@
     "lint": "npm run lint -w @repo/web && npm run lint -w @repo/api && npm run lint -w @repo/db && npm run lint -w @repo/shared",
     "db:migrate": "npm run db:migrate -w @repo/db",
     "pages:export": "npm run pages:export -w @repo/db",
-    "db:import:ideco": "npm run db:import:ideco -w @repo/db",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"

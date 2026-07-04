@@ -1,7 +1,6 @@
 import {
   IdecoCsvError,
   parseGainRate,
-  parseJapaneseInteger,
   stripUtf8Bom,
 } from "./ideco-csv-utils";
 

@@ -18,7 +18,7 @@ investment-portfolio/
 │   └── ui/
 ├── docs/                    # GitHub Pages 公開用データ（JSON 正本）
 ├── dev/                     # 開発者向け資料（DB 確認 SQL 等）
-├── data/                    # ローカルデータ（SQLite・投入用 CSV、git 無視）
+├── data/                    # ローカルデータ（SQLite、git 無視）
 └── package.json
 ```
 
@@ -55,13 +55,11 @@ npm run dev:all
 
 ## データと環境変数
 
-`data/` はローカル専用です（`.gitignore` で除外）。SQLite と投入用 CSV をまとめて置きます。
+`data/` はローカル専用です（`.gitignore` で除外）。SQLite を置きます。
 
 ```text
 data/
-├── portfolio.db              # SQLite（migrate / import で生成）
-└── imports/
-    └── ideco/                # 5 CSV（商品タイプ・分析・銘柄の情報・明細・汎用）
+└── portfolio.db              # SQLite（migrate で生成）
 ```
 
 環境変数（任意）:
@@ -74,23 +72,11 @@ data/
 - 開発時は Web がローカル API からデータを取得します（登録・更新も API 経由）。
 - 本番（GitHub Pages）ビルドでは `docs/data/` の JSON を静的に読み込みます（閲覧のみ）。
 
-## iDeCo データ投入
+## ローカルでのデータ登録
 
-iDeCo 口座のデータは `data/imports/ideco/` 以下の 5 CSV から SQLite へ一括投入します。CSV 対応の詳細は [dev/sql/ideco/README.md](dev/sql/ideco/README.md) を参照してください。
-
-```bash
-npm run db:import:ideco -- data/imports/ideco
-```
+iDeCo 口座のデータは、ローカル API 接続時に Web の設定画面（データ管理・iDeCo 一括取り込み）から登録・更新します。DB 格納の code 慣例は [dev/sql/ideco/README.md](dev/sql/ideco/README.md) を参照してください。
 
 `data/` 配下は個人データのため Git 管理しません。
-
-投入内容:
-
-- 口座 `ideco`（未作成なら自動作成）
-- 分類体系（商品タイプ・大分類・スタイル・ステータス・地域・資産）と銘柄へのタグ付け
-- 銘柄マスタ（属性: 略称・提供会社・信託報酬など）
-- 保有スナップショット（明細 CSV の日付列ごとに複数基準日を upsert、最大基準日が最新）
-- 口座レベル指標（汎用 CSV の拠出金累計など）
 
 SQLite の内容を SQL で確認する場合は [dev/sql/README.md](dev/sql/README.md) を参照してください。
 
@@ -108,14 +94,14 @@ SQLite の内容を SQL で確認する場合は [dev/sql/README.md](dev/sql/REA
 | ポートフォリオ配分 | 明細・推移タブと配分タブ（銘柄目標・リバランス試算） |
 | 推移 | ポートフォリオ配分（評価額・損益）と資産配分（構成比）に統合 |
 | 設定 | データ管理（銘柄・明細・指標の登録・更新）、分類設定、目標配分 |
-| データ投入 | iDeCo 5 CSV の一括インポート、複数基準日のスナップショット |
+| データ投入 | iDeCo 貼り付け一括取り込み、設定画面での銘柄・明細・指標登録 |
 | GitHub Pages | 静的 JSON による閲覧（登録・更新はローカルのみ） |
 
 ### 今後の予定
 
 - 投資シミュレーション
 - 通貨別分析（外貨建て資産の換算・集計）
-- NISA・課税口座など他口座種別の CSV インポート
+- NISA・課税口座など他口座種別のデータ取り込み
 - PostgreSQL への移行
 
 ## 動作確認
@@ -140,7 +126,7 @@ curl -s "http://127.0.0.1:3001/portfolios/ideco/snapshots/trends"
 curl -s http://127.0.0.1:3001/portfolios/ideco/target-allocations
 ```
 
-`health` が JSON で返れば API は待ち受けできています。明細は [iDeCo データ投入](#ideco-データ投入) のあと `snapshot/current` で確認します。
+`health` が JSON で返れば API は待ち受けできています。明細は [ローカルでのデータ登録](#ローカルでのデータ登録) のあと `snapshot/current` で確認します。
 
 ### Web（ブラウザ）
 
@@ -167,7 +153,7 @@ npm run test:coverage
 
 公開用 JSON の正本は [`docs/`](docs/) 以下のみです（詳細は [docs/README.md](docs/README.md)）。
 
-1. [iDeCo データ投入](#ideco-データ投入) で SQLite にデータを投入する。
+1. ローカル API と Web を起動し、設定画面で SQLite にデータを登録する（[ローカルでのデータ登録](#ローカルでのデータ登録)）。
 2. 目標配分などローカルで編集した内容も SQLite に反映しておく。
 3. エクスポートする。
 

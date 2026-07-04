@@ -1,5 +1,5 @@
--- iDeCo 明細 CSV 投入後の概要確認
--- 前提: npm run db:migrate および db:import:ideco 済み
+-- iDeCo データ投入後の概要確認
+-- 前提: npm run db:migrate およびデータ投入済み
 -- DB 既定: data/portfolio.db（DATABASE_PATH で変更可）
 
 SELECT

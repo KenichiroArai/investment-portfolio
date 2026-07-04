@@ -102,6 +102,25 @@ describe("portfolio repositories", () => {
     expect(missing).toBeNull();
   });
 
+  it("finds scheme by portfolio code and scheme code", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+    const scheme = await createClassificationScheme(db, {
+      portfolioCode: "ideco",
+      code: "region",
+      name: "地域",
+    });
+    const found = await findSchemeByPortfolioCodeAndSchemeCode(db, "ideco", "region");
+    expect(found?.id).toBe(scheme!.id);
+
+    const missingScheme = await findSchemeByPortfolioCodeAndSchemeCode(db, "ideco", "missing");
+    expect(missingScheme).toBeNull();
+  });
+
   it("returns null when replacing snapshot for unknown portfolio", async () => {
     const db = setup();
     const replaced = await replaceCurrentSnapshot(db, {
@@ -159,6 +178,9 @@ describe("portfolio repositories", () => {
     });
 
     const instrument = await createInstrument(db, { name: "テストファンド" });
+    await setInstrumentAttributes(db, instrument.id, [
+      { code: "short_name", textValue: "テスト" },
+    ]);
     const instrumentUntagged = await createInstrument(db, { name: "無タグファンド" });
     await setInstrumentClassifications(db, instrument.id, [
       valueJapan.id,
@@ -203,6 +225,12 @@ describe("portfolio repositories", () => {
     });
     expect(replaced?.lines).toHaveLength(2);
     expect(replaced?.lines[0].sortOrder).toBe(1);
+    expect(replaced?.lines[0].instrumentAttributes).toEqual([
+      expect.objectContaining({
+        code: "short_name",
+        textValue: "テスト",
+      }),
+    ]);
     expect(replaced?.lines[0].metrics).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -217,7 +245,6 @@ describe("portfolio repositories", () => {
     );
     expect(replaced?.lines[0].tags[0].schemeCode).toBe("currency");
     expect(replaced?.lines[0].tags[1].valueName).toBe("日本");
-    expect(replaced?.lines[0].instrumentAttributes).toEqual([]);
     expect(replaced?.lines[1].tags).toHaveLength(0);
     expect(replaced?.lines[1].instrumentAttributes).toEqual([]);
     expect(replaced?.metrics).toEqual(
@@ -293,6 +320,7 @@ describe("portfolio repositories", () => {
     const instrumentAlpha = await createInstrument(db, { name: "Alpha Fund" });
     const instrumentBeta = await createInstrument(db, { name: "Beta Fund" });
     const instrumentGamma = await createInstrument(db, { name: "Gamma Fund" });
+    const instrumentDelta = await createInstrument(db, { name: "Delta Fund" });
 
     const replaced = await replaceCurrentSnapshot(db, {
       portfolioCode: "ideco",
@@ -304,7 +332,13 @@ describe("portfolio repositories", () => {
           marketValueMinor: 1000,
         },
         {
+          instrumentId: instrumentDelta.id,
+          quantity: 1,
+          marketValueMinor: 4000,
+        },
+        {
           instrumentId: instrumentAlpha.id,
+          sortOrder: 2,
           quantity: 1,
           marketValueMinor: 2000,
         },
@@ -321,6 +355,7 @@ describe("portfolio repositories", () => {
       "Gamma Fund",
       "Alpha Fund",
       "Beta Fund",
+      "Delta Fund",
     ]);
   });
 
@@ -377,6 +412,7 @@ describe("portfolio repositories", () => {
           marketValueMinor: 1500,
         },
       ],
+      setAsCurrent: true,
     });
     const updatedOlder = await getSnapshotByDate(db, "ideco", "2026-06-02");
     expect(updatedOlder?.lines[0].marketValueMinor).toBe(1500);
@@ -590,6 +626,9 @@ describe("portfolio repositories", () => {
     const reused = await upsertInstrument(db, { name: "Alpha Fund" });
     expect(reused?.id).toBe(created.id);
 
+    const createdViaUpsert = await upsertInstrument(db, { name: "Upsert New Fund" });
+    expect(createdViaUpsert?.name).toBe("Upsert New Fund");
+
     const beta = await createInstrument(db, { name: "Beta Fund" });
     await setInstrumentAttributes(db, beta.id, [
       { code: "short_name", textValue: "Beta" },
@@ -600,9 +639,12 @@ describe("portfolio repositories", () => {
       "Beta",
     );
     expect(byAttribute?.id).toBe(beta.id);
+    expect(
+      await findInstrumentByAttributeTextValue(db, "short_name", "missing"),
+    ).toBeNull();
 
     const all = await listInstruments(db);
-    expect(all).toHaveLength(2);
+    expect(all).toHaveLength(3);
     const searched = await listInstruments(db, "alpha");
     expect(searched).toHaveLength(1);
 

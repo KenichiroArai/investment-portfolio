@@ -20,7 +20,7 @@ docs/data/
 
 ## 更新手順（ローカルのみ）
 
-1. [README の iDeCo データ投入](../README.md#ideco-データ投入)（`npm run db:import:ideco`）で SQLite にデータを投入する。
+1. ローカル API と Web を起動し、設定画面で SQLite にデータを登録する（[README のローカルでのデータ登録](../README.md#ローカルでのデータ登録)）。
 2. 目標配分・銘柄ウェイトなどをローカル API 経由で編集する（任意）。
 3. リポジトリルートで次を実行する。
 
