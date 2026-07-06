@@ -15,8 +15,8 @@ type PortfolioAllocationTableProps = {
   sortColumn: PortfolioAllocationSortColumn;
   sortDirection: SortDirection;
   onSort: (column: PortfolioAllocationSortColumn) => void;
-  highlightedInstrumentId: string | null;
-  onRowHover: (instrumentId: string) => void;
+  highlightedHoldingLineId: string | null;
+  onRowHover: (holdingLineId: string) => void;
   onRowLeave: () => void;
 };
 
@@ -25,7 +25,7 @@ export function PortfolioAllocationTable({
   sortColumn,
   sortDirection,
   onSort,
-  highlightedInstrumentId,
+  highlightedHoldingLineId,
   onRowHover,
   onRowLeave,
 }: PortfolioAllocationTableProps) {
@@ -98,15 +98,15 @@ export function PortfolioAllocationTable({
           </tr>
         ) : (
           rows.map((row) => {
-            const isHighlighted = highlightedInstrumentId === row.instrumentId;
+            const isHighlighted = highlightedHoldingLineId === row.holdingLineId;
             let bodyRow = (
               <tr
-                key={row.instrumentId}
+                key={row.holdingLineId}
                 className={cn(
                   isHighlighted ? "allocation-table__row--highlight data-table__row--highlight" : undefined,
                 )}
                 onMouseEnter={() => {
-                  onRowHover(row.instrumentId);
+                  onRowHover(row.holdingLineId);
                 }}
                 onMouseLeave={onRowLeave}
               >

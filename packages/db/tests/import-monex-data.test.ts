@@ -4,6 +4,8 @@ import { fileURLToPath } from "node:url";
 import iconv from "iconv-lite";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 
+import { computeMonexMutualFundBookValueMinor } from "@repo/shared";
+
 import { createTestDb } from "../src/test-utils";
 import { importMonexData } from "../src/import-monex-data";
 import { getCurrentSnapshot } from "../src/repositories/snapshots";
@@ -52,7 +54,14 @@ describe("importMonexData", () => {
 
     const snapshot = await getCurrentSnapshot(db, "monex");
     expect(snapshot).not.toBeNull();
+    expect(snapshot?.portfolioKind).toBe("monex");
     expect(snapshot?.lines.length).toBe(outcome.lineCount);
+    const domesticLine = snapshot?.lines.find(
+      (line) => line.instrumentName === "テストファンドＡ",
+    );
+    expect(domesticLine?.bookValueMinor).toBe(
+      computeMonexMutualFundBookValueMinor(9500, 100),
+    );
     expect(
       snapshot?.analysisSchemes.some(
         (scheme) => scheme.schemeCode === "monex_asset_class",

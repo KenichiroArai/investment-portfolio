@@ -13,6 +13,7 @@ export type PortfolioInstrumentOrderFields = {
 };
 
 export type PortfolioAllocationRow = PortfolioInstrumentOrderFields & {
+  holdingLineId: string;
   marketValueMinor: number;
   currentRatio: number;
   targetRatio: number | null;
@@ -88,6 +89,11 @@ export function comparePortfolioAllocationRows(
   }
 
   result = comparePortfolioInstrumentOrder(left, right);
+  if (result !== 0) {
+    return result;
+  }
+
+  result = left.holdingLineId.localeCompare(right.holdingLineId, "ja");
   return result;
 }
 
@@ -161,6 +167,7 @@ export function buildPortfolioAllocationRows(
     }
 
     result.push({
+      holdingLineId: line.id,
       instrumentId: line.instrumentId,
       instrumentName: line.instrumentName,
       sortOrder: line.sortOrder,

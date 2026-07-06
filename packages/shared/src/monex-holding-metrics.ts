@@ -17,6 +17,23 @@ export const MONEX_INSTRUMENT_ATTRIBUTE_CODES = {
   ticker: "ticker",
 } as const;
 
+/** 投信の平均取得単価は1万口あたり（円）のため、保有口数との積は /10000 する */
+export function computeMonexMutualFundBookValueMinor(
+  avgCostMinor: number,
+  quantityLots: number,
+): number {
+  let result = 0;
+
+  if (!Number.isFinite(avgCostMinor) || !Number.isFinite(quantityLots)) {
+    return result;
+  }
+
+  result = Number(
+    (BigInt(avgCostMinor) * BigInt(quantityLots) + 5000n) / 10000n,
+  );
+  return result;
+}
+
 export function buildMonexHoldingMetrics(params: {
   unitPriceMinor: number;
   avgCostMinor: number;

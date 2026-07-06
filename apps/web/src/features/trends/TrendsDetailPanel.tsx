@@ -37,7 +37,7 @@ import {
 import {
   getPortfolioKindFeatures,
 } from "@repo/shared";
-import { findPortfolioByCode } from "@/lib/portfolio-catalog";
+import { resolvePortfolioKind } from "@/lib/resolve-portfolio-kind";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
 
 type TrendsPanelMode = "portfolio" | "allocation" | "all";
@@ -72,8 +72,6 @@ export function TrendsDetailPanel({
   hideSchemeTabs = false,
   renderPeriodSummary = true,
 }: TrendsDetailPanelProps) {
-  const portfolioKind = findPortfolioByCode(portfolioCode)?.kind ?? "ideco";
-  const kindFeatures = getPortfolioKindFeatures(portfolioKind);
   const {
     displayTrendPoints,
     baselinePoint,
@@ -83,6 +81,8 @@ export function TrendsDetailPanel({
     snapshot,
     trends,
   } = usePortfolioTime();
+  const portfolioKind = resolvePortfolioKind(portfolioCode, snapshot);
+  const kindFeatures = getPortfolioKindFeatures(portfolioKind);
 
   const schemeCodesList = snapshot?.analysisSchemes ?? [];
   const schemeCodeValues = schemeCodesList.map((scheme) => scheme.schemeCode);

@@ -81,6 +81,18 @@ describe("buildPortfolioAllocationRows", () => {
 
     expect(result.map((row) => row.instrumentId)).toEqual(["inst-a", "inst-b"]);
   });
+
+  it("keeps separate rows when the same instrument appears on multiple holding lines", () => {
+    const duplicateLines: HoldingLineDto[] = [
+      { ...lines[0]!, id: "line-1a", sortOrder: 1 },
+      { ...lines[0]!, id: "line-1b", sortOrder: 2, marketValueMinor: 200_000 },
+    ];
+    let result = buildPortfolioAllocationRows(duplicateLines, [], 800_000);
+
+    expect(result).toHaveLength(2);
+    expect(result.map((row) => row.holdingLineId)).toEqual(["line-1a", "line-1b"]);
+    expect(result.every((row) => row.instrumentId === "inst-a")).toBe(true);
+  });
 });
 
 describe("comparePortfolioInstrumentOrder", () => {
@@ -143,6 +155,7 @@ describe("sortHoldingLinesByPortfolioInstrumentOrder", () => {
 describe("comparePortfolioAllocationRows columns", () => {
   const baseRows: PortfolioAllocationRow[] = [
     {
+      holdingLineId: "line-a",
       instrumentId: "inst-a",
       instrumentName: "銘柄A",
       sortOrder: 1,
@@ -154,6 +167,7 @@ describe("comparePortfolioAllocationRows columns", () => {
       gapMarketValueMinor: 100_000,
     },
     {
+      holdingLineId: "line-b",
       instrumentId: "inst-b",
       instrumentName: "銘柄B",
       sortOrder: 2,

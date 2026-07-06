@@ -26,6 +26,12 @@ type TargetPortfolioSettingsCardProps = {
   disabled: boolean;
 };
 
+type TargetInstrumentRow = {
+  instrumentId: string;
+  instrumentName: string;
+  marketValueMinor: number;
+};
+
 export function TargetPortfolioSettingsCard({
   portfolioCode,
   lines,
@@ -40,6 +46,28 @@ export function TargetPortfolioSettingsCard({
     return result;
   }, [lines]);
 
+  const instrumentRows = useMemo(() => {
+    let result: TargetInstrumentRow[] = [];
+
+    const rowsByInstrumentId = new Map<string, TargetInstrumentRow>();
+    for (const line of sortedLines) {
+      const existing = rowsByInstrumentId.get(line.instrumentId);
+      if (!existing) {
+        rowsByInstrumentId.set(line.instrumentId, {
+          instrumentId: line.instrumentId,
+          instrumentName: line.instrumentName,
+          marketValueMinor: line.marketValueMinor,
+        });
+        continue;
+      }
+
+      existing.marketValueMinor += line.marketValueMinor;
+    }
+
+    result = [...rowsByInstrumentId.values()];
+    return result;
+  }, [sortedLines]);
+
   useEffect(() => {
     let result: () => void = () => {};
     let cancelled = false;
@@ -52,9 +80,11 @@ export function TargetPortfolioSettingsCard({
       }
 
       const nextInputs: Record<string, string> = {};
-      for (const line of sortedLines) {
-        const weight = weights.find((item) => item.instrumentId === line.instrumentId);
-        nextInputs[line.instrumentId] =
+      for (const instrumentRow of instrumentRows) {
+        const weight = weights.find(
+          (item) => item.instrumentId === instrumentRow.instrumentId,
+        );
+        nextInputs[instrumentRow.instrumentId] =
           weight !== undefined ? String(Math.round(weight.targetRatio * 1000) / 10) : "";
       }
       setTargetInputs(nextInputs);
@@ -66,7 +96,7 @@ export function TargetPortfolioSettingsCard({
       cancelled = true;
     };
     return result;
-  }, [loading, sortedLines, weights]);
+  }, [instrumentRows, loading, weights]);
 
   const assetTotalMinor = useMemo(() => {
     let result = sumSnapshotMarketValue(lines);
@@ -76,21 +106,21 @@ export function TargetPortfolioSettingsCard({
   const currentRatioByInstrumentId = useMemo(() => {
     let result = new Map<string, number>();
 
-    for (const line of sortedLines) {
+    for (const line of instrumentRows) {
       const currentRatio =
         assetTotalMinor > 0 ? line.marketValueMinor / assetTotalMinor : 0;
       result.set(line.instrumentId, currentRatio);
     }
 
     return result;
-  }, [assetTotalMinor, sortedLines]);
+  }, [assetTotalMinor, instrumentRows]);
 
   const handleSave = async (): Promise<void> => {
     let result: void = undefined;
 
-    const targetWeights = sortedLines
-      .map((line) => {
-        const raw = targetInputs[line.instrumentId]?.trim() ?? "";
+    const targetWeights = instrumentRows
+      .map((instrumentRow) => {
+        const raw = targetInputs[instrumentRow.instrumentId]?.trim() ?? "";
         if (raw === "") {
           return null;
         }
@@ -99,7 +129,7 @@ export function TargetPortfolioSettingsCard({
           return null;
         }
         return {
-          instrumentId: line.instrumentId,
+          instrumentId: instrumentRow.instrumentId,
           targetRatio: percent / 100,
         };
       })
@@ -126,8 +156,8 @@ export function TargetPortfolioSettingsCard({
     return result;
   };
 
-  const totalPercent = sortedLines.reduce((sum, line) => {
-    const raw = targetInputs[line.instrumentId]?.trim() ?? "";
+  const totalPercent = instrumentRows.reduce((sum, instrumentRow) => {
+    const raw = targetInputs[instrumentRow.instrumentId]?.trim() ?? "";
     const percent = Number.parseFloat(raw);
     if (!Number.isFinite(percent) || percent < 0) {
       return sum;
@@ -144,7 +174,7 @@ export function TargetPortfolioSettingsCard({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {sortedLines.length === 0 ? (
+        {instrumentRows.length === 0 ? (
           <p className="text-sm text-muted-foreground">保有明細がありません。</p>
         ) : loading ? (
           <p className="text-sm text-muted-foreground">読み込み中…</p>
@@ -159,11 +189,12 @@ export function TargetPortfolioSettingsCard({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sortedLines.map((line) => {
-                  const currentRatio = currentRatioByInstrumentId.get(line.instrumentId) ?? 0;
+                {instrumentRows.map((instrumentRow) => {
+                  const currentRatio =
+                    currentRatioByInstrumentId.get(instrumentRow.instrumentId) ?? 0;
                   let row = (
-                    <TableRow key={line.instrumentId}>
-                      <TableCell>{line.instrumentName}</TableCell>
+                    <TableRow key={instrumentRow.instrumentId}>
+                      <TableCell>{instrumentRow.instrumentName}</TableCell>
                       <TableCell className="text-right tabular-nums text-muted-foreground">
                         {formatAllocationPercent(currentRatio)}
                       </TableCell>
@@ -173,15 +204,15 @@ export function TargetPortfolioSettingsCard({
                           min={0}
                           max={100}
                           step={0.1}
-                          value={targetInputs[line.instrumentId] ?? ""}
+                          value={targetInputs[instrumentRow.instrumentId] ?? ""}
                           disabled={disabled || saving}
                           onChange={(event) => {
                             setTargetInputs((current) => ({
                               ...current,
-                              [line.instrumentId]: event.target.value,
+                              [instrumentRow.instrumentId]: event.target.value,
                             }));
                           }}
-                          aria-label={`${line.instrumentName} の目標構成比`}
+                          aria-label={`${instrumentRow.instrumentName} の目標構成比`}
                         />
                       </TableCell>
                     </TableRow>

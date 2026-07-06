@@ -84,6 +84,7 @@ export type CurrentSnapshotDto = {
   id: string;
   portfolioCode: string;
   portfolioName: string;
+  portfolioKind?: string;
   asOfDate: string;
   analysisSchemes: AnalysisSchemeConfig[];
   metrics: PortfolioSnapshotMetricDto[];

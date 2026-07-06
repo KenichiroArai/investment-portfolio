@@ -3,6 +3,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
+import { computeMonexMutualFundBookValueMinor } from "../src/monex-holding-metrics";
 import {
   buildMonexAssetClassNameMap,
   parseMonexDomesticHoldingsCsv,
@@ -38,6 +39,11 @@ describe("monex csv parsers", () => {
       quantity: 2,
       marketValueMinor: 14400,
     });
+  });
+
+  it("computes mutual fund book value from avg cost per 10000 lots", () => {
+    expect(computeMonexMutualFundBookValueMinor(29147, 3431)).toBe(10000);
+    expect(computeMonexMutualFundBookValueMinor(9500, 100)).toBe(95);
   });
 
   it("builds asset class map from csv files", () => {

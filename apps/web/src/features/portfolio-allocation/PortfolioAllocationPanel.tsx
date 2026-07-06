@@ -24,7 +24,7 @@ function toChartSlices(rows: PortfolioAllocationRow[]): AllocationSliceWithLines
 
   for (const row of rows) {
     result.push({
-      valueCode: row.instrumentId,
+      valueCode: row.holdingLineId,
       valueName: row.instrumentName,
       marketValueMinor: row.marketValueMinor,
       weight: row.currentRatio,
@@ -38,7 +38,7 @@ function toChartSlices(rows: PortfolioAllocationRow[]): AllocationSliceWithLines
 }
 
 export function PortfolioAllocationPanel({ rows }: PortfolioAllocationPanelProps) {
-  const [highlightedInstrumentId, setHighlightedInstrumentId] = useState<string | null>(
+  const [highlightedHoldingLineId, setHighlightedHoldingLineId] = useState<string | null>(
     null,
   );
   const [tooltip, setTooltip] = useState<PortfolioAllocationTooltipState | null>(null);
@@ -58,18 +58,18 @@ export function PortfolioAllocationPanel({ rows }: PortfolioAllocationPanelProps
   }, [sortedRows]);
 
   function handleSliceHover(
-    instrumentId: string,
+    holdingLineId: string,
     clientX: number,
     clientY: number,
   ): void {
     let result: void = undefined;
-    const row = sortedRows.find((item) => item.instrumentId === instrumentId);
+    const row = sortedRows.find((item) => item.holdingLineId === holdingLineId);
 
     if (!row) {
       return result;
     }
 
-    setHighlightedInstrumentId(instrumentId);
+    setHighlightedHoldingLineId(holdingLineId);
     setTooltip({
       x: clientX,
       y: clientY,
@@ -80,7 +80,7 @@ export function PortfolioAllocationPanel({ rows }: PortfolioAllocationPanelProps
 
   function handleSliceLeave(): void {
     let result: void = undefined;
-    setHighlightedInstrumentId(null);
+    setHighlightedHoldingLineId(null);
     setTooltip(null);
     return result;
   }
@@ -90,7 +90,7 @@ export function PortfolioAllocationPanel({ rows }: PortfolioAllocationPanelProps
       <div className="allocation-panel__chart-area">
         <AllocationChart
           slices={chartSlices}
-          highlightedValueCode={highlightedInstrumentId}
+          highlightedValueCode={highlightedHoldingLineId}
           onSliceHover={handleSliceHover}
           onSliceLeave={handleSliceLeave}
         />
@@ -117,9 +117,9 @@ export function PortfolioAllocationPanel({ rows }: PortfolioAllocationPanelProps
         sortColumn={sortColumn}
         sortDirection={sortDirection}
         onSort={toggleSort}
-        highlightedInstrumentId={highlightedInstrumentId}
-        onRowHover={(instrumentId) => {
-          setHighlightedInstrumentId(instrumentId);
+        highlightedHoldingLineId={highlightedHoldingLineId}
+        onRowHover={(holdingLineId) => {
+          setHighlightedHoldingLineId(holdingLineId);
           setTooltip(null);
         }}
         onRowLeave={handleSliceLeave}

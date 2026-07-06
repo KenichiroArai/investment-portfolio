@@ -37,7 +37,7 @@ export function usePortfolioRebalanceResult({
     const allocationRows = buildPortfolioAllocationRows(lines, weights, totalValue);
     const trades = computeRebalanceTrades({
       rows: allocationRows.map((row) => ({
-        key: row.instrumentId,
+        key: row.holdingLineId,
         marketValueMinor: row.marketValueMinor,
         targetRatio: row.targetRatio,
       })),
@@ -48,7 +48,7 @@ export function usePortfolioRebalanceResult({
     rebalanceResult = {
       ...trades,
       rows: trades.rows.map((row) => {
-        const source = allocationRows.find((item) => item.instrumentId === row.key);
+        const source = allocationRows.find((item) => item.holdingLineId === row.key);
         let displayRow: RebalanceDisplayRow = {
           ...row,
           label: source?.instrumentName ?? row.key,

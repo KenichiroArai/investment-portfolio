@@ -17,7 +17,7 @@ import {
   formatAsOfDateJa,
   formatYen,
 } from "@/lib/format-yen";
-import { findPortfolioByCode } from "@/lib/portfolio-catalog";
+import { resolvePortfolioKind } from "@/lib/resolve-portfolio-kind";
 import { buildPortfolioPath } from "@/lib/portfolio-path";
 
 type PortfolioOverviewViewProps = {
@@ -82,7 +82,7 @@ export function PortfolioOverviewView({
       ? `最新比 評価額 ${formatYen(latestPoint.totalMarketValueMinor - assetBalance)}`
       : null;
 
-  const portfolioKind = findPortfolioByCode(portfolioCode)?.kind ?? "ideco";
+  const portfolioKind = resolvePortfolioKind(portfolioCode, snapshot);
 
   result = (
     <PageContainer>

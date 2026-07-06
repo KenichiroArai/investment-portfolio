@@ -8,6 +8,7 @@ import {
   MONEX_SCHEME_CODES,
   buildMonexAssetClassNameMap,
   buildMonexHoldingMetrics,
+  computeMonexMutualFundBookValueMinor,
   matchMonexInstrumentId,
   parseMonexCompassFundCsv,
   parseMonexDomesticHoldingsCsv,
@@ -293,7 +294,10 @@ export async function importMonexData(
       result.createdInstruments += 1;
     }
 
-    const bookValueMinor = row.avgCostMinor * row.quantity;
+    const bookValueMinor = computeMonexMutualFundBookValueMinor(
+      row.avgCostMinor,
+      row.quantity,
+    );
     let line: HoldingLineInput = {
       instrumentId: resolved.instrumentId,
       quantity: row.quantity,
@@ -379,7 +383,10 @@ export async function importMonexData(
       result.createdInstruments += 1;
     }
 
-    const bookValueMinor = row.avgCostMinor * row.quantity;
+    const bookValueMinor = computeMonexMutualFundBookValueMinor(
+      row.avgCostMinor,
+      row.quantity,
+    );
     let line: HoldingLineInput = {
       instrumentId: resolved.instrumentId,
       quantity: row.quantity,

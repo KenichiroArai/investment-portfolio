@@ -102,6 +102,7 @@ type CurrentSnapshotDto = {
   id: string;
   portfolioCode: string;
   portfolioName: string;
+  portfolioKind: string;
   asOfDate: string;
   analysisSchemes: Array<{
     schemeCode: string;
@@ -405,6 +406,7 @@ async function buildSnapshotDto(
     id: snapshot.id,
     portfolioCode: portfolio.code,
     portfolioName: portfolio.name,
+    portfolioKind: portfolio.kind,
     asOfDate: snapshot.asOfDate,
     analysisSchemes,
     metrics: snapshotMetrics,
