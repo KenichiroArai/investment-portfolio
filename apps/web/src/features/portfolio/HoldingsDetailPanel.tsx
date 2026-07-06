@@ -39,6 +39,7 @@ import { buildPortfolioPath } from "@/lib/portfolio-path";
 
 type HoldingsDetailPanelProps = {
   portfolioCode: string;
+  portfolioKind: string;
   holdingsMode: HoldingsMode;
   onHoldingsModeChange: (mode: HoldingsMode) => void;
 };
@@ -55,6 +56,7 @@ const HOLDINGS_MODE_LABELS: Record<HoldingsMode, string> = {
 
 export function HoldingsDetailPanel({
   portfolioCode,
+  portfolioKind,
   holdingsMode,
   onHoldingsModeChange,
 }: HoldingsDetailPanelProps) {
@@ -517,6 +519,7 @@ export function HoldingsDetailPanel({
                   <HoldingsRangeDetailTable
                     rows={paginatedDetailRows.pageRows}
                     classificationSchemes={rangeClassificationSchemes}
+                    portfolioKind={portfolioKind}
                     sortColumn={sortColumn}
                     sortDirection={sortDirection}
                     onSort={handleDetailSort}
@@ -575,6 +578,7 @@ export function HoldingsDetailPanel({
                 <HoldingsPeriodDetailTable
                   rows={changeRows}
                   classificationSchemes={compareClassificationSchemes}
+                  portfolioKind={portfolioKind}
                   showDeltas={showDeltas}
                 />
               )}

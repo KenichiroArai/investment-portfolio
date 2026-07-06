@@ -76,6 +76,15 @@ data/
 
 iDeCo 口座のデータは、ローカル API 接続時に Web の設定画面（データ管理・iDeCo 一括取り込み）から登録・更新します。DB 格納の code 慣例は [dev/sql/ideco/README.md](dev/sql/ideco/README.md) を参照してください。
 
+マネックス証券（ON COMPASS）口座は CSV から一括投入します。DB 格納の code 慣例は [dev/sql/monex/README.md](dev/sql/monex/README.md) を参照してください。
+
+```bash
+npm run db:migrate
+npm run db:import:monex -- data/imports/monex
+```
+
+`data/imports/monex/` に ON COMPASS からエクスポートした CSV（Shift_JIS）を配置してから実行します。投入後は `npm run pages:export` で静的 JSON を更新できます。
+
 `data/` 配下は個人データのため Git 管理しません。
 
 SQLite の内容を SQL で確認する場合は [dev/sql/README.md](dev/sql/README.md) を参照してください。
@@ -94,14 +103,14 @@ SQLite の内容を SQL で確認する場合は [dev/sql/README.md](dev/sql/REA
 | ポートフォリオ配分 | 明細・推移タブと配分タブ（銘柄目標・リバランス試算） |
 | 推移 | ポートフォリオ配分（評価額・損益）と資産配分（構成比）に統合 |
 | 設定 | データ管理（銘柄・明細・指標の登録・更新）、分類設定、目標配分 |
-| データ投入 | iDeCo 貼り付け一括取り込み、設定画面での銘柄・明細・指標登録 |
+| データ投入 | iDeCo 貼り付け一括取り込み、マネックス証券 CSV インポート、設定画面での銘柄・明細・指標登録 |
 | GitHub Pages | 静的 JSON による閲覧（登録・更新はローカルのみ） |
 
 ### 今後の予定
 
 - 投資シミュレーション
 - 通貨別分析（外貨建て資産の換算・集計）
-- NISA・課税口座など他口座種別のデータ取り込み
+- NISA・課税口座など他口座種別のデータ取り込み（マネックス証券は CSV 対応済み）
 - PostgreSQL への移行
 
 ## 動作確認

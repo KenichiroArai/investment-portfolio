@@ -34,6 +34,10 @@ import {
   formatPercentRelativeChange,
   formatYen,
 } from "@/lib/format-yen";
+import {
+  getPortfolioKindFeatures,
+} from "@repo/shared";
+import { findPortfolioByCode } from "@/lib/portfolio-catalog";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
 
 type TrendsPanelMode = "portfolio" | "allocation" | "all";
@@ -68,6 +72,8 @@ export function TrendsDetailPanel({
   hideSchemeTabs = false,
   renderPeriodSummary = true,
 }: TrendsDetailPanelProps) {
+  const portfolioKind = findPortfolioByCode(portfolioCode)?.kind ?? "ideco";
+  const kindFeatures = getPortfolioKindFeatures(portfolioKind);
   const {
     displayTrendPoints,
     baselinePoint,
@@ -427,6 +433,11 @@ export function TrendsDetailPanel({
   gainRateSeries = gainRateSeries.filter((item) =>
     item.values.some((value) => value !== null && Number.isFinite(value)),
   );
+  if (!kindFeatures.showGainRateOnContributions) {
+    gainRateSeries = gainRateSeries.filter(
+      (item) => !item.key.startsWith("gain-rate-contributions"),
+    );
+  }
 
   let gainRateDeltaSeries: TrendChartSeries[] = [
     {
@@ -453,6 +464,11 @@ export function TrendsDetailPanel({
   gainRateDeltaSeries = gainRateDeltaSeries.filter((item) =>
     item.values.some((value) => value !== null && Number.isFinite(value)),
   );
+  if (!kindFeatures.showGainRateOnContributions) {
+    gainRateDeltaSeries = gainRateDeltaSeries.filter(
+      (item) => !item.key.startsWith("gain-rate-contributions"),
+    );
+  }
 
   let gainRateRelativeRateSeries: TrendChartSeries[] = [
     {
@@ -491,6 +507,11 @@ export function TrendsDetailPanel({
   gainRateRelativeRateSeries = gainRateRelativeRateSeries.filter((item) =>
     item.values.some((value) => value !== null && Number.isFinite(value)),
   );
+  if (!kindFeatures.showGainRateOnContributions) {
+    gainRateRelativeRateSeries = gainRateRelativeRateSeries.filter(
+      (item) => !item.key.startsWith("gain-rate-contributions"),
+    );
+  }
 
   const startMarketValue =
     periodEndpoints?.start.totalMarketValueMinor ??

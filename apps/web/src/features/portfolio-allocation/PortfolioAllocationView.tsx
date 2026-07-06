@@ -45,7 +45,7 @@ type PortfolioAllocationViewProps = {
 
 export function PortfolioAllocationView({
   portfolioCode,
-  portfolioKind: _portfolioKind,
+  portfolioKind,
 }: PortfolioAllocationViewProps) {
   const {
     snapshot,
@@ -129,7 +129,10 @@ export function PortfolioAllocationView({
       ? `最新比 評価額 ${formatYen(latestPoint.totalMarketValueMinor - assetBalance)}`
       : null;
 
-  const holdingsSummarySegments = buildHoldingsTabSummarySegments(snapshot);
+  const holdingsSummarySegments = buildHoldingsTabSummarySegments(
+    snapshot,
+    portfolioKind,
+  );
   const compositionSummarySegments = buildCompositionTabSummarySegments(allocationRows);
   const trendsSummarySegments = buildTrendsTabSummarySegments(
     trendPeriodSummaryData
@@ -222,6 +225,7 @@ export function PortfolioAllocationView({
             <TabSummaryBar segments={holdingsSummarySegments} note={deltaHint} />
             <HoldingsDetailPanel
               portfolioCode={portfolioCode}
+              portfolioKind={portfolioKind}
               holdingsMode={holdingsMode}
               onHoldingsModeChange={setHoldingsMode}
             />

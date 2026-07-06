@@ -2,7 +2,13 @@ import { z } from "zod";
 
 import { findDuplicateInstrumentId } from "./snapshot-line-validation";
 
-const portfolioKindSchema = z.enum(["ideco", "nisa", "taxable", "satellite"]);
+const portfolioKindSchema = z.enum([
+  "ideco",
+  "monex",
+  "nisa",
+  "taxable",
+  "satellite",
+]);
 
 export const createPortfolioSchema = z.object({
   code: z.string().min(1).max(64),

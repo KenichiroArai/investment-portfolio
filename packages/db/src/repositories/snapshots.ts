@@ -50,6 +50,7 @@ export type ReplaceCurrentSnapshotParams = {
 
 export type UpsertSnapshotByDateParams = ReplaceCurrentSnapshotParams & {
   setAsCurrent?: boolean;
+  allowDuplicateInstrumentIds?: boolean;
 };
 
 export type SnapshotDateListItem = {
@@ -553,7 +554,9 @@ export async function upsertSnapshotByDate(
     return result;
   }
 
-  assertUniqueSnapshotInstrumentIds(params.lines);
+  if (!params.allowDuplicateInstrumentIds) {
+    assertUniqueSnapshotInstrumentIds(params.lines);
+  }
 
   db.transaction((tx) => {
     let txResult: void = undefined;

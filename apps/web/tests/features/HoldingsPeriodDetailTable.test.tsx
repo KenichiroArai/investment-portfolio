@@ -41,6 +41,7 @@ describe("HoldingsPeriodDetailTable", () => {
       <HoldingsPeriodDetailTable
         rows={rows}
         classificationSchemes={[]}
+        portfolioKind="ideco"
         showDeltas={false}
       />,
     );
@@ -125,6 +126,7 @@ describe("HoldingsPeriodDetailTable", () => {
       <HoldingsPeriodDetailTable
         rows={rows}
         classificationSchemes={classificationSchemes}
+        portfolioKind="ideco"
         showDeltas={true}
       />,
     );
@@ -159,6 +161,7 @@ describe("HoldingsPeriodDetailTable", () => {
       <HoldingsPeriodDetailTable
         rows={rows}
         classificationSchemes={[]}
+        portfolioKind="ideco"
         showDeltas={false}
       />,
     );
@@ -189,6 +192,7 @@ describe("HoldingsPeriodDetailTable", () => {
       <HoldingsPeriodDetailTable
         rows={rows}
         classificationSchemes={[]}
+        portfolioKind="ideco"
         showDeltas={false}
       />,
     );

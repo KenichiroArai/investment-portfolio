@@ -1,5 +1,5 @@
 import { and, asc, eq, inArray, notInArray } from "drizzle-orm";
-import { isIdecoAnalysisSchemeCode } from "@repo/shared";
+import { isIdecoAnalysisSchemeCode, isMonexAnalysisSchemeCode } from "@repo/shared";
 
 import type { AppDatabase } from "../client";
 import { newId, nowIso } from "../id";
@@ -366,6 +366,9 @@ export async function listAnalysisSchemesForPortfolio(
 
   for (const row of rows) {
     if (portfolio.kind === "ideco" && !isIdecoAnalysisSchemeCode(row.schemeCode)) {
+      continue;
+    }
+    if (portfolio.kind === "monex" && !isMonexAnalysisSchemeCode(row.schemeCode)) {
       continue;
     }
     result.push({

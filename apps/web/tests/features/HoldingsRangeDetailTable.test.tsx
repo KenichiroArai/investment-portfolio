@@ -45,6 +45,7 @@ describe("HoldingsRangeDetailTable", () => {
           }),
         ]}
         classificationSchemes={[]}
+        portfolioKind="ideco"
       />,
     );
 
@@ -57,7 +58,11 @@ describe("HoldingsRangeDetailTable", () => {
 
   it("shows empty message when rows are empty", () => {
     render(
-      <HoldingsRangeDetailTable rows={[]} classificationSchemes={[]} />,
+      <HoldingsRangeDetailTable
+        rows={[]}
+        classificationSchemes={[]}
+        portfolioKind="ideco"
+      />,
     );
 
     expect(
@@ -81,6 +86,7 @@ describe("HoldingsRangeDetailTable", () => {
           }),
         ]}
         classificationSchemes={[]}
+        portfolioKind="ideco"
       />,
     );
 

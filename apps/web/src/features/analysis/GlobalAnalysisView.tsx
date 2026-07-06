@@ -46,14 +46,6 @@ export function GlobalAnalysisView() {
   const [selectedSchemeCode, setSelectedSchemeCode] = useState("");
   const schemeConfigs = useMemo(() => {
     let result = mergeAnalysisSchemesFromSnapshots(snapshots);
-
-    if (portfolios.length > 0) {
-      const kinds = new Set(portfolios.map((portfolio) => portfolio.kind));
-      if (!kinds.has("ideco") && kinds.size > 0) {
-        result = [];
-      }
-    }
-
     return result;
   }, [portfolios, snapshots]);
   const activeSchemeCode = useMemo(() => {

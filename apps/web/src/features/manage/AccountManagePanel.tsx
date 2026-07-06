@@ -74,7 +74,7 @@ export function AccountManagePanel({
     const response = await createPortfolio({
       code: createCode.trim(),
       name: createName.trim(),
-      kind: createKind as "ideco" | "nisa" | "taxable" | "satellite",
+      kind: createKind as "ideco" | "monex" | "nisa" | "taxable" | "satellite",
     });
     setSubmitting(false);
 
@@ -103,7 +103,12 @@ export function AccountManagePanel({
     setSubmitting(true);
     const response = await updatePortfolio(editTarget.code, {
       name: editTarget.name.trim(),
-      kind: editTarget.kind as "ideco" | "nisa" | "taxable" | "satellite",
+      kind: editTarget.kind as
+        | "ideco"
+        | "monex"
+        | "nisa"
+        | "taxable"
+        | "satellite",
     });
     setSubmitting(false);
 

@@ -2,6 +2,8 @@
 
 import {
   IDECO_KAKEIBO_METRIC_CODES,
+  MONEX_HOLDING_METRIC_CODES,
+  shouldShowHoldingColumn,
   sortHoldingLineDetailRows,
   type HoldingLineMetricDto,
 } from "@repo/shared";
@@ -9,6 +11,8 @@ import { useMemo } from "react";
 
 import { SortableTableHeader } from "@/components/SortableTableHeader";
 import {
+  formatBookValue,
+  formatHoldingColumnLabel,
   formatLineMetric,
   formatMetricLabel,
 } from "@/lib/format-holding-line";
@@ -23,6 +27,7 @@ export type HoldingLineDetailRow = {
   instrumentName: string;
   quantity: number;
   marketValueMinor: number;
+  bookValueMinor?: number | null;
   weight: number;
   metrics: HoldingLineMetricDto[];
   portfolioName?: string;
@@ -39,6 +44,7 @@ type HoldingLineDetailSortColumn =
 
 type HoldingLineDetailTableProps = {
   rows: HoldingLineDetailRow[];
+  portfolioKind: string;
   weightColumnLabel: string;
   showPortfolioColumn?: boolean;
   className?: string;
@@ -72,6 +78,7 @@ function getMetricToneClass(
 
 export function HoldingLineDetailTable({
   rows,
+  portfolioKind,
   weightColumnLabel,
   showPortfolioColumn = false,
   className = "holding-line-detail-table",
@@ -83,6 +90,14 @@ export function HoldingLineDetailTable({
     let result = sortHoldingLineDetailRows(rows, sortColumn, sortDirection);
     return result;
   }, [rows, sortColumn, sortDirection]);
+
+  const showAccountType = shouldShowHoldingColumn(portfolioKind, "accountType");
+  const showCustodyType = shouldShowHoldingColumn(portfolioKind, "custodyType");
+  const showUnitPrice10k = shouldShowHoldingColumn(portfolioKind, "unitPrice10k");
+  const showUnitPrice = shouldShowHoldingColumn(portfolioKind, "unitPrice");
+  const showAvgCost = shouldShowHoldingColumn(portfolioKind, "avgCost");
+  const showBookValue = shouldShowHoldingColumn(portfolioKind, "bookValue");
+  const showDividendOption = shouldShowHoldingColumn(portfolioKind, "dividendOption");
 
   let result = (
     <table className={cn("data-table", className)}>
@@ -98,28 +113,54 @@ export function HoldingLineDetailTable({
             />
           ) : null}
           <SortableTableHeader
-            label="銘柄"
+            label={formatHoldingColumnLabel("instrumentName")}
             column="instrumentName"
             activeColumn={sortColumn}
             direction={sortDirection}
             onSort={toggleSort}
           />
+          {showAccountType ? (
+            <th>{formatHoldingColumnLabel("accountType")}</th>
+          ) : null}
+          {showCustodyType ? (
+            <th>{formatHoldingColumnLabel("custodyType")}</th>
+          ) : null}
           <SortableTableHeader
-            label="口数"
+            label={formatHoldingColumnLabel("quantity")}
             column="quantity"
             activeColumn={sortColumn}
             direction={sortDirection}
             onSort={toggleSort}
             className="data-table__cell-numeric"
           />
+          {showUnitPrice10k ? (
+            <th className="data-table__cell-numeric">
+              {formatMetricLabel(IDECO_KAKEIBO_METRIC_CODES.unitPricePerTenThousandLots)}
+            </th>
+          ) : null}
+          {showUnitPrice ? (
+            <th className="data-table__cell-numeric">
+              {formatHoldingColumnLabel("unitPrice")}
+            </th>
+          ) : null}
+          {showAvgCost ? (
+            <th className="data-table__cell-numeric">
+              {formatHoldingColumnLabel("avgCost")}
+            </th>
+          ) : null}
           <SortableTableHeader
-            label="評価額"
+            label={formatHoldingColumnLabel("marketValue")}
             column="marketValue"
             activeColumn={sortColumn}
             direction={sortDirection}
             onSort={toggleSort}
             className="data-table__cell-numeric"
           />
+          {showBookValue ? (
+            <th className="data-table__cell-numeric">
+              {formatHoldingColumnLabel("bookValue")}
+            </th>
+          ) : null}
           <SortableTableHeader
             label={weightColumnLabel}
             column="weight"
@@ -148,6 +189,9 @@ export function HoldingLineDetailTable({
             onSort={toggleSort}
             className="data-table__cell-numeric"
           />
+          {showDividendOption ? (
+            <th>{formatHoldingColumnLabel("dividendOption")}</th>
+          ) : null}
         </tr>
       </thead>
       <tbody>
@@ -167,10 +211,49 @@ export function HoldingLineDetailTable({
                 <td>{row.portfolioName ?? "—"}</td>
               ) : null}
               <td>{row.instrumentName}</td>
+              {showAccountType ? (
+                <td>
+                  {formatLineMetric(row.metrics, MONEX_HOLDING_METRIC_CODES.accountType)}
+                </td>
+              ) : null}
+              {showCustodyType ? (
+                <td>
+                  {formatLineMetric(row.metrics, MONEX_HOLDING_METRIC_CODES.custodyType)}
+                </td>
+              ) : null}
               <td className="data-table__cell-numeric">{row.quantity}</td>
+              {showUnitPrice10k ? (
+                <td className="data-table__cell-numeric">
+                  {formatLineMetric(
+                    row.metrics,
+                    IDECO_KAKEIBO_METRIC_CODES.unitPricePerTenThousandLots,
+                  )}
+                </td>
+              ) : null}
+              {showUnitPrice ? (
+                <td className="data-table__cell-numeric">
+                  {formatLineMetric(
+                    row.metrics,
+                    MONEX_HOLDING_METRIC_CODES.unitPriceMinor,
+                  )}
+                </td>
+              ) : null}
+              {showAvgCost ? (
+                <td className="data-table__cell-numeric">
+                  {formatLineMetric(
+                    row.metrics,
+                    MONEX_HOLDING_METRIC_CODES.avgCostMinor,
+                  )}
+                </td>
+              ) : null}
               <td className="data-table__cell-numeric">
                 {formatYen(row.marketValueMinor)}
               </td>
+              {showBookValue ? (
+                <td className="data-table__cell-numeric">
+                  {formatBookValue(row.bookValueMinor ?? null)}
+                </td>
+              ) : null}
               <td className="data-table__cell-numeric">
                 {formatPercent(row.weight)}
               </td>
@@ -186,6 +269,14 @@ export function HoldingLineDetailTable({
                   IDECO_KAKEIBO_METRIC_CODES.unrealizedGainRate,
                 )}
               </td>
+              {showDividendOption ? (
+                <td>
+                  {formatLineMetric(
+                    row.metrics,
+                    MONEX_HOLDING_METRIC_CODES.dividendOption,
+                  )}
+                </td>
+              ) : null}
             </tr>
           );
           return tableRow;

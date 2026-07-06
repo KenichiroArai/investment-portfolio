@@ -17,6 +17,7 @@ import {
   formatAsOfDateJa,
   formatYen,
 } from "@/lib/format-yen";
+import { findPortfolioByCode } from "@/lib/portfolio-catalog";
 import { buildPortfolioPath } from "@/lib/portfolio-path";
 
 type PortfolioOverviewViewProps = {
@@ -81,6 +82,8 @@ export function PortfolioOverviewView({
       ? `最新比 評価額 ${formatYen(latestPoint.totalMarketValueMinor - assetBalance)}`
       : null;
 
+  const portfolioKind = findPortfolioByCode(portfolioCode)?.kind ?? "ideco";
+
   result = (
     <PageContainer>
       <PageHeader
@@ -95,7 +98,12 @@ export function PortfolioOverviewView({
           </div>
         }
       />
-      <PortfolioOverviewSummary snapshot={snapshot} deltaHint={deltaHint} className="mb-6" />
+      <PortfolioOverviewSummary
+        snapshot={snapshot}
+        portfolioKind={portfolioKind}
+        deltaHint={deltaHint}
+        className="mb-6"
+      />
       <div className="flex flex-wrap gap-2">
         <Button variant="outline" size="sm" asChild>
           <Link href={buildPortfolioPath(portfolioCode, "portfolio-allocation")}>

@@ -32,6 +32,7 @@ describe("HoldingLineDetailTable", () => {
     render(
       <HoldingLineDetailTable
         rows={[makeRow({ id: "r1", instrumentName: "ファンドA" })]}
+        portfolioKind="ideco"
         weightColumnLabel={HOLDING_LINE_DETAIL_WEIGHT_COLUMN_LABEL}
       />,
     );
@@ -52,6 +53,7 @@ describe("HoldingLineDetailTable", () => {
     render(
       <HoldingLineDetailTable
         rows={rows}
+        portfolioKind="ideco"
         weightColumnLabel="構成比"
       />,
     );
@@ -72,6 +74,7 @@ describe("HoldingLineDetailTable", () => {
     render(
       <HoldingLineDetailTable
         rows={[makeRow({ id: "r1", portfolioName: undefined })]}
+        portfolioKind="ideco"
         weightColumnLabel="構成比"
         showPortfolioColumn
       />,

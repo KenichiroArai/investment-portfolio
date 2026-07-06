@@ -104,8 +104,9 @@ export function DataManageView({
   const [asOfDate, setAsOfDate] = useState("");
   const [instrumentName, setInstrumentName] = useState("");
   const [tagValueIds, setTagValueIds] = useState<string[]>([]);
+  const genericMetricOptions = listGenericMetricOptions(portfolioKind);
   const [metricCode, setMetricCode] = useState(
-    listGenericMetricOptions()[0]?.code ?? "",
+    genericMetricOptions[0]?.code ?? "",
   );
   const [metricValue, setMetricValue] = useState("");
 
@@ -499,7 +500,7 @@ export function DataManageView({
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {listGenericMetricOptions().map((option) => {
+                          {genericMetricOptions.map((option) => {
                             let item = (
                               <SelectItem key={option.code} value={option.code}>
                                 {option.label}

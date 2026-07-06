@@ -4,6 +4,7 @@ import {
   classificationSortColumnKey,
   findClassificationTagValue,
   IDECO_KAKEIBO_METRIC_CODES,
+  shouldShowHoldingColumn,
   sortHoldingPeriodChangeRows,
   type AnalysisSchemeConfig,
   type HoldingPeriodChangeRow,
@@ -19,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatMetricLabel } from "@/lib/format-holding-line";
+import { formatMetricLabel, resolveUnitPriceMetricCode } from "@/lib/format-holding-line";
 import {
   formatPercent,
   formatSignedIntegerDelta,
@@ -43,6 +44,7 @@ type HoldingsPeriodDetailSortColumn =
 type HoldingsPeriodDetailTableProps = {
   rows: HoldingPeriodChangeRow[];
   classificationSchemes: AnalysisSchemeConfig[];
+  portfolioKind: string;
   showDeltas: boolean;
 };
 
@@ -150,6 +152,7 @@ function getDeltaToneClass(value: number | null): string | undefined {
 export function HoldingsPeriodDetailTable({
   rows,
   classificationSchemes,
+  portfolioKind,
   showDeltas,
 }: HoldingsPeriodDetailTableProps) {
   const { sortColumn, sortDirection, toggleSort } =
@@ -159,6 +162,15 @@ export function HoldingsPeriodDetailTable({
     let result = sortHoldingPeriodChangeRows(rows, sortColumn, sortDirection);
     return result;
   }, [rows, sortColumn, sortDirection]);
+  const unitPriceMetricCode = resolveUnitPriceMetricCode(portfolioKind);
+  const showUnitPrice =
+    unitPriceMetricCode !== null &&
+    (shouldShowHoldingColumn(portfolioKind, "unitPrice10k") ||
+      shouldShowHoldingColumn(portfolioKind, "unitPrice"));
+  const unitPriceLabel =
+    unitPriceMetricCode !== null
+      ? formatMetricLabel(unitPriceMetricCode)
+      : "単価";
 
   let result = (
     <div className="overflow-x-auto px-2">
@@ -180,15 +192,15 @@ export function HoldingsPeriodDetailTable({
               direction={sortDirection}
               onSort={toggleSort}
             />
-            <SortableTableHeader
-              label={formatMetricLabel(
-                IDECO_KAKEIBO_METRIC_CODES.unitPricePerTenThousandLots,
-              )}
-              column="unitPrice"
-              activeColumn={sortColumn}
-              direction={sortDirection}
-              onSort={toggleSort}
-            />
+            {showUnitPrice ? (
+              <SortableTableHeader
+                label={unitPriceLabel}
+                column="unitPrice"
+                activeColumn={sortColumn}
+                direction={sortDirection}
+                onSort={toggleSort}
+              />
+            ) : null}
             <SortableTableHeader
               label="資産残高"
               column="marketValue"
@@ -250,7 +262,9 @@ export function HoldingsPeriodDetailTable({
                     {row.instrumentName}
                   </TableCell>
                   <TableCell>{row.end.quantity.toLocaleString("ja-JP")}</TableCell>
-                  <TableCell>{formatEndUnitPrice(row.end.unitPrice)}</TableCell>
+                  {showUnitPrice ? (
+                    <TableCell>{formatEndUnitPrice(row.end.unitPrice)}</TableCell>
+                  ) : null}
                   <TableCell>{formatYen(row.end.marketValueMinor)}</TableCell>
                   <TableCell>{formatEndBookValue(row.end.bookValueMinor)}</TableCell>
                   <TableCell
@@ -291,14 +305,16 @@ export function HoldingsPeriodDetailTable({
                     >
                       {formatDeltaInteger(row.delta.quantity)}
                     </TableCell>
-                    <TableCell
-                      className={cn(
-                        "text-xs text-muted-foreground",
-                        getDeltaToneClass(row.delta.unitPrice),
-                      )}
-                    >
-                      {formatDeltaInteger(row.delta.unitPrice)}
-                    </TableCell>
+                    {showUnitPrice ? (
+                      <TableCell
+                        className={cn(
+                          "text-xs text-muted-foreground",
+                          getDeltaToneClass(row.delta.unitPrice),
+                        )}
+                      >
+                        {formatDeltaInteger(row.delta.unitPrice)}
+                      </TableCell>
+                    ) : null}
                     <TableCell
                       className={cn(
                         "text-xs text-muted-foreground",

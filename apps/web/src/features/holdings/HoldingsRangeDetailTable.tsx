@@ -3,6 +3,7 @@
 import {
   findClassificationTagValue,
   IDECO_KAKEIBO_METRIC_CODES,
+  shouldShowHoldingColumn,
   sortHoldingDetailRows,
   type AnalysisSchemeConfig,
   type HoldingDetailRow,
@@ -20,13 +21,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useTableSort } from "@/hooks/useTableSort";
-import { formatMetricLabel } from "@/lib/format-holding-line";
+import { formatMetricLabel, resolveUnitPriceMetricCode } from "@/lib/format-holding-line";
 import { formatAsOfDateJa, formatPercent, formatYen } from "@/lib/format-yen";
 import { cn } from "@/lib/utils";
 
 type HoldingsRangeDetailTableProps = {
   rows: HoldingDetailRow[];
   classificationSchemes: AnalysisSchemeConfig[];
+  portfolioKind: string;
   sortColumn?: HoldingDetailSortColumn;
   sortDirection?: SortDirection;
   onSort?: (column: HoldingDetailSortColumn) => void;
@@ -76,6 +78,7 @@ function getToneClass(value: number | null): string | undefined {
 export function HoldingsRangeDetailTable({
   rows,
   classificationSchemes,
+  portfolioKind,
   sortColumn: controlledSortColumn,
   sortDirection: controlledSortDirection,
   onSort,
@@ -96,6 +99,16 @@ export function HoldingsRangeDetailTable({
       : sortHoldingDetailRows(rows, sortColumn, sortDirection);
     return result;
   }, [isControlled, rows, sortColumn, sortDirection]);
+
+  const unitPriceMetricCode = resolveUnitPriceMetricCode(portfolioKind);
+  const showUnitPrice =
+    unitPriceMetricCode !== null &&
+    (shouldShowHoldingColumn(portfolioKind, "unitPrice10k") ||
+      shouldShowHoldingColumn(portfolioKind, "unitPrice"));
+  const unitPriceLabel =
+    unitPriceMetricCode !== null
+      ? formatMetricLabel(unitPriceMetricCode)
+      : "単価";
 
   let result = (
     <div className="overflow-x-auto px-2">
@@ -125,15 +138,15 @@ export function HoldingsRangeDetailTable({
               direction={sortDirection}
               onSort={toggleSort}
             />
-            <SortableTableHeader
-              label={formatMetricLabel(
-                IDECO_KAKEIBO_METRIC_CODES.unitPricePerTenThousandLots,
-              )}
-              column="unitPrice"
-              activeColumn={sortColumn}
-              direction={sortDirection}
-              onSort={toggleSort}
-            />
+            {showUnitPrice ? (
+              <SortableTableHeader
+                label={unitPriceLabel}
+                column="unitPrice"
+                activeColumn={sortColumn}
+                direction={sortDirection}
+                onSort={toggleSort}
+              />
+            ) : null}
             <SortableTableHeader
               label="資産残高"
               column="marketValue"
@@ -213,7 +226,9 @@ export function HoldingsRangeDetailTable({
                     {row.instrumentName}
                   </TableCell>
                   <TableCell>{row.quantity.toLocaleString("ja-JP")}</TableCell>
-                  <TableCell>{formatUnitPrice(row.unitPrice)}</TableCell>
+                  {showUnitPrice ? (
+                    <TableCell>{formatUnitPrice(row.unitPrice)}</TableCell>
+                  ) : null}
                   <TableCell>{formatYen(row.marketValueMinor)}</TableCell>
                   <TableCell>{formatNullableRate(row.portfolioWeight)}</TableCell>
                   <TableCell>{formatNullableYen(row.bookValueMinor)}</TableCell>

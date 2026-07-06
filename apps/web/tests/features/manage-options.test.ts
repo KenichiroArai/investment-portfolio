@@ -12,8 +12,9 @@ import { IDECO_PORTFOLIO_METRIC_CODES } from "@repo/shared";
 
 describe("portfolio-kind-options", () => {
   it("exports all portfolio kind options", () => {
-    expect(PORTFOLIO_KIND_OPTIONS).toHaveLength(4);
+    expect(PORTFOLIO_KIND_OPTIONS).toHaveLength(5);
     expect(getPortfolioKindLabel("ideco")).toBe("iDeCo");
+    expect(getPortfolioKindLabel("monex")).toBe("マネックス証券");
     expect(getPortfolioKindLabel("nisa")).toBe("NISA");
     expect(getPortfolioKindLabel("taxable")).toBe("課税口座");
     expect(getPortfolioKindLabel("satellite")).toBe("サテライト");
@@ -30,7 +31,7 @@ describe("generic-metric-options", () => {
   });
 
   it("lists generic metric options from shared labels", () => {
-    const options = listGenericMetricOptions();
+    const options = listGenericMetricOptions("ideco");
     expect(options.length).toBeGreaterThan(0);
     expect(options[0]?.code).toBe(IDECO_PORTFOLIO_METRIC_CODES.totalContributions);
     expect(resolveGenericMetricLabel(options[0]?.code ?? "")).toBe("拠出金累計");
@@ -53,7 +54,7 @@ describe("generic-metric-options", () => {
 
     vi.resetModules();
     const mod = await import("@/features/manage/generic-metric-options");
-    const options = mod.listGenericMetricOptions();
+    const options = mod.listGenericMetricOptions("ideco");
     expect(options).toEqual([
       {
         code: IDECO_PORTFOLIO_METRIC_CODES.totalContributions,

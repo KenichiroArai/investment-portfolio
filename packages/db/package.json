@@ -12,11 +12,13 @@
     "lint": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/migrate.ts",
+    "db:import:monex": "tsx src/import-monex-csv-cli.ts",
     "pages:export": "tsx src/export-pages-data.ts"
   },
   "dependencies": {
     "better-sqlite3": "^11.10.0",
-    "drizzle-orm": "^0.44.2"
+    "drizzle-orm": "^0.44.2",
+    "iconv-lite": "^0.6.3"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",

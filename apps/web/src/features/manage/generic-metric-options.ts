@@ -1,4 +1,5 @@
 import {
+  getPortfolioKindFeatures,
   IDECO_PORTFOLIO_METRIC_CODES,
   IDECO_PORTFOLIO_METRIC_CSV_LABELS,
 } from "@repo/shared";
@@ -8,18 +9,22 @@ export type GenericMetricOption = {
   label: string;
 };
 
-export function listGenericMetricOptions(): GenericMetricOption[] {
+export function listGenericMetricOptions(portfolioKind: string): GenericMetricOption[] {
   let result: GenericMetricOption[] = [];
+  const features = getPortfolioKindFeatures(portfolioKind);
 
-  for (const [label, code] of Object.entries(IDECO_PORTFOLIO_METRIC_CSV_LABELS)) {
-    result.push({ code, label });
-  }
-
-  if (result.length === 0) {
-    result.push({
-      code: IDECO_PORTFOLIO_METRIC_CODES.totalContributions,
-      label: "拠出金累計",
-    });
+  for (const metricCode of features.portfolioMetrics) {
+    let label = metricCode;
+    for (const [csvLabel, code] of Object.entries(IDECO_PORTFOLIO_METRIC_CSV_LABELS)) {
+      if (code === metricCode) {
+        label = csvLabel;
+        break;
+      }
+    }
+    if (metricCode === IDECO_PORTFOLIO_METRIC_CODES.totalContributions) {
+      label = "拠出金累計";
+    }
+    result.push({ code: metricCode, label });
   }
 
   return result;

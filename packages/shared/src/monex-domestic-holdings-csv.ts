@@ -1,0 +1,81 @@
+import {
+  indexMonexHeaders,
+  MonexCsvError,
+  parseMonexCsv,
+  parseMonexDate,
+  parseMonexDecimalRate,
+  parseMonexInteger,
+  requireMonexHeader,
+} from "./monex-csv-utils";
+
+export type MonexDomesticHoldingsCsvRow = {
+  asOfDate: string;
+  instrumentName: string;
+  accountType: string;
+  custodyType: string;
+  unitPriceMinor: number;
+  dividendOption: string;
+  quantity: number;
+  avgCostMinor: number;
+  marketValueMinor: number;
+  unrealizedGainMinor: number;
+  unrealizedGainRate: number;
+};
+
+export type ParseMonexDomesticHoldingsCsvResult = {
+  rows: MonexDomesticHoldingsCsvRow[];
+};
+
+export function parseMonexDomesticHoldingsCsv(
+  content: string,
+): ParseMonexDomesticHoldingsCsvResult {
+  let result: ParseMonexDomesticHoldingsCsvResult = { rows: [] };
+
+  const table = parseMonexCsv(content);
+  if (table.length < 2) {
+    return result;
+  }
+
+  const headerIndex = indexMonexHeaders(table[0]);
+  const dateIndex = requireMonexHeader(headerIndex, "日付");
+  const nameIndex = requireMonexHeader(headerIndex, "銘柄");
+  const accountTypeIndex = requireMonexHeader(headerIndex, "口座区分");
+  const custodyTypeIndex = requireMonexHeader(headerIndex, "預り区分");
+  const unitPriceIndex = requireMonexHeader(headerIndex, "基準価額(円)");
+  const dividendIndex = requireMonexHeader(headerIndex, "分配金の取扱い");
+  const quantityIndex = requireMonexHeader(headerIndex, "保有数(口)");
+  const avgCostIndex = requireMonexHeader(headerIndex, "平均取得単価(円)");
+  const marketValueIndex = requireMonexHeader(headerIndex, "概算評価額(円)");
+  const gainIndex = requireMonexHeader(headerIndex, "評価損益(円)");
+  const gainRateIndex = requireMonexHeader(headerIndex, "評価損益率");
+
+  for (let rowIndex = 1; rowIndex < table.length; rowIndex += 1) {
+    const cells = table[rowIndex];
+    const instrumentName = cells[nameIndex]?.trim() ?? "";
+    if (instrumentName === "") {
+      continue;
+    }
+
+    const asOfDate = parseMonexDate(cells[dateIndex] ?? "");
+    if (asOfDate === "") {
+      throw new MonexCsvError(`日付の形式が不正です: ${cells[dateIndex] ?? ""}`);
+    }
+
+    let row: MonexDomesticHoldingsCsvRow = {
+      asOfDate,
+      instrumentName,
+      accountType: cells[accountTypeIndex]?.trim() ?? "",
+      custodyType: cells[custodyTypeIndex]?.trim() ?? "",
+      unitPriceMinor: parseMonexInteger(cells[unitPriceIndex] ?? ""),
+      dividendOption: cells[dividendIndex]?.trim() ?? "",
+      quantity: parseMonexInteger(cells[quantityIndex] ?? ""),
+      avgCostMinor: parseMonexInteger(cells[avgCostIndex] ?? ""),
+      marketValueMinor: parseMonexInteger(cells[marketValueIndex] ?? ""),
+      unrealizedGainMinor: parseMonexInteger(cells[gainIndex] ?? ""),
+      unrealizedGainRate: parseMonexDecimalRate(cells[gainRateIndex] ?? ""),
+    };
+    result.rows.push(row);
+  }
+
+  return result;
+}

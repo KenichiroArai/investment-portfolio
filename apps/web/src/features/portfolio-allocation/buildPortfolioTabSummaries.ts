@@ -2,7 +2,9 @@ import {
   computeSnapshotGainRate,
   computeSnapshotPortfolioGainMinor,
   findLargestAllocationDivergence,
+  getPortfolioKindFeatures,
   resolveSnapshotTotalContributions,
+  sumSnapshotBookValue,
   sumSnapshotMarketValue,
   type AllocationShareChange,
   type CurrentSnapshotDto,
@@ -63,13 +65,17 @@ function resolveSignedValueClassName(value: number): string | undefined {
 
 export function buildHoldingsTabSummarySegments(
   snapshot: CurrentSnapshotDto,
+  portfolioKind: string,
 ): TabSummarySegment[] {
   let result: TabSummarySegment[] = [];
 
+  const features = getPortfolioKindFeatures(portfolioKind);
   const assetBalance = sumSnapshotMarketValue(snapshot.lines);
+  const totalBookValue = sumSnapshotBookValue(snapshot.lines);
   const totalContributions = resolveSnapshotTotalContributions(snapshot);
-  const portfolioGain = computeSnapshotPortfolioGainMinor(assetBalance, totalContributions);
-  const gainRateOnContributions = computeSnapshotGainRate(portfolioGain, totalContributions);
+  const costBasis = features.showContributions ? totalContributions : totalBookValue;
+  const portfolioGain = computeSnapshotPortfolioGainMinor(assetBalance, costBasis);
+  const gainRateOnCostBasis = computeSnapshotGainRate(portfolioGain, costBasis);
   const gainRateOnAssetBalance = computeSnapshotGainRate(portfolioGain, assetBalance);
   const gainClassName = resolveSignedValueClassName(portfolioGain);
 
@@ -85,8 +91,7 @@ export function buildHoldingsTabSummarySegments(
     },
     {
       label: "損益率",
-      value:
-        gainRateOnContributions === null ? "—" : formatPercent(gainRateOnContributions),
+      value: gainRateOnCostBasis === null ? "—" : formatPercent(gainRateOnCostBasis),
       valueClassName: gainClassName,
     },
     {
@@ -95,11 +100,15 @@ export function buildHoldingsTabSummarySegments(
         gainRateOnAssetBalance === null ? "—" : formatPercent(gainRateOnAssetBalance),
       valueClassName: gainClassName,
     },
-    {
+  ];
+
+  if (features.showContributions) {
+    result.push({
       label: "拠出金",
       value: formatYen(totalContributions),
-    },
-  ];
+    });
+  }
+
   return result;
 }
 

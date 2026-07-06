@@ -8,12 +8,14 @@ import {
 
 type AllocationLineBreakdownProps = {
   lines: AllocationLineInSlice[];
+  portfolioKind?: string;
   showPortfolioColumn?: boolean;
   className?: string;
 };
 
 export function AllocationLineBreakdown({
   lines,
+  portfolioKind = "ideco",
   showPortfolioColumn = false,
   className = "allocation-line-breakdown",
 }: AllocationLineBreakdownProps) {
@@ -25,6 +27,7 @@ export function AllocationLineBreakdown({
       instrumentName: lineInSlice.line.instrumentName,
       quantity: lineInSlice.line.quantity,
       marketValueMinor: lineInSlice.line.marketValueMinor,
+      bookValueMinor: lineInSlice.line.bookValueMinor,
       weight: lineInSlice.weightInSlice,
       metrics: lineInSlice.line.metrics,
       portfolioName: lineInSlice.portfolioName,
@@ -35,6 +38,7 @@ export function AllocationLineBreakdown({
   let result = (
     <HoldingLineDetailTable
       rows={rows}
+      portfolioKind={portfolioKind}
       weightColumnLabel={HOLDING_LINE_DETAIL_WEIGHT_COLUMN_LABEL}
       showPortfolioColumn={showPortfolioColumn}
       className={className}
