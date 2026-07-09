@@ -134,12 +134,16 @@ export function createManageFetchMock(options: ManageFetchMockOptions = {}) {
         portfolioCode: MANAGE_SNAPSHOT.portfolioCode,
         portfolioName: MANAGE_SNAPSHOT.portfolioName,
         analysisSchemes: MANAGE_SNAPSHOT.analysisSchemes,
-        lines: body.lines.map((line, index) => ({
+        lines: body.lines.map((line, index) => {
+          const instrument = state.instruments.find(
+            (item) => item.id === line.instrumentId,
+          );
+          return {
           id: `l${index + 1}`,
           instrumentId: line.instrumentId,
-          instrumentName:
-            state.instruments.find((item) => item.id === line.instrumentId)?.name ??
-            "銘柄",
+          instrumentName: instrument?.name ?? "銘柄",
+          accountId: instrument?.accountId ?? "ideco:unknown",
+          accountName: "不明口座",
           sortOrder: line.sortOrder ?? index,
           quantity: line.quantity,
           marketValueMinor: line.marketValueMinor,
@@ -147,7 +151,8 @@ export function createManageFetchMock(options: ManageFetchMockOptions = {}) {
           metrics: [],
           instrumentAttributes: [],
           tags: [],
-        })),
+        };
+        }),
       };
       return okResponse(state.snapshot);
     }

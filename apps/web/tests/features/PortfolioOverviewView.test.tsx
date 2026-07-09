@@ -19,6 +19,8 @@ const snapshotFixture = {
       id: "l1",
       instrumentId: "i1",
       instrumentName: "テスト銘柄",
+      accountId: "ideco:unknown",
+      accountName: "不明口座",
       quantity: 1,
       marketValueMinor: 100_000,
       bookValueMinor: 80_000,

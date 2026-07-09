@@ -29,7 +29,7 @@ export function computeMonexMutualFundBookValueMinor(
   }
 
   result = Number(
-    (BigInt(avgCostMinor) * BigInt(quantityLots) + 5000n) / 10000n,
+    (BigInt(avgCostMinor) * BigInt(quantityLots) + BigInt(5000)) / BigInt(10000),
   );
   return result;
 }
