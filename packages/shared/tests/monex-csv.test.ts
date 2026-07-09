@@ -22,6 +22,8 @@ describe("monex csv parsers", () => {
       asOfDate: "2026-07-05",
       instrumentName: "テストファンドＡ",
       accountType: "一般",
+      accountId: "monex:一般:普通預り",
+      accountName: "一般 / 普通預り",
       quantity: 100,
       marketValueMinor: 1000,
       unrealizedGainRate: 0.0526,

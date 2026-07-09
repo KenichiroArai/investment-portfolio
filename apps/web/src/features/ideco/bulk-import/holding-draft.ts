@@ -41,6 +41,8 @@ export function draftRowsToHoldingInputs(drafts: IdecoHoldingDraftRow[]): Holdin
 
     result.push({
       instrumentId: draft.instrumentId,
+      accountId: "ideco:default",
+      accountName: "iDeCo",
       quantity: draft.quantity,
       marketValueMinor: draft.marketValueMinor,
       bookValueMinor: draft.bookValueMinor,

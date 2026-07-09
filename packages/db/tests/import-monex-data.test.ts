@@ -77,6 +77,8 @@ describe("importMonexData", () => {
     const domesticLine = snapshot?.lines.find(
       (line) => line.instrumentName === "テストファンドＡ",
     );
+    expect(domesticLine?.accountId).toBe("monex:一般:普通預り");
+    expect(domesticLine?.accountName).toBe("一般 / 普通預り");
     expect(domesticLine?.bookValueMinor).toBe(
       computeMonexMutualFundBookValueMinor(9500, 100),
     );

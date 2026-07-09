@@ -34,6 +34,8 @@ export type HoldingPeriodChangeRow = {
   lineId: string;
   instrumentId: string;
   instrumentName: string;
+  accountId: string;
+  accountName: string;
   sortOrder: number | null;
   tags: ClassificationTagDto[];
   end: HoldingPeriodValues;
@@ -43,6 +45,7 @@ export type HoldingPeriodChangeRow = {
 
 export type HoldingPeriodChangeSortColumn =
   | "sortOrder"
+  | "accountName"
   | "instrumentName"
   | "quantity"
   | "unitPrice"
@@ -161,15 +164,16 @@ export function buildHoldingPeriodChangeRows(
 ): HoldingPeriodChangeRow[] {
   let result: HoldingPeriodChangeRow[] = [];
 
-  const startByInstrumentId = new Map<string, HoldingLineDto>();
+  const startByAccountInstrumentId = new Map<string, HoldingLineDto>();
   if (startLines) {
     for (const line of startLines) {
-      startByInstrumentId.set(line.instrumentId, line);
+      startByAccountInstrumentId.set(`${line.accountId}:${line.instrumentId}`, line);
     }
   }
 
   for (const endLine of endLines) {
-    const startLine = startByInstrumentId.get(endLine.instrumentId) ?? null;
+    const startKey = `${endLine.accountId}:${endLine.instrumentId}`;
+    const startLine = startByAccountInstrumentId.get(startKey) ?? null;
     const endValues = extractHoldingPeriodValues(endLine);
     const startValues = startLine ? extractHoldingPeriodValues(startLine) : null;
 
@@ -177,6 +181,8 @@ export function buildHoldingPeriodChangeRows(
       lineId: endLine.id,
       instrumentId: endLine.instrumentId,
       instrumentName: endLine.instrumentName,
+      accountId: endLine.accountId,
+      accountName: endLine.accountName,
       sortOrder: endLine.sortOrder,
       tags: endLine.tags,
       end: endValues,
@@ -201,6 +207,8 @@ export function compareHoldingPeriodChangeRows(
     const leftOrder = left.sortOrder ?? Number.MAX_SAFE_INTEGER;
     const rightOrder = right.sortOrder ?? Number.MAX_SAFE_INTEGER;
     result = compareNullableNumbers(leftOrder, rightOrder, direction);
+  } else if (column === "accountName") {
+    result = compareStrings(left.accountName, right.accountName, direction);
   } else if (column === "instrumentName") {
     result = compareStrings(left.instrumentName, right.instrumentName, direction);
   } else if (column === "quantity") {
@@ -242,6 +250,11 @@ export function compareHoldingPeriodChangeRows(
     result = compareStrings(leftValue, rightValue, direction);
   }
 
+  if (result !== 0) {
+    return result;
+  }
+
+  result = compareStrings(left.accountName, right.accountName, "asc");
   if (result !== 0) {
     return result;
   }

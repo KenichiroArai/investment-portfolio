@@ -34,6 +34,8 @@ export type PortfolioSnapshotMetricInput = {
 
 export type HoldingLineInput = {
   instrumentId: string;
+  accountId: string;
+  accountName: string;
   quantity: number;
   marketValueMinor: number;
   bookValueMinor?: number | null;
@@ -77,6 +79,8 @@ type LineDto = {
   id: string;
   instrumentId: string;
   instrumentName: string;
+  accountId: string;
+  accountName: string;
   sortOrder: number | null;
   quantity: number;
   marketValueMinor: number;
@@ -198,6 +202,8 @@ function insertSnapshotContent(
           id: holdingLineId,
           snapshotId,
           instrumentId: line.instrumentId,
+          accountId: line.accountId,
+          accountName: line.accountName,
           sortOrder: line.sortOrder ?? null,
           quantity: line.quantity,
           marketValueMinor: line.marketValueMinor,
@@ -275,7 +281,7 @@ function clearSnapshotContent(tx: DbTransaction, snapshotId: string) {
 
 async function buildSnapshotDto(
   db: AppDatabase,
-  portfolio: { id: string; code: string; name: string },
+  portfolio: { id: string; code: string; name: string; kind: string },
   snapshot: SnapshotRow,
 ) {
   let result: CurrentSnapshotDto | null = null;
@@ -285,6 +291,8 @@ async function buildSnapshotDto(
       id: holdingLines.id,
       instrumentId: holdingLines.instrumentId,
       instrumentName: instruments.name,
+      accountId: holdingLines.accountId,
+      accountName: holdingLines.accountName,
       sortOrder: holdingLines.sortOrder,
       quantity: holdingLines.quantity,
       marketValueMinor: holdingLines.marketValueMinor,
@@ -311,6 +319,8 @@ async function buildSnapshotDto(
       id: "",
       instrumentId: "",
       instrumentName: "",
+      accountId: "",
+      accountName: "",
       sortOrder: null,
       quantity: 0,
       marketValueMinor: 0,
@@ -362,6 +372,8 @@ async function buildSnapshotDto(
       id: line.id,
       instrumentId: line.instrumentId,
       instrumentName: line.instrumentName,
+      accountId: line.accountId,
+      accountName: line.accountName,
       sortOrder: line.sortOrder,
       quantity: line.quantity,
       marketValueMinor: line.marketValueMinor,

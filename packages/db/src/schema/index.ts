@@ -166,25 +166,34 @@ export const portfolioSnapshots = sqliteTable(
 );
 
 /** 保有明細行 — スナップショット内の1銘柄分の保有。詳細は packages/db/README.md */
-export const holdingLines = sqliteTable("holding_lines", {
-  id: text("id").primaryKey(), // ID
-  snapshotId: text("snapshot_id")
-    .notNull()
-    .references(() => {
-      let result = portfolioSnapshots.id;
-      return result;
-    }, { onDelete: "cascade" }), // スナップショットID
-  instrumentId: text("instrument_id")
-    .notNull()
-    .references(() => {
-      let result = instruments.id;
-      return result;
-    }, { onDelete: "restrict" }), // 銘柄ID
-  sortOrder: integer("sort_order"), // 表示順
-  quantity: real("quantity").notNull(), // 数量
-  marketValueMinor: integer("market_value_minor").notNull(), // 評価額
-  bookValueMinor: integer("book_value_minor"), // 簿価
-});
+export const holdingLines = sqliteTable(
+  "holding_lines",
+  {
+    id: text("id").primaryKey(), // ID
+    snapshotId: text("snapshot_id")
+      .notNull()
+      .references(() => {
+        let result = portfolioSnapshots.id;
+        return result;
+      }, { onDelete: "cascade" }), // スナップショットID
+    instrumentId: text("instrument_id")
+      .notNull()
+      .references(() => {
+        let result = instruments.id;
+        return result;
+      }, { onDelete: "restrict" }), // 銘柄ID
+    accountId: text("account_id").notNull().default("monex:unknown"), // 口座ID
+    accountName: text("account_name").notNull().default("不明口座"), // 口座表示名
+    sortOrder: integer("sort_order"), // 表示順
+    quantity: real("quantity").notNull(), // 数量
+    marketValueMinor: integer("market_value_minor").notNull(), // 評価額
+    bookValueMinor: integer("book_value_minor"), // 簿価
+  },
+  (table) => {
+    let result = [index("holding_lines_snapshot_account_idx").on(table.snapshotId, table.accountId)];
+    return result;
+  },
+);
 
 /** スナップショット指標 — スナップショットごとの可変指標（EAV）。詳細は packages/db/README.md */
 export const portfolioSnapshotMetrics = sqliteTable(

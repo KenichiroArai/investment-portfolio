@@ -1,4 +1,6 @@
 import {
+  buildMonexAccountId,
+  buildMonexAccountName,
   indexMonexHeaders,
   MonexCsvError,
   parseMonexCsv,
@@ -13,6 +15,8 @@ export type MonexUsStockCsvRow = {
   ticker: string;
   instrumentName: string;
   market: string;
+  accountId: string;
+  accountName: string;
   accountType: string;
   custodyType: string;
   quantity: number;
@@ -64,6 +68,14 @@ export function parseMonexUsStocksCsv(content: string): ParseMonexUsStocksCsvRes
       ticker: cells[tickerIndex]?.trim() ?? "",
       instrumentName,
       market: cells[marketIndex]?.trim() ?? "",
+      accountId: buildMonexAccountId(
+        cells[accountTypeIndex]?.trim() ?? "",
+        cells[custodyTypeIndex]?.trim() ?? "",
+      ),
+      accountName: buildMonexAccountName(
+        cells[accountTypeIndex]?.trim() ?? "",
+        cells[custodyTypeIndex]?.trim() ?? "",
+      ),
       accountType: cells[accountTypeIndex]?.trim() ?? "",
       custodyType: cells[custodyTypeIndex]?.trim() ?? "",
       quantity: parseMonexInteger(cells[quantityIndex] ?? ""),

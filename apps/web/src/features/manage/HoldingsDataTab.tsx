@@ -51,6 +51,8 @@ export function HoldingsDataTab({
     const existingMetrics = snapshot ? snapshotToMetricInputs(snapshot) : [];
     const lines = mergeHoldingLine(existingLines, {
       instrumentId: params.instrumentId,
+      accountId: "manual:default",
+      accountName: "手動入力",
       quantity: params.quantity,
       marketValueMinor: params.marketValueMinor,
     });
@@ -73,6 +75,8 @@ export function HoldingsDataTab({
 
     const lines = updateHoldingLineAtIndex(snapshotToHoldingInputs(snapshot), index, {
       instrumentId: line.instrumentId,
+      accountId: line.accountId,
+      accountName: line.accountName,
       quantity,
       marketValueMinor,
       bookValueMinor: line.bookValueMinor,

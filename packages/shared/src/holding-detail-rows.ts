@@ -14,6 +14,8 @@ export type HoldingDetailRow = {
   asOfDate: string;
   instrumentId: string;
   instrumentName: string;
+  accountId: string;
+  accountName: string;
   sortOrder: number | null;
   quantity: number;
   marketValueMinor: number;
@@ -35,6 +37,7 @@ export type HoldingDetailFilter = {
 export type HoldingDetailSortColumn =
   | "asOfDate"
   | "sortOrder"
+  | "accountName"
   | "instrumentName"
   | "quantity"
   | "unitPrice"
@@ -56,7 +59,15 @@ export type PaginatedRowsResult<T> = {
 
 function extractHoldingDetailValues(line: HoldingLineDto): Omit<
   HoldingDetailRow,
-  "lineId" | "asOfDate" | "instrumentId" | "instrumentName" | "sortOrder" | "tags" | "portfolioWeight"
+  | "lineId"
+  | "asOfDate"
+  | "instrumentId"
+  | "instrumentName"
+  | "accountId"
+  | "accountName"
+  | "sortOrder"
+  | "tags"
+  | "portfolioWeight"
 > {
   let result = {
     quantity: line.quantity,
@@ -102,6 +113,8 @@ export function flattenHoldingsInRange(
         asOfDate: snapshot.asOfDate,
         instrumentId: line.instrumentId,
         instrumentName: line.instrumentName,
+        accountId: line.accountId,
+        accountName: line.accountName,
         sortOrder: line.sortOrder,
         tags: line.tags,
         portfolioWeight,
@@ -129,7 +142,9 @@ function matchesQuery(row: HoldingDetailRow, query: string): boolean {
     return result;
   }
 
-  result = normalizeSearchText(row.instrumentName).includes(normalizedQuery);
+  result =
+    normalizeSearchText(row.instrumentName).includes(normalizedQuery) ||
+    normalizeSearchText(row.accountName ?? "").includes(normalizedQuery);
   return result;
 }
 
@@ -201,6 +216,8 @@ export function compareHoldingDetailRows(
     result = compareNullableNumbers(leftOrder, rightOrder, direction);
   } else if (column === "instrumentName") {
     result = compareStrings(left.instrumentName, right.instrumentName, direction);
+  } else if (column === "accountName") {
+    result = compareStrings(left.accountName, right.accountName, direction);
   } else if (column === "quantity") {
     result = compareNullableNumbers(left.quantity, right.quantity, direction);
   } else if (column === "unitPrice") {
@@ -246,6 +263,11 @@ export function compareHoldingDetailRows(
   const leftOrder = left.sortOrder ?? Number.MAX_SAFE_INTEGER;
   const rightOrder = right.sortOrder ?? Number.MAX_SAFE_INTEGER;
   result = compareNullableNumbers(leftOrder, rightOrder, "asc");
+  if (result !== 0) {
+    return result;
+  }
+
+  result = compareStrings(left.accountName, right.accountName, "asc");
   if (result !== 0) {
     return result;
   }

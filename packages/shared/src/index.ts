@@ -1,5 +1,6 @@
 export * from "./analysis-schemes";
 export * from "./holding-line-metrics";
+export * from "./holding-account-groups";
 export * from "./holding-detail-rows";
 export * from "./allocation-detail-rows";
 export * from "./holding-period-change";

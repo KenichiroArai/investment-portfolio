@@ -59,6 +59,8 @@ export function snapshotToHoldingInputs(
   for (const line of snapshot.lines) {
     result.push({
       instrumentId: line.instrumentId,
+      accountId: line.accountId,
+      accountName: line.accountName,
       quantity: line.quantity,
       marketValueMinor: line.marketValueMinor,
       bookValueMinor: line.bookValueMinor,

@@ -1,4 +1,6 @@
 import {
+  buildMonexAccountId,
+  buildMonexAccountName,
   indexMonexHeaders,
   MonexCsvError,
   parseMonexCsv,
@@ -10,6 +12,8 @@ import {
 export type MonexCompassFundCsvRow = {
   asOfDate: string;
   instrumentName: string;
+  accountId: string;
+  accountName: string;
   accountType: string;
   custodyType: string;
   unitPriceMinor: number;
@@ -72,6 +76,14 @@ export function parseMonexCompassFundCsv(
     let row: MonexCompassFundCsvRow = {
       asOfDate,
       instrumentName,
+      accountId: buildMonexAccountId(
+        cells[accountTypeIndex]?.trim() ?? "",
+        cells[custodyTypeIndex]?.trim() ?? "",
+      ),
+      accountName: buildMonexAccountName(
+        cells[accountTypeIndex]?.trim() ?? "",
+        cells[custodyTypeIndex]?.trim() ?? "",
+      ),
       accountType: cells[accountTypeIndex]?.trim() ?? "",
       custodyType: cells[custodyTypeIndex]?.trim() ?? "",
       unitPriceMinor: parseMonexInteger(cells[unitPriceIndex] ?? ""),

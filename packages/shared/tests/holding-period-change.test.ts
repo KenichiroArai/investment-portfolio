@@ -16,6 +16,8 @@ function makeLine(
     id: overrides.id,
     instrumentId: overrides.instrumentId,
     instrumentName: overrides.instrumentName ?? "テスト銘柄",
+    accountId: overrides.accountId ?? "test:default",
+    accountName: overrides.accountName ?? "テスト口座",
     sortOrder: overrides.sortOrder ?? 0,
     quantity: overrides.quantity ?? 100,
     marketValueMinor: overrides.marketValueMinor ?? 10000,
@@ -173,6 +175,43 @@ describe("buildHoldingPeriodChangeRows", () => {
     expect(result[0]?.delta.unrealizedGainRate).toBeCloseTo(0.02);
   });
 
+  it("matches baseline by account and instrument, not instrument alone", () => {
+    const endLines = [
+      makeLine({
+        id: "l-general",
+        instrumentId: "inst-1",
+        accountId: "monex:一般:普通預り",
+        accountName: "一般 / 普通預り",
+        quantity: 120,
+      }),
+      makeLine({
+        id: "l-specific",
+        instrumentId: "inst-1",
+        accountId: "monex:特定:普通預り",
+        accountName: "特定 / 普通預り",
+        quantity: 80,
+      }),
+    ];
+    const startLines = [
+      makeLine({
+        id: "l0-general",
+        instrumentId: "inst-1",
+        accountId: "monex:一般:普通預り",
+        accountName: "一般 / 普通預り",
+        quantity: 100,
+      }),
+    ];
+
+    let result = buildHoldingPeriodChangeRows(endLines, startLines);
+
+    expect(result).toHaveLength(2);
+    const generalRow = result.find((row) => row.accountId === "monex:一般:普通預り");
+    const specificRow = result.find((row) => row.accountId === "monex:特定:普通預り");
+    expect(generalRow?.hasBaseline).toBe(true);
+    expect(generalRow?.delta.quantity).toBe(20);
+    expect(specificRow?.hasBaseline).toBe(false);
+  });
+
   it("returns null deltas when start lines are missing", () => {
     const endLines = [makeLine({ id: "l1", instrumentId: "inst-1" })];
 
@@ -233,6 +272,8 @@ describe("sortHoldingPeriodChangeRows", () => {
       lineId: "line-i2",
       instrumentId: "i2",
       instrumentName: "B",
+      accountId: "test:b",
+      accountName: "口座B",
       sortOrder: 1,
       tags: [
         {
@@ -264,6 +305,8 @@ describe("sortHoldingPeriodChangeRows", () => {
       lineId: "line-i1",
       instrumentId: "i1",
       instrumentName: "A",
+      accountId: "test:a",
+      accountName: "口座A",
       sortOrder: 0,
       tags: [
         {

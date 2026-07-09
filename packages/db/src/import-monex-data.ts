@@ -381,6 +381,8 @@ export async function importMonexData(
     );
     let line: HoldingLineInput = {
       instrumentId: resolved.instrumentId,
+      accountId: row.accountId,
+      accountName: row.accountName,
       quantity: row.quantity,
       marketValueMinor: row.marketValueMinor,
       bookValueMinor,
@@ -436,6 +438,8 @@ export async function importMonexData(
     const bookValueMinor = row.avgCostMinor * row.quantity;
     let line: HoldingLineInput = {
       instrumentId: resolved.instrumentId,
+      accountId: row.accountId,
+      accountName: row.accountName,
       quantity: row.quantity,
       marketValueMinor: row.marketValueMinor,
       bookValueMinor,
@@ -482,6 +486,8 @@ export async function importMonexData(
     );
     let line: HoldingLineInput = {
       instrumentId: resolved.instrumentId,
+      accountId: row.accountId,
+      accountName: row.accountName,
       quantity: row.quantity,
       marketValueMinor: row.marketValueMinor,
       bookValueMinor,

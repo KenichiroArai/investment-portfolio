@@ -1,4 +1,6 @@
 import {
+  buildMonexAccountId,
+  buildMonexAccountName,
   indexMonexHeaders,
   MonexCsvError,
   parseMonexCsv,
@@ -11,6 +13,8 @@ import {
 export type MonexDomesticHoldingsCsvRow = {
   asOfDate: string;
   instrumentName: string;
+  accountId: string;
+  accountName: string;
   accountType: string;
   custodyType: string;
   unitPriceMinor: number;
@@ -62,6 +66,14 @@ export function parseMonexDomesticHoldingsCsv(
     }
 
     let row: MonexDomesticHoldingsCsvRow = {
+      accountId: buildMonexAccountId(
+        cells[accountTypeIndex]?.trim() ?? "",
+        cells[custodyTypeIndex]?.trim() ?? "",
+      ),
+      accountName: buildMonexAccountName(
+        cells[accountTypeIndex]?.trim() ?? "",
+        cells[custodyTypeIndex]?.trim() ?? "",
+      ),
       asOfDate,
       instrumentName,
       accountType: cells[accountTypeIndex]?.trim() ?? "",

@@ -29,6 +29,8 @@ describe("shared schemas", () => {
       lines: [
         {
           instrumentId: "550e8400-e29b-41d4-a716-446655440000",
+          accountId: "test:default",
+          accountName: "テスト口座",
           quantity: 1,
           marketValueMinor: 1000,
         },
@@ -41,6 +43,8 @@ describe("shared schemas", () => {
       lines: [
         {
           instrumentId: "550e8400-e29b-41d4-a716-446655440000",
+          accountId: "test:default",
+          accountName: "テスト口座",
           quantity: 1,
           marketValueMinor: 1000,
         },

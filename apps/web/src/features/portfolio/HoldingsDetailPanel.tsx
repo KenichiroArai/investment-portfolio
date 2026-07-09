@@ -119,7 +119,7 @@ export function HoldingsDetailPanel({
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(HOLDINGS_RANGE_DEFAULT_PAGE_SIZE);
   const { sortColumn, sortDirection, toggleSort } =
-    useTableSort<HoldingDetailSortColumn>("asOfDate", "desc");
+    useTableSort<HoldingDetailSortColumn>("accountName", "asc");
 
   const rangeDatesKey = rangeDates.join(",");
 
@@ -322,6 +322,8 @@ export function HoldingsDetailPanel({
         id: `${row.asOfDate}:${row.instrumentId}`,
         instrumentId: row.instrumentId,
         instrumentName: row.instrumentName,
+        accountId: row.accountId,
+        accountName: row.accountName,
         sortOrder: row.sortOrder,
         quantity: row.quantity,
         marketValueMinor: row.marketValueMinor,

@@ -66,6 +66,8 @@ export type HoldingLineDto = {
   id: string;
   instrumentId: string;
   instrumentName: string;
+  accountId: string;
+  accountName: string;
   sortOrder: number | null;
   quantity: number;
   marketValueMinor: number;
