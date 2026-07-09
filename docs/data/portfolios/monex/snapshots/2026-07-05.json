@@ -1,0 +1,2380 @@
+{
+  "id": "47f96ed4-1ecb-4b5b-85f3-c8bd5ee69543",
+  "portfolioCode": "monex",
+  "portfolioName": "マネックス証券",
+  "portfolioKind": "monex",
+  "asOfDate": "2026-07-05",
+  "analysisSchemes": [
+    {
+      "schemeCode": "monex_asset_class",
+      "schemeName": "資産クラス"
+    }
+  ],
+  "metrics": [],
+  "lines": [
+    {
+      "id": "55f4c861-ff8b-4e16-a7c2-202c58e634e8",
+      "instrumentId": "17401cd5-c91b-4e7e-9dd1-42b9735ce69a",
+      "instrumentName": "インベスコ　世界厳選株式オープン＜為替ヘッジなし＞（毎月決算型）",
+      "accountId": "monex:一般:普通預り",
+      "accountName": "一般 / 普通預り",
+      "sortOrder": 1,
+      "quantity": 1200,
+      "marketValueMinor": 1096,
+      "bookValueMinor": 1030,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "一般"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 8584,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 9139,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 66,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0646,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "developed_equity",
+          "valueName": "先進国株式"
+        }
+      ]
+    },
+    {
+      "id": "f860628d-4558-41ef-a43c-5ace09ba1271",
+      "instrumentId": "35162a93-003a-47eb-bf68-fcb3695ce78e",
+      "instrumentName": "ステート・ストリート国内債券インデックス・オープン（隔月分配型）",
+      "accountId": "monex:特定:普通預り",
+      "accountName": "特定 / 普通預り",
+      "sortOrder": 2,
+      "quantity": 592,
+      "marketValueMinor": 510,
+      "bookValueMinor": 514,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 8683,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 8631,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -4,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0059,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "domestic_bond",
+          "valueName": "国内債券"
+        }
+      ]
+    },
+    {
+      "id": "706400ce-79b7-4192-933e-eb2a71abb0e6",
+      "instrumentId": "14d2a702-6586-42ec-89c2-e842c21eb10d",
+      "instrumentName": "ダイワＪ－ＲＥＩＴオープン（毎月分配型）",
+      "accountId": "monex:特定:普通預り",
+      "accountName": "特定 / 普通預り",
+      "sortOrder": 3,
+      "quantity": 6481,
+      "marketValueMinor": 1000,
+      "bookValueMinor": 1000,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 1543,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 1543,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 0,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "domestic_reit",
+          "valueName": "国内REIT"
+        }
+      ]
+    },
+    {
+      "id": "619fb545-6329-481d-9d3b-3db8f1efef52",
+      "instrumentId": "ee9e8c41-73ee-4e5c-bcab-4502d279d7c9",
+      "instrumentName": "ニッセイＳＯＸ指数インデックスファンド（米国半導体株）＜購入・換金手数料なし＞",
+      "accountId": "monex:一般:普通預り",
+      "accountName": "一般 / 普通預り",
+      "sortOrder": 4,
+      "quantity": 28,
+      "marketValueMinor": 136,
+      "bookValueMinor": 137,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "一般"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 48929,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 48834,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -1,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0019,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "developed_equity",
+          "valueName": "先進国株式"
+        }
+      ]
+    },
+    {
+      "id": "89de7901-58d8-49e0-81b7-2bd43109bd34",
+      "instrumentId": "4239669e-65d1-4438-9300-46b56d73e85f",
+      "instrumentName": "ピクテ新興国インカム株式ファンド（毎月決算型）",
+      "accountId": "monex:一般:普通預り",
+      "accountName": "一般 / 普通預り",
+      "sortOrder": 5,
+      "quantity": 388,
+      "marketValueMinor": 148,
+      "bookValueMinor": 150,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "一般"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 3866,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 3837,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -2,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0075,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "emerging_equity",
+          "valueName": "新興国株式"
+        }
+      ]
+    },
+    {
+      "id": "f8a7fadc-1e5d-423b-a95e-dbb89753999b",
+      "instrumentId": "b74a0e8b-e5b1-4ef8-b63e-0b705a16349c",
+      "instrumentName": "フィデリティ・ＵＳ　ハイ・イールド・ファンド（毎月決算型）Ｂ（為替ヘッジなし）",
+      "accountId": "monex:一般:普通預り",
+      "accountName": "一般 / 普通預り",
+      "sortOrder": 6,
+      "quantity": 634,
+      "marketValueMinor": 236,
+      "bookValueMinor": 234,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "一般"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 3691,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 3732,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 2,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0111,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "high_yield_bond",
+          "valueName": "ハイ・イールド債券"
+        }
+      ]
+    },
+    {
+      "id": "26289a7d-468e-47f7-bd56-8e96d6ac10c2",
+      "instrumentId": "7948b850-705a-41ff-86c1-917335335370",
+      "instrumentName": "マネックス・ゴールド・ファンド",
+      "accountId": "monex:特定:普通預り",
+      "accountName": "特定 / 普通預り",
+      "sortOrder": 7,
+      "quantity": 386,
+      "marketValueMinor": 388,
+      "bookValueMinor": 389,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 10078,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 10076,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -1,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0001,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "commodity",
+          "valueName": "コモディティ"
+        }
+      ]
+    },
+    {
+      "id": "8aa0b718-dfe0-4e6e-bec3-6de7c4159b1c",
+      "instrumentId": "3767e685-e58e-47b8-b277-64c2c9501d55",
+      "instrumentName": "ラサール・グローバルＲＥＩＴファンド（毎月分配型）",
+      "accountId": "monex:一般:普通預り",
+      "accountName": "一般 / 普通預り",
+      "sortOrder": 8,
+      "quantity": 1001,
+      "marketValueMinor": 266,
+      "bookValueMinor": 254,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "一般"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 2538,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 2666,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 12,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0504,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "domestic_reit",
+          "valueName": "国内REIT"
+        }
+      ]
+    },
+    {
+      "id": "878af85e-d141-4b36-b626-b5ff0bcab9ac",
+      "instrumentId": "bdc4034a-aa05-4bb9-9dfe-028d14101408",
+      "instrumentName": "日本好配当リバランスオープン",
+      "accountId": "monex:特定:普通預り",
+      "accountName": "特定 / 普通預り",
+      "sortOrder": 9,
+      "quantity": 68,
+      "marketValueMinor": 103,
+      "bookValueMinor": 101,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 14853,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 15210,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 2,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.024,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式"
+        }
+      ]
+    },
+    {
+      "id": "af0862d1-3a88-4ae6-ae34-c19cdd4872a6",
+      "instrumentId": "bdc4034a-aa05-4bb9-9dfe-028d14101408",
+      "instrumentName": "日本好配当リバランスオープン",
+      "accountId": "monex:一般:普通預り",
+      "accountName": "一般 / 普通預り",
+      "sortOrder": 10,
+      "quantity": 289,
+      "marketValueMinor": 439,
+      "bookValueMinor": 432,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "一般"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 14949,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 15210,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 7,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0174,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式"
+        }
+      ]
+    },
+    {
+      "id": "d64f1c27-e80c-4c0f-8806-127b7876d27e",
+      "instrumentId": "f947fcb3-0df0-4ef8-9908-9607a3035aec",
+      "instrumentName": "財産３分法ファンド（不動産・債券・株式）毎月分配型",
+      "accountId": "monex:一般:普通預り",
+      "accountName": "一般 / 普通預り",
+      "sortOrder": 11,
+      "quantity": 1153,
+      "marketValueMinor": 418,
+      "bookValueMinor": 407,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "一般"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 3530,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 3629,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 11,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.028,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "emerging_bond",
+          "valueName": "新興国債券"
+        }
+      ]
+    },
+    {
+      "id": "79eda427-9533-42c5-800a-cc1afd91c1f6",
+      "instrumentId": "1535eeed-091b-4ba8-9489-7bfb8bc6fa2c",
+      "instrumentName": "野村新興国債券投信Ｂコース＜為替ヘッジなし＞（毎月分配型）",
+      "accountId": "monex:一般:普通預り",
+      "accountName": "一般 / 普通預り",
+      "sortOrder": 12,
+      "quantity": 111,
+      "marketValueMinor": 108,
+      "bookValueMinor": 106,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "一般"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 9550,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 9737,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 2,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0195,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "emerging_bond",
+          "valueName": "新興国債券"
+        }
+      ]
+    },
+    {
+      "id": "b07d3d9c-9767-401d-b2c4-1687c021e7cc",
+      "instrumentId": "268ebaa3-4ee1-49f8-9d8d-be00b7ed5716",
+      "instrumentName": "高金利先進国債券オープン（毎月分配型）",
+      "accountId": "monex:一般:普通預り",
+      "accountName": "一般 / 普通預り",
+      "sortOrder": 13,
+      "quantity": 1120,
+      "marketValueMinor": 386,
+      "bookValueMinor": 388,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "一般"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 3465,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 3453,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -2,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0034,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "developed_bond",
+          "valueName": "先進国債券"
+        }
+      ]
+    },
+    {
+      "id": "51da86d6-9d04-4d22-ae46-fcff98ba68bb",
+      "instrumentId": "2ecc4086-70de-4a2a-b21d-4c925de4e36d",
+      "instrumentName": "ＳＢＩネクスト・フロンティア高配当株式ファンド（年４回決算型）",
+      "accountId": "monex:特定:普通預り",
+      "accountName": "特定 / 普通預り",
+      "sortOrder": 14,
+      "quantity": 212,
+      "marketValueMinor": 267,
+      "bookValueMinor": 264,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 12453,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 12607,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 3,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0123,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "emerging_equity",
+          "valueName": "新興国株式"
+        }
+      ]
+    },
+    {
+      "id": "4bdc1aad-5b69-4df1-8767-766c00c9188e",
+      "instrumentId": "1a6c3a57-7971-4505-9f42-5ff8b5db2727",
+      "instrumentName": "ＳＭＴ　日本株式モメンタムファンド",
+      "accountId": "monex:特定:普通預り",
+      "accountName": "特定 / 普通預り",
+      "sortOrder": 15,
+      "quantity": 605,
+      "marketValueMinor": 925,
+      "bookValueMinor": 1000,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 16529,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 15299,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -75,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0744,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式"
+        }
+      ]
+    },
+    {
+      "id": "d9827267-01bb-4f50-9063-9436c32f2d8e",
+      "instrumentId": "6609c441-1812-45f1-873c-1518d61cb999",
+      "instrumentName": "Ｔｒａｃｅｒｓ　日経平均高配当株５０インデックス（奇数月分配型）",
+      "accountId": "monex:特定:普通預り",
+      "accountName": "特定 / 普通預り",
+      "sortOrder": 16,
+      "quantity": 501,
+      "marketValueMinor": 774,
+      "bookValueMinor": 768,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 15330,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 15454,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 6,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.008,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式"
+        }
+      ]
+    },
+    {
+      "id": "20813e1f-d9b9-4b59-ac48-7247030505d0",
+      "instrumentId": "8f9d63cb-de00-494e-ac7c-056b98c44743",
+      "instrumentName": "ｅＭＡＸＩＳ　日経半導体株インデックス",
+      "accountId": "monex:特定:普通預り",
+      "accountName": "特定 / 普通預り",
+      "sortOrder": 17,
+      "quantity": 448,
+      "marketValueMinor": 1242,
+      "bookValueMinor": 1331,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 29710,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 27730,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -89,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0666,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式"
+        }
+      ]
+    },
+    {
+      "id": "add95130-2eae-42c3-9d6d-1989d78ed021",
+      "instrumentId": "8f9d63cb-de00-494e-ac7c-056b98c44743",
+      "instrumentName": "ｅＭＡＸＩＳ　日経半導体株インデックス",
+      "accountId": "monex:一般:普通預り",
+      "accountName": "一般 / 普通預り",
+      "sortOrder": 18,
+      "quantity": 47,
+      "marketValueMinor": 130,
+      "bookValueMinor": 112,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "一般"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 23830,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 27730,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 18,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.1636,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式"
+        }
+      ]
+    },
+    {
+      "id": "b34cb479-f9d3-46f1-a994-f3c920da9289",
+      "instrumentId": "de131865-8742-4ca1-88de-229cdf5c11ac",
+      "instrumentName": "ｅＭＡＸＩＳ　Ｎｅｏ　ドローン",
+      "accountId": "monex:一般:普通預り",
+      "accountName": "一般 / 普通預り",
+      "sortOrder": 19,
+      "quantity": 89,
+      "marketValueMinor": 376,
+      "bookValueMinor": 361,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "一般"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 40562,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 42300,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 15,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0428,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "developed_equity",
+          "valueName": "先進国株式"
+        }
+      ]
+    },
+    {
+      "id": "3480d727-59fe-45de-9af2-d25ab0304304",
+      "instrumentId": "a6168c9b-f82b-435a-9a70-29c991d0ea5c",
+      "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ バランス（８資産均等型）",
+      "accountId": "monex:一般:普通預り",
+      "accountName": "一般 / 普通預り",
+      "sortOrder": 20,
+      "quantity": 146,
+      "marketValueMinor": 315,
+      "bookValueMinor": 301,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "一般"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 20617,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 21625,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 14,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0488,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [
+        {
+          "code": "provider",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "三菱UFJアセットマネジメント"
+        },
+        {
+          "code": "short_name",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "eMAXIS Slim ﾊﾞﾗﾝｽ(8資産均等型)"
+        },
+        {
+          "code": "trust_fee_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0.143以内"
+        },
+        {
+          "code": "trust_reserve_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0"
+        }
+      ],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "emerging_bond",
+          "valueName": "新興国債券"
+        }
+      ]
+    },
+    {
+      "id": "b9472e72-35f7-4b59-aefb-754031d392a1",
+      "instrumentId": "5a3d64af-6d3b-4936-90f4-bd6589b669eb",
+      "instrumentName": "ｅＭＡＸＩＳ　Ｓｌｉｍ　先進国リートインデックス（除く日本）",
+      "accountId": "monex:特定:普通預り",
+      "accountName": "特定 / 普通預り",
+      "sortOrder": 21,
+      "quantity": 270,
+      "marketValueMinor": 527,
+      "bookValueMinor": 515,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 19075,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 19547,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 12,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0247,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "foreign_reit",
+          "valueName": "海外REIT"
+        }
+      ]
+    },
+    {
+      "id": "3fae256b-1ae3-44d3-9f16-7f44b2149f0f",
+      "instrumentId": "29ad4f4e-3a4c-45e7-b81e-c3f696c320d2",
+      "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 先進国債券インデックス",
+      "accountId": "monex:一般:普通預り",
+      "accountName": "一般 / 普通預り",
+      "sortOrder": 22,
+      "quantity": 251,
+      "marketValueMinor": 394,
+      "bookValueMinor": 385,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "一般"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 15339,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 15726,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 9,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0252,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [
+        {
+          "code": "provider",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "三菱UFJアセットマネジメント"
+        },
+        {
+          "code": "short_name",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "eMAXIS Slim 先進国債券インデックス"
+        },
+        {
+          "code": "trust_fee_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0.154以内"
+        },
+        {
+          "code": "trust_reserve_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0"
+        }
+      ],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "developed_bond",
+          "valueName": "先進国債券"
+        }
+      ]
+    },
+    {
+      "id": "da31c0ab-a4bd-4b9c-90f5-6fe6b5ebae1f",
+      "instrumentId": "9f64177a-d0ce-4087-a5bb-1f5ebe1db53f",
+      "instrumentName": "ｅＭＡＸＩＳ　Ｓｌｉｍ　国内リートインデックス",
+      "accountId": "monex:特定:普通預り",
+      "accountName": "特定 / 普通預り",
+      "sortOrder": 23,
+      "quantity": 554,
+      "marketValueMinor": 592,
+      "bookValueMinor": 572,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 10325,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 10689,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 20,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0352,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "domestic_reit",
+          "valueName": "国内REIT"
+        }
+      ]
+    },
+    {
+      "id": "05dea807-a837-4973-8c95-25c7d989f4ac",
+      "instrumentId": "4df2214c-2e30-4459-b220-7fb34043de3c",
+      "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 国内株式（ＴＯＰＩＸ）",
+      "accountId": "monex:特定:普通預り",
+      "accountName": "特定 / 普通預り",
+      "sortOrder": 24,
+      "quantity": 311,
+      "marketValueMinor": 1006,
+      "bookValueMinor": 1000,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 32155,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 32365,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 6,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0065,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [
+        {
+          "code": "provider",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "三菱UFJアセットマネジメント"
+        },
+        {
+          "code": "short_name",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "eMAXIS Slim 国内株式(TOPIX)"
+        },
+        {
+          "code": "trust_fee_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0.143以内"
+        },
+        {
+          "code": "trust_reserve_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0"
+        }
+      ],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式"
+        }
+      ]
+    },
+    {
+      "id": "718b90fa-8520-402f-93d7-6f29fc871ada",
+      "instrumentId": "a39a69e9-48e3-473f-9716-6f4ce59b2dea",
+      "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 新興国株式インデックス",
+      "accountId": "monex:特定:普通預り",
+      "accountName": "特定 / 普通預り",
+      "sortOrder": 25,
+      "quantity": 1357,
+      "marketValueMinor": 3722,
+      "bookValueMinor": 3954,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 29138,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 27429,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -232,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0586,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [
+        {
+          "code": "provider",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "三菱UFJアセットマネジメント"
+        },
+        {
+          "code": "short_name",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "eMAXIS Slim 新興国株式インデックス"
+        },
+        {
+          "code": "trust_fee_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0.1518以内"
+        },
+        {
+          "code": "trust_reserve_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0"
+        }
+      ],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "emerging_equity",
+          "valueName": "新興国株式"
+        }
+      ]
+    },
+    {
+      "id": "ce3d92db-ea45-4b27-81bc-fc342e4135b9",
+      "instrumentId": "a39a69e9-48e3-473f-9716-6f4ce59b2dea",
+      "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 新興国株式インデックス",
+      "accountId": "monex:一般:普通預り",
+      "accountName": "一般 / 普通預り",
+      "sortOrder": 26,
+      "quantity": 89,
+      "marketValueMinor": 244,
+      "bookValueMinor": 240,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "一般"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 26967,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 27429,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 4,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0171,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [
+        {
+          "code": "provider",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "三菱UFJアセットマネジメント"
+        },
+        {
+          "code": "short_name",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "eMAXIS Slim 新興国株式インデックス"
+        },
+        {
+          "code": "trust_fee_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0.1518以内"
+        },
+        {
+          "code": "trust_reserve_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0"
+        }
+      ],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "emerging_equity",
+          "valueName": "新興国株式"
+        }
+      ]
+    },
+    {
+      "id": "7aa53328-e9cd-4e83-97ca-7b5b2e5910d4",
+      "instrumentId": "7c8aad06-ed36-4cd7-abe2-66085e44af87",
+      "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 米国株式（Ｓ＆Ｐ５００）",
+      "accountId": "monex:一般:普通預り",
+      "accountName": "一般 / 普通預り",
+      "sortOrder": 27,
+      "quantity": 72,
+      "marketValueMinor": 319,
+      "bookValueMinor": 275,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "一般"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 38195,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 44352,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 44,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.1611,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [
+        {
+          "code": "provider",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "三菱UFJアセットマネジメント"
+        },
+        {
+          "code": "short_name",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "eMAXIS Slim 米国株式(S&P500)"
+        },
+        {
+          "code": "trust_fee_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0.08140以内"
+        },
+        {
+          "code": "trust_reserve_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0"
+        }
+      ],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "developed_equity",
+          "valueName": "先進国株式"
+        }
+      ]
+    },
+    {
+      "id": "7ea66062-ec53-4d0a-a7bd-496bea36b060",
+      "instrumentId": "e186e256-a732-4d13-a203-67c525b96a73",
+      "instrumentName": "ｅＭＡＸＩＳプラス　コモディティインデックス",
+      "accountId": "monex:特定:普通預り",
+      "accountName": "特定 / 普通預り",
+      "sortOrder": 28,
+      "quantity": 58,
+      "marketValueMinor": 100,
+      "bookValueMinor": 100,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 17242,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 17356,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 0,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0066,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "commodity",
+          "valueName": "コモディティ"
+        }
+      ]
+    },
+    {
+      "id": "46863470-f9b3-401d-8de7-cedb4b75124c",
+      "instrumentId": "e186e256-a732-4d13-a203-67c525b96a73",
+      "instrumentName": "ｅＭＡＸＩＳプラス　コモディティインデックス",
+      "accountId": "monex:一般:普通預り",
+      "accountName": "一般 / 普通預り",
+      "sortOrder": 29,
+      "quantity": 161,
+      "marketValueMinor": 279,
+      "bookValueMinor": 294,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "一般"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 18261,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 17356,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -15,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0495,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "commodity",
+          "valueName": "コモディティ"
+        }
+      ]
+    },
+    {
+      "id": "010a9c6c-b384-4549-b68c-afb6a1c8c127",
+      "instrumentId": "5c7b28cf-eb4f-48e8-ba55-9fd12dc08439",
+      "instrumentName": "ｉシェアーズ　ハイイールド債券インデックス・ファンド",
+      "accountId": "monex:特定:普通預り",
+      "accountName": "特定 / 普通預り",
+      "sortOrder": 30,
+      "quantity": 188,
+      "marketValueMinor": 494,
+      "bookValueMinor": 493,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 26224,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 26316,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 1,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0035,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "high_yield_bond",
+          "valueName": "ハイ・イールド債券"
+        }
+      ]
+    },
+    {
+      "id": "f31384d7-13b8-42d9-8c19-a4ff03b3383c",
+      "instrumentId": "0485871c-aad3-4ea1-8a9b-a5d6d709813b",
+      "instrumentName": "ｉＦｒｅｅ 新興国債券インデックス",
+      "accountId": "monex:特定:普通預り",
+      "accountName": "特定 / 普通預り",
+      "sortOrder": 31,
+      "quantity": 199,
+      "marketValueMinor": 382,
+      "bookValueMinor": 382,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 19196,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 19218,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 0,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0011,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [
+        {
+          "code": "provider",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "大和アセットマネジメント"
+        },
+        {
+          "code": "short_name",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "iFree 新興国債券インデックス"
+        },
+        {
+          "code": "trust_fee_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0.242000"
+        },
+        {
+          "code": "trust_reserve_text",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "0"
+        }
+      ],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "emerging_bond",
+          "valueName": "新興国債券"
+        }
+      ]
+    },
+    {
+      "id": "8a360586-2e14-43e7-9e8e-fcd187b6e9d6",
+      "instrumentId": "f33ec918-fd60-4e35-8d54-d321cdace033",
+      "instrumentName": "ｉＦｒｅｅＨＯＬＤ　日本国債（ＪＧＢ２０５６）",
+      "accountId": "monex:一般:普通預り",
+      "accountName": "一般 / 普通預り",
+      "sortOrder": 32,
+      "quantity": 555,
+      "marketValueMinor": 462,
+      "bookValueMinor": 474,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "一般"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 8541,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "再投資コース（再投資中）"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 8333,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -12,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0243,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "domestic_bond",
+          "valueName": "国内債券"
+        }
+      ]
+    },
+    {
+      "id": "ef12b843-3855-4313-bfa3-37e935024820",
+      "instrumentId": "e559e5ab-df75-49bc-8016-b6ef690d7cfb",
+      "instrumentName": "ＪＰモルガン・ナスダック米国株式・プレミアム・インカムＥＴＦ",
+      "accountId": "monex:特定:保護",
+      "accountName": "特定 / 保護",
+      "sortOrder": 33,
+      "quantity": 1,
+      "marketValueMinor": 9572,
+      "bookValueMinor": 9913,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 9913,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "保護"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": ""
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 9913,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -341,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0344,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [
+        {
+          "code": "market",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "米国"
+        },
+        {
+          "code": "ticker",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "JEPQ"
+        }
+      ],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "developed_equity",
+          "valueName": "先進国株式"
+        }
+      ]
+    },
+    {
+      "id": "9e10857f-4ba4-4494-a53a-75b01eb26694",
+      "instrumentId": "b0f92ebc-865e-4639-bd16-6106a240f82d",
+      "instrumentName": "ＭＳＶ内外ＥＴＦ資産配分Ｆ・Ｇ",
+      "accountId": "monex:特定:普通預り",
+      "accountName": "特定 / 普通預り",
+      "sortOrder": 34,
+      "quantity": 3431,
+      "marketValueMinor": 10052,
+      "bookValueMinor": 10000,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 29147,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "custody_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "普通預り"
+        },
+        {
+          "code": "dividend_option",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "受取"
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 29299,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 52,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 5.199825441859917e-7,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "emerging_bond",
+          "valueName": "新興国債券"
+        }
+      ]
+    }
+  ]
+}
