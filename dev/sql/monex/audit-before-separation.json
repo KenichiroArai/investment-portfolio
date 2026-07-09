@@ -1,0 +1,135 @@
+{
+  "shared_count": 6,
+  "shared": [
+    {
+      "instrument_id": "ba158649-918a-42c7-824b-021765191743",
+      "instrument_name": "ｅＭＡＸＩＳ Ｓｌｉｍ バランス（８資産均等型）",
+      "used_in": "ideco,monex"
+    },
+    {
+      "instrument_id": "f74a084e-8eee-45c3-abef-a9337b908b01",
+      "instrument_name": "ｅＭＡＸＩＳ Ｓｌｉｍ 先進国債券インデックス",
+      "used_in": "ideco,monex"
+    },
+    {
+      "instrument_id": "13462933-8a0b-48f4-912a-3bfd25762509",
+      "instrument_name": "ｅＭＡＸＩＳ Ｓｌｉｍ 国内株式（ＴＯＰＩＸ）",
+      "used_in": "ideco,monex"
+    },
+    {
+      "instrument_id": "a3028224-f890-4258-b8f9-417133d7cf6a",
+      "instrument_name": "ｅＭＡＸＩＳ Ｓｌｉｍ 新興国株式インデックス",
+      "used_in": "ideco,monex"
+    },
+    {
+      "instrument_id": "e6dc9d16-d6b0-4a65-ab00-e5c4d338df88",
+      "instrument_name": "ｅＭＡＸＩＳ Ｓｌｉｍ 米国株式（Ｓ＆Ｐ５００）",
+      "used_in": "ideco,monex"
+    },
+    {
+      "instrument_id": "d642675f-5dd0-42df-8feb-63429b27ca60",
+      "instrument_name": "ｉＦｒｅｅ 新興国債券インデックス",
+      "used_in": "ideco,monex"
+    }
+  ],
+  "scope_count": 40,
+  "delete_candidate_count": 24,
+  "delete_candidates": [
+    {
+      "instrument_id": "2cc96317-c9e5-4f1d-88ba-1bc89c4da9c4",
+      "instrument_name": "インベスコ　世界厳選株式オープン＜為替ヘッジなし＞（毎月決算型）"
+    },
+    {
+      "instrument_id": "bbb36d6b-6fef-48db-8de9-28eca1e8251e",
+      "instrument_name": "ステート・ストリート国内債券インデックス・オープン（隔月分配型）"
+    },
+    {
+      "instrument_id": "9cdbf1fc-559f-40bd-8fd7-222a010007f3",
+      "instrument_name": "ダイワＪ－ＲＥＩＴオープン（毎月分配型）"
+    },
+    {
+      "instrument_id": "f154d82b-3210-44f1-b6aa-8eb4ef7d4122",
+      "instrument_name": "ニッセイＳＯＸ指数インデックスファンド（米国半導体株）＜購入・換金手数料なし＞"
+    },
+    {
+      "instrument_id": "e670731c-4a4b-4553-9538-ea4a49f434b0",
+      "instrument_name": "ピクテ新興国インカム株式ファンド（毎月決算型）"
+    },
+    {
+      "instrument_id": "fc1f0892-8d84-4c1f-acfb-edb01c54b06d",
+      "instrument_name": "フィデリティ・ＵＳ　ハイ・イールド・ファンド（毎月決算型）Ｂ（為替ヘッジなし）"
+    },
+    {
+      "instrument_id": "4b659b34-c672-4bbf-b8b9-50ccb492f290",
+      "instrument_name": "マネックス・ゴールド・ファンド"
+    },
+    {
+      "instrument_id": "03acf8eb-2c39-4527-b4db-fa87a179117a",
+      "instrument_name": "ラサール・グローバルＲＥＩＴファンド（毎月分配型）"
+    },
+    {
+      "instrument_id": "14d598ff-8811-47f5-9227-34a28ededa81",
+      "instrument_name": "日本好配当リバランスオープン"
+    },
+    {
+      "instrument_id": "71aaddc1-b083-4427-bfd8-d5cf21266b1b",
+      "instrument_name": "財産３分法ファンド（不動産・債券・株式）毎月分配型"
+    },
+    {
+      "instrument_id": "ce7a8235-42cc-40d2-a9f2-500d87ecbfa3",
+      "instrument_name": "野村新興国債券投信Ｂコース＜為替ヘッジなし＞（毎月分配型）"
+    },
+    {
+      "instrument_id": "34e5b203-bcac-485a-92e4-11f83070a837",
+      "instrument_name": "高金利先進国債券オープン（毎月分配型）"
+    },
+    {
+      "instrument_id": "7f3fef21-faae-4b10-bbe6-8c88f95e712e",
+      "instrument_name": "ＪＰモルガン・ナスダック米国株式・プレミアム・インカムＥＴＦ"
+    },
+    {
+      "instrument_id": "68de8fe9-bc77-467b-8593-eccd77fbcfe6",
+      "instrument_name": "ＭＳＶ内外ＥＴＦ資産配分Ｆ・Ｇ"
+    },
+    {
+      "instrument_id": "b573196b-3605-42fc-9fb8-aafa5b4ff0eb",
+      "instrument_name": "ＳＢＩネクスト・フロンティア高配当株式ファンド（年４回決算型）"
+    },
+    {
+      "instrument_id": "c53793d4-ac9c-465b-919e-f4cce128c776",
+      "instrument_name": "ＳＭＴ　日本株式モメンタムファンド"
+    },
+    {
+      "instrument_id": "b36731d6-062e-44d3-af23-24f65fac70e7",
+      "instrument_name": "Ｔｒａｃｅｒｓ　日経平均高配当株５０インデックス（奇数月分配型）"
+    },
+    {
+      "instrument_id": "488c64e2-0713-4879-beed-54bd43bdb875",
+      "instrument_name": "ｅＭＡＸＩＳ　日経半導体株インデックス"
+    },
+    {
+      "instrument_id": "061bd0d5-434f-430e-8408-14a1edabe945",
+      "instrument_name": "ｅＭＡＸＩＳ　Ｎｅｏ　ドローン"
+    },
+    {
+      "instrument_id": "015615b5-0828-4511-af0c-5570af6707d1",
+      "instrument_name": "ｅＭＡＸＩＳ　Ｓｌｉｍ　先進国リートインデックス（除く日本）"
+    },
+    {
+      "instrument_id": "f7eeafd4-1100-4a05-b3c9-7f74cdbef07f",
+      "instrument_name": "ｅＭＡＸＩＳ　Ｓｌｉｍ　国内リートインデックス"
+    },
+    {
+      "instrument_id": "51c8dcf2-7292-40a6-ba81-e1eefad396cd",
+      "instrument_name": "ｅＭＡＸＩＳプラス　コモディティインデックス"
+    },
+    {
+      "instrument_id": "8c8e95fe-afdf-44f3-b2bc-95938f0ad752",
+      "instrument_name": "ｉシェアーズ　ハイイールド債券インデックス・ファンド"
+    },
+    {
+      "instrument_id": "57de6363-3df0-4e21-abd7-8ccf3eeba628",
+      "instrument_name": "ｉＦｒｅｅＨＯＬＤ　日本国債（ＪＧＢ２０５６）"
+    }
+  ]
+}

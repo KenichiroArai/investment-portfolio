@@ -1,0 +1,18 @@
+{
+  "executed_at": "2026-07-09T21:39:27",
+  "overlap_count": 0,
+  "portfolio_line_counts": [
+    [
+      "ideco",
+      302,
+      67669963
+    ],
+    [
+      "monex",
+      34,
+      37408
+    ]
+  ],
+  "instrument_count": 46,
+  "monex_only_instruments_count": 30
+}

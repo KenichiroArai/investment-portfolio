@@ -1,0 +1,48 @@
+{
+  "executed_at": "2026-07-09T21:38:08",
+  "count": 6,
+  "mappings": [
+    {
+      "old_instrument_id": "13462933-8a0b-48f4-912a-3bfd25762509",
+      "new_ideco_instrument_id": "a674cd9e-34b4-4710-8533-de779f30c49f",
+      "name": "ｅＭＡＸＩＳ Ｓｌｉｍ 国内株式（ＴＯＰＩＸ）",
+      "copied_attribute_count": 4,
+      "copied_ideco_classification_count": 9
+    },
+    {
+      "old_instrument_id": "a3028224-f890-4258-b8f9-417133d7cf6a",
+      "new_ideco_instrument_id": "b82582e7-bd74-4464-a495-79e24d2690a4",
+      "name": "ｅＭＡＸＩＳ Ｓｌｉｍ 新興国株式インデックス",
+      "copied_attribute_count": 4,
+      "copied_ideco_classification_count": 0
+    },
+    {
+      "old_instrument_id": "ba158649-918a-42c7-824b-021765191743",
+      "new_ideco_instrument_id": "83c00fdd-3931-4aa8-8641-cb4425a76905",
+      "name": "ｅＭＡＸＩＳ Ｓｌｉｍ バランス（８資産均等型）",
+      "copied_attribute_count": 4,
+      "copied_ideco_classification_count": 0
+    },
+    {
+      "old_instrument_id": "d642675f-5dd0-42df-8feb-63429b27ca60",
+      "new_ideco_instrument_id": "daa38fe9-1da2-451a-81c3-b1af0aa494fd",
+      "name": "ｉＦｒｅｅ 新興国債券インデックス",
+      "copied_attribute_count": 4,
+      "copied_ideco_classification_count": 0
+    },
+    {
+      "old_instrument_id": "e6dc9d16-d6b0-4a65-ab00-e5c4d338df88",
+      "new_ideco_instrument_id": "b2901524-cc62-4b9c-a36c-d92e2803f754",
+      "name": "ｅＭＡＸＩＳ Ｓｌｉｍ 米国株式（Ｓ＆Ｐ５００）",
+      "copied_attribute_count": 4,
+      "copied_ideco_classification_count": 0
+    },
+    {
+      "old_instrument_id": "f74a084e-8eee-45c3-abef-a9337b908b01",
+      "new_ideco_instrument_id": "aac8e3ad-64db-4e30-b163-896bf2f1ff90",
+      "name": "ｅＭＡＸＩＳ Ｓｌｉｍ 先進国債券インデックス",
+      "copied_attribute_count": 4,
+      "copied_ideco_classification_count": 0
+    }
+  ]
+}

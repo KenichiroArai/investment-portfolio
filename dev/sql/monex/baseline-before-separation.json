@@ -1,0 +1,17 @@
+{
+  "backup_file": "data/portfolio.db.20260709-213635.bak",
+  "overlap_count": 6,
+  "portfolio_line_counts": [
+    [
+      "ideco",
+      302,
+      67669963
+    ],
+    [
+      "monex",
+      34,
+      37408
+    ]
+  ],
+  "instrument_count": 63
+}

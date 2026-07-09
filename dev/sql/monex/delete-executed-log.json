@@ -1,0 +1,99 @@
+{
+  "executed_at": "2026-07-09T21:38:59",
+  "backup_file": "data/portfolio.db.20260709-213635.bak",
+  "deleted_count": 23,
+  "deleted": [
+    {
+      "instrument_id": "04d2d938-b35b-4546-9c56-f9f03130e1a9",
+      "instrument_name": "インデックスファンド海外株式ヘッジあり（ＤＣ専用）"
+    },
+    {
+      "instrument_id": "060b1539-9267-4d82-a56f-5fb59edd24a4",
+      "instrument_name": "ＳＢＩ－ＰＩＭＣＯ 世界債券アクティブファンド（ＤＣ）"
+    },
+    {
+      "instrument_id": "1bd80d52-d257-44d2-934d-408028b4183b",
+      "instrument_name": "セレブライフ・ストーリー2025"
+    },
+    {
+      "instrument_id": "1c02df10-74c0-4be0-8890-f3a33f86c2bc",
+      "instrument_name": "ニッセイ外国株式インデックスファンド（購入・換金手数料なし）"
+    },
+    {
+      "instrument_id": "2647ba70-c79f-4b31-b2e9-c933341e39b7",
+      "instrument_name": "セゾン・グローバルバランスファンド"
+    },
+    {
+      "instrument_id": "2b6690fe-b638-48fc-9187-625760993686",
+      "instrument_name": "ＳＢＩ中小型割安成長株ファンドジェイリバイブ＜ＤＣ年金＞"
+    },
+    {
+      "instrument_id": "33b1f6bc-b0b0-4499-9c58-101483c190eb",
+      "instrument_name": "あおぞらＤＣ定期（１年）"
+    },
+    {
+      "instrument_id": "35ac1b64-8fe8-4c98-a0fc-9470d70d2f96",
+      "instrument_name": "野村リアルグロース・オープン（確定拠出年金向け）"
+    },
+    {
+      "instrument_id": "3d6ff885-802b-42a4-ac1f-a048cef3eba1",
+      "instrument_name": "農林中金＜パートナーズ＞長期厳選投資 おおぶね"
+    },
+    {
+      "instrument_id": "5ce2ca77-ce79-4eb9-8fb1-c76584ad5de5",
+      "instrument_name": "ＳＢＩグローバル・バランス・ファンド"
+    },
+    {
+      "instrument_id": "603dfe01-d094-46f4-81e0-0451b726c06a",
+      "instrument_name": "ＥＸＥ－ｉ 全世界中小型株式ファンド"
+    },
+    {
+      "instrument_id": "67383da3-83e8-4498-9f80-687158614de5",
+      "instrument_name": "ラッセル・インベストメント外国株式ファンド（ＤＣ向け）"
+    },
+    {
+      "instrument_id": "694694aa-0df9-4f52-b6c8-2e2f11d5a2ee",
+      "instrument_name": "セレブライフ・ストーリー2035"
+    },
+    {
+      "instrument_id": "69fa5830-931d-4499-8d00-d8b4c37fb6ad",
+      "instrument_name": "ひふみ年金"
+    },
+    {
+      "instrument_id": "76ed3113-1eb7-466f-9c9d-12869682f8cc",
+      "instrument_name": "ニッセイ日経平均インデックスファンド（購入・換金手数料なし）"
+    },
+    {
+      "instrument_id": "8836aa8a-d7f6-4cb0-bd56-682e8c549edc",
+      "instrument_name": "ハーベスト アジア フロンティア株式ファンド"
+    },
+    {
+      "instrument_id": "88dfc1c4-028a-4054-9f7f-ca51c8512f61",
+      "instrument_name": "ハリス グローバル バリュー株ファンド（年１回決算型）"
+    },
+    {
+      "instrument_id": "9369f520-faa0-4de4-8a8e-c6def0a1a7e8",
+      "instrument_name": "インデックスファンド海外債券ヘッジあり（ＤＣ専用）"
+    },
+    {
+      "instrument_id": "9505cac4-9b24-4af2-9667-333d14bbfa35",
+      "instrument_name": "ｉＦｒｅｅ ＮＹダウ・インデックス"
+    },
+    {
+      "instrument_id": "df92afc9-3835-4d5e-abad-c62d6b30cad5",
+      "instrument_name": "ひふみワールド年金"
+    },
+    {
+      "instrument_id": "f1d21aca-ac04-4696-a424-bf03adf4f957",
+      "instrument_name": "セレブライフ・ストーリー2055"
+    },
+    {
+      "instrument_id": "f59519af-4a55-4b93-9371-776bfbff9a68",
+      "instrument_name": "つみたて株"
+    },
+    {
+      "instrument_id": "fd02a252-8fe5-4a7d-b19b-19fcbc1a3a6d",
+      "instrument_name": "セゾン資産形成の達人ファンド"
+    }
+  ]
+}
