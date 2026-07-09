@@ -9,10 +9,13 @@ import {
   buildMonexAssetClassNameMap,
   buildMonexHoldingMetrics,
   computeMonexMutualFundBookValueMinor,
+  indexMonexHeaders,
   matchMonexInstrumentId,
+  parseMonexCsv,
   parseMonexCompassFundCsv,
   parseMonexDomesticHoldingsCsv,
   parseMonexUsStocksCsv,
+  requireMonexHeader,
   type MonexInstrumentMatchCandidate,
 } from "@repo/shared";
 
@@ -41,6 +44,7 @@ const MONEX_PORTFOLIO_CODE = "monex";
 const DOMESTIC_HOLDINGS_FILE = "国内株等.csv";
 const US_STOCKS_FILE = "米国株.csv";
 const COMPASS_FUND_FILE = "ON COMPASS.csv";
+const INSTRUMENT_MAPPING_FILE = "銘柄マッピング.csv";
 
 export type ImportMonexDataResult = {
   asOfDate: string;
@@ -128,11 +132,16 @@ async function resolveInstrumentId(
     externalId?: string | null;
     attributes?: InstrumentAttributeInput[];
     classificationValueId?: string | null;
+    additionalMatchNames?: string[];
   },
 ): Promise<{ instrumentId: string; created: boolean }> {
   let result = { instrumentId: "", created: false };
 
-  const matchedId = matchMonexInstrumentId(candidates, instrumentName);
+  const matchedId = matchMonexInstrumentId(
+    candidates,
+    instrumentName,
+    params.additionalMatchNames ?? [],
+  );
   if (matchedId) {
     result.instrumentId = matchedId;
     if (params.classificationValueId) {
@@ -213,6 +222,71 @@ function loadAssetClassEntries(directory: string) {
   return result;
 }
 
+function loadInstrumentAliasMap(directory: string): Map<string, string[]> {
+  let result = new Map<string, string[]>();
+
+  const mappingContent = readMonexCsvFile(directory, INSTRUMENT_MAPPING_FILE);
+  if (!mappingContent) {
+    return result;
+  }
+
+  const table = parseMonexCsv(mappingContent);
+  if (table.length < 2) {
+    return result;
+  }
+
+  const headerIndex = indexMonexHeaders(table[0]);
+  const value1Index = requireMonexHeader(headerIndex, "対応値1");
+  const value2Index = requireMonexHeader(headerIndex, "対応値2");
+
+  const addAlias = (source: string, alias: string): void => {
+    let addAliasResult: void = undefined;
+    const current = result.get(source) ?? [];
+    if (!current.includes(alias)) {
+      current.push(alias);
+      result.set(source, current);
+    }
+    return addAliasResult;
+  };
+
+  for (let rowIndex = 1; rowIndex < table.length; rowIndex += 1) {
+    const cells = table[rowIndex];
+    const value1 = cells[value1Index]?.trim() ?? "";
+    const value2 = cells[value2Index]?.trim() ?? "";
+    if (value1 === "" || value2 === "") {
+      continue;
+    }
+    if (value1 === value2) {
+      continue;
+    }
+
+    addAlias(value1, value2);
+    addAlias(value2, value1);
+  }
+
+  return result;
+}
+
+function resolveAssetClassCode(
+  assetClassNameMap: Map<string, string>,
+  instrumentName: string,
+  additionalMatchNames: string[],
+): string | undefined {
+  let result = assetClassNameMap.get(instrumentName);
+  if (result) {
+    return result;
+  }
+
+  for (const aliasName of additionalMatchNames) {
+    result = assetClassNameMap.get(aliasName);
+    if (result) {
+      return result;
+    }
+  }
+
+  return result;
+}
+
 export async function importMonexData(
   db: AppDatabase,
   params: MonexImportDirectory,
@@ -240,6 +314,7 @@ export async function importMonexData(
     loadAssetClassEntries(directory),
     MONEX_ASSET_CLASS_FILE_MAP,
   );
+  const instrumentAliasMap = loadInstrumentAliasMap(directory);
 
   const domesticContent = readMonexCsvFile(directory, DOMESTIC_HOLDINGS_FILE);
   const usStocksContent = readMonexCsvFile(directory, US_STOCKS_FILE);
@@ -279,7 +354,12 @@ export async function importMonexData(
   let sortOrder = 1;
 
   for (const row of domesticRows) {
-    const assetClassCode = assetClassNameMap.get(row.instrumentName);
+    const additionalMatchNames = instrumentAliasMap.get(row.instrumentName) ?? [];
+    const assetClassCode = resolveAssetClassCode(
+      assetClassNameMap,
+      row.instrumentName,
+      additionalMatchNames,
+    );
     const classificationValueId = await resolveClassificationValueId(
       db,
       scheme.id,
@@ -289,6 +369,7 @@ export async function importMonexData(
       instrumentType: "mutual_fund",
       currency: "JPY",
       classificationValueId,
+      additionalMatchNames,
     });
     if (resolved.created) {
       result.createdInstruments += 1;
@@ -319,7 +400,12 @@ export async function importMonexData(
   }
 
   for (const row of usStockRows) {
-    const assetClassCode = assetClassNameMap.get(row.instrumentName);
+    const additionalMatchNames = instrumentAliasMap.get(row.instrumentName) ?? [];
+    const assetClassCode = resolveAssetClassCode(
+      assetClassNameMap,
+      row.instrumentName,
+      additionalMatchNames,
+    );
     const classificationValueId = await resolveClassificationValueId(
       db,
       scheme.id,
@@ -341,6 +427,7 @@ export async function importMonexData(
       externalId: row.ticker,
       attributes,
       classificationValueId,
+      additionalMatchNames,
     });
     if (resolved.created) {
       result.createdInstruments += 1;
@@ -368,7 +455,12 @@ export async function importMonexData(
   }
 
   for (const row of compassRows) {
-    const assetClassCode = assetClassNameMap.get(row.instrumentName);
+    const additionalMatchNames = instrumentAliasMap.get(row.instrumentName) ?? [];
+    const assetClassCode = resolveAssetClassCode(
+      assetClassNameMap,
+      row.instrumentName,
+      additionalMatchNames,
+    );
     const classificationValueId = await resolveClassificationValueId(
       db,
       scheme.id,
@@ -378,6 +470,7 @@ export async function importMonexData(
       instrumentType: "mutual_fund",
       currency: "JPY",
       classificationValueId,
+      additionalMatchNames,
     });
     if (resolved.created) {
       result.createdInstruments += 1;

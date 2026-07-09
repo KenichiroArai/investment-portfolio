@@ -41,6 +41,7 @@ export function buildMonexInstrumentMatchKeys(name: string): string[] {
 export function matchMonexInstrumentId(
   candidates: MonexInstrumentMatchCandidate[],
   instrumentName: string,
+  additionalNames: string[] = [],
 ): string | null {
   let result: string | null = null;
 
@@ -49,7 +50,15 @@ export function matchMonexInstrumentId(
     return result;
   }
 
-  const matchKeys = buildMonexInstrumentMatchKeys(trimmedName);
+  const sourceNames = [trimmedName, ...additionalNames];
+  const matchKeySet = new Set<string>();
+  for (const sourceName of sourceNames) {
+    const keys = buildMonexInstrumentMatchKeys(sourceName);
+    for (const key of keys) {
+      matchKeySet.add(key);
+    }
+  }
+  const matchKeys = [...matchKeySet];
   if (matchKeys.length === 0) {
     return result;
   }
