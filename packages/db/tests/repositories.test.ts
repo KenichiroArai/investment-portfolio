@@ -26,10 +26,12 @@ import {
   deleteInstrument,
   findInstrumentByAttributeTextValue,
   findInstrumentById,
+  findInstrumentByIdentity,
   findInstrumentByName,
   getAttributesForInstruments,
   listInstruments,
   listIdecoInstrumentsForPaste,
+  mergeInstruments,
   setInstrumentAttributes,
   updateInstrument,
   upsertInstrument,
@@ -264,7 +266,7 @@ describe("portfolio repositories", () => {
     expect(again?.lines).toHaveLength(0);
   });
 
-  it("rejects duplicate instrument ids in snapshot lines", async () => {
+  it("rejects duplicate instrument account pairs in snapshot lines", async () => {
     const db = setup();
     await createPortfolio(db, {
       code: "ideco",
@@ -280,17 +282,115 @@ describe("portfolio repositories", () => {
         lines: [
           {
             instrumentId: instrument.id,
+            accountId: "ideco:unknown",
+            accountName: "不明口座",
             quantity: 1,
             marketValueMinor: 1000,
           },
           {
             instrumentId: instrument.id,
+            accountId: "ideco:unknown",
+            accountName: "不明口座",
             quantity: 2,
             marketValueMinor: 2000,
           },
         ],
       }),
     ).rejects.toThrow(SnapshotValidationError);
+  });
+
+  it("allows the same instrument across different accounts in one snapshot", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "monex",
+      name: "Monex",
+      kind: "monex",
+    });
+    const instrument = await createInstrument(db, {
+      portfolioCode: "monex",
+      name: "同一ファンド",
+    });
+
+    const snapshot = await replaceCurrentSnapshot(db, {
+      portfolioCode: "monex",
+      asOfDate: "2026-06-01",
+      lines: [
+        {
+          instrumentId: instrument.id,
+          accountId: "monex:一般:普通預り",
+          accountName: "一般 / 普通預り",
+          quantity: 1,
+          marketValueMinor: 1000,
+        },
+        {
+          instrumentId: instrument.id,
+          accountId: "monex:特定:普通預り",
+          accountName: "特定 / 普通預り",
+          quantity: 2,
+          marketValueMinor: 2000,
+        },
+      ],
+    });
+
+    expect(snapshot?.lines).toHaveLength(2);
+    expect(snapshot?.lines.every((line) => line.instrumentId === instrument.id)).toBe(true);
+  });
+
+  it("upsertInstrument matches identity across account ids", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "monex",
+      name: "Monex",
+      kind: "monex",
+    });
+
+    const first = await createInstrument(db, {
+      portfolioCode: "monex",
+      accountId: "monex:一般:普通預り",
+      name: "同一ファンド",
+    });
+    const second = await upsertInstrument(db, {
+      portfolioCode: "monex",
+      accountId: "monex:特定:普通預り",
+      name: "同一ファンド",
+    });
+
+    expect(second?.id).toBe(first?.id);
+    expect(await listInstruments(db, { portfolioCode: "monex" })).toHaveLength(1);
+  });
+
+  it("mergeInstruments returns zero when no losers are provided", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+    const instrument = await createInstrument(db, { name: "Alpha Fund" });
+
+    const merged = await mergeInstruments(db, instrument.id, []);
+    expect(merged).toEqual({ canonicalId: instrument.id, mergedCount: 0 });
+  });
+
+  it("findInstrumentByIdentity matches external id null and empty equally", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+    const created = await createInstrument(db, {
+      portfolioCode: "ideco",
+      name: "Null External",
+      externalId: null,
+    });
+
+    const found = await findInstrumentByIdentity(db, {
+      portfolioCode: "ideco",
+      name: "Null External",
+      externalId: "",
+    });
+    expect(found?.id).toBe(created.id);
   });
 
   it("returns null when scheme portfolio is missing", async () => {

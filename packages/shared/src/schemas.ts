@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { findDuplicateInstrumentId } from "./snapshot-line-validation";
+import { findDuplicateInstrumentAccountPair } from "./snapshot-line-validation";
 
 const portfolioKindSchema = z.enum([
   "ideco",
@@ -96,14 +96,14 @@ export const replaceCurrentSnapshotSchema = z
   .superRefine((data, ctx) => {
     let result: void = undefined;
 
-    const duplicateId = findDuplicateInstrumentId(data.lines);
-    if (!duplicateId) {
+    const duplicatePair = findDuplicateInstrumentAccountPair(data.lines);
+    if (!duplicatePair) {
       return result;
     }
 
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: `同一銘柄が複数行に含まれています（instrumentId: ${duplicateId}）`,
+      message: `同一銘柄が同一口座内で複数行に含まれています（instrumentId: ${duplicatePair.instrumentId}, accountId: ${duplicatePair.accountId}）`,
       path: ["lines"],
     });
     return result;

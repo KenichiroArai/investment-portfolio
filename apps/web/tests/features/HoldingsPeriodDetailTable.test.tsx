@@ -15,6 +15,8 @@ function makeLine(
     id: overrides.id,
     instrumentId: overrides.instrumentId,
     instrumentName: overrides.instrumentName ?? "テスト銘柄",
+    accountId: overrides.accountId ?? "ideco:unknown",
+    accountName: overrides.accountName ?? "不明口座",
     sortOrder: overrides.sortOrder ?? 0,
     quantity: overrides.quantity ?? 1,
     marketValueMinor: overrides.marketValueMinor ?? 1000,

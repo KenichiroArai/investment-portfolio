@@ -29,6 +29,8 @@ export const MANAGE_SNAPSHOT = {
       id: "l1",
       instrumentId: "i1",
       instrumentName: "テスト銘柄",
+      accountId: "ideco:unknown",
+      accountName: "不明口座",
       sortOrder: 0,
       quantity: 10,
       marketValueMinor: 100_000,
@@ -150,7 +152,11 @@ export function createManageFetchMock(options: ManageFetchMockOptions = {}) {
       return okResponse(state.snapshot);
     }
 
-    if (url.endsWith("/instruments") && method === "GET") {
+    if (
+      (url.endsWith("/instruments") || url.includes("/instruments?")) &&
+      !url.includes("/instruments-for-paste") &&
+      method === "GET"
+    ) {
       return okResponse(state.instruments);
     }
 

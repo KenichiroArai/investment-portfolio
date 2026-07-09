@@ -64,6 +64,13 @@
       "when": 1783608000000,
       "tag": "0008_split_instruments_by_account",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1783694400000,
+      "tag": "0009_merge_duplicate_instruments",
+      "breakpoints": true
     }
   ]
 }

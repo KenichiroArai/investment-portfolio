@@ -1,8 +1,15 @@
-import { and, eq, inArray, like } from "drizzle-orm";
+import { and, eq, inArray, isNull, like, or } from "drizzle-orm";
 
 import type { AppDatabase } from "../client";
 import { newId, nowIso } from "../id";
-import { holdingLines, instrumentAttributes, instruments, portfolios } from "../schema/index";
+import {
+  holdingLines,
+  instrumentAttributes,
+  instrumentClassifications,
+  instruments,
+  portfolios,
+  targetPortfolioWeights,
+} from "../schema/index";
 import { findPortfolioByCode } from "./portfolios";
 
 export type CreateInstrumentParams = {
@@ -13,6 +20,32 @@ export type CreateInstrumentParams = {
   currency?: string;
   externalId?: string | null;
 };
+
+async function resolvePortfolioCodeForInstrument(
+  db: AppDatabase,
+  portfolioCode?: string,
+) {
+  let result = "legacy";
+
+  if (portfolioCode && portfolioCode.trim() !== "") {
+    result = portfolioCode;
+    return result;
+  }
+
+  const ideco = await findPortfolioByCode(db, "ideco");
+  if (ideco) {
+    result = ideco.code;
+    return result;
+  }
+
+  const firstRows = await db.select({ code: portfolios.code }).from(portfolios).limit(1);
+  if (firstRows[0]) {
+    result = firstRows[0].code;
+    return result;
+  }
+
+  return result;
+}
 
 async function resolvePortfolioIdForInstrument(
   db: AppDatabase,
@@ -103,17 +136,24 @@ export async function upsertInstrument(
 ) {
   let result: Awaited<ReturnType<typeof createInstrument>> | null = null;
 
-  const existing = await findInstrumentByName(db, {
-    portfolioCode: params.portfolioCode,
-    accountId: params.accountId,
+  const portfolioCode = await resolvePortfolioCodeForInstrument(db, params.portfolioCode);
+  const existing = await findInstrumentByIdentity(db, {
+    portfolioCode,
     name: params.name,
+    instrumentType: params.instrumentType,
+    currency: params.currency,
+    externalId: params.externalId,
   });
   if (existing) {
     result = existing;
     return result;
   }
 
-  result = await createInstrument(db, params);
+  result = await createInstrument(db, {
+    ...params,
+    portfolioCode,
+    accountId: params.accountId ?? `${portfolioCode}:unknown`,
+  });
   return result;
 }
 
@@ -263,6 +303,186 @@ export async function findInstrumentById(db: AppDatabase, id: string) {
     .where(eq(instruments.id, id))
     .limit(1);
   result = rows[0] ?? null;
+  return result;
+}
+
+export type FindInstrumentByIdentityParams = {
+  portfolioCode?: string;
+  name: string;
+  instrumentType?: string;
+  currency?: string;
+  externalId?: string | null;
+};
+
+function buildExternalIdMatch(externalId?: string | null) {
+  let result = undefined;
+  const normalized = externalId ?? "";
+  if (normalized === "") {
+    result = or(isNull(instruments.externalId), eq(instruments.externalId, ""));
+    return result;
+  }
+  result = eq(instruments.externalId, normalized);
+  return result;
+}
+
+export async function findInstrumentByIdentity(
+  db: AppDatabase,
+  params: FindInstrumentByIdentityParams,
+) {
+  let result: (typeof instruments.$inferSelect) | null = null;
+
+  const portfolioCode = await resolvePortfolioCodeForInstrument(db, params.portfolioCode);
+  const portfolio = await findPortfolioByCode(db, portfolioCode);
+  if (!portfolio) {
+    return result;
+  }
+
+  const instrumentType = params.instrumentType ?? "mutual_fund";
+  const currency = params.currency ?? "JPY";
+  const rows = await db
+    .select()
+    .from(instruments)
+    .where(
+      and(
+        eq(instruments.portfolioId, portfolio.id),
+        eq(instruments.name, params.name),
+        eq(instruments.instrumentType, instrumentType),
+        eq(instruments.currency, currency),
+        buildExternalIdMatch(params.externalId),
+      ),
+    )
+    .limit(1);
+  result = rows[0] ?? null;
+  return result;
+}
+
+export type MergeInstrumentsResult = {
+  canonicalId: string;
+  mergedCount: number;
+};
+
+export async function mergeInstruments(
+  db: AppDatabase,
+  canonicalId: string,
+  loserIds: string[],
+) {
+  let result: MergeInstrumentsResult | null = null;
+
+  const canonical = await findInstrumentById(db, canonicalId);
+  if (!canonical) {
+    return result;
+  }
+
+  const uniqueLoserIds = [...new Set(loserIds)].filter((id) => id !== canonicalId);
+  if (uniqueLoserIds.length === 0) {
+    result = { canonicalId, mergedCount: 0 };
+    return result;
+  }
+
+  db.transaction((tx) => {
+    let txResult: void = undefined;
+
+    for (const loserId of uniqueLoserIds) {
+      tx
+        .update(holdingLines)
+        .set({ instrumentId: canonicalId })
+        .where(eq(holdingLines.instrumentId, loserId))
+        .run();
+    }
+
+    for (const loserId of uniqueLoserIds) {
+      const loserWeights = tx
+        .select()
+        .from(targetPortfolioWeights)
+        .where(eq(targetPortfolioWeights.instrumentId, loserId))
+        .all();
+      for (const weight of loserWeights) {
+        const canonicalWeight = tx
+          .select()
+          .from(targetPortfolioWeights)
+          .where(
+            and(
+              eq(targetPortfolioWeights.portfolioId, weight.portfolioId),
+              eq(targetPortfolioWeights.instrumentId, canonicalId),
+            ),
+          )
+          .all()[0];
+        if (canonicalWeight) {
+          tx
+            .update(targetPortfolioWeights)
+            .set({
+              targetRatio: canonicalWeight.targetRatio + weight.targetRatio,
+              updatedAt: nowIso(),
+            })
+            .where(eq(targetPortfolioWeights.id, canonicalWeight.id))
+            .run();
+          tx.delete(targetPortfolioWeights).where(eq(targetPortfolioWeights.id, weight.id)).run();
+          continue;
+        }
+        tx
+          .update(targetPortfolioWeights)
+          .set({ instrumentId: canonicalId })
+          .where(eq(targetPortfolioWeights.id, weight.id))
+          .run();
+      }
+    }
+
+    for (const loserId of uniqueLoserIds) {
+      const loserClassifications = tx
+        .select()
+        .from(instrumentClassifications)
+        .where(eq(instrumentClassifications.instrumentId, loserId))
+        .all();
+      for (const classification of loserClassifications) {
+        tx
+          .insert(instrumentClassifications)
+          .values({
+            instrumentId: canonicalId,
+            classificationValueId: classification.classificationValueId,
+          })
+          .onConflictDoNothing()
+          .run();
+      }
+      tx
+        .delete(instrumentClassifications)
+        .where(eq(instrumentClassifications.instrumentId, loserId))
+        .run();
+    }
+
+    for (const loserId of uniqueLoserIds) {
+      const canonicalAttributeCodes = new Set(
+        tx
+          .select({ code: instrumentAttributes.code })
+          .from(instrumentAttributes)
+          .where(eq(instrumentAttributes.instrumentId, canonicalId))
+          .all()
+          .map((row) => row.code),
+      );
+      const loserAttributes = tx
+        .select()
+        .from(instrumentAttributes)
+        .where(eq(instrumentAttributes.instrumentId, loserId))
+        .all();
+      for (const attribute of loserAttributes) {
+        if (canonicalAttributeCodes.has(attribute.code)) {
+          tx.delete(instrumentAttributes).where(eq(instrumentAttributes.id, attribute.id)).run();
+          continue;
+        }
+        tx
+          .update(instrumentAttributes)
+          .set({ instrumentId: canonicalId })
+          .where(eq(instrumentAttributes.id, attribute.id))
+          .run();
+        canonicalAttributeCodes.add(attribute.code);
+      }
+    }
+
+    tx.delete(instruments).where(inArray(instruments.id, uniqueLoserIds)).run();
+
+    return txResult;
+  });
+
+  result = { canonicalId, mergedCount: uniqueLoserIds.length };
   return result;
 }
 

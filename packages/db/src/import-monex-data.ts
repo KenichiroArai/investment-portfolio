@@ -28,9 +28,9 @@ import {
   setInstrumentClassifications,
 } from "./repositories/classifications";
 import {
-  createInstrument,
   listInstruments,
   setInstrumentAttributes,
+  upsertInstrument,
   type InstrumentAttributeInput,
 } from "./repositories/instruments";
 import { createPortfolio, findPortfolioByCode } from "./repositories/portfolios";
@@ -125,7 +125,6 @@ async function syncMonexAssetClassValues(db: AppDatabase, schemeId: string) {
 async function resolveInstrumentId(
   db: AppDatabase,
   candidates: MonexInstrumentMatchCandidate[],
-  accountId: string,
   instrumentName: string,
   params: {
     instrumentType: string;
@@ -151,9 +150,9 @@ async function resolveInstrumentId(
     return result;
   }
 
-  const instrument = await createInstrument(db, {
+  const instrument = await upsertInstrument(db, {
     portfolioCode: MONEX_PORTFOLIO_CODE,
-    accountId,
+    accountId: `${MONEX_PORTFOLIO_CODE}:unknown`,
     name: instrumentName,
     instrumentType: params.instrumentType,
     currency: params.currency,
@@ -161,10 +160,11 @@ async function resolveInstrumentId(
   });
   if (!instrument) {
     throw new Error(
-      `銘柄の作成に失敗しました: ${MONEX_PORTFOLIO_CODE} / ${accountId} / ${instrumentName}`,
+      `銘柄の作成に失敗しました: ${MONEX_PORTFOLIO_CODE} / ${instrumentName}`,
     );
   }
 
+  const alreadyListed = candidates.some((candidate) => candidate.id === instrument.id);
   if (params.attributes && params.attributes.length > 0) {
     await setInstrumentAttributes(db, instrument.id, params.attributes);
   }
@@ -175,8 +175,13 @@ async function resolveInstrumentId(
     ]);
   }
 
-  candidates.push({ id: instrument.id, name: instrument.name });
-  result = { instrumentId: instrument.id, created: true };
+  if (!alreadyListed) {
+    candidates.push({ id: instrument.id, name: instrument.name });
+    result = { instrumentId: instrument.id, created: true };
+    return result;
+  }
+
+  result = { instrumentId: instrument.id, created: false };
   return result;
 }
 
@@ -353,15 +358,12 @@ export async function importMonexData(
   const existingInstruments = await listInstruments(db, {
     portfolioCode: MONEX_PORTFOLIO_CODE,
   });
-  const candidatesByAccount = new Map<string, MonexInstrumentMatchCandidate[]>();
-  for (const instrument of existingInstruments) {
-    const existing = candidatesByAccount.get(instrument.accountId) ?? [];
-    existing.push({
+  const candidates: MonexInstrumentMatchCandidate[] = existingInstruments.map(
+    (instrument) => ({
       id: instrument.id,
       name: instrument.name,
-    });
-    candidatesByAccount.set(instrument.accountId, existing);
-  }
+    }),
+  );
 
   const lines: HoldingLineInput[] = [];
   let sortOrder = 1;
@@ -378,11 +380,9 @@ export async function importMonexData(
       scheme.id,
       assetClassCode,
     );
-    const candidates = candidatesByAccount.get(row.accountId) ?? [];
     const resolved = await resolveInstrumentId(
       db,
       candidates,
-      row.accountId,
       row.instrumentName,
       {
       instrumentType: "mutual_fund",
@@ -391,7 +391,6 @@ export async function importMonexData(
       additionalMatchNames,
       },
     );
-    candidatesByAccount.set(row.accountId, candidates);
     if (resolved.created) {
       result.createdInstruments += 1;
     }
@@ -444,11 +443,9 @@ export async function importMonexData(
         textValue: row.ticker,
       },
     ];
-    const candidates = candidatesByAccount.get(row.accountId) ?? [];
     const resolved = await resolveInstrumentId(
       db,
       candidates,
-      row.accountId,
       row.instrumentName,
       {
         instrumentType: "equity",
@@ -459,7 +456,6 @@ export async function importMonexData(
         additionalMatchNames,
       },
     );
-    candidatesByAccount.set(row.accountId, candidates);
     if (resolved.created) {
       result.createdInstruments += 1;
     }
@@ -499,11 +495,9 @@ export async function importMonexData(
       scheme.id,
       assetClassCode,
     );
-    const candidates = candidatesByAccount.get(row.accountId) ?? [];
     const resolved = await resolveInstrumentId(
       db,
       candidates,
-      row.accountId,
       row.instrumentName,
       {
       instrumentType: "mutual_fund",
@@ -512,7 +506,6 @@ export async function importMonexData(
       additionalMatchNames,
       },
     );
-    candidatesByAccount.set(row.accountId, candidates);
     if (resolved.created) {
       result.createdInstruments += 1;
     }
@@ -548,14 +541,10 @@ export async function importMonexData(
     asOfDate,
     lines,
     setAsCurrent: true,
-    allowDuplicateInstrumentIds: true,
   });
 
   result.lineCount = lines.length;
-  result.instrumentCount = Array.from(candidatesByAccount.values()).reduce(
-    (sum, items) => sum + items.length,
-    0,
-  );
+  result.instrumentCount = candidates.length;
   return result;
 }
 

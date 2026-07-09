@@ -72,7 +72,11 @@ describe("API app", () => {
     const instrumentRes = await app.request("/instruments", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: "テストファンド" }),
+      body: JSON.stringify({
+        portfolioCode: "ideco",
+        accountId: "ideco:manual",
+        name: "テストファンド",
+      }),
     });
     const instrument = (await instrumentRes.json()) as { id: string };
 
@@ -90,6 +94,8 @@ describe("API app", () => {
         lines: [
           {
             instrumentId: instrument.id,
+            accountId: "ideco:unknown",
+            accountName: "不明口座",
             quantity: 10,
             marketValueMinor: 10000,
           },
@@ -111,6 +117,8 @@ describe("API app", () => {
         lines: [
           {
             instrumentId: instrument.id,
+            accountId: "ideco:unknown",
+            accountName: "不明口座",
             quantity: 5,
             marketValueMinor: 5000,
           },
@@ -224,7 +232,11 @@ describe("API app", () => {
     const instrumentRes = await app.request("/instruments", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: "重複テスト銘柄" }),
+      body: JSON.stringify({
+        portfolioCode: "ideco",
+        accountId: "ideco:manual",
+        name: "重複テスト銘柄",
+      }),
     });
     const instrument = (await instrumentRes.json()) as { id: string };
 
@@ -236,11 +248,15 @@ describe("API app", () => {
         lines: [
           {
             instrumentId: instrument.id,
+            accountId: "ideco:unknown",
+            accountName: "不明口座",
             quantity: 1,
             marketValueMinor: 1000,
           },
           {
             instrumentId: instrument.id,
+            accountId: "ideco:unknown",
+            accountName: "不明口座",
             quantity: 2,
             marketValueMinor: 2000,
           },
@@ -355,7 +371,11 @@ describe("API app", () => {
     const instrumentRes = await app.request("/instruments", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: "テスト銘柄" }),
+      body: JSON.stringify({
+        portfolioCode: "test",
+        accountId: "test:manual",
+        name: "テスト銘柄",
+      }),
     });
     const instrument = (await instrumentRes.json()) as { id: string };
 
@@ -394,6 +414,8 @@ describe("API app", () => {
         lines: [
           {
             instrumentId: instrument.id,
+            accountId: "test:unknown",
+            accountName: "不明口座",
             quantity: 1,
             marketValueMinor: 1000,
           },
@@ -405,6 +427,16 @@ describe("API app", () => {
       method: "DELETE",
     });
     expect(deleteInstrumentInUse.status).toBe(409);
+
+    const clearSnapshot = await app.request("/portfolios/test/snapshot/current", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        asOfDate: "2026-06-01",
+        lines: [],
+      }),
+    });
+    expect(clearSnapshot.status).toBe(200);
 
     const deleteValue = await app.request(`/classification-values/${value.id}`, {
       method: "DELETE",
@@ -461,7 +493,11 @@ describe("API app", () => {
     const orphanInstrumentRes = await app.request("/instruments", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: "削除対象" }),
+      body: JSON.stringify({
+        portfolioCode: "bad-update",
+        accountId: "bad-update:manual",
+        name: "削除対象",
+      }),
     });
     const orphanInstrument = (await orphanInstrumentRes.json()) as { id: string };
 
@@ -615,7 +651,11 @@ describe("API app", () => {
     const instrumentRes = await app.request("/instruments", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: "トレンド銘柄" }),
+      body: JSON.stringify({
+        portfolioCode: "trendy",
+        accountId: "trendy:manual",
+        name: "トレンド銘柄",
+      }),
     });
     const trendInstrument = (await instrumentRes.json()) as { id: string };
 
@@ -627,6 +667,8 @@ describe("API app", () => {
         lines: [
           {
             instrumentId: trendInstrument.id,
+            accountId: "trendy:unknown",
+            accountName: "不明口座",
             quantity: 1,
             marketValueMinor: 1000,
           },

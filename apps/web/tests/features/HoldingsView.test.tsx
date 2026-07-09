@@ -8,6 +8,11 @@ import {
 } from "../helpers/portfolio-time-test-utils";
 import { portfolioTimeNavigationState } from "../helpers/portfolio-time-navigation-state";
 
+const HOLDING_LINE_ACCOUNT = {
+  accountId: "ideco:unknown",
+  accountName: "不明口座",
+};
+
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
     replace: vi.fn(),
@@ -89,6 +94,7 @@ describe("HoldingsDetailPanel", () => {
               id: "l1",
               instrumentId: "i1",
               instrumentName: "テストファンド",
+              ...HOLDING_LINE_ACCOUNT,
               quantity: 10,
               marketValueMinor: 10000,
               bookValueMinor: null,
@@ -161,6 +167,7 @@ describe("HoldingsDetailPanel", () => {
               id: "l1",
               instrumentId: "i1",
               instrumentName: "無タグ",
+              ...HOLDING_LINE_ACCOUNT,
               quantity: 1,
               marketValueMinor: 100,
               bookValueMinor: null,
@@ -222,6 +229,7 @@ describe("HoldingsDetailPanel", () => {
               id: "l1",
               instrumentId: "i1",
               instrumentName: "テストファンド",
+              ...HOLDING_LINE_ACCOUNT,
               sortOrder: 0,
               quantity: 10,
               marketValueMinor: 10000,
@@ -266,6 +274,7 @@ describe("HoldingsDetailPanel", () => {
               id: "l2",
               instrumentId: "i1",
               instrumentName: "テストファンド",
+              ...HOLDING_LINE_ACCOUNT,
               sortOrder: 0,
               quantity: 120,
               marketValueMinor: 12000,
@@ -289,6 +298,7 @@ describe("HoldingsDetailPanel", () => {
                 id: "l1",
                 instrumentId: "i1",
                 instrumentName: "テストファンド",
+              ...HOLDING_LINE_ACCOUNT,
                 sortOrder: 0,
                 quantity: 100,
                 marketValueMinor: 10000,
@@ -363,6 +373,7 @@ describe("HoldingsDetailPanel", () => {
               id: "l2",
               instrumentId: "i1",
               instrumentName: "国内株式",
+              ...HOLDING_LINE_ACCOUNT,
               quantity: 1,
               marketValueMinor: 1000,
               bookValueMinor: null,
@@ -374,6 +385,7 @@ describe("HoldingsDetailPanel", () => {
               id: "l3",
               instrumentId: "i2",
               instrumentName: "外国債券",
+              ...HOLDING_LINE_ACCOUNT,
               quantity: 2,
               marketValueMinor: 2000,
               bookValueMinor: null,
@@ -396,6 +408,7 @@ describe("HoldingsDetailPanel", () => {
                 id: "l1",
                 instrumentId: "i1",
                 instrumentName: "国内株式",
+              ...HOLDING_LINE_ACCOUNT,
                 quantity: 1,
                 marketValueMinor: 900,
                 bookValueMinor: null,
@@ -432,6 +445,7 @@ describe("HoldingsDetailPanel", () => {
       id: `l${index}`,
       instrumentId: `i${index}`,
       instrumentName: `銘柄${String(index).padStart(2, "0")}`,
+      ...HOLDING_LINE_ACCOUNT,
       sortOrder: index,
       quantity: 1,
       marketValueMinor: (index + 1) * 1000,

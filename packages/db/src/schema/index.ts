@@ -1,5 +1,5 @@
-import { relations } from "drizzle-orm";
-import { index, integer, real, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
+import { relations, sql } from "drizzle-orm";
+import { index, integer, real, sqliteTable, text, unique, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 /** 口座 — 投資口座のマスタ。詳細は packages/db/README.md */
 export const portfolios = sqliteTable(
@@ -17,7 +17,7 @@ export const portfolios = sqliteTable(
   },
 );
 
-/** 銘柄 — 口座・口座内アカウント単位の運用商品マスタ。詳細は packages/db/README.md */
+/** 銘柄 — 口座単位の運用商品マスタ。口座内アカウント区分は holding_lines で管理。詳細は packages/db/README.md */
 export const instruments = sqliteTable(
   "instruments",
   {
@@ -28,7 +28,7 @@ export const instruments = sqliteTable(
         let result = portfolios.id;
         return result;
       }, { onDelete: "cascade" }), // 口座ID
-    accountId: text("account_id").notNull(), // 口座内アカウントID
+    accountId: text("account_id").notNull(), // 口座内アカウントID（参照用既定値）
     name: text("name").notNull(), // 銘柄名
     instrumentType: text("instrument_type").notNull().default("mutual_fund"), // 銘柄種別
     currency: text("currency").notNull().default("JPY"), // 通貨
@@ -38,6 +38,13 @@ export const instruments = sqliteTable(
   (table) => {
     let result = [
       index("instruments_portfolio_account_idx").on(table.portfolioId, table.accountId),
+      uniqueIndex("instruments_portfolio_identity_unique").on(
+        table.portfolioId,
+        table.name,
+        table.instrumentType,
+        table.currency,
+        sql`coalesce(${table.externalId}, '')`,
+      ),
     ];
     return result;
   },

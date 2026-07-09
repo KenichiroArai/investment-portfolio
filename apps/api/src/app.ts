@@ -1,7 +1,6 @@
 import {
   createClassificationScheme,
   createClassificationValue,
-  createInstrument,
   createPortfolio,
   deleteClassificationSchemeById,
   deleteClassificationValueById,
@@ -28,6 +27,7 @@ import {
   replaceTargetPortfolioWeights,
   setInstrumentClassifications,
   updateClassificationSchemeName,
+  upsertInstrument,
   updateClassificationValue,
   updateInstrument,
   updatePortfolio,
@@ -353,7 +353,7 @@ export function createApp(options?: CreateAppOptions) {
     }
 
     const db = resolveDb();
-    const row = await createInstrument(db, parsed.data);
+    const row = await upsertInstrument(db, parsed.data);
     if (!row) {
       result = c.json({ error: "Portfolio not found" }, 404);
       return result;
