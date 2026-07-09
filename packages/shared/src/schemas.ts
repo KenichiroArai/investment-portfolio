@@ -42,6 +42,8 @@ export const updateClassificationValueSchema = z.object({
 });
 
 export const createInstrumentSchema = z.object({
+  portfolioCode: z.string().min(1).max(64),
+  accountId: z.string().min(1).max(128),
   name: z.string().min(1).max(512),
   instrumentType: z.string().min(1).max(64).optional(),
   currency: z.string().length(3).optional(),
@@ -49,6 +51,7 @@ export const createInstrumentSchema = z.object({
 });
 
 export const updateInstrumentSchema = z.object({
+  accountId: z.string().min(1).max(128).optional(),
   name: z.string().min(1).max(512),
   instrumentType: z.string().min(1).max(64).optional(),
   currency: z.string().length(3).optional(),

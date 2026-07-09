@@ -253,10 +253,24 @@ export async function deleteClassificationValue(valueId: string) {
   return result;
 }
 
-export async function fetchInstruments(searchQuery?: string) {
+export async function fetchInstruments(
+  portfolioCode?: string,
+  searchQuery?: string,
+  accountId?: string,
+) {
   let path = "/instruments";
+  const params = new URLSearchParams();
+  if (portfolioCode && portfolioCode.trim() !== "") {
+    params.set("portfolioCode", portfolioCode.trim());
+  }
+  if (accountId && accountId.trim() !== "") {
+    params.set("accountId", accountId.trim());
+  }
   if (searchQuery && searchQuery.trim() !== "") {
-    path = `${path}?q=${encodeURIComponent(searchQuery.trim())}`;
+    params.set("q", searchQuery.trim());
+  }
+  if (params.size > 0) {
+    path = `${path}?${params.toString()}`;
   }
   let result = await requestJson<InstrumentListItemDto[]>(path);
   return result;

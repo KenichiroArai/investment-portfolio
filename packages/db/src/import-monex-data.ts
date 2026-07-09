@@ -125,6 +125,7 @@ async function syncMonexAssetClassValues(db: AppDatabase, schemeId: string) {
 async function resolveInstrumentId(
   db: AppDatabase,
   candidates: MonexInstrumentMatchCandidate[],
+  accountId: string,
   instrumentName: string,
   params: {
     instrumentType: string;
@@ -151,11 +152,18 @@ async function resolveInstrumentId(
   }
 
   const instrument = await createInstrument(db, {
+    portfolioCode: MONEX_PORTFOLIO_CODE,
+    accountId,
     name: instrumentName,
     instrumentType: params.instrumentType,
     currency: params.currency,
     externalId: params.externalId ?? null,
   });
+  if (!instrument) {
+    throw new Error(
+      `銘柄の作成に失敗しました: ${MONEX_PORTFOLIO_CODE} / ${accountId} / ${instrumentName}`,
+    );
+  }
 
   if (params.attributes && params.attributes.length > 0) {
     await setInstrumentAttributes(db, instrument.id, params.attributes);
@@ -342,13 +350,18 @@ export async function importMonexData(
   const asOfDate = asOfDates[asOfDates.length - 1];
   result.asOfDate = asOfDate;
 
-  const existingInstruments = await listInstruments(db);
-  const candidates: MonexInstrumentMatchCandidate[] = existingInstruments.map(
-    (instrument) => ({
+  const existingInstruments = await listInstruments(db, {
+    portfolioCode: MONEX_PORTFOLIO_CODE,
+  });
+  const candidatesByAccount = new Map<string, MonexInstrumentMatchCandidate[]>();
+  for (const instrument of existingInstruments) {
+    const existing = candidatesByAccount.get(instrument.accountId) ?? [];
+    existing.push({
       id: instrument.id,
       name: instrument.name,
-    }),
-  );
+    });
+    candidatesByAccount.set(instrument.accountId, existing);
+  }
 
   const lines: HoldingLineInput[] = [];
   let sortOrder = 1;
@@ -365,12 +378,20 @@ export async function importMonexData(
       scheme.id,
       assetClassCode,
     );
-    const resolved = await resolveInstrumentId(db, candidates, row.instrumentName, {
+    const candidates = candidatesByAccount.get(row.accountId) ?? [];
+    const resolved = await resolveInstrumentId(
+      db,
+      candidates,
+      row.accountId,
+      row.instrumentName,
+      {
       instrumentType: "mutual_fund",
       currency: "JPY",
       classificationValueId,
       additionalMatchNames,
-    });
+      },
+    );
+    candidatesByAccount.set(row.accountId, candidates);
     if (resolved.created) {
       result.createdInstruments += 1;
     }
@@ -423,14 +444,22 @@ export async function importMonexData(
         textValue: row.ticker,
       },
     ];
-    const resolved = await resolveInstrumentId(db, candidates, row.instrumentName, {
-      instrumentType: "equity",
-      currency: "USD",
-      externalId: row.ticker,
-      attributes,
-      classificationValueId,
-      additionalMatchNames,
-    });
+    const candidates = candidatesByAccount.get(row.accountId) ?? [];
+    const resolved = await resolveInstrumentId(
+      db,
+      candidates,
+      row.accountId,
+      row.instrumentName,
+      {
+        instrumentType: "equity",
+        currency: "USD",
+        externalId: row.ticker,
+        attributes,
+        classificationValueId,
+        additionalMatchNames,
+      },
+    );
+    candidatesByAccount.set(row.accountId, candidates);
     if (resolved.created) {
       result.createdInstruments += 1;
     }
@@ -470,12 +499,20 @@ export async function importMonexData(
       scheme.id,
       assetClassCode,
     );
-    const resolved = await resolveInstrumentId(db, candidates, row.instrumentName, {
+    const candidates = candidatesByAccount.get(row.accountId) ?? [];
+    const resolved = await resolveInstrumentId(
+      db,
+      candidates,
+      row.accountId,
+      row.instrumentName,
+      {
       instrumentType: "mutual_fund",
       currency: "JPY",
       classificationValueId,
       additionalMatchNames,
-    });
+      },
+    );
+    candidatesByAccount.set(row.accountId, candidates);
     if (resolved.created) {
       result.createdInstruments += 1;
     }
@@ -515,7 +552,10 @@ export async function importMonexData(
   });
 
   result.lineCount = lines.length;
-  result.instrumentCount = candidates.length;
+  result.instrumentCount = Array.from(candidatesByAccount.values()).reduce(
+    (sum, items) => sum + items.length,
+    0,
+  );
   return result;
 }
 

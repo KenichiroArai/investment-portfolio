@@ -40,6 +40,8 @@ export type ClassificationSchemeWithValuesDto = {
 
 export type InstrumentListItemDto = {
   id: string;
+  portfolioId: string;
+  accountId: string;
   name: string;
   instrumentType: string;
   currency: string;

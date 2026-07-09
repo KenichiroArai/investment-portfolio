@@ -321,10 +321,18 @@ export function createApp(options?: CreateAppOptions) {
 
     const db = resolveDb();
     const searchQuery = c.req.query("q");
-    const rows = await listInstruments(db, searchQuery);
+    const portfolioCode = c.req.query("portfolioCode");
+    const accountId = c.req.query("accountId");
+    const rows = await listInstruments(db, {
+      portfolioCode: portfolioCode && portfolioCode.trim() !== "" ? portfolioCode : undefined,
+      accountId: accountId && accountId.trim() !== "" ? accountId : undefined,
+      searchQuery,
+    });
     result = c.json(
       rows.map((row) => ({
         id: row.id,
+        portfolioId: row.portfolioId,
+        accountId: row.accountId,
         name: row.name,
         instrumentType: row.instrumentType,
         currency: row.currency,
@@ -346,6 +354,10 @@ export function createApp(options?: CreateAppOptions) {
 
     const db = resolveDb();
     const row = await createInstrument(db, parsed.data);
+    if (!row) {
+      result = c.json({ error: "Portfolio not found" }, 404);
+      return result;
+    }
     result = c.json(row, 201);
     return result;
   });
@@ -370,6 +382,8 @@ export function createApp(options?: CreateAppOptions) {
 
     result = c.json({
       id: instrument.id,
+      portfolioId: instrument.portfolioId,
+      accountId: instrument.accountId,
       name: instrument.name,
       instrumentType: instrument.instrumentType,
       currency: instrument.currency,

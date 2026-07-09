@@ -119,7 +119,7 @@ export function DataManageView({
 
     const [snapshotResponse, instrumentResponse, schemeResponse] = await Promise.all([
       fetchCurrentSnapshot(portfolioCode),
-      fetchInstruments(),
+      fetchInstruments(portfolioCode),
       fetchClassificationSchemes(portfolioCode),
     ]);
 
@@ -226,7 +226,11 @@ export function DataManageView({
     event.preventDefault();
     setSubmitting(true);
 
-    const response = await createInstrument({ name: instrumentName.trim() });
+    const response = await createInstrument({
+      portfolioCode,
+      accountId: `${portfolioCode}:manual`,
+      name: instrumentName.trim(),
+    });
     if (!response.ok) {
       setSubmitting(false);
       toast.error(response.message);

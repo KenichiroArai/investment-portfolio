@@ -2,14 +2,66 @@ import { and, eq, inArray, like } from "drizzle-orm";
 
 import type { AppDatabase } from "../client";
 import { newId, nowIso } from "../id";
-import { holdingLines, instrumentAttributes, instruments } from "../schema/index";
+import { holdingLines, instrumentAttributes, instruments, portfolios } from "../schema/index";
+import { findPortfolioByCode } from "./portfolios";
 
 export type CreateInstrumentParams = {
+  portfolioCode?: string;
+  accountId?: string;
   name: string;
   instrumentType?: string;
   currency?: string;
   externalId?: string | null;
 };
+
+async function resolvePortfolioIdForInstrument(
+  db: AppDatabase,
+  portfolioCode?: string,
+) {
+  let result: string | null = null;
+
+  if (portfolioCode && portfolioCode.trim() !== "") {
+    let named = await findPortfolioByCode(db, portfolioCode);
+    if (!named) {
+      await db.insert(portfolios).values({
+        id: newId(),
+        code: portfolioCode,
+        name: `${portfolioCode} portfolio`,
+        kind: "taxable",
+        createdAt: nowIso(),
+      });
+      named = await findPortfolioByCode(db, portfolioCode);
+      if (!named) {
+        return result;
+      }
+    }
+    result = named.id;
+    return result;
+  }
+
+  const ideco = await findPortfolioByCode(db, "ideco");
+  if (ideco) {
+    result = ideco.id;
+    return result;
+  }
+
+  const firstRows = await db.select({ id: portfolios.id }).from(portfolios).limit(1);
+  if (firstRows[0]) {
+    result = firstRows[0].id;
+    return result;
+  }
+
+  await db.insert(portfolios).values({
+    id: newId(),
+    code: "legacy",
+    name: "Legacy Portfolio",
+    kind: "taxable",
+    createdAt: nowIso(),
+  });
+  const created = await findPortfolioByCode(db, "legacy");
+  result = created?.id ?? null;
+  return result;
+}
 
 export type InstrumentAttributeInput = {
   code: string;
@@ -22,8 +74,17 @@ export async function createInstrument(
   db: AppDatabase,
   params: CreateInstrumentParams,
 ) {
-  let result = {
+  let result: (typeof instruments.$inferSelect) | null = null;
+
+  const portfolioId = await resolvePortfolioIdForInstrument(db, params.portfolioCode);
+  if (!portfolioId) {
+    return result;
+  }
+
+  const row = {
     id: newId(),
+    portfolioId,
+    accountId: params.accountId ?? `${params.portfolioCode ?? "legacy"}:unknown`,
     name: params.name,
     instrumentType: params.instrumentType ?? "mutual_fund",
     currency: params.currency ?? "JPY",
@@ -31,7 +92,8 @@ export async function createInstrument(
     createdAt: nowIso(),
   };
 
-  await db.insert(instruments).values(result);
+  await db.insert(instruments).values(row);
+  result = row;
   return result;
 }
 
@@ -41,7 +103,11 @@ export async function upsertInstrument(
 ) {
   let result: Awaited<ReturnType<typeof createInstrument>> | null = null;
 
-  const existing = await findInstrumentByName(db, params.name);
+  const existing = await findInstrumentByName(db, {
+    portfolioCode: params.portfolioCode,
+    accountId: params.accountId,
+    name: params.name,
+  });
   if (existing) {
     result = existing;
     return result;
@@ -51,15 +117,57 @@ export async function upsertInstrument(
   return result;
 }
 
-export async function listInstruments(db: AppDatabase, searchQuery?: string) {
+export type ListInstrumentsParams = {
+  portfolioCode?: string;
+  accountId?: string;
+  searchQuery?: string;
+};
+
+export async function listInstruments(
+  db: AppDatabase,
+  params?: ListInstrumentsParams | string,
+) {
   let result: (typeof instruments.$inferSelect)[] = [];
+  const normalized =
+    typeof params === "string" ? { searchQuery: params } : params;
+  const searchQuery = normalized?.searchQuery;
+  let portfolioId: string | null = null;
+
+  if (normalized?.portfolioCode) {
+    const portfolio = await findPortfolioByCode(db, normalized.portfolioCode);
+    if (!portfolio) {
+      return result;
+    }
+    portfolioId = portfolio.id;
+  }
+
+  const whereClause =
+    portfolioId && normalized?.accountId
+      ? and(
+          eq(instruments.portfolioId, portfolioId),
+          eq(instruments.accountId, normalized.accountId),
+        )
+      : portfolioId
+        ? eq(instruments.portfolioId, portfolioId)
+        : undefined;
 
   if (searchQuery && searchQuery.trim() !== "") {
     const pattern = `%${searchQuery.trim()}%`;
+    const query = db
+      .select()
+      .from(instruments)
+      .orderBy(instruments.name);
+    result = whereClause
+      ? await query.where(and(whereClause, like(instruments.name, pattern)))
+      : await query.where(like(instruments.name, pattern));
+    return result;
+  }
+
+  if (whereClause) {
     result = await db
       .select()
       .from(instruments)
-      .where(like(instruments.name, pattern))
+      .where(whereClause)
       .orderBy(instruments.name);
     return result;
   }
@@ -69,6 +177,7 @@ export async function listInstruments(db: AppDatabase, searchQuery?: string) {
 }
 
 export type UpdateInstrumentParams = {
+  accountId?: string;
   name: string;
   instrumentType?: string;
   currency?: string;
@@ -91,6 +200,7 @@ export async function updateInstrument(
     .update(instruments)
     .set({
       name: params.name,
+      accountId: params.accountId ?? existing.accountId,
       instrumentType: params.instrumentType ?? existing.instrumentType,
       currency: params.currency ?? existing.currency,
       externalId:
@@ -101,6 +211,7 @@ export async function updateInstrument(
   result = {
     ...existing,
     name: params.name,
+    accountId: params.accountId ?? existing.accountId,
     instrumentType: params.instrumentType ?? existing.instrumentType,
     currency: params.currency ?? existing.currency,
     externalId:
@@ -155,14 +266,39 @@ export async function findInstrumentById(db: AppDatabase, id: string) {
   return result;
 }
 
-export async function findInstrumentByName(db: AppDatabase, name: string) {
-  let result: (typeof instruments.$inferSelect) | null = null;
+export type FindInstrumentByNameParams = {
+  portfolioCode?: string;
+  accountId?: string;
+  name: string;
+};
 
-  const rows = await db
-    .select()
-    .from(instruments)
-    .where(eq(instruments.name, name))
-    .limit(1);
+export async function findInstrumentByName(
+  db: AppDatabase,
+  params: FindInstrumentByNameParams | string,
+) {
+  let result: (typeof instruments.$inferSelect) | null = null;
+  const normalized: FindInstrumentByNameParams =
+    typeof params === "string" ? { name: params } : params;
+
+  const baseQuery = db.select().from(instruments);
+  let rows: (typeof instruments.$inferSelect)[] = [];
+  if (normalized.portfolioCode && normalized.accountId) {
+    const portfolio = await findPortfolioByCode(db, normalized.portfolioCode);
+    if (!portfolio) {
+      return result;
+    }
+    rows = await baseQuery
+      .where(
+        and(
+          eq(instruments.portfolioId, portfolio.id),
+          eq(instruments.accountId, normalized.accountId),
+          eq(instruments.name, normalized.name),
+        ),
+      )
+      .limit(1);
+  } else {
+    rows = await baseQuery.where(eq(instruments.name, normalized.name)).limit(1);
+  }
   result = rows[0] ?? null;
   return result;
 }
@@ -278,7 +414,14 @@ export type IdecoPasteInstrumentRow = {
 export async function listIdecoInstrumentsForPaste(db: AppDatabase) {
   let result: IdecoPasteInstrumentRow[] = [];
 
-  const rows = await db.select().from(instruments).orderBy(instruments.name);
+  const portfolio = await findPortfolioByCode(db, "ideco");
+  const rows = portfolio
+    ? await db
+        .select()
+        .from(instruments)
+        .where(eq(instruments.portfolioId, portfolio.id))
+        .orderBy(instruments.name)
+    : await db.select().from(instruments).orderBy(instruments.name);
   const instrumentIds = rows.map((row) => row.id);
   const attributesByInstrumentId = await getAttributesForInstruments(db, instrumentIds);
 

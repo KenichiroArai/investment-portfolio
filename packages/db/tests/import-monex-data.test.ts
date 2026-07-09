@@ -54,10 +54,6 @@ describe("importMonexData", () => {
     }
     if (dbPath && existsSync(dbPath)) {
       rmSync(dbPath, { force: true });
-      const dir = join(dbPath, "..");
-      if (existsSync(dir)) {
-        rmSync(dir, { recursive: true, force: true });
-      }
     }
   });
 
@@ -97,6 +93,8 @@ describe("importMonexData", () => {
     mkdirSync(importDir, { recursive: true });
 
     await createInstrument(db, {
+      portfolioCode: "monex",
+      accountId: "monex:一般:特定",
       name: "ＭＳＶ内外ＥＴＦ資産配分ファンド（Ｇコース）",
       instrumentType: "mutual_fund",
       currency: "JPY",
@@ -117,7 +115,7 @@ describe("importMonexData", () => {
     const outcome = await importMonexData(db, { directory: importDir });
     expect(outcome.createdInstruments).toBe(0);
 
-    const instruments = await listInstruments(db);
+    const instruments = await listInstruments(db, { portfolioCode: "monex" });
     expect(instruments).toHaveLength(1);
     expect(instruments[0]?.name).toBe("ＭＳＶ内外ＥＴＦ資産配分ファンド（Ｇコース）");
   });
@@ -130,6 +128,8 @@ describe("importMonexData", () => {
     mkdirSync(importDir, { recursive: true });
 
     await createInstrument(db, {
+      portfolioCode: "monex",
+      accountId: "monex:一般:特定",
       name: "ＭＳＶ内外ＥＴＦ資産配分ファンド（Ｇコース）",
       instrumentType: "mutual_fund",
       currency: "JPY",
@@ -145,7 +145,7 @@ describe("importMonexData", () => {
     const outcome = await importMonexData(db, { directory: importDir });
     expect(outcome.createdInstruments).toBe(1);
 
-    const instruments = await listInstruments(db);
+    const instruments = await listInstruments(db, { portfolioCode: "monex" });
     expect(instruments).toHaveLength(2);
   });
 });

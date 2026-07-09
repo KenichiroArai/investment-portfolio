@@ -2,6 +2,8 @@ import { vi } from "vitest";
 
 export const MANAGE_INSTRUMENT = {
   id: "i1",
+  portfolioId: "p1",
+  accountId: "ideco:manual",
   name: "テスト銘柄",
   instrumentType: "fund",
   currency: "JPY",

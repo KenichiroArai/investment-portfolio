@@ -106,6 +106,8 @@ describe("api-client fetch functions", () => {
 
   const instrument = {
     id: "i1",
+    portfolioId: "p1",
+    accountId: "ideco:manual",
     name: "テスト銘柄",
     instrumentType: "fund",
     currency: "JPY",
@@ -208,7 +210,12 @@ describe("api-client fetch functions", () => {
     },
     {
       label: "createInstrument",
-      run: () => createInstrument({ name: "テスト銘柄" }),
+      run: () =>
+        createInstrument({
+          portfolioCode: "ideco",
+          accountId: "ideco:manual",
+          name: "テスト銘柄",
+        }),
       pathSuffix: "/instruments",
       method: "POST",
       successBody: instrument,
@@ -359,7 +366,7 @@ describe("api-client fetch functions", () => {
       json: async () => [],
     });
 
-    await fetchInstruments(" テスト ");
+    await fetchInstruments(undefined, " テスト ");
 
     expect(fetchMock).toHaveBeenCalledWith(
       "http://127.0.0.1:3001/instruments?q=%E3%83%86%E3%82%B9%E3%83%88",
@@ -374,7 +381,7 @@ describe("api-client fetch functions", () => {
       json: async () => [],
     });
 
-    await fetchInstruments("   ");
+    await fetchInstruments(undefined, "   ");
 
     expect(fetchMock).toHaveBeenCalledWith(
       "http://127.0.0.1:3001/instruments",

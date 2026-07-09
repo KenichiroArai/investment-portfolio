@@ -112,7 +112,7 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
 
     const [schemeResponse, instrumentResponse] = await Promise.all([
       fetchClassificationSchemes(portfolioCode),
-      fetchInstruments(),
+      fetchInstruments(portfolioCode),
     ]);
 
     if (!schemeResponse.ok) {

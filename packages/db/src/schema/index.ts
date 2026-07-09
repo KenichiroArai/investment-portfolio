@@ -17,15 +17,31 @@ export const portfolios = sqliteTable(
   },
 );
 
-/** 銘柄 — 運用商品のマスタ。詳細は packages/db/README.md */
-export const instruments = sqliteTable("instruments", {
-  id: text("id").primaryKey(), // ID
-  name: text("name").notNull(), // 銘柄名
-  instrumentType: text("instrument_type").notNull().default("mutual_fund"), // 銘柄種別
-  currency: text("currency").notNull().default("JPY"), // 通貨
-  externalId: text("external_id"), // 外部ID
-  createdAt: text("created_at").notNull(), // 作成日時
-});
+/** 銘柄 — 口座・口座内アカウント単位の運用商品マスタ。詳細は packages/db/README.md */
+export const instruments = sqliteTable(
+  "instruments",
+  {
+    id: text("id").primaryKey(), // ID
+    portfolioId: text("portfolio_id")
+      .notNull()
+      .references(() => {
+        let result = portfolios.id;
+        return result;
+      }, { onDelete: "cascade" }), // 口座ID
+    accountId: text("account_id").notNull(), // 口座内アカウントID
+    name: text("name").notNull(), // 銘柄名
+    instrumentType: text("instrument_type").notNull().default("mutual_fund"), // 銘柄種別
+    currency: text("currency").notNull().default("JPY"), // 通貨
+    externalId: text("external_id"), // 外部ID
+    createdAt: text("created_at").notNull(), // 作成日時
+  },
+  (table) => {
+    let result = [
+      index("instruments_portfolio_account_idx").on(table.portfolioId, table.accountId),
+    ];
+    return result;
+  },
+);
 
 /** 分類体系 — 口座ごとの分類軸。詳細は packages/db/README.md */
 export const classificationSchemes = sqliteTable(
@@ -352,6 +368,7 @@ export const classificationValuesRelations = relations(
 /** 銘柄リレーション */
 export const instrumentsRelations = relations(instruments, ({ many }) => {
   let result = {
+    // 銘柄は口座単位で管理する
     classifications: many(instrumentClassifications),
     attributes: many(instrumentAttributes),
     holdingLines: many(holdingLines),
