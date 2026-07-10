@@ -147,7 +147,7 @@ export function PortfolioContextBar({ portfolioCode }: PortfolioContextBarProps)
               <Select
                 value={portfolioCode}
                 onValueChange={(nextCode) => {
-                  window.location.assign(buildPortfolioHref(nextCode, ""));
+                  router.push(buildPortfolioHref(nextCode, ""));
                 }}
               >
                 <SelectTrigger className="w-[min(100%,14rem)]" aria-label="口座を選択">

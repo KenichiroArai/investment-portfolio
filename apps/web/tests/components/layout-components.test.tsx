@@ -6,11 +6,12 @@ import { SettingsSidebar } from "@/components/layout/settings-sidebar";
 import { PortfolioContextBar } from "@/components/PortfolioContextBar";
 
 const usePathname = vi.hoisted(() => vi.fn());
+const routerPush = vi.hoisted(() => vi.fn());
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
     replace: vi.fn(),
-    push: vi.fn(),
+    push: routerPush,
   }),
   usePathname: () => usePathname(),
   useSearchParams: () => new URLSearchParams(),
@@ -19,13 +20,10 @@ vi.mock("next/navigation", () => ({
 describe("layout components", () => {
   beforeAll(() => {
     Element.prototype.scrollIntoView = vi.fn();
-    Object.defineProperty(window, "location", {
-      configurable: true,
-      value: { assign: vi.fn() },
-    });
   });
 
   beforeEach(() => {
+    routerPush.mockClear();
     vi.stubGlobal(
       "fetch",
       vi.fn(async () => ({
@@ -47,6 +45,7 @@ describe("layout components", () => {
     cleanup();
     vi.unstubAllGlobals();
     delete process.env.NEXT_PUBLIC_DATA_SOURCE;
+    delete process.env.NEXT_PUBLIC_BASE_PATH;
   });
 
   describe("static mode", () => {
@@ -66,6 +65,33 @@ describe("layout components", () => {
         "href",
         "/portfolios/ideco/analysis",
       );
+    });
+
+    it("navigates via router.push when switching portfolios in static mode", async () => {
+      process.env.NEXT_PUBLIC_BASE_PATH = "/investment-portfolio";
+      const user = userEvent.setup();
+      vi.stubGlobal(
+        "fetch",
+        vi.fn(async () => ({
+          ok: true,
+          status: 200,
+          json: async () => [
+            { id: "p1", code: "ideco", name: "iDeCo", kind: "ideco" },
+            { id: "p2", code: "monex", name: "マネックス証券", kind: "monex" },
+          ],
+        })),
+      );
+
+      usePathname.mockReturnValue("/portfolios/ideco/");
+      render(<PortfolioContextBar portfolioCode="ideco" />);
+
+      await waitFor(() => {
+        expect(screen.getByRole("combobox", { name: "口座を選択" })).toBeInTheDocument();
+      });
+
+      await user.click(screen.getByRole("combobox", { name: "口座を選択" }));
+      await user.click(screen.getByRole("option", { name: "マネックス証券" }));
+      expect(routerPush).toHaveBeenCalledWith("/portfolios/monex/");
     });
   });
 
@@ -127,7 +153,7 @@ describe("layout components", () => {
 
       await user.click(screen.getByRole("combobox", { name: "口座を選択" }));
       await user.click(screen.getByRole("option", { name: "NISA" }));
-      expect(window.location.assign).toHaveBeenCalledWith("/portfolios/nisa/");
+      expect(routerPush).toHaveBeenCalledWith("/portfolios/nisa/");
     });
 
     it("marks portfolio allocation tab active on nested routes", () => {
