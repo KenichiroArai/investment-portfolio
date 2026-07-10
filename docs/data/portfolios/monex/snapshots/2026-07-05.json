@@ -13,7 +13,7 @@
   "metrics": [],
   "lines": [
     {
-      "id": "55f4c861-ff8b-4e16-a7c2-202c58e634e8",
+      "id": "95e5cfdd-8f99-42ee-9770-1748c7a3f176",
       "instrumentId": "17401cd5-c91b-4e7e-9dd1-42b9735ce69a",
       "instrumentName": "インベスコ　世界厳選株式オープン＜為替ヘッジなし＞（毎月決算型）",
       "accountId": "monex:一般:普通預り",
@@ -71,13 +71,21 @@
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式",
+          "allocationWeight": 0.015525114155251141
+        },
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
           "valueCode": "developed_equity",
-          "valueName": "先進国株式"
+          "valueName": "先進国株式",
+          "allocationWeight": 0.9844748858447488
         }
       ]
     },
     {
-      "id": "f860628d-4558-41ef-a43c-5ace09ba1271",
+      "id": "f846b7c7-6780-41b9-9e17-1bd69a9e0be0",
       "instrumentId": "35162a93-003a-47eb-bf68-fcb3695ce78e",
       "instrumentName": "ステート・ストリート国内債券インデックス・オープン（隔月分配型）",
       "accountId": "monex:特定:普通預り",
@@ -136,12 +144,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "domestic_bond",
-          "valueName": "国内債券"
+          "valueName": "国内債券",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "706400ce-79b7-4192-933e-eb2a71abb0e6",
+      "id": "1dbb5b0f-30f5-443f-ab88-bc574fe0296f",
       "instrumentId": "14d2a702-6586-42ec-89c2-e842c21eb10d",
       "instrumentName": "ダイワＪ－ＲＥＩＴオープン（毎月分配型）",
       "accountId": "monex:特定:普通預り",
@@ -200,12 +209,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "domestic_reit",
-          "valueName": "国内REIT"
+          "valueName": "国内REIT",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "619fb545-6329-481d-9d3b-3db8f1efef52",
+      "id": "22a7d709-5fc5-4f5f-8729-c651d51f3746",
       "instrumentId": "ee9e8c41-73ee-4e5c-bcab-4502d279d7c9",
       "instrumentName": "ニッセイＳＯＸ指数インデックスファンド（米国半導体株）＜購入・換金手数料なし＞",
       "accountId": "monex:一般:普通預り",
@@ -264,12 +274,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "developed_equity",
-          "valueName": "先進国株式"
+          "valueName": "先進国株式",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "89de7901-58d8-49e0-81b7-2bd43109bd34",
+      "id": "574919cf-4da0-4cf3-901c-fad61b4665a6",
       "instrumentId": "4239669e-65d1-4438-9300-46b56d73e85f",
       "instrumentName": "ピクテ新興国インカム株式ファンド（毎月決算型）",
       "accountId": "monex:一般:普通預り",
@@ -328,12 +339,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "emerging_equity",
-          "valueName": "新興国株式"
+          "valueName": "新興国株式",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "f8a7fadc-1e5d-423b-a95e-dbb89753999b",
+      "id": "8f1cec8f-3daa-47d3-abd5-722c4e2da0d4",
       "instrumentId": "b74a0e8b-e5b1-4ef8-b63e-0b705a16349c",
       "instrumentName": "フィデリティ・ＵＳ　ハイ・イールド・ファンド（毎月決算型）Ｂ（為替ヘッジなし）",
       "accountId": "monex:一般:普通預り",
@@ -392,12 +404,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "high_yield_bond",
-          "valueName": "ハイ・イールド債券"
+          "valueName": "ハイ・イールド債券",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "26289a7d-468e-47f7-bd56-8e96d6ac10c2",
+      "id": "c21c92ef-aac8-4376-b669-7fb68e862b8b",
       "instrumentId": "7948b850-705a-41ff-86c1-917335335370",
       "instrumentName": "マネックス・ゴールド・ファンド",
       "accountId": "monex:特定:普通預り",
@@ -456,12 +469,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "commodity",
-          "valueName": "コモディティ"
+          "valueName": "コモディティ",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "8aa0b718-dfe0-4e6e-bec3-6de7c4159b1c",
+      "id": "ca1c49dd-fd56-4413-aa20-7a73b2606cf6",
       "instrumentId": "3767e685-e58e-47b8-b277-64c2c9501d55",
       "instrumentName": "ラサール・グローバルＲＥＩＴファンド（毎月分配型）",
       "accountId": "monex:一般:普通預り",
@@ -519,13 +533,21 @@
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
+          "valueCode": "foreign_reit",
+          "valueName": "海外REIT",
+          "allocationWeight": 0.9584905660377359
+        },
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
           "valueCode": "domestic_reit",
-          "valueName": "国内REIT"
+          "valueName": "国内REIT",
+          "allocationWeight": 0.04150943396226415
         }
       ]
     },
     {
-      "id": "878af85e-d141-4b36-b626-b5ff0bcab9ac",
+      "id": "deeeb0d1-679f-45dd-a482-08bfffd5387a",
       "instrumentId": "bdc4034a-aa05-4bb9-9dfe-028d14101408",
       "instrumentName": "日本好配当リバランスオープン",
       "accountId": "monex:特定:普通預り",
@@ -584,12 +606,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "domestic_equity",
-          "valueName": "国内株式"
+          "valueName": "国内株式",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "af0862d1-3a88-4ae6-ae34-c19cdd4872a6",
+      "id": "0cda61fe-9285-4deb-89bb-0233e45d09fa",
       "instrumentId": "bdc4034a-aa05-4bb9-9dfe-028d14101408",
       "instrumentName": "日本好配当リバランスオープン",
       "accountId": "monex:一般:普通預り",
@@ -648,12 +671,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "domestic_equity",
-          "valueName": "国内株式"
+          "valueName": "国内株式",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "d64f1c27-e80c-4c0f-8806-127b7876d27e",
+      "id": "df1c05be-fb77-4437-b9f5-9e0ff7ded59e",
       "instrumentId": "f947fcb3-0df0-4ef8-9908-9607a3035aec",
       "instrumentName": "財産３分法ファンド（不動産・債券・株式）毎月分配型",
       "accountId": "monex:一般:普通預り",
@@ -711,13 +735,35 @@
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式",
+          "allocationWeight": 0.25961538461538464
+        },
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "domestic_reit",
+          "valueName": "国内REIT",
+          "allocationWeight": 0.25961538461538464
+        },
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "developed_bond",
+          "valueName": "先進国債券",
+          "allocationWeight": 0.35096153846153844
+        },
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
           "valueCode": "emerging_bond",
-          "valueName": "新興国債券"
+          "valueName": "新興国債券",
+          "allocationWeight": 0.12980769230769232
         }
       ]
     },
     {
-      "id": "79eda427-9533-42c5-800a-cc1afd91c1f6",
+      "id": "cbaec3df-d63b-46fc-955d-36fcb505fa82",
       "instrumentId": "1535eeed-091b-4ba8-9489-7bfb8bc6fa2c",
       "instrumentName": "野村新興国債券投信Ｂコース＜為替ヘッジなし＞（毎月分配型）",
       "accountId": "monex:一般:普通預り",
@@ -776,12 +822,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "emerging_bond",
-          "valueName": "新興国債券"
+          "valueName": "新興国債券",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "b07d3d9c-9767-401d-b2c4-1687c021e7cc",
+      "id": "a9ad7e3a-6115-4024-ad13-0fffd6ff0c87",
       "instrumentId": "268ebaa3-4ee1-49f8-9d8d-be00b7ed5716",
       "instrumentName": "高金利先進国債券オープン（毎月分配型）",
       "accountId": "monex:一般:普通預り",
@@ -840,12 +887,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "developed_bond",
-          "valueName": "先進国債券"
+          "valueName": "先進国債券",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "51da86d6-9d04-4d22-ae46-fcff98ba68bb",
+      "id": "e95c01c2-67a0-4dda-8c6e-903e1b2cd840",
       "instrumentId": "2ecc4086-70de-4a2a-b21d-4c925de4e36d",
       "instrumentName": "ＳＢＩネクスト・フロンティア高配当株式ファンド（年４回決算型）",
       "accountId": "monex:特定:普通預り",
@@ -904,12 +952,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "emerging_equity",
-          "valueName": "新興国株式"
+          "valueName": "新興国株式",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "4bdc1aad-5b69-4df1-8767-766c00c9188e",
+      "id": "ce520483-f8d7-4d42-8f56-0aaec07018fb",
       "instrumentId": "1a6c3a57-7971-4505-9f42-5ff8b5db2727",
       "instrumentName": "ＳＭＴ　日本株式モメンタムファンド",
       "accountId": "monex:特定:普通預り",
@@ -968,12 +1017,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "domestic_equity",
-          "valueName": "国内株式"
+          "valueName": "国内株式",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "d9827267-01bb-4f50-9063-9436c32f2d8e",
+      "id": "cc682b3a-bcf7-4b08-a71e-c51ccc272c86",
       "instrumentId": "6609c441-1812-45f1-873c-1518d61cb999",
       "instrumentName": "Ｔｒａｃｅｒｓ　日経平均高配当株５０インデックス（奇数月分配型）",
       "accountId": "monex:特定:普通預り",
@@ -1032,12 +1082,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "domestic_equity",
-          "valueName": "国内株式"
+          "valueName": "国内株式",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "20813e1f-d9b9-4b59-ac48-7247030505d0",
+      "id": "c6652ad8-3f62-403d-b2e3-b508e5374479",
       "instrumentId": "8f9d63cb-de00-494e-ac7c-056b98c44743",
       "instrumentName": "ｅＭＡＸＩＳ　日経半導体株インデックス",
       "accountId": "monex:特定:普通預り",
@@ -1096,12 +1147,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "domestic_equity",
-          "valueName": "国内株式"
+          "valueName": "国内株式",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "add95130-2eae-42c3-9d6d-1989d78ed021",
+      "id": "de7eda08-2daa-4a1d-8de7-7b86497b29e9",
       "instrumentId": "8f9d63cb-de00-494e-ac7c-056b98c44743",
       "instrumentName": "ｅＭＡＸＩＳ　日経半導体株インデックス",
       "accountId": "monex:一般:普通預り",
@@ -1160,12 +1212,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "domestic_equity",
-          "valueName": "国内株式"
+          "valueName": "国内株式",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "b34cb479-f9d3-46f1-a994-f3c920da9289",
+      "id": "918485d5-0f8c-4a0e-ab06-f6ec608d8dc0",
       "instrumentId": "de131865-8742-4ca1-88de-229cdf5c11ac",
       "instrumentName": "ｅＭＡＸＩＳ　Ｎｅｏ　ドローン",
       "accountId": "monex:一般:普通預り",
@@ -1224,12 +1277,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "developed_equity",
-          "valueName": "先進国株式"
+          "valueName": "先進国株式",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "3480d727-59fe-45de-9af2-d25ab0304304",
+      "id": "5498d3a6-d662-4015-a03c-df842fe00be1",
       "instrumentId": "a6168c9b-f82b-435a-9a70-29c991d0ea5c",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ バランス（８資産均等型）",
       "accountId": "monex:一般:普通預り",
@@ -1312,13 +1366,63 @@
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式",
+          "allocationWeight": 0.1282051282051282
+        },
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "developed_equity",
+          "valueName": "先進国株式",
+          "allocationWeight": 0.125
+        },
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "emerging_equity",
+          "valueName": "新興国株式",
+          "allocationWeight": 0.13141025641025642
+        },
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "foreign_reit",
+          "valueName": "海外REIT",
+          "allocationWeight": 0.1282051282051282
+        },
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "domestic_reit",
+          "valueName": "国内REIT",
+          "allocationWeight": 0.125
+        },
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "developed_bond",
+          "valueName": "先進国債券",
+          "allocationWeight": 0.10576923076923077
+        },
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "domestic_bond",
+          "valueName": "国内債券",
+          "allocationWeight": 0.11217948717948718
+        },
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
           "valueCode": "emerging_bond",
-          "valueName": "新興国債券"
+          "valueName": "新興国債券",
+          "allocationWeight": 0.14423076923076922
         }
       ]
     },
     {
-      "id": "b9472e72-35f7-4b59-aefb-754031d392a1",
+      "id": "cd5140af-6cfa-4f45-84f0-f0f9f1cadd20",
       "instrumentId": "5a3d64af-6d3b-4936-90f4-bd6589b669eb",
       "instrumentName": "ｅＭＡＸＩＳ　Ｓｌｉｍ　先進国リートインデックス（除く日本）",
       "accountId": "monex:特定:普通預り",
@@ -1377,12 +1481,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "foreign_reit",
-          "valueName": "海外REIT"
+          "valueName": "海外REIT",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "3fae256b-1ae3-44d3-9f16-7f44b2149f0f",
+      "id": "ad6b1564-c2a8-4b67-9a8a-9f27874ad901",
       "instrumentId": "29ad4f4e-3a4c-45e7-b81e-c3f696c320d2",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 先進国債券インデックス",
       "accountId": "monex:一般:普通預り",
@@ -1466,12 +1571,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "developed_bond",
-          "valueName": "先進国債券"
+          "valueName": "先進国債券",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "da31c0ab-a4bd-4b9c-90f5-6fe6b5ebae1f",
+      "id": "ba38177f-5b43-40fa-b2d5-9928266ed13f",
       "instrumentId": "9f64177a-d0ce-4087-a5bb-1f5ebe1db53f",
       "instrumentName": "ｅＭＡＸＩＳ　Ｓｌｉｍ　国内リートインデックス",
       "accountId": "monex:特定:普通預り",
@@ -1530,12 +1636,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "domestic_reit",
-          "valueName": "国内REIT"
+          "valueName": "国内REIT",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "05dea807-a837-4973-8c95-25c7d989f4ac",
+      "id": "e1d8261d-f2cd-486d-9d2b-3029fc51647d",
       "instrumentId": "4df2214c-2e30-4459-b220-7fb34043de3c",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 国内株式（ＴＯＰＩＸ）",
       "accountId": "monex:特定:普通預り",
@@ -1619,12 +1726,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "domestic_equity",
-          "valueName": "国内株式"
+          "valueName": "国内株式",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "718b90fa-8520-402f-93d7-6f29fc871ada",
+      "id": "cc528989-83cc-46bf-8d4c-ab7b76e1ea03",
       "instrumentId": "a39a69e9-48e3-473f-9716-6f4ce59b2dea",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 新興国株式インデックス",
       "accountId": "monex:特定:普通預り",
@@ -1708,12 +1816,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "emerging_equity",
-          "valueName": "新興国株式"
+          "valueName": "新興国株式",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "ce3d92db-ea45-4b27-81bc-fc342e4135b9",
+      "id": "ee53adc4-96dd-4225-93a9-1bac5070a28a",
       "instrumentId": "a39a69e9-48e3-473f-9716-6f4ce59b2dea",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 新興国株式インデックス",
       "accountId": "monex:一般:普通預り",
@@ -1797,12 +1906,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "emerging_equity",
-          "valueName": "新興国株式"
+          "valueName": "新興国株式",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "7aa53328-e9cd-4e83-97ca-7b5b2e5910d4",
+      "id": "53e7a121-7de3-4fad-970b-28be245bb9ce",
       "instrumentId": "7c8aad06-ed36-4cd7-abe2-66085e44af87",
       "instrumentName": "ｅＭＡＸＩＳ Ｓｌｉｍ 米国株式（Ｓ＆Ｐ５００）",
       "accountId": "monex:一般:普通預り",
@@ -1886,12 +1996,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "developed_equity",
-          "valueName": "先進国株式"
+          "valueName": "先進国株式",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "7ea66062-ec53-4d0a-a7bd-496bea36b060",
+      "id": "9192b9b2-067a-4b3c-b276-ea77c8b2ae54",
       "instrumentId": "e186e256-a732-4d13-a203-67c525b96a73",
       "instrumentName": "ｅＭＡＸＩＳプラス　コモディティインデックス",
       "accountId": "monex:特定:普通預り",
@@ -1950,12 +2061,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "commodity",
-          "valueName": "コモディティ"
+          "valueName": "コモディティ",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "46863470-f9b3-401d-8de7-cedb4b75124c",
+      "id": "aca9b779-0e9d-4982-a309-7c9d3d8ada37",
       "instrumentId": "e186e256-a732-4d13-a203-67c525b96a73",
       "instrumentName": "ｅＭＡＸＩＳプラス　コモディティインデックス",
       "accountId": "monex:一般:普通預り",
@@ -2014,12 +2126,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "commodity",
-          "valueName": "コモディティ"
+          "valueName": "コモディティ",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "010a9c6c-b384-4549-b68c-afb6a1c8c127",
+      "id": "60e7f3f4-d972-4b19-a404-5651c49d2590",
       "instrumentId": "5c7b28cf-eb4f-48e8-ba55-9fd12dc08439",
       "instrumentName": "ｉシェアーズ　ハイイールド債券インデックス・ファンド",
       "accountId": "monex:特定:普通預り",
@@ -2078,12 +2191,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "high_yield_bond",
-          "valueName": "ハイ・イールド債券"
+          "valueName": "ハイ・イールド債券",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "f31384d7-13b8-42d9-8c19-a4ff03b3383c",
+      "id": "ffba8af6-2419-4c1d-94e2-2107ab1b682d",
       "instrumentId": "0485871c-aad3-4ea1-8a9b-a5d6d709813b",
       "instrumentName": "ｉＦｒｅｅ 新興国債券インデックス",
       "accountId": "monex:特定:普通預り",
@@ -2167,12 +2281,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "emerging_bond",
-          "valueName": "新興国債券"
+          "valueName": "新興国債券",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "8a360586-2e14-43e7-9e8e-fcd187b6e9d6",
+      "id": "a5fd6e94-31ef-4208-8005-dfa9bda091e4",
       "instrumentId": "f33ec918-fd60-4e35-8d54-d321cdace033",
       "instrumentName": "ｉＦｒｅｅＨＯＬＤ　日本国債（ＪＧＢ２０５６）",
       "accountId": "monex:一般:普通預り",
@@ -2231,12 +2346,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "domestic_bond",
-          "valueName": "国内債券"
+          "valueName": "国内債券",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "ef12b843-3855-4313-bfa3-37e935024820",
+      "id": "b056a54f-987e-44cc-9f25-494d99b2ac61",
       "instrumentId": "e559e5ab-df75-49bc-8016-b6ef690d7cfb",
       "instrumentName": "ＪＰモルガン・ナスダック米国株式・プレミアム・インカムＥＴＦ",
       "accountId": "monex:特定:保護",
@@ -2308,12 +2424,13 @@
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "developed_equity",
-          "valueName": "先進国株式"
+          "valueName": "先進国株式",
+          "allocationWeight": 1
         }
       ]
     },
     {
-      "id": "9e10857f-4ba4-4494-a53a-75b01eb26694",
+      "id": "0ca1bf35-f3cd-4bc1-9543-886956520a10",
       "instrumentId": "b0f92ebc-865e-4639-bd16-6106a240f82d",
       "instrumentName": "ＭＳＶ内外ＥＴＦ資産配分Ｆ・Ｇ",
       "accountId": "monex:特定:普通預り",
@@ -2371,8 +2488,51 @@
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式",
+          "allocationWeight": 0.06996417197452229
+        },
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "developed_equity",
+          "valueName": "先進国株式",
+          "allocationWeight": 0.5861863057324841
+        },
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "emerging_equity",
+          "valueName": "新興国株式",
+          "allocationWeight": 0.03095143312101911
+        },
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "foreign_reit",
+          "valueName": "海外REIT",
+          "allocationWeight": 0.028960987261146497
+        },
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "developed_bond",
+          "valueName": "先進国債券",
+          "allocationWeight": 0.22800557324840764
+        },
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "domestic_bond",
+          "valueName": "国内債券",
+          "allocationWeight": 0.0419984076433121
+        },
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
           "valueCode": "emerging_bond",
-          "valueName": "新興国債券"
+          "valueName": "新興国債券",
+          "allocationWeight": 0.01393312101910828
         }
       ]
     }

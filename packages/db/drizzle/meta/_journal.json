@@ -71,6 +71,13 @@
       "when": 1783694400000,
       "tag": "0009_merge_duplicate_instruments",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1783780800000,
+      "tag": "0010_instrument_classification_allocation_weight",
+      "breakpoints": true
     }
   ]
 }

@@ -1,5 +1,6 @@
 import type { TargetPortfolioWeight } from "./portfolio-allocation";
 import type { AllocationSlice } from "./snapshot-allocation";
+import { listSchemeTagAllocations } from "./snapshot-allocation";
 import type { HoldingLineDto } from "./types";
 
 export const UNTAGGED_ALLOCATION_VALUE_CODE = "__untagged__";
@@ -31,21 +32,24 @@ export function aggregatePortfolioTargetsByScheme(
       continue;
     }
 
-    const tag = line.tags.find((item) => item.schemeCode === schemeCode);
-    if (!tag) {
+    const tagAllocations = listSchemeTagAllocations(line.tags, schemeCode);
+    if (tagAllocations.length === 0) {
       continue;
     }
 
-    const existing = totals.get(tag.valueCode);
-    if (existing) {
-      existing.impliedTargetRatio += targetRatio;
-      continue;
-    }
+    for (const allocation of tagAllocations) {
+      const impliedTargetRatio = targetRatio * allocation.weight;
+      const existing = totals.get(allocation.tag.valueCode);
+      if (existing) {
+        existing.impliedTargetRatio += impliedTargetRatio;
+        continue;
+      }
 
-    totals.set(tag.valueCode, {
-      valueName: tag.valueName,
-      impliedTargetRatio: targetRatio,
-    });
+      totals.set(allocation.tag.valueCode, {
+        valueName: allocation.tag.valueName,
+        impliedTargetRatio,
+      });
+    }
   }
 
   for (const [valueCode, item] of totals) {

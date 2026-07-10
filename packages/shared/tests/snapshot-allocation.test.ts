@@ -268,6 +268,45 @@ describe("snapshot-allocation", () => {
     expect(zeroTaggedTotal[0]?.weight).toBe(0);
   });
 
+  it("splits a holding across weighted tags for the same scheme", () => {
+    const lines = [
+      makeLine(
+        1_000_000,
+        [
+          {
+            schemeCode: "monex_asset_class",
+            schemeName: "資産クラス",
+            valueCode: "developed_equity",
+            valueName: "先進国株式",
+            allocationWeight: 0.6,
+          },
+          {
+            schemeCode: "monex_asset_class",
+            schemeName: "資産クラス",
+            valueCode: "domestic_bond",
+            valueName: "国内債券",
+            allocationWeight: 0.4,
+          },
+        ],
+        { instrumentName: "テスト複合ファンド" },
+      ),
+    ];
+
+    const slices = groupSnapshotLinesByTag(lines, "monex_asset_class");
+    expect(slices).toHaveLength(2);
+    expect(slices[0]?.valueCode).toBe("developed_equity");
+    expect(slices[0]?.marketValueMinor).toBe(600_000);
+    expect(slices[0]?.weight).toBeCloseTo(0.6);
+    expect(slices[1]?.valueCode).toBe("domestic_bond");
+    expect(slices[1]?.marketValueMinor).toBe(400_000);
+    expect(slices[1]?.weight).toBeCloseTo(0.4);
+
+    const withLines = groupSnapshotLinesByTagWithLines(lines, "monex_asset_class");
+    expect(withLines[0]?.lines).toHaveLength(1);
+    expect(withLines[0]?.lines[0]?.weightInSlice).toBeCloseTo(1);
+    expect(withLines[1]?.lines[0]?.weightInSlice).toBeCloseTo(1);
+  });
+
   it("builds allocation by scheme", () => {
     const lines = [
       makeLine(50_000, [

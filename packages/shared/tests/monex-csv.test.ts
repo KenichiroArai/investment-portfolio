@@ -6,6 +6,8 @@ import { describe, expect, it } from "vitest";
 import { computeMonexMutualFundBookValueMinor } from "../src/monex-holding-metrics";
 import {
   buildMonexAssetClassNameMap,
+  buildMonexInstrumentAssetClassBreakdown,
+  parseMonexAssetClassCsv,
   parseMonexDomesticHoldingsCsv,
   parseMonexUsStocksCsv,
 } from "../src/index";
@@ -58,5 +60,50 @@ describe("monex csv parsers", () => {
     );
 
     expect(map.get("テストファンドＡ")).toBe("domestic_equity");
+  });
+
+  it("parses asset class csv with holding ratio and market value", () => {
+    const content = readFileSync(join(fixtureDir, "国内株式.csv"), "utf8");
+    const parsed = parseMonexAssetClassCsv(content);
+
+    expect(parsed.rows).toHaveLength(1);
+    expect(parsed.rows[0]).toMatchObject({
+      instrumentName: "テストファンドＡ",
+      holdingRatio: 0.5,
+      marketValueMinor: 1000,
+    });
+  });
+
+  it("builds instrument asset class breakdown across files", () => {
+    const compositeContent = `"番号","日付","銘柄","保有比率","評価額(円)","評価額前日比(円)","評価額前日比率"
+"1","2026/07/05","テスト複合ファンド","0.6","600","0","0"
+"2","2026/07/05","テスト単独ファンド","0.4","400","0","0"`;
+    const bondContent = `"番号","日付","銘柄","保有比率","評価額(円)","評価額前日比(円)","評価額前日比率"
+"1","2026/07/05","テスト複合ファンド","1.0","400","0","0"`;
+
+    const breakdown = buildMonexInstrumentAssetClassBreakdown(
+      [
+        { fileName: "国内株式.csv", content: compositeContent },
+        { fileName: "国内債券.csv", content: bondContent },
+      ],
+      {
+        "国内株式.csv": { code: "domestic_equity", name: "国内株式" },
+        "国内債券.csv": { code: "domestic_bond", name: "国内債券" },
+      },
+    );
+
+    const composite = breakdown.get("テスト複合ファンド");
+    expect(composite).toHaveLength(2);
+    expect(composite?.find((item) => item.valueCode === "domestic_equity")?.allocationWeight).toBeCloseTo(
+      0.6,
+    );
+    expect(composite?.find((item) => item.valueCode === "domestic_bond")?.allocationWeight).toBeCloseTo(
+      0.4,
+    );
+
+    const single = breakdown.get("テスト単独ファンド");
+    expect(single).toEqual([
+      { valueCode: "domestic_equity", allocationWeight: 1 },
+    ]);
   });
 });

@@ -8,6 +8,7 @@ import {
   MONEX_SCHEME_CODES,
   buildMonexAssetClassNameMap,
   buildMonexHoldingMetrics,
+  buildMonexInstrumentAssetClassBreakdown,
   computeMonexMutualFundBookValueMinor,
   indexMonexHeaders,
   matchMonexInstrumentId,
@@ -16,6 +17,8 @@ import {
   parseMonexDomesticHoldingsCsv,
   parseMonexUsStocksCsv,
   requireMonexHeader,
+  resolveMonexInstrumentAssetClassBreakdown,
+  type MonexInstrumentAssetClassBreakdownEntry,
   type MonexInstrumentMatchCandidate,
 } from "@repo/shared";
 
@@ -25,7 +28,7 @@ import {
   createClassificationValue,
   findClassificationValueBySchemeAndCode,
   findSchemeByPortfolioCodeAndSchemeCode,
-  setInstrumentClassifications,
+  setInstrumentClassificationsWithWeights,
 } from "./repositories/classifications";
 import {
   listInstruments,
@@ -131,7 +134,6 @@ async function resolveInstrumentId(
     currency: string;
     externalId?: string | null;
     attributes?: InstrumentAttributeInput[];
-    classificationValueId?: string | null;
     additionalMatchNames?: string[];
   },
 ): Promise<{ instrumentId: string; created: boolean }> {
@@ -144,9 +146,6 @@ async function resolveInstrumentId(
   );
   if (matchedId) {
     result.instrumentId = matchedId;
-    if (params.classificationValueId) {
-      await setInstrumentClassifications(db, matchedId, [params.classificationValueId]);
-    }
     return result;
   }
 
@@ -169,12 +168,6 @@ async function resolveInstrumentId(
     await setInstrumentAttributes(db, instrument.id, params.attributes);
   }
 
-  if (params.classificationValueId) {
-    await setInstrumentClassifications(db, instrument.id, [
-      params.classificationValueId,
-    ]);
-  }
-
   if (!alreadyListed) {
     candidates.push({ id: instrument.id, name: instrument.name });
     result = { instrumentId: instrument.id, created: true };
@@ -182,6 +175,73 @@ async function resolveInstrumentId(
   }
 
   result = { instrumentId: instrument.id, created: false };
+  return result;
+}
+
+async function applyInstrumentAssetClassTags(
+  db: AppDatabase,
+  schemeId: string,
+  instrumentId: string,
+  instrumentName: string,
+  additionalMatchNames: string[],
+  breakdownMap: Map<string, MonexInstrumentAssetClassBreakdownEntry[]>,
+  fallbackNameMap: Map<string, string>,
+): Promise<void> {
+  let result: void = undefined;
+
+  const breakdown = resolveMonexInstrumentAssetClassBreakdown(
+    breakdownMap,
+    instrumentName,
+    additionalMatchNames,
+  );
+
+  if (breakdown.length > 0) {
+    const weights: Array<{
+      classificationValueId: string;
+      allocationWeight: number;
+    }> = [];
+
+    for (const entry of breakdown) {
+      const classificationValueId = await resolveClassificationValueId(
+        db,
+        schemeId,
+        entry.valueCode,
+      );
+      if (!classificationValueId) {
+        continue;
+      }
+      weights.push({
+        classificationValueId,
+        allocationWeight: entry.allocationWeight,
+      });
+    }
+
+    if (weights.length > 0) {
+      await setInstrumentClassificationsWithWeights(db, instrumentId, weights);
+      return result;
+    }
+  }
+
+  const fallbackCode = resolveAssetClassCode(
+    fallbackNameMap,
+    instrumentName,
+    additionalMatchNames,
+  );
+  const fallbackValueId = await resolveClassificationValueId(
+    db,
+    schemeId,
+    fallbackCode,
+  );
+  if (!fallbackValueId) {
+    return result;
+  }
+
+  await setInstrumentClassificationsWithWeights(db, instrumentId, [
+    {
+      classificationValueId: fallbackValueId,
+      allocationWeight: 1,
+    },
+  ]);
   return result;
 }
 
@@ -323,11 +383,17 @@ export async function importMonexData(
   }
   await syncMonexAssetClassValues(db, scheme.id);
 
+  const instrumentAliasMap = loadInstrumentAliasMap(directory);
+  const assetClassEntries = loadAssetClassEntries(directory);
+  const assetClassBreakdownMap = buildMonexInstrumentAssetClassBreakdown(
+    assetClassEntries,
+    MONEX_ASSET_CLASS_FILE_MAP,
+    instrumentAliasMap,
+  );
   const assetClassNameMap = buildMonexAssetClassNameMap(
-    loadAssetClassEntries(directory),
+    assetClassEntries,
     MONEX_ASSET_CLASS_FILE_MAP,
   );
-  const instrumentAliasMap = loadInstrumentAliasMap(directory);
 
   const domesticContent = readMonexCsvFile(directory, DOMESTIC_HOLDINGS_FILE);
   const usStocksContent = readMonexCsvFile(directory, US_STOCKS_FILE);
@@ -370,16 +436,6 @@ export async function importMonexData(
 
   for (const row of domesticRows) {
     const additionalMatchNames = instrumentAliasMap.get(row.instrumentName) ?? [];
-    const assetClassCode = resolveAssetClassCode(
-      assetClassNameMap,
-      row.instrumentName,
-      additionalMatchNames,
-    );
-    const classificationValueId = await resolveClassificationValueId(
-      db,
-      scheme.id,
-      assetClassCode,
-    );
     const resolved = await resolveInstrumentId(
       db,
       candidates,
@@ -387,13 +443,21 @@ export async function importMonexData(
       {
       instrumentType: "mutual_fund",
       currency: "JPY",
-      classificationValueId,
       additionalMatchNames,
       },
     );
     if (resolved.created) {
       result.createdInstruments += 1;
     }
+    await applyInstrumentAssetClassTags(
+      db,
+      scheme.id,
+      resolved.instrumentId,
+      row.instrumentName,
+      additionalMatchNames,
+      assetClassBreakdownMap,
+      assetClassNameMap,
+    );
 
     const bookValueMinor = computeMonexMutualFundBookValueMinor(
       row.avgCostMinor,
@@ -423,16 +487,6 @@ export async function importMonexData(
 
   for (const row of usStockRows) {
     const additionalMatchNames = instrumentAliasMap.get(row.instrumentName) ?? [];
-    const assetClassCode = resolveAssetClassCode(
-      assetClassNameMap,
-      row.instrumentName,
-      additionalMatchNames,
-    );
-    const classificationValueId = await resolveClassificationValueId(
-      db,
-      scheme.id,
-      assetClassCode,
-    );
     const attributes: InstrumentAttributeInput[] = [
       {
         code: MONEX_INSTRUMENT_ATTRIBUTE_CODES.market,
@@ -452,13 +506,21 @@ export async function importMonexData(
         currency: "USD",
         externalId: row.ticker,
         attributes,
-        classificationValueId,
         additionalMatchNames,
       },
     );
     if (resolved.created) {
       result.createdInstruments += 1;
     }
+    await applyInstrumentAssetClassTags(
+      db,
+      scheme.id,
+      resolved.instrumentId,
+      row.instrumentName,
+      additionalMatchNames,
+      assetClassBreakdownMap,
+      assetClassNameMap,
+    );
 
     const bookValueMinor = row.avgCostMinor * row.quantity;
     let line: HoldingLineInput = {
@@ -485,16 +547,6 @@ export async function importMonexData(
 
   for (const row of compassRows) {
     const additionalMatchNames = instrumentAliasMap.get(row.instrumentName) ?? [];
-    const assetClassCode = resolveAssetClassCode(
-      assetClassNameMap,
-      row.instrumentName,
-      additionalMatchNames,
-    );
-    const classificationValueId = await resolveClassificationValueId(
-      db,
-      scheme.id,
-      assetClassCode,
-    );
     const resolved = await resolveInstrumentId(
       db,
       candidates,
@@ -502,13 +554,21 @@ export async function importMonexData(
       {
       instrumentType: "mutual_fund",
       currency: "JPY",
-      classificationValueId,
       additionalMatchNames,
       },
     );
     if (resolved.created) {
       result.createdInstruments += 1;
     }
+    await applyInstrumentAssetClassTags(
+      db,
+      scheme.id,
+      resolved.instrumentId,
+      row.instrumentName,
+      additionalMatchNames,
+      assetClassBreakdownMap,
+      assetClassNameMap,
+    );
 
     const bookValueMinor = computeMonexMutualFundBookValueMinor(
       row.avgCostMinor,

@@ -313,6 +313,11 @@ export async function listInstrumentClassificationValueIds(
   return result;
 }
 
+export type InstrumentClassificationWeightInput = {
+  classificationValueId: string;
+  allocationWeight: number;
+};
+
 export async function setInstrumentClassifications(
   db: AppDatabase,
   instrumentId: string,
@@ -320,21 +325,62 @@ export async function setInstrumentClassifications(
 ) {
   let result: void = undefined;
 
+  const weights = classificationValueIds.map((classificationValueId) => {
+    let weightInput: InstrumentClassificationWeightInput = {
+      classificationValueId,
+      allocationWeight: 1,
+    };
+    return weightInput;
+  });
+  await setInstrumentClassificationsWithWeights(db, instrumentId, weights);
+  return result;
+}
+
+export async function setInstrumentClassificationsWithWeights(
+  db: AppDatabase,
+  instrumentId: string,
+  weights: InstrumentClassificationWeightInput[],
+) {
+  let result: void = undefined;
+
   await db
     .delete(instrumentClassifications)
     .where(eq(instrumentClassifications.instrumentId, instrumentId));
 
-  if (classificationValueIds.length === 0) {
+  if (weights.length === 0) {
     return result;
   }
 
-  const rows = classificationValueIds.map((classificationValueId) => {
-    let result = {
-      instrumentId,
-      classificationValueId,
-    };
+  let total = 0;
+  for (const weight of weights) {
+    if (!Number.isFinite(weight.allocationWeight) || weight.allocationWeight < 0) {
+      continue;
+    }
+    total += weight.allocationWeight;
+  }
+
+  if (total <= 0 || !Number.isFinite(total)) {
     return result;
-  });
+  }
+
+  const rows = weights
+    .filter(
+      (weight) =>
+        Number.isFinite(weight.allocationWeight) && weight.allocationWeight > 0,
+    )
+    .map((weight) => {
+      let row = {
+        instrumentId,
+        classificationValueId: weight.classificationValueId,
+        allocationWeight: weight.allocationWeight / total,
+      };
+      return row;
+    });
+
+  if (rows.length === 0) {
+    return result;
+  }
+
   await db.insert(instrumentClassifications).values(rows);
 
   return result;
@@ -390,6 +436,7 @@ export async function getTagsForInstruments(
     valueCode: string;
     valueName: string;
     sortOrder: number;
+    allocationWeight: number | null;
   };
 
   let result = new Map<string, InstrumentTag[]>();
@@ -406,6 +453,7 @@ export async function getTagsForInstruments(
       valueCode: classificationValues.code,
       valueName: classificationValues.name,
       sortOrder: classificationValues.sortOrder,
+      allocationWeight: instrumentClassifications.allocationWeight,
     })
     .from(instrumentClassifications)
     .innerJoin(
@@ -429,6 +477,7 @@ export async function getTagsForInstruments(
       valueCode: row.valueCode,
       valueName: row.valueName,
       sortOrder: row.sortOrder,
+      allocationWeight: row.allocationWeight,
     });
     result.set(row.instrumentId, existing);
   }

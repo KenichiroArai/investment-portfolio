@@ -119,6 +119,7 @@ export const instrumentClassifications = sqliteTable(
         let result = classificationValues.id;
         return result;
       }, { onDelete: "cascade" }), // 分類値ID
+    allocationWeight: real("allocation_weight"), // 構成比按分ウェイト（0–1、null は 1.0 扱い）
   },
   (table) => {
     let result = [

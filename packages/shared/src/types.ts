@@ -13,6 +13,7 @@ export type ClassificationTagDto = {
   schemeName: string;
   valueCode: string;
   valueName: string;
+  allocationWeight?: number | null;
 };
 
 export type { HoldingLineMetricDto, PortfolioSnapshotMetricDto };

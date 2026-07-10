@@ -8,9 +8,12 @@ import { computeMonexMutualFundBookValueMinor } from "@repo/shared";
 
 import { createTestDb } from "../src/test-utils";
 import { importMonexData } from "../src/import-monex-data";
+import { listInstrumentClassificationValueIds } from "../src/repositories/classifications";
 import { createInstrument, listInstruments } from "../src/repositories/instruments";
 import { getCurrentSnapshot } from "../src/repositories/snapshots";
 import { readCsvText } from "../src/read-csv-text";
+import { instrumentClassifications } from "../src/schema/index";
+import { eq } from "drizzle-orm";
 
 const packageDir = dirname(fileURLToPath(import.meta.url));
 const utf8FixtureDir = join(packageDir, "../../shared/tests/fixtures/monex");
@@ -147,6 +150,56 @@ describe("importMonexData", () => {
 
     const instruments = await listInstruments(db, { portfolioCode: "monex" });
     expect(instruments).toHaveLength(2);
+  });
+
+  it("stores weighted asset class breakdown from asset class csv files", async () => {
+    const { db, sqlite, path } = createTestDb();
+    sqliteToClose = sqlite;
+    dbPath = path;
+    const importDir = join(dirname(path), "monex-import-breakdown");
+    mkdirSync(importDir, { recursive: true });
+
+    writeShiftJisTextFile(
+      importDir,
+      "国内株等.csv",
+      `"日付","銘柄","口座区分","預り区分","基準価額(円)","分配金の取扱い","保有数(口)","平均取得単価(円)","概算評価額(円)","評価損益(円)","評価損益率"\n"2026/07/09","テスト複合ファンド","一般","特定","10,000","再投資","100","9,500","1,000","50","5.26"\n`,
+    );
+    writeShiftJisTextFile(
+      importDir,
+      "国内株式.csv",
+      `"番号","日付","銘柄","保有比率","評価額(円)","評価額前日比(円)","評価額前日比率"\n"1","2026/07/09","テスト複合ファンド","0.6","600","0","0"\n`,
+    );
+    writeShiftJisTextFile(
+      importDir,
+      "国内債券.csv",
+      `"番号","日付","銘柄","保有比率","評価額(円)","評価額前日比(円)","評価額前日比率"\n"1","2026/07/09","テスト複合ファンド","1.0","400","0","0"\n`,
+    );
+
+    await importMonexData(db, { directory: importDir });
+
+    const instruments = await listInstruments(db, { portfolioCode: "monex" });
+    expect(instruments).toHaveLength(1);
+
+    const instrumentId = instruments[0]!.id;
+    const classificationValueIds = await listInstrumentClassificationValueIds(
+      db,
+      instrumentId,
+    );
+    expect(classificationValueIds).toHaveLength(2);
+
+    const rows = await db
+      .select()
+      .from(instrumentClassifications)
+      .where(eq(instrumentClassifications.instrumentId, instrumentId));
+    const weights = rows
+      .map((row) => row.allocationWeight)
+      .sort((left, right) => (right ?? 0) - (left ?? 0));
+    expect(weights[0]).toBeCloseTo(0.6);
+    expect(weights[1]).toBeCloseTo(0.4);
+
+    const snapshot = await getCurrentSnapshot(db, "monex");
+    const line = snapshot?.lines[0];
+    expect(line?.tags.filter((tag) => tag.schemeCode === "monex_asset_class")).toHaveLength(2);
   });
 });
 
