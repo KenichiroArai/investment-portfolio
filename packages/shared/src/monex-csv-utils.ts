@@ -5,6 +5,12 @@ export class MonexCsvError extends Error {
   }
 }
 
+export function getMonexCsvCell(cells: string[], index: number): string {
+  let result = "";
+  result = cells[index]?.trim() ?? "";
+  return result;
+}
+
 export function parseMonexQuotedCsvLine(line: string): string[] {
   let result: string[] = [];
   let current = "";

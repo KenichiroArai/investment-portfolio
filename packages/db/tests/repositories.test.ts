@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 
-import { IDECO_SCHEME_CODES, SnapshotValidationError } from "@repo/shared";
+import { IDECO_SCHEME_CODES, MONEX_SCHEME_CODES, SnapshotValidationError } from "@repo/shared";
 
 import {
   createClassificationScheme,
@@ -18,6 +18,7 @@ import {
   listInstrumentClassificationValueIds,
   listSchemesWithValuesForPortfolio,
   setInstrumentClassifications,
+  setInstrumentClassificationsWithWeights,
   updateClassificationSchemeName,
   updateClassificationValue,
 } from "../src/repositories/classifications";
@@ -372,6 +373,113 @@ describe("portfolio repositories", () => {
     expect(merged).toEqual({ canonicalId: instrument.id, mergedCount: 0 });
   });
 
+  it("merges loser instruments into canonical and consolidates related data", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+
+    const scheme = await createClassificationScheme(db, {
+      portfolioCode: "ideco",
+      code: "region",
+      name: "地域",
+    });
+    const valueJapan = await createClassificationValue(db, {
+      schemeId: scheme!.id,
+      code: "japan",
+      name: "日本",
+      sortOrder: 0,
+    });
+
+    const canonical = await createInstrument(db, { name: "Canonical Fund" });
+    const loserOne = await createInstrument(db, { name: "Loser One" });
+    const loserTwo = await createInstrument(db, { name: "Loser Two" });
+
+    await replaceTargetPortfolioWeights(db, "ideco", [
+      { instrumentId: canonical.id, targetRatio: 0.3 },
+      { instrumentId: loserOne.id, targetRatio: 0.2 },
+      { instrumentId: loserTwo.id, targetRatio: 0.1 },
+    ]);
+    await setInstrumentClassifications(db, canonical.id, [valueJapan.id]);
+    await setInstrumentClassifications(db, loserOne.id, [valueJapan.id]);
+    await setInstrumentAttributes(db, canonical.id, [
+      { code: "market", textValue: "JP" },
+    ]);
+    await setInstrumentAttributes(db, loserOne.id, [
+      { code: "market", textValue: "US" },
+    ]);
+    await setInstrumentAttributes(db, loserTwo.id, [
+      { code: "ticker", textValue: "TEST" },
+    ]);
+
+    await replaceCurrentSnapshot(db, {
+      portfolioCode: "ideco",
+      asOfDate: "2026-06-01",
+      lines: [
+        {
+          instrumentId: canonical.id,
+          quantity: 1,
+          marketValueMinor: 1000,
+        },
+        {
+          instrumentId: loserOne.id,
+          quantity: 2,
+          marketValueMinor: 2000,
+        },
+        {
+          instrumentId: loserTwo.id,
+          quantity: 3,
+          marketValueMinor: 3000,
+        },
+      ],
+    });
+
+    const merged = await mergeInstruments(db, canonical.id, [loserOne.id, loserTwo.id]);
+    expect(merged).toEqual({ canonicalId: canonical.id, mergedCount: 2 });
+    expect(await mergeInstruments(db, "missing", [loserOne.id])).toBeNull();
+
+    const snapshot = await getCurrentSnapshot(db, "ideco");
+    expect(snapshot?.lines).toHaveLength(3);
+    expect(snapshot?.lines.every((line) => line.instrumentId === canonical.id)).toBe(true);
+
+    const weights = await listTargetPortfolioWeights(db, "ideco");
+    const canonicalWeight = weights.find((weight) => weight.instrumentId === canonical.id);
+    expect(canonicalWeight?.targetRatio).toBeCloseTo(0.6);
+
+    expect(await findInstrumentById(db, loserOne.id)).toBeNull();
+    expect(await findInstrumentById(db, loserTwo.id)).toBeNull();
+
+    const attributes = await getAttributesForInstruments(db, [canonical.id]);
+    expect(attributes.get(canonical.id)?.map((item) => item.code).sort()).toEqual([
+      "market",
+      "ticker",
+    ]);
+  });
+
+  it("moves target portfolio weights when canonical has no existing weight", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+
+    const canonical = await createInstrument(db, { name: "Canonical Fund" });
+    const loser = await createInstrument(db, { name: "Loser Fund" });
+    await replaceTargetPortfolioWeights(db, "ideco", [
+      { instrumentId: loser.id, targetRatio: 0.15 },
+    ]);
+
+    await mergeInstruments(db, canonical.id, [loser.id]);
+
+    const weights = await listTargetPortfolioWeights(db, "ideco");
+    expect(weights).toHaveLength(1);
+    expect(weights[0]?.instrumentId).toBe(canonical.id);
+    expect(weights[0]?.targetRatio).toBeCloseTo(0.15);
+  });
+
   it("findInstrumentByIdentity matches external id null and empty equally", async () => {
     const db = setup();
     await createPortfolio(db, {
@@ -698,8 +806,179 @@ describe("portfolio repositories", () => {
     expect(schemes).toEqual([]);
   });
 
+  it("filters monex analysis schemes", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "monex",
+      name: "Monex",
+      kind: "monex",
+    });
+    await createClassificationScheme(db, {
+      portfolioCode: "monex",
+      code: MONEX_SCHEME_CODES.assetClass,
+      name: "資産クラス",
+    });
+    await createClassificationScheme(db, {
+      portfolioCode: "monex",
+      code: "custom_axis",
+      name: "カスタム",
+    });
+
+    const analysisSchemes = await listAnalysisSchemesForPortfolio(db, "monex");
+    expect(analysisSchemes.map((item) => item.schemeCode)).toEqual([
+      MONEX_SCHEME_CODES.assetClass,
+    ]);
+  });
+
+  it("ignores invalid classification weights", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+    const scheme = await createClassificationScheme(db, {
+      portfolioCode: "ideco",
+      code: "region",
+      name: "地域",
+    });
+    const valueJapan = await createClassificationValue(db, {
+      schemeId: scheme!.id,
+      code: "japan",
+      name: "日本",
+      sortOrder: 0,
+    });
+    const instrument = await createInstrument(db, { name: "Alpha Fund" });
+
+    await setInstrumentClassificationsWithWeights(db, instrument.id, [
+      { classificationValueId: valueJapan.id, allocationWeight: -1 },
+      { classificationValueId: valueJapan.id, allocationWeight: Number.NaN },
+    ]);
+    expect(await listInstrumentClassificationValueIds(db, instrument.id)).toEqual([]);
+
+    await setInstrumentClassificationsWithWeights(db, instrument.id, [
+      { classificationValueId: valueJapan.id, allocationWeight: 2 },
+      { classificationValueId: valueJapan.id, allocationWeight: 0 },
+    ]);
+    expect(await listInstrumentClassificationValueIds(db, instrument.id)).toEqual([
+      valueJapan.id,
+    ]);
+
+    await setInstrumentClassificationsWithWeights(db, instrument.id, [
+      { classificationValueId: valueJapan.id, allocationWeight: 0 },
+    ]);
+    expect(await listInstrumentClassificationValueIds(db, instrument.id)).toEqual([]);
+  });
+
+  it("lists instruments with portfolio, account, and search filters", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "monex",
+      name: "Monex",
+      kind: "monex",
+    });
+    await createInstrument(db, {
+      portfolioCode: "monex",
+      accountId: "monex:一般:普通預り",
+      name: "Alpha Fund",
+    });
+    await createInstrument(db, {
+      portfolioCode: "monex",
+      accountId: "monex:NISA:普通預り",
+      name: "Beta Fund",
+    });
+
+    expect(await listInstruments(db, { portfolioCode: "missing" })).toEqual([]);
+    expect(
+      await listInstruments(db, {
+        portfolioCode: "monex",
+        accountId: "monex:一般:普通預り",
+      }),
+    ).toHaveLength(1);
+    expect(
+      await listInstruments(db, {
+        portfolioCode: "monex",
+        searchQuery: "alpha",
+      }),
+    ).toHaveLength(1);
+    expect(
+      await findInstrumentByName(db, {
+        portfolioCode: "monex",
+        accountId: "monex:一般:普通預り",
+        name: "Alpha Fund",
+      }),
+    ).not.toBeNull();
+    expect(
+      await findInstrumentByName(db, {
+        portfolioCode: "missing",
+        accountId: "monex:一般:普通預り",
+        name: "Alpha Fund",
+      }),
+    ).toBeNull();
+    expect(
+      await findInstrumentByIdentity(db, {
+        portfolioCode: "missing",
+        name: "Alpha Fund",
+      }),
+    ).toBeNull();
+  });
+
+  it("lists paste instruments from all instruments when ideco portfolio is missing", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "sample",
+      name: "Sample",
+      kind: "taxable",
+    });
+    const instrument = await createInstrument(db, {
+      portfolioCode: "sample",
+      name: "Sample Fund",
+    });
+
+    const rows = await listIdecoInstrumentsForPaste(db);
+    expect(rows.some((row) => row.id === instrument.id)).toBe(true);
+  });
+
+  it("creates portfolio automatically for unknown portfolio code on createInstrument", async () => {
+    const db = setup();
+    const created = await createInstrument(db, {
+      portfolioCode: "newpf",
+      name: "New Portfolio Fund",
+    });
+    expect(created).not.toBeNull();
+    expect(await findPortfolioByCode(db, "newpf")).not.toBeNull();
+  });
+
+  it("uses the first portfolio when ideco is absent", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "sample",
+      name: "Sample",
+      kind: "taxable",
+    });
+    const created = await createInstrument(db, { name: "Sample Fund" });
+    expect(created?.portfolioId).toBe(
+      (await findPortfolioByCode(db, "sample"))?.id,
+    );
+
+    const upserted = await upsertInstrument(db, { name: "Upsert Sample Fund" });
+    expect(upserted?.portfolioId).toBe((await findPortfolioByCode(db, "sample"))?.id);
+  });
+
+  it("defaults portfolio code to legacy when no portfolios exist", async () => {
+    const db = setup();
+    const created = await upsertInstrument(db, { name: "Legacy Fund" });
+    expect(created?.portfolioId).toBeTruthy();
+    expect(await findPortfolioByCode(db, "legacy")).not.toBeNull();
+  });
+
   it("lists ideco paste instruments with and without short name attributes", async () => {
     const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
     const withShortName = await createInstrument(db, { name: "Alpha Fund" });
     await createInstrument(db, { name: "Beta Fund" });
     await setInstrumentAttributes(db, withShortName.id, [

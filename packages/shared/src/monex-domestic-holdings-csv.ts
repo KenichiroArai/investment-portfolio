@@ -1,6 +1,7 @@
 import {
   buildMonexAccountId,
   buildMonexAccountName,
+  getMonexCsvCell,
   indexMonexHeaders,
   MonexCsvError,
   parseMonexCsv,
@@ -55,36 +56,36 @@ export function parseMonexDomesticHoldingsCsv(
 
   for (let rowIndex = 1; rowIndex < table.length; rowIndex += 1) {
     const cells = table[rowIndex];
-    const instrumentName = cells[nameIndex]?.trim() ?? "";
+    const instrumentName = getMonexCsvCell(cells, nameIndex);
     if (instrumentName === "") {
       continue;
     }
 
-    const asOfDate = parseMonexDate(cells[dateIndex] ?? "");
+    const asOfDate = parseMonexDate(getMonexCsvCell(cells, dateIndex));
     if (asOfDate === "") {
-      throw new MonexCsvError(`日付の形式が不正です: ${cells[dateIndex] ?? ""}`);
+      throw new MonexCsvError(`日付の形式が不正です: ${getMonexCsvCell(cells, dateIndex)}`);
     }
 
     let row: MonexDomesticHoldingsCsvRow = {
       accountId: buildMonexAccountId(
-        cells[accountTypeIndex]?.trim() ?? "",
-        cells[custodyTypeIndex]?.trim() ?? "",
+        getMonexCsvCell(cells, accountTypeIndex),
+        getMonexCsvCell(cells, custodyTypeIndex),
       ),
       accountName: buildMonexAccountName(
-        cells[accountTypeIndex]?.trim() ?? "",
-        cells[custodyTypeIndex]?.trim() ?? "",
+        getMonexCsvCell(cells, accountTypeIndex),
+        getMonexCsvCell(cells, custodyTypeIndex),
       ),
       asOfDate,
       instrumentName,
-      accountType: cells[accountTypeIndex]?.trim() ?? "",
-      custodyType: cells[custodyTypeIndex]?.trim() ?? "",
-      unitPriceMinor: parseMonexInteger(cells[unitPriceIndex] ?? ""),
-      dividendOption: cells[dividendIndex]?.trim() ?? "",
-      quantity: parseMonexInteger(cells[quantityIndex] ?? ""),
-      avgCostMinor: parseMonexInteger(cells[avgCostIndex] ?? ""),
-      marketValueMinor: parseMonexInteger(cells[marketValueIndex] ?? ""),
-      unrealizedGainMinor: parseMonexInteger(cells[gainIndex] ?? ""),
-      unrealizedGainRate: parseMonexDecimalRate(cells[gainRateIndex] ?? ""),
+      accountType: getMonexCsvCell(cells, accountTypeIndex),
+      custodyType: getMonexCsvCell(cells, custodyTypeIndex),
+      unitPriceMinor: parseMonexInteger(getMonexCsvCell(cells, unitPriceIndex)),
+      dividendOption: getMonexCsvCell(cells, dividendIndex),
+      quantity: parseMonexInteger(getMonexCsvCell(cells, quantityIndex)),
+      avgCostMinor: parseMonexInteger(getMonexCsvCell(cells, avgCostIndex)),
+      marketValueMinor: parseMonexInteger(getMonexCsvCell(cells, marketValueIndex)),
+      unrealizedGainMinor: parseMonexInteger(getMonexCsvCell(cells, gainIndex)),
+      unrealizedGainRate: parseMonexDecimalRate(getMonexCsvCell(cells, gainRateIndex)),
     };
     result.rows.push(row);
   }

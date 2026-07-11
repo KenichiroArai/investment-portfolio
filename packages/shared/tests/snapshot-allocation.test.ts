@@ -19,6 +19,7 @@ import {
   computeSnapshotUnrealizedGainRate,
   groupSnapshotLinesByTag,
   groupSnapshotLinesByTagWithLines,
+  listSchemeTagAllocations,
   mergeSnapshotsForGlobalAnalysis,
   sumSnapshotBookValue,
   sumSnapshotMarketValue,
@@ -357,7 +358,79 @@ describe("snapshot-allocation", () => {
     expect(domesticLine?.attributedMarketValueMinor).toBe(1_289);
     expect(domesticLine?.attributedMarketValueMinor).not.toBe(10_052);
     expect(domesticLine?.attributedUnrealizedGainMinor).toBe(7);
+    expect(domesticLine?.attributedUnrealizedGainRate).toBeCloseTo(
+      7 / (domesticLine?.attributedBookValueMinor ?? 1),
+    );
     expect(domesticLine?.weightInSlice).toBeCloseTo(1);
+  });
+
+  it("equal-splits tags when allocation weights are missing", () => {
+    const tags: HoldingLineDto["tags"] = [
+      {
+        schemeCode: "ideco_region",
+        schemeName: "地域",
+        valueCode: "a",
+        valueName: "A",
+        allocationWeight: null,
+      },
+      {
+        schemeCode: "ideco_region",
+        schemeName: "地域",
+        valueCode: "b",
+        valueName: "B",
+        allocationWeight: null,
+      },
+    ];
+    const allocations = listSchemeTagAllocations(tags, "ideco_region");
+    expect(allocations).toHaveLength(2);
+    expect(allocations[0]?.weight).toBeCloseTo(0.5);
+    expect(allocations[1]?.weight).toBeCloseTo(0.5);
+  });
+
+  it("normalizes valid tag weights and ignores invalid weights", () => {
+    const tags: HoldingLineDto["tags"] = [
+      {
+        schemeCode: "ideco_region",
+        schemeName: "地域",
+        valueCode: "a",
+        valueName: "A",
+        allocationWeight: 2,
+      },
+      {
+        schemeCode: "ideco_region",
+        schemeName: "地域",
+        valueCode: "b",
+        valueName: "B",
+        allocationWeight: -1,
+      },
+      {
+        schemeCode: "ideco_region",
+        schemeName: "地域",
+        valueCode: "c",
+        valueName: "C",
+        allocationWeight: 1,
+      },
+    ];
+    const allocations = listSchemeTagAllocations(tags, "ideco_region");
+    expect(allocations).toHaveLength(2);
+    expect(allocations.find((item) => item.tag.valueCode === "a")?.weight).toBeCloseTo(2 / 3);
+    expect(allocations.find((item) => item.tag.valueCode === "c")?.weight).toBeCloseTo(1 / 3);
+  });
+
+  it("skips non-finite attributed market values in slice breakdown", () => {
+    const lines = [
+      makeLine(Number.NaN, [
+        {
+          schemeCode: "ideco_region",
+          schemeName: "地域",
+          valueCode: "domestic",
+          valueName: "国内",
+          allocationWeight: 1,
+        },
+      ]),
+    ];
+    const slices = groupSnapshotLinesByTagWithLines(lines, "ideco_region");
+    expect(slices).toEqual([]);
   });
 
   it("preserves market value when splitting small amounts across many tags", () => {

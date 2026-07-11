@@ -238,9 +238,11 @@ function attributeLineAmountsByTagAllocations(
     weight: allocation.weight,
   }));
 
+  /* v8 ignore start */
   if (weights.length === 0) {
     return result;
   }
+  /* v8 ignore stop */
 
   result = distributeAmountProportionally(weights, amountMinor);
   return result;

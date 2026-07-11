@@ -61,6 +61,17 @@ describe("buildPortfolioAllocationRows", () => {
     expect(result).toEqual([]);
   });
 
+  it("ignores non-finite target ratios when building gap fields", () => {
+    const targets: TargetPortfolioWeight[] = [
+      { instrumentId: "inst-a", targetRatio: Number.NaN },
+    ];
+    let result = buildPortfolioAllocationRows(lines, targets, 1_000_000);
+    expect(result[0]?.targetRatio).toBe(Number.NaN);
+    expect(result[0]?.gapRatio).toBeNull();
+    expect(result[0]?.gapDivergenceRatio).toBeNull();
+    expect(result[0]?.gapMarketValueMinor).toBeNull();
+  });
+
   it("uses zero current ratio and null gap market value when asset total is zero", () => {
     const targets: TargetPortfolioWeight[] = [
       { instrumentId: "inst-a", targetRatio: 0.5 },
@@ -158,6 +169,71 @@ describe("rollupPortfolioAllocationRowsByInstrument", () => {
     expect(result[0]?.gapDivergenceRatio).toBeCloseTo(1);
     expect(result[0]?.gapMarketValueMinor).toBe(400_000);
   });
+
+  it("keeps the first row as representative when sort orders are equal", () => {
+    const rows: PortfolioAllocationRow[] = [
+      {
+        holdingLineId: "line-1a",
+        instrumentId: "inst-a",
+        instrumentName: "銘柄A",
+        sortOrder: 2,
+        marketValueMinor: 200_000,
+        currentRatio: 0.25,
+        targetRatio: null,
+        gapRatio: null,
+        gapDivergenceRatio: null,
+        gapMarketValueMinor: null,
+      },
+      {
+        holdingLineId: "line-1b",
+        instrumentId: "inst-a",
+        instrumentName: "銘柄A",
+        sortOrder: 2,
+        marketValueMinor: 600_000,
+        currentRatio: 0.75,
+        targetRatio: null,
+        gapRatio: null,
+        gapDivergenceRatio: null,
+        gapMarketValueMinor: null,
+      },
+    ];
+
+    let result = rollupPortfolioAllocationRowsByInstrument(rows, 800_000);
+    expect(result[0]?.sortOrder).toBe(2);
+    expect(result[0]?.holdingLineId).toBe("inst-a");
+  });
+
+  it("keeps the first row when both sort orders are null", () => {
+    const rows: PortfolioAllocationRow[] = [
+      {
+        holdingLineId: "line-1a",
+        instrumentId: "inst-a",
+        instrumentName: "銘柄A",
+        sortOrder: null,
+        marketValueMinor: 200_000,
+        currentRatio: 0.25,
+        targetRatio: null,
+        gapRatio: null,
+        gapDivergenceRatio: null,
+        gapMarketValueMinor: null,
+      },
+      {
+        holdingLineId: "line-1b",
+        instrumentId: "inst-a",
+        instrumentName: "銘柄A",
+        sortOrder: null,
+        marketValueMinor: 600_000,
+        currentRatio: 0.75,
+        targetRatio: null,
+        gapRatio: null,
+        gapDivergenceRatio: null,
+        gapMarketValueMinor: null,
+      },
+    ];
+
+    let result = rollupPortfolioAllocationRowsByInstrument(rows, 800_000);
+    expect(result[0]?.sortOrder).toBeNull();
+  });
 });
 
 describe("comparePortfolioInstrumentOrder", () => {
@@ -171,6 +247,18 @@ describe("comparePortfolioInstrumentOrder", () => {
     const left = { sortOrder: 1, instrumentName: "銘柄A", instrumentId: "inst-a" };
     const right = { sortOrder: 1, instrumentName: "銘柄A", instrumentId: "inst-b" };
     expect(comparePortfolioInstrumentOrder(left, right)).toBeLessThan(0);
+  });
+
+  it("sorts by instrument name when sort order matches", () => {
+    const left = { sortOrder: 1, instrumentName: "銘柄B", instrumentId: "inst-a" };
+    const right = { sortOrder: 1, instrumentName: "銘柄A", instrumentId: "inst-a" };
+    expect(comparePortfolioInstrumentOrder(left, right)).toBeGreaterThan(0);
+  });
+
+  it("treats null sort order as last when comparing instrument order", () => {
+    const left = { sortOrder: null, instrumentName: "銘柄A", instrumentId: "inst-a" };
+    const right = { sortOrder: 1, instrumentName: "銘柄B", instrumentId: "inst-b" };
+    expect(comparePortfolioInstrumentOrder(left, right)).toBeGreaterThan(0);
   });
 });
 
@@ -299,6 +387,42 @@ describe("comparePortfolioAllocationRows columns", () => {
         { ...baseRows[0]!, sortOrder: null },
         { ...baseRows[1]!, sortOrder: 2 },
         "sortOrder",
+        "asc",
+      ),
+    ).toBeGreaterThan(0);
+  });
+
+  it("uses holdingLineId as final tie-breaker", () => {
+    const row = baseRows[0]!;
+    expect(
+      comparePortfolioAllocationRows(
+        {
+          ...row,
+          holdingLineId: "line-z",
+          instrumentId: "same",
+          instrumentName: "Same",
+          sortOrder: 1,
+          marketValueMinor: 100,
+          currentRatio: 0.5,
+          targetRatio: 0.5,
+          gapRatio: 0,
+          gapDivergenceRatio: 0,
+          gapMarketValueMinor: 0,
+        },
+        {
+          ...row,
+          holdingLineId: "line-a",
+          instrumentId: "same",
+          instrumentName: "Same",
+          sortOrder: 1,
+          marketValueMinor: 100,
+          currentRatio: 0.5,
+          targetRatio: 0.5,
+          gapRatio: 0,
+          gapDivergenceRatio: 0,
+          gapMarketValueMinor: 0,
+        },
+        "marketValue",
         "asc",
       ),
     ).toBeGreaterThan(0);

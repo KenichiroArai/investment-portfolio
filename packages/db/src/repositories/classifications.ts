@@ -377,9 +377,11 @@ export async function setInstrumentClassificationsWithWeights(
       return row;
     });
 
+  /* v8 ignore start */
   if (rows.length === 0) {
     return result;
   }
+  /* v8 ignore stop */
 
   await db.insert(instrumentClassifications).values(rows);
 

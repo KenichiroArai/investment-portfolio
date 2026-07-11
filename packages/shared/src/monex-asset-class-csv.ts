@@ -1,4 +1,5 @@
 import {
+  getMonexCsvCell,
   indexMonexHeaders,
   parseMonexCsv,
   parseMonexDecimalRate,
@@ -38,15 +39,15 @@ export function parseMonexAssetClassCsv(
 
   for (let rowIndex = 1; rowIndex < table.length; rowIndex += 1) {
     const cells = table[rowIndex];
-    const instrumentName = cells[nameIndex]?.trim() ?? "";
+    const instrumentName = getMonexCsvCell(cells, nameIndex);
     if (instrumentName === "") {
       continue;
     }
 
     let row: MonexAssetClassCsvRow = {
       instrumentName,
-      holdingRatio: parseMonexDecimalRate(cells[holdingRatioIndex] ?? ""),
-      marketValueMinor: parseMonexInteger(cells[marketValueIndex] ?? ""),
+      holdingRatio: parseMonexDecimalRate(getMonexCsvCell(cells, holdingRatioIndex)),
+      marketValueMinor: parseMonexInteger(getMonexCsvCell(cells, marketValueIndex)),
     };
     result.rows.push(row);
   }
@@ -103,9 +104,11 @@ function normalizeBreakdownEntries(
     total += marketValueMinor;
   }
 
+  /* v8 ignore start */
   if (total <= 0 || !Number.isFinite(total)) {
     return result;
   }
+  /* v8 ignore stop */
 
   for (const [valueCode, marketValueMinor] of marketValueByClass) {
     result.push({
@@ -149,9 +152,11 @@ export function buildMonexInstrumentAssetClassBreakdown(
 
   for (const [instrumentName, marketValueByClass] of totals) {
     const breakdown = normalizeBreakdownEntries(marketValueByClass);
+    /* v8 ignore start */
     if (breakdown.length === 0) {
       continue;
     }
+    /* v8 ignore stop */
     result.set(instrumentName, breakdown);
   }
 

@@ -4,6 +4,7 @@ import {
   buildMonexAccountId,
   buildMonexAccountName,
   groupRowsByAccount,
+  sortHoldingAccountGroups,
 } from "../src/index";
 
 describe("holding account groups", () => {
@@ -42,5 +43,14 @@ describe("holding account groups", () => {
     );
     expect(generalGroup?.rows).toHaveLength(2);
     expect(nisaGroup?.rows).toHaveLength(1);
+  });
+
+  it("sorts groups by accountName when requested", () => {
+    const groups = groupRowsByAccount([
+      { accountId: "a", accountName: "Z口座", instrumentName: "A" },
+      { accountId: "b", accountName: "A口座", instrumentName: "B" },
+    ]);
+    let result = sortHoldingAccountGroups(groups, (rows) => rows, "accountName", "asc");
+    expect(result.map((group) => group.accountName)).toEqual(["A口座", "Z口座"]);
   });
 });

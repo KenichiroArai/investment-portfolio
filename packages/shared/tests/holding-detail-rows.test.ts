@@ -220,6 +220,19 @@ describe("filterHoldingDetailRows", () => {
     expect(result).toHaveLength(2);
   });
 
+  it("handles rows without accountName in text search", () => {
+    const rowWithoutAccountName = {
+      ...makeDetailRow({
+        asOfDate: "2026-06-01",
+        instrumentId: "i3",
+        instrumentName: "口座名なし",
+      }),
+      accountName: undefined as unknown as string,
+    };
+    let result = filterHoldingDetailRows([rowWithoutAccountName], { query: "missing" });
+    expect(result).toHaveLength(0);
+  });
+
   it("skips as-of date filtering when value is __all__", () => {
     let result = filterHoldingDetailRows(rows, { asOfDate: "__all__" });
     expect(result).toHaveLength(2);
@@ -439,6 +452,32 @@ describe("sortHoldingDetailRows", () => {
 
     let result = sortHoldingDetailRows(tiedRows, "quantity", "asc");
     expect(result.map((row) => row.lineId)).toEqual(["line-a", "line-b"]);
+  });
+
+  it("uses accountName tie-breaker before instrumentName", () => {
+    const tiedRows: HoldingDetailRow[] = [
+      makeDetailRow({
+        asOfDate: "2026-06-01",
+        instrumentId: "i1",
+        accountName: "B口座",
+        sortOrder: 0,
+        quantity: 1,
+        marketValueMinor: 1000,
+        bookValueMinor: null,
+      }),
+      makeDetailRow({
+        asOfDate: "2026-06-01",
+        instrumentId: "i2",
+        accountName: "A口座",
+        sortOrder: 0,
+        quantity: 1,
+        marketValueMinor: 1000,
+        bookValueMinor: null,
+      }),
+    ];
+
+    let result = sortHoldingDetailRows(tiedRows, "quantity", "asc");
+    expect(result.map((row) => row.accountName)).toEqual(["A口座", "B口座"]);
   });
 
   it("compares sortOrder when either side lacks sortOrder", () => {

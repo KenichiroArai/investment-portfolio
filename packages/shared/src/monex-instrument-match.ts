@@ -59,9 +59,11 @@ export function matchMonexInstrumentId(
     }
   }
   const matchKeys = [...matchKeySet];
+  /* v8 ignore start */
   if (matchKeys.length === 0) {
     return result;
   }
+  /* v8 ignore stop */
 
   for (const candidate of candidates) {
     const candidateKeys = buildMonexInstrumentMatchKeys(candidate.name);

@@ -57,4 +57,23 @@ describe("snapshot line validation", () => {
       ]),
     ).toThrow(SnapshotValidationError);
   });
+
+  it("does not throw when instrument account pairs are unique", () => {
+    expect(() =>
+      assertUniqueSnapshotInstrumentIds([
+        { instrumentId: "inst-1", accountId: "acct-a" },
+        { instrumentId: "inst-2", accountId: "acct-a" },
+      ]),
+    ).not.toThrow();
+  });
+
+  it("treats missing accountId as empty string in legacy helper", () => {
+    expect(
+      findDuplicateInstrumentId([
+        { instrumentId: "inst-1" },
+        { instrumentId: "inst-1" },
+      ]),
+    ).toBe("inst-1");
+    expect(findDuplicateInstrumentId([{ instrumentId: "inst-1" }])).toBeNull();
+  });
 });

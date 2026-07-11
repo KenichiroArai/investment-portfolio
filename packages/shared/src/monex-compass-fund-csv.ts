@@ -1,6 +1,7 @@
 import {
   buildMonexAccountId,
   buildMonexAccountName,
+  getMonexCsvCell,
   indexMonexHeaders,
   MonexCsvError,
   parseMonexCsv,
@@ -53,20 +54,20 @@ export function parseMonexCompassFundCsv(
 
   for (let rowIndex = 1; rowIndex < table.length; rowIndex += 1) {
     const cells = table[rowIndex];
-    const instrumentName = cells[nameIndex]?.trim() ?? "";
+    const instrumentName = getMonexCsvCell(cells, nameIndex);
     if (instrumentName === "") {
       continue;
     }
 
-    const asOfDate = parseMonexDate(cells[dateIndex] ?? "");
+    const asOfDate = parseMonexDate(getMonexCsvCell(cells, dateIndex));
     if (asOfDate === "") {
-      throw new MonexCsvError(`日付の形式が不正です: ${cells[dateIndex] ?? ""}`);
+      throw new MonexCsvError(`日付の形式が不正です: ${getMonexCsvCell(cells, dateIndex)}`);
     }
 
-    const quantity = parseMonexInteger(cells[quantityIndex] ?? "");
-    const marketValueMinor = parseMonexInteger(cells[marketValueIndex] ?? "");
-    const avgCostMinor = parseMonexInteger(cells[avgCostIndex] ?? "");
-    const unrealizedGainMinor = parseMonexInteger(cells[gainIndex] ?? "");
+    const quantity = parseMonexInteger(getMonexCsvCell(cells, quantityIndex));
+    const marketValueMinor = parseMonexInteger(getMonexCsvCell(cells, marketValueIndex));
+    const avgCostMinor = parseMonexInteger(getMonexCsvCell(cells, avgCostIndex));
+    const unrealizedGainMinor = parseMonexInteger(getMonexCsvCell(cells, gainIndex));
     const bookValueMinor = avgCostMinor * quantity;
     let unrealizedGainRate = 0;
     if (bookValueMinor > 0 && Number.isFinite(unrealizedGainMinor)) {
@@ -77,17 +78,17 @@ export function parseMonexCompassFundCsv(
       asOfDate,
       instrumentName,
       accountId: buildMonexAccountId(
-        cells[accountTypeIndex]?.trim() ?? "",
-        cells[custodyTypeIndex]?.trim() ?? "",
+        getMonexCsvCell(cells, accountTypeIndex),
+        getMonexCsvCell(cells, custodyTypeIndex),
       ),
       accountName: buildMonexAccountName(
-        cells[accountTypeIndex]?.trim() ?? "",
-        cells[custodyTypeIndex]?.trim() ?? "",
+        getMonexCsvCell(cells, accountTypeIndex),
+        getMonexCsvCell(cells, custodyTypeIndex),
       ),
-      accountType: cells[accountTypeIndex]?.trim() ?? "",
-      custodyType: cells[custodyTypeIndex]?.trim() ?? "",
-      unitPriceMinor: parseMonexInteger(cells[unitPriceIndex] ?? ""),
-      dividendOption: cells[dividendIndex]?.trim() ?? "",
+      accountType: getMonexCsvCell(cells, accountTypeIndex),
+      custodyType: getMonexCsvCell(cells, custodyTypeIndex),
+      unitPriceMinor: parseMonexInteger(getMonexCsvCell(cells, unitPriceIndex)),
+      dividendOption: getMonexCsvCell(cells, dividendIndex),
       quantity,
       avgCostMinor,
       marketValueMinor,
