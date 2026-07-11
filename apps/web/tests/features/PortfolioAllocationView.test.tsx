@@ -78,7 +78,7 @@ describe("PortfolioAllocationView", () => {
     });
 
     expect(screen.getByText("最大乖離銘柄")).toBeInTheDocument();
-    expect(screen.getAllByText("100.0%").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("100.00%").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByRole("columnheader", { name: "乖離率" })).toBeInTheDocument();
     expect(screen.queryByText("1 / 1 銘柄")).not.toBeInTheDocument();
     expect(screen.queryByText("銘柄目標配分")).not.toBeInTheDocument();

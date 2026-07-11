@@ -55,7 +55,7 @@ describe("formatMetricValue", () => {
       realValue: 0.052,
       textValue: null,
     };
-    expect(formatMetricValue(metric)).toBe("5.2%");
+    expect(formatMetricValue(metric)).toBe("5.20%");
   });
 
   it("returns dash when unrealized gain rate is null", () => {

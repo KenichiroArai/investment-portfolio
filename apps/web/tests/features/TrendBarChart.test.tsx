@@ -202,7 +202,7 @@ describe("TrendBarChart", () => {
     const axisLabels = Array.from(
       container.querySelectorAll(".trend-bar-chart__y-label"),
     ).map((node) => node.textContent);
-    expect(axisLabels).toEqual(["0.00%", "25%", "50%", "75%", "100%"]);
+    expect(axisLabels).toEqual(["0.00%", "25.00%", "50.00%", "75.00%", "100.00%"]);
     expect(container.querySelector(".trend-chart__y-unit")).toBeNull();
   });
 });

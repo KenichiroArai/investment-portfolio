@@ -18,6 +18,9 @@ export function formatAsOfDateJa(iso: string): string {
   return result;
 }
 
+const PERCENT_DISPLAY_DECIMALS = 2;
+const PERCENT_POINT_DISPLAY_DECIMALS = 2;
+
 export function formatPercent(ratio: number): string {
   let result = "—";
 
@@ -25,53 +28,28 @@ export function formatPercent(ratio: number): string {
     return result;
   }
 
-  result = `${(ratio * 100).toFixed(1)}%`;
+  result = `${(ratio * 100).toFixed(PERCENT_DISPLAY_DECIMALS)}%`;
   return result;
 }
 
 export function formatAllocationPercent(ratio: number): string {
-  let result = "—";
-
-  if (!Number.isFinite(ratio)) {
-    return result;
-  }
-
-  result = `${(ratio * 100).toFixed(2)}%`;
+  let result = formatPercent(ratio);
   return result;
 }
 
 export function formatAllocationDivergenceRatio(ratio: number): string {
-  let result = "—";
-
-  if (!Number.isFinite(ratio)) {
-    return result;
-  }
-
-  result = `${(ratio * 100).toFixed(1)}%`;
+  let result = formatPercent(ratio);
   return result;
 }
 
 export function formatPercentAxis(ratio: number): string {
-  let result = "0%";
+  let result = "0.00%";
 
   if (!Number.isFinite(ratio)) {
     return result;
   }
 
-  const percent = ratio * 100;
-  const abs = Math.abs(percent);
-
-  if (abs >= 10) {
-    result = `${percent.toFixed(0)}%`;
-    return result;
-  }
-
-  if (abs >= 1) {
-    result = `${percent.toFixed(1)}%`;
-    return result;
-  }
-
-  result = `${percent.toFixed(2)}%`;
+  result = `${(ratio * 100).toFixed(PERCENT_DISPLAY_DECIMALS)}%`;
   return result;
 }
 
@@ -93,9 +71,7 @@ export function formatPercentPoint(ratioDelta: number): string {
   }
 
   const points = ratioDelta * 100;
-  const abs = Math.abs(points);
-  const decimals = abs >= 1 ? 1 : 2;
-  result = `${formatSignedPointValue(points, decimals)} pt`;
+  result = `${formatSignedPointValue(points, PERCENT_POINT_DISPLAY_DECIMALS)} pt`;
   return result;
 }
 
@@ -107,21 +83,19 @@ export function formatAllocationPercentPoint(ratioDelta: number): string {
   }
 
   const points = ratioDelta * 100;
-  result = `${formatSignedPointValue(points, 2)} pt`;
+  result = `${formatSignedPointValue(points, PERCENT_POINT_DISPLAY_DECIMALS)} pt`;
   return result;
 }
 
 export function formatPercentPointAxis(ratioDelta: number): string {
-  let result = "0 pt";
+  let result = "0.00 pt";
 
   if (!Number.isFinite(ratioDelta)) {
     return result;
   }
 
   const points = ratioDelta * 100;
-  const abs = Math.abs(points);
-  const decimals = abs >= 1 ? 1 : 2;
-  result = `${points.toFixed(decimals)} pt`;
+  result = `${points.toFixed(PERCENT_POINT_DISPLAY_DECIMALS)} pt`;
   return result;
 }
 
@@ -133,16 +107,7 @@ export function formatPercentRelativeChange(ratio: number): string {
   }
 
   const percent = ratio * 100;
-  const abs = Math.abs(percent);
-  let decimals = 2;
-
-  if (abs >= 10) {
-    decimals = 1;
-  } else if (abs >= 1) {
-    decimals = 1;
-  }
-
-  result = `${formatSignedPointValue(percent, decimals)}%`;
+  result = `${formatSignedPointValue(percent, PERCENT_DISPLAY_DECIMALS)}%`;
   return result;
 }
 

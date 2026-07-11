@@ -85,7 +85,7 @@ export function TargetPortfolioSettingsCard({
           (item) => item.instrumentId === instrumentRow.instrumentId,
         );
         nextInputs[instrumentRow.instrumentId] =
-          weight !== undefined ? String(Math.round(weight.targetRatio * 1000) / 10) : "";
+          weight !== undefined ? String(Math.round(weight.targetRatio * 10000) / 100) : "";
       }
       setTargetInputs(nextInputs);
       return syncResult;

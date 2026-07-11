@@ -42,7 +42,7 @@ describe("formatAsOfDateJa", () => {
 
 describe("formatPercent", () => {
   it("formats finite ratios as percent", () => {
-    expect(formatPercent(0.052)).toBe("5.2%");
+    expect(formatPercent(0.052)).toBe("5.20%");
   });
 
   it("returns dash for non-finite ratios", () => {
@@ -119,15 +119,15 @@ describe("formatYenAxisLabel", () => {
 });
 
 describe("formatPercentAxis", () => {
-  it("uses adaptive precision for percent axis ticks", () => {
-    expect(formatPercentAxis(0.25)).toBe("25%");
-    expect(formatPercentAxis(0.052)).toBe("5.2%");
+  it("uses two decimal places for percent axis ticks", () => {
+    expect(formatPercentAxis(0.25)).toBe("25.00%");
+    expect(formatPercentAxis(0.052)).toBe("5.20%");
     expect(formatPercentAxis(0.0013)).toBe("0.13%");
     expect(formatPercentAxis(-0.002)).toBe("-0.20%");
   });
 
   it("returns zero percent for non-finite ratios", () => {
-    expect(formatPercentAxis(Number.NaN)).toBe("0%");
+    expect(formatPercentAxis(Number.NaN)).toBe("0.00%");
   });
 });
 
@@ -157,7 +157,7 @@ describe("formatAllocationPercentPoint", () => {
 describe("formatPercentPoint", () => {
   it("formats ratio deltas as signed points", () => {
     expect(formatPercentPoint(0.003)).toBe("+0.30 pt");
-    expect(formatPercentPoint(-0.021)).toBe("-2.1 pt");
+    expect(formatPercentPoint(-0.021)).toBe("-2.10 pt");
     expect(formatPercentPoint(-0.0004)).toBe("-0.04 pt");
   });
 
@@ -169,33 +169,33 @@ describe("formatPercentPoint", () => {
 describe("formatPercentPointAxis", () => {
   it("formats axis ticks without explicit sign", () => {
     expect(formatPercentPointAxis(0.003)).toBe("0.30 pt");
-    expect(formatPercentPointAxis(-0.021)).toBe("-2.1 pt");
+    expect(formatPercentPointAxis(-0.021)).toBe("-2.10 pt");
   });
 });
 
 describe("formatPercentRelativeChange", () => {
   it("formats relative change with sign", () => {
-    expect(formatPercentRelativeChange(0.01)).toBe("+1.0%");
-    expect(formatPercentRelativeChange(-0.14)).toBe("-14.0%");
+    expect(formatPercentRelativeChange(0.01)).toBe("+1.00%");
+    expect(formatPercentRelativeChange(-0.14)).toBe("-14.00%");
   });
 });
 
 describe("formatYenLevelDeltaTooltip", () => {
   it("shows level with absolute and relative suffix", () => {
-    expect(formatYenLevelDeltaTooltip(100, 101)).toBe("￥101 (+￥1 (+1.0%))");
+    expect(formatYenLevelDeltaTooltip(100, 101)).toBe("￥101 (+￥1 (+1.00%))");
   });
 });
 
 describe("formatYenTrendDeltaTooltip", () => {
   it("combines yen delta and relative change", () => {
-    expect(formatYenTrendDeltaTooltip(100, 101)).toBe("+￥1 (+1.0%)");
+    expect(formatYenTrendDeltaTooltip(100, 101)).toBe("+￥1 (+1.00%)");
   });
 });
 
 describe("formatPercentDeltaTooltip", () => {
   it("combines level transition, points, and relative change", () => {
     expect(formatPercentDeltaTooltip(0.288, 0.291)).toBe(
-      "28.8% → 29.1% (+0.30 pt / +1.0%)",
+      "28.80% → 29.10% (+0.30 pt / +1.04%)",
     );
   });
 

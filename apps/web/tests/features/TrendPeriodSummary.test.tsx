@@ -55,12 +55,12 @@ describe("TrendPeriodSummary", () => {
     );
 
     expect(screen.getByText("評価額")).toBeInTheDocument();
-    expect(screen.getByText(/\+1\.2%/)).toBeInTheDocument();
+    expect(screen.getByText(/\+1\.22%/)).toBeInTheDocument();
     expect(screen.getByText("評価損益")).toBeInTheDocument();
     expect(screen.getByText("利益率（簿価）")).toBeInTheDocument();
-    expect(screen.getByText(/\+2\.0 pt/)).toBeInTheDocument();
-    expect(screen.getByText(/\+15\.4%/)).toBeInTheDocument();
+    expect(screen.getByText(/\+2\.00 pt/)).toBeInTheDocument();
+    expect(screen.getByText(/\+15\.38%/)).toBeInTheDocument();
     expect(screen.getByText(/最大シェア変動/)).toBeInTheDocument();
-    expect(screen.getByText(/-2\.5%/)).toBeInTheDocument();
+    expect(screen.getByText(/-2\.50%/)).toBeInTheDocument();
   });
 });

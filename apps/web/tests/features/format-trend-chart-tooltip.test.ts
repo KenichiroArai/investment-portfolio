@@ -17,7 +17,7 @@ describe("formatTrendChartTooltipValue", () => {
     };
 
     expect(formatTrendChartTooltipValue(series, 0)).toContain("+￥41,347");
-    expect(formatTrendChartTooltipValue(series, 0)).toContain("+1.2%");
+    expect(formatTrendChartTooltipValue(series, 0)).toContain("+1.22%");
   });
 
   it("formats relative rate bar tooltip with absolute suffix", () => {
@@ -31,6 +31,6 @@ describe("formatTrendChartTooltipValue", () => {
       tooltipUnit: "yen",
     };
 
-    expect(formatTrendChartTooltipValue(series, 1)).toBe("+1.0% (+￥1)");
+    expect(formatTrendChartTooltipValue(series, 1)).toBe("+1.00% (+￥1)");
   });
 });

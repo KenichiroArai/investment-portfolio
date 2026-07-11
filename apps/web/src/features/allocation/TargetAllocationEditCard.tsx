@@ -70,7 +70,7 @@ export function TargetAllocationEditCard({
       for (const value of values) {
         const weight = weights.find((item) => item.valueCode === value.code);
         nextInputs[value.code] =
-          weight !== undefined ? String(Math.round(weight.targetRatio * 1000) / 10) : "";
+          weight !== undefined ? String(Math.round(weight.targetRatio * 10000) / 100) : "";
       }
       setTargetInputs(nextInputs);
       return loadResult;

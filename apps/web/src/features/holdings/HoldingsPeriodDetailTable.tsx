@@ -25,6 +25,7 @@ import {
 import { formatMetricLabel, resolveUnitPriceMetricCode } from "@/lib/format-holding-line";
 import {
   formatPercent,
+  formatPercentPoint,
   formatSignedIntegerDelta,
   formatSignedYenDelta,
   formatYen,
@@ -126,19 +127,7 @@ function formatDeltaRatePoint(value: number | null): string {
     return result;
   }
 
-  const points = value * 100;
-  const abs = Math.abs(points);
-  const decimals = abs >= 1 ? 1 : 2;
-  const formatted = points.toFixed(decimals);
-  if (points > 0) {
-    result = `+${formatted} pt`;
-    return result;
-  }
-  if (points < 0) {
-    result = `${formatted} pt`;
-    return result;
-  }
-  result = "0 pt";
+  result = formatPercentPoint(value);
   return result;
 }
 
