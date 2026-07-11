@@ -138,6 +138,92 @@ export function computePortfolioGapDivergenceRatio(
   return result;
 }
 
+function buildPortfolioAllocationGapFields(
+  currentRatio: number,
+  targetRatio: number | null,
+  assetTotalMinor: number,
+): Pick<
+  PortfolioAllocationRow,
+  "gapRatio" | "gapDivergenceRatio" | "gapMarketValueMinor"
+> {
+  let result: Pick<
+    PortfolioAllocationRow,
+    "gapRatio" | "gapDivergenceRatio" | "gapMarketValueMinor"
+  > = {
+    gapRatio: null,
+    gapDivergenceRatio: null,
+    gapMarketValueMinor: null,
+  };
+
+  if (targetRatio === null || !Number.isFinite(targetRatio)) {
+    return result;
+  }
+
+  const gapRatio = currentRatio - targetRatio;
+  result = {
+    gapRatio,
+    gapDivergenceRatio: computePortfolioGapDivergenceRatio(currentRatio, targetRatio),
+    gapMarketValueMinor:
+      assetTotalMinor > 0 ? Math.round(gapRatio * assetTotalMinor) : null,
+  };
+  return result;
+}
+
+export function rollupPortfolioAllocationRowsByInstrument(
+  rows: PortfolioAllocationRow[],
+  assetTotalMinor: number,
+): PortfolioAllocationRow[] {
+  let result: PortfolioAllocationRow[] = [];
+
+  const grouped = new Map<string, PortfolioAllocationRow[]>();
+  for (const row of rows) {
+    const existing = grouped.get(row.instrumentId);
+    if (existing) {
+      existing.push(row);
+      continue;
+    }
+    grouped.set(row.instrumentId, [row]);
+  }
+
+  for (const [instrumentId, groupRows] of grouped) {
+    const representative = groupRows.reduce((best, row) => {
+      const bestOrder = best.sortOrder ?? Number.MAX_SAFE_INTEGER;
+      const rowOrder = row.sortOrder ?? Number.MAX_SAFE_INTEGER;
+      if (rowOrder < bestOrder) {
+        return row;
+      }
+      return best;
+    });
+    const marketValueMinor = groupRows.reduce(
+      (sum, row) => sum + row.marketValueMinor,
+      0,
+    );
+    const currentRatio = assetTotalMinor > 0 ? marketValueMinor / assetTotalMinor : 0;
+    const sortOrder = representative.sortOrder;
+    const targetRatio =
+      groupRows.find((row) => row.targetRatio !== null)?.targetRatio ?? null;
+    const gapFields = buildPortfolioAllocationGapFields(
+      currentRatio,
+      targetRatio,
+      assetTotalMinor,
+    );
+
+    result.push({
+      holdingLineId: instrumentId,
+      instrumentId,
+      instrumentName: representative.instrumentName,
+      sortOrder,
+      marketValueMinor,
+      currentRatio,
+      targetRatio,
+      ...gapFields,
+    });
+  }
+
+  result = sortPortfolioAllocationRows(result, "sortOrder", "asc");
+  return result;
+}
+
 export function buildPortfolioAllocationRows(
   lines: HoldingLineDto[],
   targets: TargetPortfolioWeight[],
@@ -150,23 +236,18 @@ export function buildPortfolioAllocationRows(
     targetByInstrumentId.set(target.instrumentId, target.targetRatio);
   }
 
+  const lineRows: PortfolioAllocationRow[] = [];
   for (const line of lines) {
     const currentRatio =
       assetTotalMinor > 0 ? line.marketValueMinor / assetTotalMinor : 0;
     const targetRatio = targetByInstrumentId.get(line.instrumentId) ?? null;
-    let gapRatio: number | null = null;
-    let gapDivergenceRatio: number | null = null;
-    let gapMarketValueMinor: number | null = null;
+    const gapFields = buildPortfolioAllocationGapFields(
+      currentRatio,
+      targetRatio,
+      assetTotalMinor,
+    );
 
-    if (targetRatio !== null && Number.isFinite(targetRatio)) {
-      gapRatio = currentRatio - targetRatio;
-      gapDivergenceRatio = computePortfolioGapDivergenceRatio(currentRatio, targetRatio);
-      if (assetTotalMinor > 0) {
-        gapMarketValueMinor = Math.round(gapRatio * assetTotalMinor);
-      }
-    }
-
-    result.push({
+    lineRows.push({
       holdingLineId: line.id,
       instrumentId: line.instrumentId,
       instrumentName: line.instrumentName,
@@ -174,12 +255,10 @@ export function buildPortfolioAllocationRows(
       marketValueMinor: line.marketValueMinor,
       currentRatio,
       targetRatio,
-      gapRatio,
-      gapDivergenceRatio,
-      gapMarketValueMinor,
+      ...gapFields,
     });
   }
 
-  result = sortPortfolioAllocationRows(result, "sortOrder", "asc");
+  result = rollupPortfolioAllocationRowsByInstrument(lineRows, assetTotalMinor);
   return result;
 }

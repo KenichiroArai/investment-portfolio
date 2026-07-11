@@ -5,6 +5,7 @@ import {
   comparePortfolioAllocationRows,
   comparePortfolioInstrumentOrder,
   computePortfolioGapDivergenceRatio,
+  rollupPortfolioAllocationRowsByInstrument,
   sortHoldingLinesByPortfolioInstrumentOrder,
   sortPortfolioAllocationRows,
   type PortfolioAllocationRow,
@@ -82,16 +83,80 @@ describe("buildPortfolioAllocationRows", () => {
     expect(result.map((row) => row.instrumentId)).toEqual(["inst-a", "inst-b"]);
   });
 
-  it("keeps separate rows when the same instrument appears on multiple holding lines", () => {
+  it("merges rows when the same instrument appears on multiple holding lines", () => {
     const duplicateLines: HoldingLineDto[] = [
       { ...lines[0]!, id: "line-1a", sortOrder: 1 },
       { ...lines[0]!, id: "line-1b", sortOrder: 2, marketValueMinor: 200_000 },
     ];
     let result = buildPortfolioAllocationRows(duplicateLines, [], 800_000);
 
-    expect(result).toHaveLength(2);
-    expect(result.map((row) => row.holdingLineId)).toEqual(["line-1a", "line-1b"]);
-    expect(result.every((row) => row.instrumentId === "inst-a")).toBe(true);
+    expect(result).toHaveLength(1);
+    expect(result[0]?.holdingLineId).toBe("inst-a");
+    expect(result[0]?.instrumentId).toBe("inst-a");
+    expect(result[0]?.marketValueMinor).toBe(800_000);
+    expect(result[0]?.currentRatio).toBeCloseTo(1);
+    expect(result[0]?.sortOrder).toBe(1);
+  });
+
+  it("merges account-split holdings and recomputes gap from combined ratio", () => {
+    const targets: TargetPortfolioWeight[] = [
+      { instrumentId: "inst-a", targetRatio: 0.5 },
+    ];
+    const duplicateLines: HoldingLineDto[] = [
+      { ...lines[0]!, id: "line-general", marketValueMinor: 600_000, sortOrder: 1 },
+      { ...lines[0]!, id: "line-specific", marketValueMinor: 200_000, sortOrder: 2 },
+    ];
+    let result = buildPortfolioAllocationRows(duplicateLines, targets, 1_000_000);
+
+    expect(result).toHaveLength(1);
+    expect(result[0]?.marketValueMinor).toBe(800_000);
+    expect(result[0]?.currentRatio).toBeCloseTo(0.8);
+    expect(result[0]?.gapRatio).toBeCloseTo(0.3);
+    expect(result[0]?.gapDivergenceRatio).toBeCloseTo(0.6);
+    expect(result[0]?.gapMarketValueMinor).toBe(300_000);
+  });
+});
+
+describe("rollupPortfolioAllocationRowsByInstrument", () => {
+  it("returns a single row per instrument with summed market value", () => {
+    const rows: PortfolioAllocationRow[] = [
+      {
+        holdingLineId: "line-1a",
+        instrumentId: "inst-a",
+        instrumentName: "銘柄A",
+        sortOrder: 2,
+        marketValueMinor: 200_000,
+        currentRatio: 0.25,
+        targetRatio: null,
+        gapRatio: null,
+        gapDivergenceRatio: null,
+        gapMarketValueMinor: null,
+      },
+      {
+        holdingLineId: "line-1b",
+        instrumentId: "inst-a",
+        instrumentName: "銘柄A",
+        sortOrder: 1,
+        marketValueMinor: 600_000,
+        currentRatio: 0.75,
+        targetRatio: 0.5,
+        gapRatio: 0.25,
+        gapDivergenceRatio: 0.5,
+        gapMarketValueMinor: 200_000,
+      },
+    ];
+
+    let result = rollupPortfolioAllocationRowsByInstrument(rows, 800_000);
+
+    expect(result).toHaveLength(1);
+    expect(result[0]?.holdingLineId).toBe("inst-a");
+    expect(result[0]?.marketValueMinor).toBe(800_000);
+    expect(result[0]?.currentRatio).toBeCloseTo(1);
+    expect(result[0]?.sortOrder).toBe(1);
+    expect(result[0]?.targetRatio).toBe(0.5);
+    expect(result[0]?.gapRatio).toBeCloseTo(0.5);
+    expect(result[0]?.gapDivergenceRatio).toBeCloseTo(1);
+    expect(result[0]?.gapMarketValueMinor).toBe(400_000);
   });
 });
 
