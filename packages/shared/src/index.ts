@@ -38,6 +38,7 @@ export * from "./monex-us-stocks-csv";
 export * from "./portfolio-kind-features";
 export * from "./snapshot-line-validation";
 export * from "./backup-manifest";
+export * from "./backup-zip-filename";
 export * from "./csv-utils";
 export * from "./schemas";
 export * from "./table-sort";

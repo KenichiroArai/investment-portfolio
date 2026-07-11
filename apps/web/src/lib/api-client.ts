@@ -21,6 +21,7 @@ import type {
   UpdateInstrumentInput,
   UpdatePortfolioInput,
 } from "@repo/shared";
+import { buildBackupZipFilename } from "@repo/shared";
 
 import { getApiBaseUrl } from "@/lib/api-base";
 import {
@@ -128,6 +129,7 @@ async function requestWritableJson<T>(
 
 async function requestWritableBlob(
   path: string,
+  fallbackFilename?: string,
 ): Promise<
   | { ok: true; blob: Blob; filename: string }
   | { ok: false; status: number; message: string }
@@ -162,7 +164,7 @@ async function requestWritableBlob(
     const blob = await response.blob();
     const disposition = response.headers.get("Content-Disposition") ?? "";
     const filenameMatch = /filename="([^"]+)"/.exec(disposition);
-    const filename = filenameMatch?.[1] ?? "portfolio-export.zip";
+    const filename = filenameMatch?.[1] ?? fallbackFilename ?? "portfolio-export.zip";
     result = { ok: true, blob, filename };
     return result;
   } catch {
@@ -252,7 +254,10 @@ export async function downloadBackupZip(
   scope: "all" | "portfolio",
   portfolioCode?: string,
 ) {
-  let result = await requestWritableBlob(buildBackupPath(scope, portfolioCode));
+  let result = await requestWritableBlob(
+    buildBackupPath(scope, portfolioCode),
+    buildBackupZipFilename(scope, portfolioCode),
+  );
   return result;
 }
 

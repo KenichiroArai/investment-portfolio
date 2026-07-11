@@ -689,4 +689,21 @@ describe("API app", () => {
 
     sqlite.close();
   });
+
+  it("exports all portfolios with site-prefixed zip filename and exposes Content-Disposition", async () => {
+    const { db, sqlite } = createTestDb();
+    const app = createApp({ getDb: () => db, getSqlite: () => sqlite });
+
+    const exportRes = await app.request("/export");
+    expect(exportRes.status).toBe(200);
+    expect(exportRes.headers.get("Content-Type")).toBe("application/zip");
+
+    const disposition = exportRes.headers.get("Content-Disposition") ?? "";
+    expect(disposition).toMatch(
+      /^attachment; filename="investment-portfolio-all-\d{14}\.zip"$/,
+    );
+    expect(exportRes.headers.get("Access-Control-Expose-Headers")).toContain("Content-Disposition");
+
+    sqlite.close();
+  });
 });
