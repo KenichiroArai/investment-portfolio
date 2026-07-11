@@ -4,9 +4,9 @@ import { BarChart3, Home, Moon, Sun } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { useIsClient } from "@/hooks/use-is-client";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -17,13 +17,7 @@ const NAV_ITEMS = [
 export function TopBar() {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    let result: void = undefined;
-    setMounted(true);
-    return result;
-  }, []);
+  const isClient = useIsClient();
 
   let result = (
     <header className="sticky top-0 z-40 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
@@ -62,7 +56,7 @@ export function TopBar() {
             })}
           </nav>
         </div>
-        {mounted ? (
+        {isClient ? (
           <Button
             variant="ghost"
             size="icon"

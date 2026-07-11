@@ -1,5 +1,6 @@
 import { IDECO_KAKEIBO_METRIC_CODES } from "./holding-line-metrics";
 import type { HoldingLineMetricDto } from "./holding-line-metrics";
+import { distributeAmountProportionally } from "./rebalance";
 import type { ClassificationTagDto, CurrentSnapshotDto, HoldingLineDto } from "./types";
 
 function getLineMetricIntegerValue(
@@ -44,6 +45,10 @@ export type AllocationLineInSlice = {
   weightInSlice: number;
   portfolioCode?: string;
   portfolioName?: string;
+  attributedMarketValueMinor: number;
+  attributedBookValueMinor: number | null;
+  attributedUnrealizedGainMinor: number | null;
+  attributedUnrealizedGainRate: number | null;
 };
 
 export type AllocationSliceWithLines = AllocationSlice & {
@@ -223,12 +228,77 @@ export function listSchemeTagAllocations(
   return result;
 }
 
-type AttributedLine = {
-  line: HoldingLineDto;
-  attributedMarketValueMinor: number;
+function attributeLineAmountsByTagAllocations(
+  tagAllocations: SchemeTagAllocation[],
+  amountMinor: number,
+): Map<string, number> {
+  let result = new Map<string, number>();
+  const weights = tagAllocations.map((allocation) => ({
+    key: allocation.tag.valueCode,
+    weight: allocation.weight,
+  }));
+
+  if (weights.length === 0) {
+    return result;
+  }
+
+  result = distributeAmountProportionally(weights, amountMinor);
+  return result;
+}
+
+type LineTagAttribution = {
+  tag: ClassificationTagDto;
+  marketValueMinor: number;
+  gainMinor: number | null;
+  bookValueMinor: number | null;
 };
 
-function computeAttributedSliceGainMetrics(lines: AttributedLine[]): {
+function buildLineTagAttributions(
+  line: HoldingLineDto,
+  tagAllocations: SchemeTagAllocation[],
+): LineTagAttribution[] {
+  let result: LineTagAttribution[] = [];
+  const marketValueByTag = attributeLineAmountsByTagAllocations(
+    tagAllocations,
+    line.marketValueMinor,
+  );
+  const gain = getLineMetricIntegerValueOrNull(
+    line.metrics,
+    IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor,
+  );
+  const gainByTag =
+    gain !== null
+      ? attributeLineAmountsByTagAllocations(tagAllocations, gain)
+      : null;
+  const bookValueByTag =
+    line.bookValueMinor !== null
+      ? attributeLineAmountsByTagAllocations(tagAllocations, line.bookValueMinor)
+      : null;
+
+  for (const allocation of tagAllocations) {
+    const valueCode = allocation.tag.valueCode;
+    const marketValueMinor = marketValueByTag.get(valueCode) ?? 0;
+    if (!Number.isFinite(marketValueMinor) || marketValueMinor < 0) {
+      continue;
+    }
+
+    result.push({
+      tag: allocation.tag,
+      marketValueMinor,
+      gainMinor: gainByTag?.get(valueCode) ?? null,
+      bookValueMinor: bookValueByTag?.get(valueCode) ?? null,
+    });
+  }
+
+  return result;
+}
+
+type AttributedGainEntry = {
+  attributedGainMinor: number | null;
+  attributedBookValueMinor: number | null;
+};
+
+function computeAttributedSliceGainMetrics(lines: AttributedGainEntry[]): {
   unrealizedGainMinor: number | null;
   unrealizedGainRate: number | null;
 } {
@@ -241,24 +311,14 @@ function computeAttributedSliceGainMetrics(lines: AttributedLine[]): {
   let bookValueSum = 0;
   let hasGainData = false;
 
-  for (const attributedLine of lines) {
-    const gain = getLineMetricIntegerValueOrNull(
-      attributedLine.line.metrics,
-      IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor,
-    );
-    if (gain === null) {
+  for (const entry of lines) {
+    if (entry.attributedGainMinor === null) {
       continue;
     }
 
-    const lineMarketValueMinor = attributedLine.line.marketValueMinor;
-    if (lineMarketValueMinor <= 0) {
-      continue;
-    }
-
-    const ratio = attributedLine.attributedMarketValueMinor / lineMarketValueMinor;
-    gainSum += Math.round(gain * ratio);
-    if (attributedLine.line.bookValueMinor !== null) {
-      bookValueSum += Math.round(attributedLine.line.bookValueMinor * ratio);
+    gainSum += entry.attributedGainMinor;
+    if (entry.attributedBookValueMinor !== null) {
+      bookValueSum += entry.attributedBookValueMinor;
     }
     hasGainData = true;
   }
@@ -279,7 +339,7 @@ export function groupSnapshotLinesByTag(
   let result: AllocationSlice[] = [];
   const totals = new Map<
     string,
-    { valueName: string; marketValueMinor: number; lines: AttributedLine[] }
+    { valueName: string; marketValueMinor: number; lines: AttributedGainEntry[] }
   >();
   let taggedTotal = 0;
 
@@ -289,26 +349,24 @@ export function groupSnapshotLinesByTag(
       continue;
     }
 
-    for (const allocation of tagAllocations) {
-      const attributedMarketValueMinor = Math.round(
-        line.marketValueMinor * allocation.weight,
-      );
-      if (!Number.isFinite(attributedMarketValueMinor) || attributedMarketValueMinor < 0) {
-        continue;
-      }
-
-      taggedTotal += attributedMarketValueMinor;
-      const existing = totals.get(allocation.tag.valueCode);
+    const attributions = buildLineTagAttributions(line, tagAllocations);
+    for (const attribution of attributions) {
+      taggedTotal += attribution.marketValueMinor;
+      const gainEntry: AttributedGainEntry = {
+        attributedGainMinor: attribution.gainMinor,
+        attributedBookValueMinor: attribution.bookValueMinor,
+      };
+      const existing = totals.get(attribution.tag.valueCode);
       if (existing) {
-        existing.marketValueMinor += attributedMarketValueMinor;
-        existing.lines.push({ line, attributedMarketValueMinor });
+        existing.marketValueMinor += attribution.marketValueMinor;
+        existing.lines.push(gainEntry);
         continue;
       }
 
-      totals.set(allocation.tag.valueCode, {
-        valueName: allocation.tag.valueName,
-        marketValueMinor: attributedMarketValueMinor,
-        lines: [{ line, attributedMarketValueMinor }],
+      totals.set(attribution.tag.valueCode, {
+        valueName: attribution.tag.valueName,
+        marketValueMinor: attribution.marketValueMinor,
+        lines: [gainEntry],
       });
     }
   }
@@ -336,6 +394,36 @@ type TaggedLineContext = {
   portfolioName?: string;
 };
 
+function buildAllocationLineInSlice(
+  line: HoldingLineDto,
+  attribution: LineTagAttribution,
+  context: TaggedLineContext,
+  weightInSlice: number,
+): AllocationLineInSlice {
+  let result: AllocationLineInSlice = {
+    line,
+    weightInSlice,
+    portfolioCode: context.portfolioCode,
+    portfolioName: context.portfolioName,
+    attributedMarketValueMinor: attribution.marketValueMinor,
+    attributedBookValueMinor: attribution.bookValueMinor,
+    attributedUnrealizedGainMinor: attribution.gainMinor,
+    attributedUnrealizedGainRate: null,
+  };
+
+  if (
+    attribution.gainMinor !== null &&
+    attribution.bookValueMinor !== null
+  ) {
+    result.attributedUnrealizedGainRate = computeSnapshotUnrealizedGainRate(
+      attribution.gainMinor,
+      attribution.bookValueMinor,
+    );
+  }
+
+  return result;
+}
+
 function groupTaggedLinesByTagWithLines(
   taggedLines: TaggedLineContext[],
   schemeCode: string,
@@ -346,7 +434,7 @@ function groupTaggedLinesByTagWithLines(
     {
       valueName: string;
       marketValueMinor: number;
-      lines: Array<AllocationLineInSlice & { attributedMarketValueMinor: number }>;
+      lines: AllocationLineInSlice[];
     }
   >();
   let taggedTotal = 0;
@@ -360,32 +448,25 @@ function groupTaggedLinesByTagWithLines(
       continue;
     }
 
-    for (const allocation of tagAllocations) {
-      const attributedMarketValueMinor = Math.round(
-        taggedLine.line.marketValueMinor * allocation.weight,
+    const attributions = buildLineTagAttributions(taggedLine.line, tagAllocations);
+    for (const attribution of attributions) {
+      taggedTotal += attribution.marketValueMinor;
+      const existing = totals.get(attribution.tag.valueCode);
+      const lineInSlice = buildAllocationLineInSlice(
+        taggedLine.line,
+        attribution,
+        taggedLine,
+        0,
       );
-      if (!Number.isFinite(attributedMarketValueMinor) || attributedMarketValueMinor < 0) {
-        continue;
-      }
-
-      taggedTotal += attributedMarketValueMinor;
-      const existing = totals.get(allocation.tag.valueCode);
-      const lineInSlice = {
-        line: taggedLine.line,
-        weightInSlice: 0,
-        portfolioCode: taggedLine.portfolioCode,
-        portfolioName: taggedLine.portfolioName,
-        attributedMarketValueMinor,
-      };
       if (existing) {
-        existing.marketValueMinor += attributedMarketValueMinor;
+        existing.marketValueMinor += attribution.marketValueMinor;
         existing.lines.push(lineInSlice);
         continue;
       }
 
-      totals.set(allocation.tag.valueCode, {
-        valueName: allocation.tag.valueName,
-        marketValueMinor: attributedMarketValueMinor,
+      totals.set(attribution.tag.valueCode, {
+        valueName: attribution.tag.valueName,
+        marketValueMinor: attribution.marketValueMinor,
         lines: [lineInSlice],
       });
     }
@@ -407,8 +488,8 @@ function groupTaggedLinesByTagWithLines(
 
     const gainMetrics = computeAttributedSliceGainMetrics(
       item.lines.map((lineInSlice) => ({
-        line: lineInSlice.line,
-        attributedMarketValueMinor: lineInSlice.attributedMarketValueMinor,
+        attributedGainMinor: lineInSlice.attributedUnrealizedGainMinor,
+        attributedBookValueMinor: lineInSlice.attributedBookValueMinor,
       })),
     );
     let slice: AllocationSliceWithLines = {
@@ -418,7 +499,7 @@ function groupTaggedLinesByTagWithLines(
       weight: taggedTotal > 0 ? sliceMarketValueMinor / taggedTotal : 0,
       unrealizedGainMinor: gainMetrics.unrealizedGainMinor,
       unrealizedGainRate: gainMetrics.unrealizedGainRate,
-      lines: item.lines.map(({ attributedMarketValueMinor: _ignored, ...line }) => line),
+      lines: item.lines,
     };
     result.push(slice);
   }

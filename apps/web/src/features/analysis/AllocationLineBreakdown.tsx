@@ -1,4 +1,9 @@
-import type { AllocationLineInSlice } from "@repo/shared";
+import {
+  computeSnapshotUnrealizedGainRate,
+  IDECO_KAKEIBO_METRIC_CODES,
+  type AllocationLineInSlice,
+  type HoldingLineMetricDto,
+} from "@repo/shared";
 
 import {
   HoldingLineDetailTable,
@@ -13,6 +18,56 @@ type AllocationLineBreakdownProps = {
   className?: string;
 };
 
+function buildAttributedLineMetrics(
+  lineMetrics: HoldingLineMetricDto[],
+  attributedGainMinor: number | null,
+  attributedBookValueMinor: number | null,
+): HoldingLineMetricDto[] {
+  let result: HoldingLineMetricDto[] = [];
+
+  for (const metric of lineMetrics) {
+    if (
+      metric.code === IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor ||
+      metric.code === IDECO_KAKEIBO_METRIC_CODES.unrealizedGainRate
+    ) {
+      continue;
+    }
+
+    result.push(metric);
+  }
+
+  if (attributedGainMinor === null) {
+    return result;
+  }
+
+  result.push({
+    code: IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor,
+    integerValue: attributedGainMinor,
+    realValue: null,
+    textValue: null,
+  });
+
+  if (attributedBookValueMinor === null) {
+    return result;
+  }
+
+  const attributedGainRate = computeSnapshotUnrealizedGainRate(
+    attributedGainMinor,
+    attributedBookValueMinor,
+  );
+  if (attributedGainRate === null) {
+    return result;
+  }
+
+  result.push({
+    code: IDECO_KAKEIBO_METRIC_CODES.unrealizedGainRate,
+    integerValue: null,
+    realValue: attributedGainRate,
+    textValue: null,
+  });
+  return result;
+}
+
 export function AllocationLineBreakdown({
   lines,
   portfolioKind = "ideco",
@@ -26,10 +81,14 @@ export function AllocationLineBreakdown({
       id: lineInSlice.line.id,
       instrumentName: lineInSlice.line.instrumentName,
       quantity: lineInSlice.line.quantity,
-      marketValueMinor: lineInSlice.line.marketValueMinor,
-      bookValueMinor: lineInSlice.line.bookValueMinor,
+      marketValueMinor: lineInSlice.attributedMarketValueMinor,
+      bookValueMinor: lineInSlice.attributedBookValueMinor,
       weight: lineInSlice.weightInSlice,
-      metrics: lineInSlice.line.metrics,
+      metrics: buildAttributedLineMetrics(
+        lineInSlice.line.metrics,
+        lineInSlice.attributedUnrealizedGainMinor,
+        lineInSlice.attributedBookValueMinor,
+      ),
       portfolioName: lineInSlice.portfolioName,
     };
     rows.push(row);

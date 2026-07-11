@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 import { IDECO_SCHEME_CODES } from "../src/ideco-analysis";
@@ -304,7 +307,163 @@ describe("snapshot-allocation", () => {
     const withLines = groupSnapshotLinesByTagWithLines(lines, "monex_asset_class");
     expect(withLines[0]?.lines).toHaveLength(1);
     expect(withLines[0]?.lines[0]?.weightInSlice).toBeCloseTo(1);
+    expect(withLines[0]?.lines[0]?.attributedMarketValueMinor).toBe(600_000);
     expect(withLines[1]?.lines[0]?.weightInSlice).toBeCloseTo(1);
+    expect(withLines[1]?.lines[0]?.attributedMarketValueMinor).toBe(400_000);
+  });
+
+  it("exposes attributed line values for multi-tag holdings in slice breakdown", () => {
+    const lines = [
+      makeLine(
+        10_052,
+        [
+          {
+            schemeCode: "monex_asset_class",
+            schemeName: "資産クラス",
+            valueCode: "domestic_equity",
+            valueName: "国内株式",
+            allocationWeight: 0.1282051282051282,
+          },
+          {
+            schemeCode: "monex_asset_class",
+            schemeName: "資産クラス",
+            valueCode: "developed_equity",
+            valueName: "先進国株式",
+            allocationWeight: 0.8717948717948718,
+          },
+        ],
+        {
+          instrumentName: "MSV内外ETF 資産配分F・G",
+          bookValueMinor: 10_000,
+          metrics: [
+            {
+              code: IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor,
+              integerValue: 52,
+              realValue: null,
+              textValue: null,
+            },
+          ],
+        },
+      ),
+    ];
+
+    const withLines = groupSnapshotLinesByTagWithLines(lines, "monex_asset_class");
+    const domesticSlice = withLines.find(
+      (slice) => slice.valueCode === "domestic_equity",
+    );
+    const domesticLine = domesticSlice?.lines[0];
+
+    expect(domesticSlice?.marketValueMinor).toBe(1_289);
+    expect(domesticLine?.attributedMarketValueMinor).toBe(1_289);
+    expect(domesticLine?.attributedMarketValueMinor).not.toBe(10_052);
+    expect(domesticLine?.attributedUnrealizedGainMinor).toBe(7);
+    expect(domesticLine?.weightInSlice).toBeCloseTo(1);
+  });
+
+  it("preserves market value when splitting small amounts across many tags", () => {
+    const eightAssetBalanceTags: HoldingLineDto["tags"] = [
+      {
+        schemeCode: "monex_asset_class",
+        schemeName: "資産クラス",
+        valueCode: "domestic_equity",
+        valueName: "国内株式",
+        allocationWeight: 0.1282051282051282,
+      },
+      {
+        schemeCode: "monex_asset_class",
+        schemeName: "資産クラス",
+        valueCode: "developed_equity",
+        valueName: "先進国株式",
+        allocationWeight: 0.125,
+      },
+      {
+        schemeCode: "monex_asset_class",
+        schemeName: "資産クラス",
+        valueCode: "emerging_equity",
+        valueName: "新興国株式",
+        allocationWeight: 0.13141025641025642,
+      },
+      {
+        schemeCode: "monex_asset_class",
+        schemeName: "資産クラス",
+        valueCode: "foreign_reit",
+        valueName: "海外REIT",
+        allocationWeight: 0.1282051282051282,
+      },
+      {
+        schemeCode: "monex_asset_class",
+        schemeName: "資産クラス",
+        valueCode: "domestic_reit",
+        valueName: "国内REIT",
+        allocationWeight: 0.125,
+      },
+      {
+        schemeCode: "monex_asset_class",
+        schemeName: "資産クラス",
+        valueCode: "developed_bond",
+        valueName: "先進国債券",
+        allocationWeight: 0.10576923076923077,
+      },
+      {
+        schemeCode: "monex_asset_class",
+        schemeName: "資産クラス",
+        valueCode: "domestic_bond",
+        valueName: "国内債券",
+        allocationWeight: 0.11217948717948718,
+      },
+      {
+        schemeCode: "monex_asset_class",
+        schemeName: "資産クラス",
+        valueCode: "emerging_bond",
+        valueName: "新興国債券",
+        allocationWeight: 0.14423076923076922,
+      },
+    ];
+    const lines = [
+      makeLine(315, eightAssetBalanceTags, {
+        instrumentName: "eMAXIS Slim バランス（8資産均等型）",
+        bookValueMinor: 301,
+        metrics: [
+          {
+            code: IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor,
+            integerValue: 14,
+            realValue: null,
+            textValue: null,
+          },
+        ],
+      }),
+    ];
+
+    const allocation = buildAllocationByScheme(
+      lines,
+      "monex_asset_class",
+      "資産クラス",
+    );
+    expect(allocation.totalMarketValueMinor).toBe(315);
+    expect(sumSnapshotMarketValue(lines)).toBe(315);
+
+    const sliceGainSum = allocation.slices.reduce(
+      (sum, slice) => sum + (slice.unrealizedGainMinor ?? 0),
+      0,
+    );
+    expect(sliceGainSum).toBe(14);
+  });
+
+  it("matches monex snapshot total without rounding gap", () => {
+    const fixturePath = join(
+      dirname(fileURLToPath(import.meta.url)),
+      "../../../docs/data/portfolios/monex/current.json",
+    );
+    const snapshot = JSON.parse(readFileSync(fixturePath, "utf8")) as CurrentSnapshotDto;
+    const assetTotalMinor = sumSnapshotMarketValue(snapshot.lines);
+    const allocation = buildAllocationByScheme(
+      snapshot.lines,
+      "monex_asset_class",
+      "資産クラス",
+    );
+
+    expect(assetTotalMinor).toBe(37_408);
+    expect(allocation.totalMarketValueMinor).toBe(assetTotalMinor);
   });
 
   it("builds allocation by scheme", () => {

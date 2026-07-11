@@ -20,6 +20,46 @@ describe("AllocationLineBreakdown", () => {
     expect(screen.getByRole("columnheader", { name: "分類内構成比" })).toBeInTheDocument();
   });
 
+  it("renders attributed market value for multi-tag holdings", () => {
+    render(
+      <AllocationLineBreakdown
+        lines={[
+          {
+            line: {
+              id: "line-msv",
+              instrumentId: "inst-msv",
+              instrumentName: "MSV内外ETF 資産配分F・G",
+              sortOrder: 0,
+              quantity: 3431,
+              marketValueMinor: 10_052,
+              bookValueMinor: 10_000,
+              metrics: [
+                {
+                  code: "unrealized_gain_minor",
+                  integerValue: 52,
+                  realValue: null,
+                  textValue: null,
+                },
+              ],
+              instrumentAttributes: [],
+              tags: [],
+            },
+            weightInSlice: 0.1281,
+            attributedMarketValueMinor: 1_289,
+            attributedBookValueMinor: 1_282,
+            attributedUnrealizedGainMinor: 7,
+            attributedUnrealizedGainRate: 0.00546,
+          },
+        ]}
+        portfolioKind="monex"
+      />,
+    );
+
+    expect(screen.getByText("￥1,289")).toBeInTheDocument();
+    expect(screen.queryByText("￥10,052")).not.toBeInTheDocument();
+    expect(screen.getByText("￥7")).toBeInTheDocument();
+  });
+
   it("renders portfolio column when enabled", () => {
     render(
       <AllocationLineBreakdown
