@@ -2,10 +2,12 @@ import {
   createClassificationScheme,
   createClassificationValue,
   createPortfolio,
+  createBackupZipBuffer,
   deleteClassificationSchemeById,
   deleteClassificationValueById,
   deleteInstrument,
   deletePortfolio,
+  exportPortfolioBackup,
   findClassificationValueById,
   findInstrumentById,
   findPortfolioByCode,
@@ -13,6 +15,8 @@ import {
   getCurrentSnapshot,
   getSnapshotByDate,
   getSnapshotsInDateRange,
+  importPortfolioBackup,
+  BackupImportError,
   listInstrumentClassificationValueIds,
   listInstruments,
   listIdecoInstrumentsForPaste,
@@ -34,6 +38,7 @@ import {
   type AppDatabase,
 } from "@repo/db";
 import {
+  backupImportModeSchema,
   buildSnapshotTrends,
   createClassificationSchemeSchema,
   createClassificationValueSchema,
@@ -53,15 +58,40 @@ import {
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 
-import { getDatabase, getDatabasePath } from "./db";
+import { getDatabase, getDatabasePath, getSqlite } from "./db";
 
 export type CreateAppOptions = {
   getDb?: () => AppDatabase;
+  getSqlite?: () => ReturnType<typeof getSqlite>;
 };
+
+async function readBackupUploadFile(file: unknown): Promise<Buffer> {
+  let result = Buffer.alloc(0);
+
+  if (!file || typeof file !== "object" || !("arrayBuffer" in file)) {
+    throw new BackupImportError("ZIP ファイルが必要です。");
+  }
+
+  const buffer = await (file as { arrayBuffer: () => Promise<ArrayBuffer> }).arrayBuffer();
+  result = Buffer.from(buffer);
+  return result;
+}
+
+function parseBackupImportMode(value: unknown): "merge" | "replace" | null {
+  let result: "merge" | "replace" | null = null;
+  const parsed = backupImportModeSchema.safeParse(value);
+
+  if (parsed.success) {
+    result = parsed.data;
+  }
+
+  return result;
+}
 
 export function createApp(options?: CreateAppOptions) {
   let result!: Hono;
   const resolveDb = options?.getDb ?? getDatabase;
+  const resolveSqlite = options?.getSqlite ?? getSqlite;
   const app = new Hono();
 
   app.use(
@@ -715,6 +745,175 @@ export function createApp(options?: CreateAppOptions) {
 
     result = c.json(snapshot);
     return result;
+  });
+
+  app.get("/export", async (c) => {
+    let result!: Response;
+
+    const sqlite = resolveSqlite();
+    const exported = await exportPortfolioBackup(sqlite, { type: "all" });
+    const zipBuffer = createBackupZipBuffer(exported.manifest, exported.files);
+    result = new Response(zipBuffer, {
+      headers: {
+        "Content-Type": "application/zip",
+        "Content-Disposition": `attachment; filename="${exported.filename}"`,
+      },
+    });
+    return result;
+  });
+
+  app.get("/portfolios/:code/export", async (c) => {
+    let result!: Response;
+
+    const portfolioCode = c.req.param("code");
+    const db = resolveDb();
+    const portfolio = await findPortfolioByCode(db, portfolioCode);
+    if (!portfolio) {
+      result = c.json({ error: "Portfolio not found" }, 404);
+      return result;
+    }
+
+    const sqlite = resolveSqlite();
+    const exported = await exportPortfolioBackup(sqlite, {
+      type: "portfolio",
+      portfolioCode,
+    });
+    const zipBuffer = createBackupZipBuffer(exported.manifest, exported.files);
+    result = new Response(zipBuffer, {
+      headers: {
+        "Content-Type": "application/zip",
+        "Content-Disposition": `attachment; filename="${exported.filename}"`,
+      },
+    });
+    return result;
+  });
+
+  app.post("/import/preview", async (c) => {
+    let result!: Response;
+
+    const body = await c.req.parseBody();
+    const mode = parseBackupImportMode(body.mode);
+    if (!mode) {
+      result = c.json({ error: "mode は merge または replace を指定してください。" }, 400);
+      return result;
+    }
+
+    try {
+      const zipBuffer = await readBackupUploadFile(body.file);
+      const preview = importPortfolioBackup(resolveSqlite(), zipBuffer, {
+        mode,
+        scope: { type: "all" },
+        dryRun: true,
+      });
+      result = c.json(preview);
+      return result;
+    } catch (error) {
+      if (error instanceof BackupImportError) {
+        result = c.json({ error: error.message }, 400);
+        return result;
+      }
+      throw error;
+    }
+  });
+
+  app.post("/import", async (c) => {
+    let result!: Response;
+
+    const body = await c.req.parseBody();
+    const mode = parseBackupImportMode(body.mode);
+    if (!mode) {
+      result = c.json({ error: "mode は merge または replace を指定してください。" }, 400);
+      return result;
+    }
+
+    try {
+      const zipBuffer = await readBackupUploadFile(body.file);
+      const importResult = importPortfolioBackup(resolveSqlite(), zipBuffer, {
+        mode,
+        scope: { type: "all" },
+        dryRun: false,
+      });
+      result = c.json(importResult);
+      return result;
+    } catch (error) {
+      if (error instanceof BackupImportError) {
+        result = c.json({ error: error.message }, 400);
+        return result;
+      }
+      throw error;
+    }
+  });
+
+  app.post("/portfolios/:code/import/preview", async (c) => {
+    let result!: Response;
+
+    const portfolioCode = c.req.param("code");
+    const db = resolveDb();
+    const portfolio = await findPortfolioByCode(db, portfolioCode);
+    if (!portfolio) {
+      result = c.json({ error: "Portfolio not found" }, 404);
+      return result;
+    }
+
+    const body = await c.req.parseBody();
+    const mode = parseBackupImportMode(body.mode);
+    if (!mode) {
+      result = c.json({ error: "mode は merge または replace を指定してください。" }, 400);
+      return result;
+    }
+
+    try {
+      const zipBuffer = await readBackupUploadFile(body.file);
+      const preview = importPortfolioBackup(resolveSqlite(), zipBuffer, {
+        mode,
+        scope: { type: "portfolio", portfolioCode },
+        dryRun: true,
+      });
+      result = c.json(preview);
+      return result;
+    } catch (error) {
+      if (error instanceof BackupImportError) {
+        result = c.json({ error: error.message }, 400);
+        return result;
+      }
+      throw error;
+    }
+  });
+
+  app.post("/portfolios/:code/import", async (c) => {
+    let result!: Response;
+
+    const portfolioCode = c.req.param("code");
+    const db = resolveDb();
+    const portfolio = await findPortfolioByCode(db, portfolioCode);
+    if (!portfolio) {
+      result = c.json({ error: "Portfolio not found" }, 404);
+      return result;
+    }
+
+    const body = await c.req.parseBody();
+    const mode = parseBackupImportMode(body.mode);
+    if (!mode) {
+      result = c.json({ error: "mode は merge または replace を指定してください。" }, 400);
+      return result;
+    }
+
+    try {
+      const zipBuffer = await readBackupUploadFile(body.file);
+      const importResult = importPortfolioBackup(resolveSqlite(), zipBuffer, {
+        mode,
+        scope: { type: "portfolio", portfolioCode },
+        dryRun: false,
+      });
+      result = c.json(importResult);
+      return result;
+    } catch (error) {
+      if (error instanceof BackupImportError) {
+        result = c.json({ error: error.message }, 400);
+        return result;
+      }
+      throw error;
+    }
   });
 
   result = app;

@@ -40,6 +40,11 @@ export const SETTINGS_CATEGORIES: SettingsCategory[] = [
         label: "汎用指標",
         tab: "generic",
       },
+      {
+        id: "backup",
+        label: "バックアップ",
+        tab: "backup",
+      },
     ],
   },
   {

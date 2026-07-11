@@ -52,6 +52,7 @@ import {
   upsertMetric,
 } from "@/features/manage/snapshot-input";
 import { WritableGuard } from "@/features/manage/WritableGuard";
+import { BackupPanel } from "@/features/backup/BackupPanel";
 import { PortfolioExtraDataTabContent } from "@/features/portfolios/PortfolioExtraDataTabContent";
 import {
   createInstrument,
@@ -584,6 +585,16 @@ export function DataManageView({
                   )}
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="backup" className="space-y-6">
+              <BackupPanel
+                scope="portfolio"
+                portfolioCode={portfolioCode}
+                onImported={() => {
+                  void load();
+                }}
+              />
             </TabsContent>
           </Tabs>
         ) : null}

@@ -11,46 +11,15 @@ export function getMonexCsvCell(cells: string[], index: number): string {
   return result;
 }
 
+import { parseCsv, parseQuotedCsvLine } from "./csv-utils";
+
 export function parseMonexQuotedCsvLine(line: string): string[] {
-  let result: string[] = [];
-  let current = "";
-  let inQuotes = false;
-
-  for (let index = 0; index < line.length; index += 1) {
-    const char = line[index];
-
-    if (char === '"') {
-      if (inQuotes && line[index + 1] === '"') {
-        current += '"';
-        index += 1;
-        continue;
-      }
-      inQuotes = !inQuotes;
-      continue;
-    }
-
-    if (char === "," && !inQuotes) {
-      result.push(current);
-      current = "";
-      continue;
-    }
-
-    current += char;
-  }
-
-  result.push(current);
+  let result = parseQuotedCsvLine(line);
   return result;
 }
 
 export function parseMonexCsv(content: string): string[][] {
-  let result: string[][] = [];
-  const normalized = content.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-  const lines = normalized.split("\n").filter((line) => line.trim() !== "");
-
-  for (const line of lines) {
-    result.push(parseMonexQuotedCsvLine(line));
-  }
-
+  let result = parseCsv(content);
   return result;
 }
 

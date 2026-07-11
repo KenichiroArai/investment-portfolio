@@ -16,6 +16,7 @@ import { LoadingSkeleton } from "@/components/loading-skeleton";
 import { WritableOnly } from "@/components/WritableOnly";
 import { StatCard } from "@/components/stat-card";
 import { AccountManagePanel } from "@/features/manage/AccountManagePanel";
+import { BackupPanel } from "@/features/backup/BackupPanel";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -320,6 +321,18 @@ export function HomeView() {
           </div>
         )}
       </section>
+
+      <WritableOnly>
+        <section className="space-y-4">
+          <h2 className="text-lg font-semibold">データのバックアップ</h2>
+          <BackupPanel
+            scope="all"
+            onImported={() => {
+              setReloadKey((value) => value + 1);
+            }}
+          />
+        </section>
+      </WritableOnly>
     </div>
   );
   return result;

@@ -7,6 +7,7 @@ export const BASE_DATA_MANAGE_TABS: DataManageTabItem[] = [
   { id: "instrument", label: "銘柄" },
   { id: "holding", label: "保有明細" },
   { id: "generic", label: "汎用指標" },
+  { id: "backup", label: "バックアップ" },
 ];
 
 export type PortfolioKindExtraDataTab = {

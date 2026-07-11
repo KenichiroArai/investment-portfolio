@@ -54,6 +54,17 @@ export function getDatabasePath(): string | null {
   return result;
 }
 
+export function getSqlite(): ReturnType<typeof createDb>["sqlite"] {
+  let result: ReturnType<typeof createDb>["sqlite"];
+
+  if (!cached) {
+    throw new Error("Database not initialized. Call initDatabase() before handling requests.");
+  }
+
+  result = cached.sqlite;
+  return result;
+}
+
 export function resetDatabaseCacheForTests(): void {
   let result: void = undefined;
   cached = null;

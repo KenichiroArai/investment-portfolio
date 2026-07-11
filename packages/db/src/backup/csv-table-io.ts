@@ -1,0 +1,98 @@
+import { serializeCsvTable } from "@repo/shared";
+
+import { type BackupTableConfig } from "./backup-tables";
+
+export function formatBackupCellValue(value: unknown): string {
+  let result = "";
+
+  if (value === null || value === undefined) {
+    return result;
+  }
+
+  result = String(value);
+  return result;
+}
+
+export function rowsToCsv(config: BackupTableConfig, rows: Record<string, unknown>[]): string {
+  let result = "";
+  const csvRows = rows.map((row) =>
+    config.exportColumns.map((column) => formatBackupCellValue(row[column])),
+  );
+  result = serializeCsvTable(config.exportColumns, csvRows);
+  return result;
+}
+
+export function parseBackupCellValue(
+  column: string,
+  rawValue: string,
+  config: BackupTableConfig,
+): string | number | null {
+  let result: string | number | null = rawValue;
+  const trimmed = rawValue.trim();
+
+  if (trimmed === "") {
+    if (config.nullableColumns.has(column)) {
+      result = null;
+      return result;
+    }
+    result = "";
+    return result;
+  }
+
+  if (config.integerColumns.has(column)) {
+    result = Number.parseInt(trimmed, 10);
+    return result;
+  }
+
+  if (config.realColumns.has(column)) {
+    result = Number.parseFloat(trimmed);
+    return result;
+  }
+
+  result = trimmed;
+  return result;
+}
+
+export function rowRecordToInsertValues(
+  row: Record<string, string>,
+  config: BackupTableConfig,
+): Record<string, string | number | null> {
+  let result: Record<string, string | number | null> = {};
+
+  for (const column of config.columns) {
+    result[column] = parseBackupCellValue(column, row[column] ?? "", config);
+  }
+
+  return result;
+}
+
+export function buildInsertStatement(tableName: string, columns: string[]): string {
+  let result = "";
+  const placeholders = columns.map(() => "?").join(", ");
+  result = `INSERT INTO ${tableName} (${columns.join(", ")}) VALUES (${placeholders})`;
+  return result;
+}
+
+export function buildMergeUpsertStatement(
+  tableName: string,
+  config: BackupTableConfig,
+): string {
+  let result = "";
+  const columns = config.columns;
+  const placeholders = columns.map(() => "?").join(", ");
+
+  if (tableName === "instrument_classifications") {
+    result = `INSERT INTO ${tableName} (${columns.join(", ")}) VALUES (${placeholders})
+      ON CONFLICT(instrument_id, classification_value_id)
+      DO UPDATE SET allocation_weight = excluded.allocation_weight`;
+    return result;
+  }
+
+  const updateAssignments = columns
+    .filter((column) => column !== "id")
+    .map((column) => `${column} = excluded.${column}`)
+    .join(", ");
+  result = `INSERT INTO ${tableName} (${columns.join(", ")}) VALUES (${placeholders})
+    ON CONFLICT(id) DO UPDATE SET ${updateAssignments}`;
+  return result;
+}

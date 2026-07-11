@@ -1,4 +1,7 @@
 import type {
+  BackupImportMode,
+  BackupImportPreview,
+  BackupImportResult,
   ClassificationSchemeWithValuesDto,
   CreateClassificationSchemeInput,
   CreateClassificationValueInput,
@@ -120,6 +123,182 @@ async function requestWritableJson<T>(
   }
 
   result = await requestJson<T>(path, init);
+  return result;
+}
+
+async function requestWritableBlob(
+  path: string,
+): Promise<
+  | { ok: true; blob: Blob; filename: string }
+  | { ok: false; status: number; message: string }
+> {
+  let result:
+    | { ok: true; blob: Blob; filename: string }
+    | { ok: false; status: number; message: string } = {
+    ok: false,
+    status: 403,
+    message: WRITABLE_BLOCKED_MESSAGE,
+  };
+
+  if (!isWritableDataSource()) {
+    return result;
+  }
+
+  try {
+    const response = await fetch(`${getApiBaseUrl()}${path}`);
+
+    if (!response.ok) {
+      let message = `HTTP ${response.status}`;
+      try {
+        const body = (await response.json()) as ApiErrorBody;
+        message = formatApiError(body);
+      } catch {
+        // ignore parse errors
+      }
+      result = { ok: false, status: response.status, message };
+      return result;
+    }
+
+    const blob = await response.blob();
+    const disposition = response.headers.get("Content-Disposition") ?? "";
+    const filenameMatch = /filename="([^"]+)"/.exec(disposition);
+    const filename = filenameMatch?.[1] ?? "portfolio-export.zip";
+    result = { ok: true, blob, filename };
+    return result;
+  } catch {
+    result = {
+      ok: false,
+      status: 0,
+      message:
+        "API に接続できません。`npm run dev:api` でローカル API を起動してください。",
+    };
+    return result;
+  }
+}
+
+async function requestWritableFormData<T>(
+  path: string,
+  formData: FormData,
+): Promise<{ ok: true; data: T } | { ok: false; status: number; message: string }> {
+  let result:
+    | { ok: true; data: T }
+    | { ok: false; status: number; message: string } = {
+    ok: false,
+    status: 403,
+    message: WRITABLE_BLOCKED_MESSAGE,
+  };
+
+  if (!isWritableDataSource()) {
+    return result;
+  }
+
+  try {
+    const response = await fetch(`${getApiBaseUrl()}${path}`, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      let message = `HTTP ${response.status}`;
+      try {
+        const body = (await response.json()) as ApiErrorBody;
+        message = formatApiError(body);
+      } catch {
+        // ignore parse errors
+      }
+      result = { ok: false, status: response.status, message };
+      return result;
+    }
+
+    const data = (await response.json()) as T;
+    result = { ok: true, data };
+    return result;
+  } catch {
+    result = {
+      ok: false,
+      status: 0,
+      message:
+        "API に接続できません。`npm run dev:api` でローカル API を起動してください。",
+    };
+    return result;
+  }
+}
+
+function buildBackupPath(scope: "all" | "portfolio", portfolioCode?: string): string {
+  let result = "/export";
+
+  if (scope === "portfolio" && portfolioCode) {
+    result = `/portfolios/${encodePortfolioCodeForPath(portfolioCode)}/export`;
+  }
+
+  return result;
+}
+
+function buildBackupImportPath(
+  action: "import" | "import/preview",
+  scope: "all" | "portfolio",
+  portfolioCode?: string,
+): string {
+  let result = `/${action}`;
+
+  if (scope === "portfolio" && portfolioCode) {
+    result = `/portfolios/${encodePortfolioCodeForPath(portfolioCode)}/${action}`;
+  }
+
+  return result;
+}
+
+export async function downloadBackupZip(
+  scope: "all" | "portfolio",
+  portfolioCode?: string,
+) {
+  let result = await requestWritableBlob(buildBackupPath(scope, portfolioCode));
+  return result;
+}
+
+export async function previewBackupImport(
+  scope: "all" | "portfolio",
+  file: File,
+  mode: BackupImportMode,
+  portfolioCode?: string,
+) {
+  let result:
+    | { ok: true; data: BackupImportPreview }
+    | { ok: false; status: number; message: string } = {
+    ok: false,
+    status: 0,
+    message: "リクエストに失敗しました。",
+  };
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("mode", mode);
+  result = await requestWritableFormData<BackupImportPreview>(
+    buildBackupImportPath("import/preview", scope, portfolioCode),
+    formData,
+  );
+  return result;
+}
+
+export async function importBackupZip(
+  scope: "all" | "portfolio",
+  file: File,
+  mode: BackupImportMode,
+  portfolioCode?: string,
+) {
+  let result:
+    | { ok: true; data: BackupImportResult }
+    | { ok: false; status: number; message: string } = {
+    ok: false,
+    status: 0,
+    message: "リクエストに失敗しました。",
+  };
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("mode", mode);
+  result = await requestWritableFormData<BackupImportResult>(
+    buildBackupImportPath("import", scope, portfolioCode),
+    formData,
+  );
   return result;
 }
 

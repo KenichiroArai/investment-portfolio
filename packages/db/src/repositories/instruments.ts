@@ -533,7 +533,14 @@ export async function findInstrumentByAttributeTextValue(
   attributeCode: string,
   textValue: string,
 ) {
-  let result: (typeof instruments.$inferSelect) | null = null;
+  let result: {
+    id: string;
+    name: string;
+    instrumentType: string;
+    currency: string;
+    externalId: string | null;
+    createdAt: string;
+  } | null = null;
 
   const rows = await db
     .select({
