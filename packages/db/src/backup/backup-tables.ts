@@ -29,6 +29,20 @@ export const BACKUP_DELETE_ORDER: BackupTableName[] = [
   ...BACKUP_IMPORT_ORDER,
 ].reverse();
 
+/**
+ * merge 時の ON CONFLICT 対象。
+ * id 以外の業務ユニークがある葉テーブルはこちらを使う。
+ * （同一業務キーで id だけ違う行が既存にあると ON CONFLICT(id) では UNIQUE 違反になる）
+ */
+export const BACKUP_MERGE_CONFLICT_COLUMNS: Partial<Record<BackupTableName, string[]>> = {
+  instrument_classifications: ["instrument_id", "classification_value_id"],
+  instrument_attributes: ["instrument_id", "code"],
+  holding_line_metrics: ["holding_line_id", "code"],
+  portfolio_snapshot_metrics: ["snapshot_id", "code"],
+  target_allocation_weights: ["portfolio_id", "scheme_code", "value_code"],
+  target_portfolio_weights: ["portfolio_id", "instrument_id"],
+};
+
 function defineTable(config: BackupTableConfig): BackupTableConfig {
   let result = config;
   return result;

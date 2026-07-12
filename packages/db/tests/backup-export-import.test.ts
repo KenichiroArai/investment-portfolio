@@ -65,7 +65,14 @@ describe("backup export/import", () => {
           metrics: [],
         },
       ],
-      metrics: [],
+      metrics: [
+        {
+          code: "total_market_value_minor",
+          integerValue: 100_000,
+          realValue: null,
+          textValue: null,
+        },
+      ],
     });
   }
 
@@ -97,6 +104,56 @@ describe("backup export/import", () => {
 
     expect(imported.ok).toBe(true);
     expect(imported.tables.find((table) => table.table === "portfolios")?.insert).toBe(0);
+  });
+
+  it("merges portfolio_snapshot_metrics when business key matches but id differs", async () => {
+    const { sqlite, db } = setup();
+    await seedPortfolio(db, "ideco");
+
+    const exported = await exportPortfolioBackup(sqlite, {
+      type: "portfolio",
+      portfolioCode: "ideco",
+    });
+    const zipBuffer = createBackupZipBuffer(exported.manifest, exported.files);
+
+    const existing = sqlite
+      .prepare(
+        `SELECT id, snapshot_id, code
+         FROM portfolio_snapshot_metrics
+         WHERE code = 'total_market_value_minor'
+         LIMIT 1`,
+      )
+      .get() as { id: string; snapshot_id: string; code: string };
+
+    sqlite
+      .prepare(
+        `UPDATE portfolio_snapshot_metrics
+         SET id = ?, integer_value = 1
+         WHERE id = ?`,
+      )
+      .run("regen-metric-id", existing.id);
+
+    const imported = importPortfolioBackup(sqlite, zipBuffer, {
+      mode: "merge",
+      scope: { type: "portfolio", portfolioCode: "ideco" },
+      dryRun: false,
+    });
+
+    expect(imported.ok).toBe(true);
+
+    const merged = sqlite
+      .prepare(
+        `SELECT id, integer_value
+         FROM portfolio_snapshot_metrics
+         WHERE snapshot_id = ? AND code = ?`,
+      )
+      .get(existing.snapshot_id, existing.code) as {
+      id: string;
+      integer_value: number;
+    };
+
+    expect(merged.id).toBe(existing.id);
+    expect(merged.integer_value).toBe(100_000);
   });
 
   it("exports and imports a single portfolio with replace mode", async () => {

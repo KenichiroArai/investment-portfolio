@@ -14,6 +14,7 @@ import {
 
 import {
   BACKUP_IMPORT_ORDER,
+  BACKUP_MERGE_CONFLICT_COLUMNS,
   BACKUP_TABLE_CONFIGS,
   buildBackupDeleteStatements,
   buildBackupExportQuery,
@@ -103,9 +104,10 @@ function validateHeaders(tableName: BackupTableName, headers: string[]): string[
 function rowKey(tableName: BackupTableName, row: Record<string, string>): string {
   let result = "";
   const config = BACKUP_TABLE_CONFIGS[tableName];
+  const conflictColumns = BACKUP_MERGE_CONFLICT_COLUMNS[tableName];
 
-  if (tableName === "instrument_classifications") {
-    result = `${row.instrument_id}::${row.classification_value_id}`;
+  if (conflictColumns) {
+    result = conflictColumns.map((column) => row[column] ?? "").join("::");
     return result;
   }
 

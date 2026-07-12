@@ -1,6 +1,9 @@
 import { serializeCsvTable } from "@repo/shared";
 
-import { type BackupTableConfig } from "./backup-tables";
+import {
+  BACKUP_MERGE_CONFLICT_COLUMNS,
+  type BackupTableConfig,
+} from "./backup-tables";
 
 export function formatBackupCellValue(value: unknown): string {
   let result = "";
@@ -80,19 +83,17 @@ export function buildMergeUpsertStatement(
   let result = "";
   const columns = config.columns;
   const placeholders = columns.map(() => "?").join(", ");
-
-  if (tableName === "instrument_classifications") {
-    result = `INSERT INTO ${tableName} (${columns.join(", ")}) VALUES (${placeholders})
-      ON CONFLICT(instrument_id, classification_value_id)
-      DO UPDATE SET allocation_weight = excluded.allocation_weight`;
-    return result;
-  }
-
+  const conflictColumns =
+    BACKUP_MERGE_CONFLICT_COLUMNS[tableName as keyof typeof BACKUP_MERGE_CONFLICT_COLUMNS] ?? [
+      "id",
+    ];
+  const conflictColumnSet = new Set(conflictColumns);
   const updateAssignments = columns
-    .filter((column) => column !== "id")
+    .filter((column) => !conflictColumnSet.has(column))
     .map((column) => `${column} = excluded.${column}`)
     .join(", ");
+
   result = `INSERT INTO ${tableName} (${columns.join(", ")}) VALUES (${placeholders})
-    ON CONFLICT(id) DO UPDATE SET ${updateAssignments}`;
+    ON CONFLICT(${conflictColumns.join(", ")}) DO UPDATE SET ${updateAssignments}`;
   return result;
 }

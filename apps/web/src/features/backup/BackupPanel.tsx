@@ -43,6 +43,11 @@ type BackupPanelProps = {
   onImported?: () => void;
 };
 
+type BackupImportSummary = {
+  tables: BackupImportPreview["tables"];
+  warnings: string[];
+};
+
 function triggerBlobDownload(blob: Blob, filename: string): void {
   let result: void = undefined;
   const url = URL.createObjectURL(blob);
@@ -57,7 +62,7 @@ function triggerBlobDownload(blob: Blob, filename: string): void {
 export function BackupPanel({ scope, portfolioCode, onImported }: BackupPanelProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [mode, setMode] = useState<BackupImportMode>("merge");
-  const [preview, setPreview] = useState<BackupImportPreview | null>(null);
+  const [preview, setPreview] = useState<BackupImportSummary | null>(null);
   const [exporting, setExporting] = useState(false);
   const [previewing, setPreviewing] = useState(false);
   const [importing, setImporting] = useState(false);
@@ -102,7 +107,10 @@ export function BackupPanel({ scope, portfolioCode, onImported }: BackupPanelPro
       return result;
     }
 
-    setPreview(response.data);
+    setPreview({
+      tables: response.data.tables,
+      warnings: response.data.warnings,
+    });
     return result;
   }, [mode, portfolioCode, scope, selectedFile]);
 
@@ -124,7 +132,10 @@ export function BackupPanel({ scope, portfolioCode, onImported }: BackupPanelPro
     }
 
     toast.success("バックアップをインポートしました。");
-    setPreview(response.data);
+    setPreview({
+      tables: response.data.tables,
+      warnings: [],
+    });
     setSelectedFile(null);
     setConfirmOpen(false);
     setConfirmText("");
