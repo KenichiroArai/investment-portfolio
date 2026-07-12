@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { href: "/", label: "ホーム", icon: Home },
-  { href: "/analysis/", label: "全口座分析", icon: BarChart3 },
+  { href: "/analysis/", label: "全口座", icon: BarChart3 },
 ];
 
 export function TopBar() {

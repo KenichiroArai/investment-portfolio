@@ -2,21 +2,30 @@
 
 import Link from "next/link";
 import {
+  buildGlobalInstrumentRankingValues,
+  buildGlobalInstrumentRows,
+  buildGlobalPortfolioSlices,
+  collapseGlobalInstrumentRows,
   computeSnapshotGainRate,
   computeSnapshotPortfolioGainMinor,
   resolveSnapshotTotalContributions,
   sumSnapshotMarketValue,
+  toPortfolioAllocationSlices,
   type CurrentSnapshotDto,
 } from "@repo/shared";
 import { ArrowRight, BarChart3, List } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { EmptyState } from "@/components/empty-state";
 import { LoadingSkeleton } from "@/components/loading-skeleton";
 import { WritableOnly } from "@/components/WritableOnly";
 import { StatCard } from "@/components/stat-card";
+import { GlobalAllocationDonutCard } from "@/features/analysis/GlobalAllocationDonutCard";
+import { getAllocationChartColor } from "@/features/analysis/chart-colors";
 import { AccountManagePanel } from "@/features/manage/AccountManagePanel";
 import { BackupPanel } from "@/features/backup/BackupPanel";
+import { TrendBarChart } from "@/features/trends/TrendBarChart";
+import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,6 +45,8 @@ import {
 } from "@/lib/data-source";
 import { cn } from "@/lib/utils";
 
+const HOME_CHART_INSTRUMENT_LIMIT = 8;
+
 type PortfolioCard = {
   code: string;
   name: string;
@@ -49,6 +60,7 @@ type PortfolioCard = {
 export function HomeView() {
   const [cards, setCards] = useState<PortfolioCard[]>([]);
   const [portfolios, setPortfolios] = useState<PortfolioListItem[]>([]);
+  const [snapshots, setSnapshots] = useState<CurrentSnapshotDto[]>([]);
   const [reloadKey, setReloadKey] = useState(0);
   const [totalMarketValueMinor, setTotalMarketValueMinor] = useState(0);
   const [totalPortfolioGainMinor, setTotalPortfolioGainMinor] = useState(0);
@@ -80,6 +92,7 @@ export function HomeView() {
           (await portfolioResponse.json()) as PortfolioListItem[];
         setPortfolios(portfolioRows);
         const nextCards: PortfolioCard[] = [];
+        const nextSnapshots: CurrentSnapshotDto[] = [];
         let total = 0;
         let totalGain = 0;
         let snapshotCount = 0;
@@ -125,6 +138,7 @@ export function HomeView() {
           total += marketValueMinor;
           totalGain += portfolioGainMinor;
           snapshotCount += 1;
+          nextSnapshots.push(snapshot);
           nextCards.push({
             code: portfolio.code,
             name: portfolio.name,
@@ -137,6 +151,7 @@ export function HomeView() {
         }
 
         setCards(nextCards);
+        setSnapshots(nextSnapshots);
         setTotalMarketValueMinor(total);
         setTotalPortfolioGainMinor(totalGain);
         setHasAnySnapshot(snapshotCount > 0);
@@ -160,6 +175,39 @@ export function HomeView() {
     };
     return result;
   }, [reloadKey]);
+
+  const portfolioSlices = useMemo(() => {
+    let result = toPortfolioAllocationSlices(
+      buildGlobalPortfolioSlices(snapshots).portfolios,
+    );
+    return result;
+  }, [snapshots]);
+
+  const instrumentChartRows = useMemo(() => {
+    let result = collapseGlobalInstrumentRows(
+      buildGlobalInstrumentRows(snapshots),
+      HOME_CHART_INSTRUMENT_LIMIT,
+    );
+    return result;
+  }, [snapshots]);
+
+  const rankingLabels = useMemo(() => {
+    let result = instrumentChartRows.map((row) => row.instrumentName);
+    return result;
+  }, [instrumentChartRows]);
+
+  const rankingSeries = useMemo(() => {
+    let result: TrendChartSeries[] = [
+      {
+        key: "marketValue",
+        label: "評価額",
+        color: getAllocationChartColor(0),
+        values: buildGlobalInstrumentRankingValues(instrumentChartRows),
+        formatValue: (value) => formatYen(value),
+      },
+    ];
+    return result;
+  }, [instrumentChartRows]);
 
   let result: ReactNode = null;
 
@@ -213,10 +261,38 @@ export function HomeView() {
             </>
           ) : null}
         </div>
+
+        {hasAnySnapshot ? (
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Card>
+              <CardContent className="pt-6">
+                <GlobalAllocationDonutCard
+                  title="口座別構成"
+                  slices={portfolioSlices}
+                />
+              </CardContent>
+            </Card>
+            {rankingLabels.length > 0 ? (
+              <Card>
+                <CardContent className="pt-6">
+                  <TrendBarChart
+                    title="上位銘柄"
+                    caption={`評価額上位 ${HOME_CHART_INSTRUMENT_LIMIT} 銘柄`}
+                    labels={rankingLabels}
+                    series={rankingSeries}
+                    valueKind="yen"
+                    height={240}
+                  />
+                </CardContent>
+              </Card>
+            ) : null}
+          </div>
+        ) : null}
+
         <Button variant="outline" asChild>
           <Link href="/analysis/">
             <BarChart3 className="h-4 w-4" />
-            全口座の資産配分を見る
+            全口座を見る
             <ArrowRight className="h-4 w-4" />
           </Link>
         </Button>

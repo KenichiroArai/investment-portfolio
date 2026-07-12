@@ -1,36 +1,33 @@
 "use client";
 
-import Link from "next/link";
 import {
-  buildAllocationBySchemeWithLinesFromSnapshots,
-  mergeAnalysisSchemesFromSnapshots,
-  mergeSnapshotsForGlobalAnalysis,
+  buildGlobalInstrumentPortfolioStack,
+  buildGlobalInstrumentRankingValues,
+  buildGlobalInstrumentRows,
+  buildGlobalPortfolioSlices,
+  collapseGlobalInstrumentRows,
+  computeSnapshotGainRate,
+  computeSnapshotPortfolioGainMinor,
+  resolveSnapshotTotalContributions,
+  sumSnapshotMarketValue,
+  toInstrumentAllocationSlices,
+  toPortfolioAllocationSlices,
   type CurrentSnapshotDto,
 } from "@repo/shared";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
-import { AllocationPanel } from "@/features/analysis/AllocationPanel";
-import { AnalysisPanelSummary } from "@/features/analysis/AnalysisPanelSummary";
+import { GlobalAllocationDonutCard } from "@/features/analysis/GlobalAllocationDonutCard";
+import { GlobalInstrumentTable } from "@/features/analysis/GlobalInstrumentTable";
+import { getAllocationChartColor } from "@/features/analysis/chart-colors";
 import { LoadingSkeleton } from "@/components/loading-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
+import { StatCard } from "@/components/stat-card";
+import { TrendBarChart } from "@/features/trends/TrendBarChart";
+import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  formatAllocationPercent,
-  formatAsOfDateJa,
-  formatYen,
-} from "@/lib/format-yen";
-import { buildPortfolioPath } from "@/lib/portfolio-path";
+import { formatPercent, formatYen } from "@/lib/format-yen";
 import {
   getPortfoliosFetchUrl,
   getSnapshotFetchUrl,
@@ -38,28 +35,12 @@ import {
   type PortfolioListItem,
 } from "@/lib/data-source";
 
+const CHART_INSTRUMENT_LIMIT = 12;
+
 export function GlobalAnalysisView() {
-  const [portfolios, setPortfolios] = useState<PortfolioListItem[]>([]);
   const [snapshots, setSnapshots] = useState<CurrentSnapshotDto[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedSchemeCode, setSelectedSchemeCode] = useState("");
-  const schemeConfigs = useMemo(() => {
-    let result = mergeAnalysisSchemesFromSnapshots(snapshots);
-    return result;
-  }, [portfolios, snapshots]);
-  const activeSchemeCode = useMemo(() => {
-    let result = schemeConfigs[0]?.schemeCode ?? "";
-
-    const selected = schemeConfigs.find(
-      (config) => config.schemeCode === selectedSchemeCode,
-    );
-    if (selected) {
-      result = selected.schemeCode;
-    }
-
-    return result;
-  }, [schemeConfigs, selectedSchemeCode]);
 
   useEffect(() => {
     let result: () => void = () => {};
@@ -83,7 +64,6 @@ export function GlobalAnalysisView() {
 
         const portfolioRows =
           (await portfolioResponse.json()) as PortfolioListItem[];
-        setPortfolios(portfolioRows);
 
         const loadedSnapshots: CurrentSnapshotDto[] = [];
         for (const portfolio of portfolioRows) {
@@ -123,6 +103,98 @@ export function GlobalAnalysisView() {
     return result;
   }, []);
 
+  const portfolioSummary = useMemo(() => {
+    let result = buildGlobalPortfolioSlices(snapshots);
+    return result;
+  }, [snapshots]);
+
+  const instrumentRows = useMemo(() => {
+    let result = buildGlobalInstrumentRows(snapshots);
+    return result;
+  }, [snapshots]);
+
+  const portfolioSlices = useMemo(() => {
+    let result = toPortfolioAllocationSlices(portfolioSummary.portfolios);
+    return result;
+  }, [portfolioSummary]);
+
+  const instrumentChartRows = useMemo(() => {
+    let result = collapseGlobalInstrumentRows(
+      instrumentRows,
+      CHART_INSTRUMENT_LIMIT,
+    );
+    return result;
+  }, [instrumentRows]);
+
+  const instrumentSlices = useMemo(() => {
+    let result = toInstrumentAllocationSlices(instrumentChartRows);
+    return result;
+  }, [instrumentChartRows]);
+
+  const rankingLabels = useMemo(() => {
+    let result = instrumentChartRows.map((row) => row.instrumentName);
+    return result;
+  }, [instrumentChartRows]);
+
+  const rankingSeries = useMemo(() => {
+    let result: TrendChartSeries[] = [
+      {
+        key: "marketValue",
+        label: "評価額",
+        color: getAllocationChartColor(0),
+        values: buildGlobalInstrumentRankingValues(instrumentChartRows),
+        formatValue: (value) => formatYen(value),
+      },
+    ];
+    return result;
+  }, [instrumentChartRows]);
+
+  const stackChart = useMemo(() => {
+    let result = buildGlobalInstrumentPortfolioStack(
+      instrumentRows,
+      portfolioSummary.portfolios,
+      CHART_INSTRUMENT_LIMIT,
+    );
+    return result;
+  }, [instrumentRows, portfolioSummary.portfolios]);
+
+  const stackSeries = useMemo(() => {
+    let result: TrendChartSeries[] = stackChart.series.map((item, index) => {
+      let series: TrendChartSeries = {
+        key: item.key,
+        label: item.label,
+        color: getAllocationChartColor(index),
+        values: item.values,
+        formatValue: (value) => formatYen(value),
+      };
+      return series;
+    });
+    return result;
+  }, [stackChart.series]);
+
+  const totalPortfolioGainMinor = useMemo(() => {
+    let result = 0;
+
+    for (const snapshot of snapshots) {
+      const marketValueMinor = sumSnapshotMarketValue(snapshot.lines);
+      const totalContributions = resolveSnapshotTotalContributions(snapshot);
+      result += computeSnapshotPortfolioGainMinor(
+        marketValueMinor,
+        totalContributions,
+      );
+    }
+
+    return result;
+  }, [snapshots]);
+
+  const totalGainRate = useMemo(() => {
+    let result = computeSnapshotGainRate(
+      totalPortfolioGainMinor,
+      portfolioSummary.totalMarketValueMinor,
+    );
+    return result;
+  }, [totalPortfolioGainMinor, portfolioSummary.totalMarketValueMinor]);
+
   let result: ReactNode = null;
 
   if (loading) {
@@ -137,7 +209,7 @@ export function GlobalAnalysisView() {
   if (error) {
     result = (
       <PageContainer>
-        <PageHeader title="全口座の資産配分" />
+        <PageHeader title="全口座" />
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
@@ -149,125 +221,101 @@ export function GlobalAnalysisView() {
   if (snapshots.length === 0) {
     result = (
       <PageContainer>
-        <PageHeader title="全口座の資産配分" />
+        <PageHeader title="全口座" />
         <Alert variant="destructive">
-          <AlertDescription>資産配分の対象となる明細がありません。</AlertDescription>
+          <AlertDescription>表示できる明細がありません。</AlertDescription>
         </Alert>
       </PageContainer>
     );
     return result;
   }
 
-  const merged = mergeSnapshotsForGlobalAnalysis(snapshots, schemeConfigs);
-  const activeScheme = schemeConfigs.find(
-    (config) => config.schemeCode === activeSchemeCode,
-  );
-  const allocation =
-    activeScheme !== undefined
-      ? buildAllocationBySchemeWithLinesFromSnapshots(
-          snapshots,
-          activeScheme.schemeCode,
-          activeScheme.schemeName,
-        )
-      : null;
+  const gainClassName =
+    totalPortfolioGainMinor >= 0 ? "text-positive" : "text-negative";
+  const gainRateLabel =
+    totalGainRate === null ? "—" : formatPercent(totalGainRate);
 
   result = (
     <PageContainer>
       <PageHeader
-        title="全口座の資産配分"
-        description={`総評価額: ${formatYen(merged.totalMarketValueMinor)}`}
+        title="全口座"
+        description="銘柄名で口座横断に合算した共通表示です。"
       />
 
+      <div className="mb-6 grid gap-4 sm:grid-cols-3">
+        <StatCard
+          label="総評価額"
+          value={formatYen(portfolioSummary.totalMarketValueMinor)}
+          valueClassName="text-2xl"
+        />
+        <StatCard
+          label="損益"
+          value={formatYen(totalPortfolioGainMinor)}
+          valueClassName={gainClassName}
+        />
+        <StatCard
+          label="利益率"
+          value={gainRateLabel}
+          valueClassName={gainClassName}
+        />
+      </div>
+
+      <div className="mb-6 grid gap-6 lg:grid-cols-2">
+        <Card>
+          <CardContent className="pt-6">
+            <GlobalAllocationDonutCard
+              title="口座別構成"
+              slices={portfolioSlices}
+            />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <GlobalAllocationDonutCard
+              title="銘柄別構成"
+              slices={instrumentSlices}
+            />
+          </CardContent>
+        </Card>
+      </div>
+
       <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="text-base">口座別内訳</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0 pt-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>口座</TableHead>
-                <TableHead>基準日</TableHead>
-                <TableHead>評価額</TableHead>
-                <TableHead>構成比</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {merged.portfolios.map((portfolio) => {
-                let row = (
-                  <TableRow key={portfolio.portfolioCode}>
-                    <TableCell>
-                      <Link
-                        href={buildPortfolioPath(portfolio.portfolioCode, "analysis")}
-                        className="font-medium hover:underline"
-                      >
-                        {portfolio.portfolioName}
-                      </Link>
-                    </TableCell>
-                    <TableCell>{formatAsOfDateJa(portfolio.asOfDate)}</TableCell>
-                    <TableCell>{formatYen(portfolio.marketValueMinor)}</TableCell>
-                    <TableCell>{formatAllocationPercent(portfolio.weight)}</TableCell>
-                  </TableRow>
-                );
-                return row;
-              })}
-            </TableBody>
-          </Table>
+        <CardContent className="pt-6">
+          <TrendBarChart
+            title="銘柄ランキング"
+            caption={`評価額上位 ${CHART_INSTRUMENT_LIMIT} 銘柄（超過分はその他）`}
+            labels={rankingLabels}
+            series={rankingSeries}
+            valueKind="yen"
+            height={280}
+          />
         </CardContent>
       </Card>
 
-      {schemeConfigs.length > 0 && allocation ? (
-        <Tabs
-          value={activeSchemeCode}
-          onValueChange={setSelectedSchemeCode}
-          className="space-y-4"
-        >
-          <TabsList className="flex h-auto flex-wrap">
-            {schemeConfigs.map((config) => {
-              let tab = (
-                <TabsTrigger key={config.schemeCode} value={config.schemeCode}>
-                  {config.schemeName}
-                </TabsTrigger>
-              );
-              return tab;
-            })}
-          </TabsList>
-          {schemeConfigs.map((config) => {
-            const schemeAllocation = buildAllocationBySchemeWithLinesFromSnapshots(
-              snapshots,
-              config.schemeCode,
-              config.schemeName,
-            );
+      {stackSeries.length > 0 && stackChart.labels.length > 0 ? (
+        <Card className="mb-6">
+          <CardContent className="pt-6">
+            <TrendBarChart
+              title="口座×銘柄"
+              caption="上位銘柄ごとの口座別評価額"
+              labels={stackChart.labels}
+              series={stackSeries}
+              mode="stacked"
+              valueKind="yen"
+              height={300}
+            />
+          </CardContent>
+        </Card>
+      ) : null}
 
-            let content = (
-              <TabsContent key={config.schemeCode} value={config.schemeCode}>
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">
-                      全口座合算 — {config.schemeName}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <AnalysisPanelSummary
-                      axisTotalMinor={schemeAllocation.totalMarketValueMinor}
-                      assetTotalMinor={merged.totalMarketValueMinor}
-                    />
-                    <AllocationPanel
-                      slices={schemeAllocation.slices}
-                      showPortfolioColumn
-                    />
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            );
-            return content;
-          })}
-        </Tabs>
-      ) : (
-        <p className="text-sm text-muted-foreground">
-          横断分析に利用できる分類軸がありません。
-        </p>
-      )}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">銘柄一覧</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0 pt-0">
+          <GlobalInstrumentTable rows={instrumentRows} />
+        </CardContent>
+      </Card>
     </PageContainer>
   );
   return result;
