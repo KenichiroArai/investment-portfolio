@@ -689,6 +689,89 @@ export function aggregateTrendPoints(
   return result;
 }
 
+function resolveCalendarYearMonth(asOfDate: string): string | null {
+  let result: string | null = null;
+  const match = /^(\d{4})-(\d{2})-\d{2}$/.exec(asOfDate);
+  if (!match) {
+    return result;
+  }
+  result = `${match[1]}-${match[2]}`;
+  return result;
+}
+
+function formatCalendarMonthBucketLabel(yearMonth: string): string {
+  let result = yearMonth;
+  const match = /^(\d{4})-(\d{2})$/.exec(yearMonth);
+  if (!match) {
+    return result;
+  }
+  result = `${Number(match[2])}月`;
+  return result;
+}
+
+/**
+ * 暦月ごとに集約する。既定の pick は期末（その月の最終スナップショット）。
+ */
+export function aggregateTrendPointsByCalendarMonth(
+  points: SnapshotTrendPointDto[],
+  rangeFrom: string,
+  rangeTo: string,
+  options?: TrendAggregationOptions,
+): AggregatedTrendPoint[] {
+  let result: AggregatedTrendPoint[] = [];
+
+  if (points.length === 0) {
+    return result;
+  }
+
+  const { pick, minMaxField } = resolveAggregationOptions(options);
+  const buckets = new Map<string, SnapshotTrendPointDto[]>();
+
+  for (const point of points) {
+    if (point.asOfDate < rangeFrom || point.asOfDate > rangeTo) {
+      continue;
+    }
+    const yearMonth = resolveCalendarYearMonth(point.asOfDate);
+    if (!yearMonth) {
+      continue;
+    }
+    const existing = buckets.get(yearMonth);
+    if (existing) {
+      existing.push(point);
+      continue;
+    }
+    buckets.set(yearMonth, [point]);
+  }
+
+  result = [...buckets.entries()]
+    .sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey))
+    .flatMap(([yearMonth, bucketPoints]) => {
+      const resolved = resolveBucketPoint(
+        bucketPoints,
+        pick,
+        minMaxField,
+        yearMonth,
+      );
+      if (!resolved) {
+        return [];
+      }
+
+      let aggregated: AggregatedTrendPoint = {
+        ...resolved.point,
+        asOfDate: resolved.isAveraged ? yearMonth : resolved.point.asOfDate,
+        bucketKey: yearMonth,
+        bucketLabel: formatCalendarMonthBucketLabel(yearMonth),
+        sourceAsOfDate: resolved.isAveraged
+          ? yearMonth
+          : resolved.point.asOfDate,
+        isAveraged: resolved.isAveraged || undefined,
+      };
+      return [aggregated];
+    });
+
+  return result;
+}
+
 function buildBaselinePointFromRaw(
   point: SnapshotTrendPointDto,
 ): AggregatedTrendPoint {

@@ -93,7 +93,10 @@ export function truncateTrendChartLabel(
   return result;
 }
 
-export function resolveTrendChartSlotWidth(labels: string[]): number {
+export function resolveTrendChartSlotWidth(
+  labels: string[],
+  targetPlotWidth: number = DEFAULT_TARGET_WIDTH,
+): number {
   let result = MIN_SLOT_WIDTH;
   const labelCount = labels.length;
 
@@ -101,7 +104,7 @@ export function resolveTrendChartSlotWidth(labels: string[]): number {
     return result;
   }
 
-  const fitWidth = DEFAULT_TARGET_WIDTH / labelCount;
+  const fitWidth = targetPlotWidth / labelCount;
 
   if (labelCount === 1) {
     result = Math.max(

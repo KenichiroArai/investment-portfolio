@@ -152,6 +152,35 @@ describe("TrendBarChart", () => {
     expect(axisLabels).toEqual(["0", "100", "200", "300", "400"]);
   });
 
+  it("fits y-axis to the data range when domainMode is fitData", () => {
+    const { container } = render(
+      <TrendBarChart
+        labels={["2026/6", "2026/7"]}
+        valueKind="yen"
+        domainMode="fitData"
+        targetPlotWidth={320}
+        series={[
+          {
+            key: "market-value",
+            label: "評価額",
+            color: "#2563eb",
+            values: [3_400_000, 3_500_000],
+          },
+        ]}
+      />,
+    );
+
+    const axisLabels = Array.from(
+      container.querySelectorAll(".trend-bar-chart__y-label"),
+    ).map((node) => node.textContent);
+    expect(axisLabels.some((label) => label === "0万円")).toBe(false);
+    expect(axisLabels.length).toBeGreaterThan(0);
+
+    const svg = container.querySelector(".trend-bar-chart__svg");
+    const minWidth = svg?.getAttribute("style") ?? "";
+    expect(minWidth).toMatch(/min-width:\s*4\d{2}px/);
+  });
+
   it("shows yen unit on each y-axis tick", () => {
     const { container } = render(
       <TrendBarChart

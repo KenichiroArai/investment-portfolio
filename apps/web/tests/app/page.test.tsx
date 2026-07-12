@@ -72,6 +72,59 @@ function createHomeFetchMock(options: {
     }
 
     for (const portfolio of portfolios) {
+      if (url.includes(`/portfolios/${portfolio.code}/snapshots/trends`)) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            portfolioCode: portfolio.code,
+            from: "2026-01-31",
+            to: "2026-03-31",
+            points: [
+              {
+                asOfDate: "2026-01-31",
+                totalMarketValueMinor:
+                  portfolio.code === "ideco" ? 900_000 : 400_000,
+                totalBookValueMinor:
+                  portfolio.code === "ideco" ? 800_000 : 350_000,
+                unrealizedGainMinor:
+                  portfolio.code === "ideco" ? 100_000 : 50_000,
+                gainRateOnBook: null,
+                totalContributionsMinor: null,
+                gainRateOnContributions: null,
+                allocationsByScheme: {},
+              },
+              {
+                asOfDate: "2026-02-28",
+                totalMarketValueMinor:
+                  portfolio.code === "ideco" ? 950_000 : 450_000,
+                totalBookValueMinor:
+                  portfolio.code === "ideco" ? 850_000 : 400_000,
+                unrealizedGainMinor:
+                  portfolio.code === "ideco" ? 100_000 : 50_000,
+                gainRateOnBook: null,
+                totalContributionsMinor: null,
+                gainRateOnContributions: null,
+                allocationsByScheme: {},
+              },
+              {
+                asOfDate: "2026-03-31",
+                totalMarketValueMinor:
+                  portfolio.code === "ideco" ? 1_000_000 : 500_000,
+                totalBookValueMinor:
+                  portfolio.code === "ideco" ? 900_000 : 450_000,
+                unrealizedGainMinor:
+                  portfolio.code === "ideco" ? 100_000 : 50_000,
+                gainRateOnBook: null,
+                totalContributionsMinor: null,
+                gainRateOnContributions: null,
+                allocationsByScheme: {},
+              },
+            ],
+          }),
+        };
+      }
+
       if (url.includes(`/portfolios/${portfolio.code}/snapshot/current`)) {
         const entry = options.snapshotByCode?.[portfolio.code] ?? {
           status: 200,
@@ -159,7 +212,18 @@ describe("Home", () => {
     expect(screen.getAllByText("利益率").length).toBeGreaterThan(0);
     expect(screen.getAllByText("iDeCo").length).toBeGreaterThan(0);
     expect(screen.getAllByText("NISA").length).toBeGreaterThan(0);
-    expect(screen.getByRole("link", { name: /全口座の資産配分を見る/ })).toHaveAttribute(
+    expect(screen.getByRole("heading", { name: "評価額・利益率の変化" })).toBeInTheDocument();
+    expect(screen.getByText("直近1年・期末・万円 / 月 / %")).toBeInTheDocument();
+    expect(
+      screen.getByLabelText("評価額と利益率の複合グラフ"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("1")).toBeInTheDocument();
+    expect(screen.getByText("2")).toBeInTheDocument();
+    expect(screen.getByText("3")).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "上位銘柄" })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("推移折れ線グラフ")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("推移棒グラフ")).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /全口座を見る/ })).toHaveAttribute(
       "href",
       "/analysis",
     );

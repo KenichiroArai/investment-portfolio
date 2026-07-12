@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   __snapshotTrendAggregationTesting,
   aggregateTrendPoints,
+  aggregateTrendPointsByCalendarMonth,
   buildTrendDisplayPoints,
   formatTrendBucketLabel,
   formatTrendSparseDataNote,
@@ -733,5 +734,53 @@ describe("snapshot-trend-aggregation", () => {
   it("skips buckets when rolling end date cannot be resolved", () => {
     const points = [createPoint("2026-06-02", 100)];
     expect(aggregateTrendPoints(points, "week", "invalid", "2026-06-30")).toEqual([]);
+  });
+
+  it("aggregates by calendar month using period-end snapshot by default", () => {
+    const points = [
+      createPoint("2025-12-10", 100),
+      createPoint("2026-01-05", 110),
+      createPoint("2026-01-28", 120),
+      createPoint("2026-02-15", 130),
+      createPoint("2026-03-01", 140),
+    ];
+    const aggregated = aggregateTrendPointsByCalendarMonth(
+      points,
+      "2025-12-01",
+      "2026-03-31",
+      { pick: "last" },
+    );
+
+    expect(aggregated.map((point) => point.bucketLabel)).toEqual([
+      "12月",
+      "1月",
+      "2月",
+      "3月",
+    ]);
+    expect(aggregated[1]).toMatchObject({
+      bucketKey: "2026-01",
+      sourceAsOfDate: "2026-01-28",
+      totalMarketValueMinor: 120,
+    });
+    expect(aggregated[2]).toMatchObject({
+      bucketKey: "2026-02",
+      sourceAsOfDate: "2026-02-15",
+      totalMarketValueMinor: 130,
+    });
+  });
+
+  it("excludes calendar months outside the selected range", () => {
+    const points = [
+      createPoint("2025-11-30", 90),
+      createPoint("2026-01-31", 110),
+      createPoint("2026-04-01", 150),
+    ];
+    const aggregated = aggregateTrendPointsByCalendarMonth(
+      points,
+      "2026-01-01",
+      "2026-03-31",
+    );
+    expect(aggregated).toHaveLength(1);
+    expect(aggregated[0].bucketLabel).toBe("1月");
   });
 });

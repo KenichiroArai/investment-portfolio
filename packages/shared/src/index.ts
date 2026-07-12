@@ -9,6 +9,7 @@ export * from "./snapshot-allocation";
 export * from "./snapshot-time-range";
 export * from "./snapshot-trends";
 export * from "./snapshot-trend-aggregation";
+export * from "./merge-snapshot-trend-points";
 export * from "./allocation-series";
 export * from "./allocation-period-change";
 export * from "./allocation-gap";

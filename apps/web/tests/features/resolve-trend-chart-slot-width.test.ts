@@ -26,6 +26,11 @@ describe("resolveTrendChartSlotWidth", () => {
     expect(slotWidth).toBeLessThan(120);
   });
 
+  it("honors a smaller target plot width", () => {
+    const slotWidth = resolveTrendChartSlotWidth(["2026/6", "2026/7"], 320);
+    expect(slotWidth).toBe(160);
+  });
+
   it("estimates wide characters wider than ascii", () => {
     expect(estimateTrendChartLabelWidth("あ")).toBeGreaterThan(
       estimateTrendChartLabelWidth("a"),

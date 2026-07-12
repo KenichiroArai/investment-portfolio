@@ -2,6 +2,8 @@
 
 import {
   buildNiceAxisScale,
+  resolveTrendSeriesValueDomain,
+  type TrendChartDomainMode,
   type TrendChartValueKind,
 } from "@repo/shared";
 import { useMemo, useState, type ReactNode } from "react";
@@ -43,6 +45,8 @@ type TrendBarChartProps = {
   height?: number;
   className?: string;
   valueDomain?: { min: number; max: number };
+  domainMode?: TrendChartDomainMode;
+  targetPlotWidth?: number;
   formatYAxis?: (value: number) => string;
   valueKind?: TrendChartValueKind;
   title?: string;
@@ -52,6 +56,7 @@ type TrendBarChartProps = {
 
 const CHART_HEIGHT = 220;
 const PADDING = { top: 16, right: 16, bottom: 48, left: 88 };
+const DEFAULT_MIN_PLOT_WIDTH = 320;
 
 export function TrendBarChart({
   labels,
@@ -62,6 +67,8 @@ export function TrendBarChart({
   height = CHART_HEIGHT,
   className,
   valueDomain,
+  domainMode = "includeZero",
+  targetPlotWidth,
   formatYAxis,
   valueKind,
   title,
@@ -72,8 +79,12 @@ export function TrendBarChart({
 
   const plotHeight = height - PADDING.top - PADDING.bottom;
   const displayLabels = labels.map((label) => truncateTrendChartLabel(label));
-  const barSlotWidth = resolveTrendChartSlotWidth(displayLabels);
-  const plotWidth = Math.max(320, barSlotWidth * labels.length);
+  const barSlotWidth = resolveTrendChartSlotWidth(
+    displayLabels,
+    targetPlotWidth,
+  );
+  const minPlotWidth = targetPlotWidth ?? DEFAULT_MIN_PLOT_WIDTH;
+  const plotWidth = Math.max(minPlotWidth, barSlotWidth * labels.length);
   const chartWidth = plotWidth + PADDING.left + PADDING.right;
 
   const activeSeries = series.filter((item) =>
@@ -88,46 +99,40 @@ export function TrendBarChart({
     if (valueDomain) {
       rawMin = valueDomain.min;
       rawMax = valueDomain.max;
-    } else {
+    } else if (mode === "stacked") {
       for (let bucketIndex = 0; bucketIndex < labels.length; bucketIndex += 1) {
-        if (mode === "stacked") {
-          let positiveSum = 0;
-          let negativeSum = 0;
-          for (const item of activeSeries) {
-            const value = item.values[bucketIndex];
-            if (value === null || !Number.isFinite(value)) {
-              continue;
-            }
-            if (value >= 0) {
-              positiveSum += value;
-            } else {
-              negativeSum += value;
-            }
-          }
-          rawMin = Math.min(rawMin, negativeSum, 0);
-          rawMax = Math.max(rawMax, positiveSum, 0);
-          continue;
-        }
-
+        let positiveSum = 0;
+        let negativeSum = 0;
         for (const item of activeSeries) {
           const value = item.values[bucketIndex];
           if (value === null || !Number.isFinite(value)) {
             continue;
           }
-          rawMin = Math.min(rawMin, value);
-          rawMax = Math.max(rawMax, value);
+          if (value >= 0) {
+            positiveSum += value;
+          } else {
+            negativeSum += value;
+          }
         }
+        rawMin = Math.min(rawMin, negativeSum, 0);
+        rawMax = Math.max(rawMax, positiveSum, 0);
       }
 
       if (!Number.isFinite(rawMin) || !Number.isFinite(rawMax)) {
         rawMin = 0;
         rawMax = 1;
       }
-      if (rawMin > 0) {
+    } else {
+      const resolvedDomain = resolveTrendSeriesValueDomain(
+        activeSeries,
+        domainMode,
+      );
+      rawMin = resolvedDomain.min;
+      rawMax = resolvedDomain.max;
+
+      if (!Number.isFinite(rawMin) || !Number.isFinite(rawMax)) {
         rawMin = 0;
-      }
-      if (rawMax < 0) {
-        rawMax = 0;
+        rawMax = 1;
       }
     }
 
@@ -138,7 +143,7 @@ export function TrendBarChart({
       yAxisTicks: scale.ticks,
     };
     return result;
-  }, [activeSeries, labels.length, mode, valueDomain]);
+  }, [activeSeries, domainMode, labels.length, mode, valueDomain]);
 
   const valueToY = (value: number): number => {
     let result = plotHeight;
@@ -154,7 +159,9 @@ export function TrendBarChart({
     return result;
   }
 
-  const zeroY = valueToY(0);
+  const includesZero = minValue <= 0 && maxValue >= 0;
+  const zeroY = includesZero ? valueToY(0) : valueToY(minValue);
+  const barBaselineValue = includesZero ? 0 : minValue;
 
   result = (
     <div className={className ? `trend-bar-chart ${className}` : "trend-bar-chart"}>
@@ -296,8 +303,8 @@ export function TrendBarChart({
                     if (value === null || !Number.isFinite(value)) {
                       return null;
                     }
-                    const barTop = valueToY(Math.max(value, 0));
-                    const barBottom = valueToY(Math.min(value, 0));
+                    const barTop = valueToY(Math.max(value, barBaselineValue));
+                    const barBottom = valueToY(Math.min(value, barBaselineValue));
                     const barHeight = Math.max(1, Math.abs(barBottom - barTop));
                     const barY = Math.min(barTop, barBottom);
                     let rect = (
