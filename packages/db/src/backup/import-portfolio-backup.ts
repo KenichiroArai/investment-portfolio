@@ -370,6 +370,60 @@ function resolvePortfolioId(sqlite: Database.Database, portfolioCode: string): s
   return result;
 }
 
+/**
+ * merge 時、同一 (snapshot_id, instrument_id, account_id) で id だけ違う
+ * holding_lines が追加されないよう、backup 側 id を既存行 id に揃える。
+ */
+function remapHoldingLineIdsForMerge(
+  sqlite: Database.Database,
+  parsedTables: Record<BackupTableName, Record<string, string>[]>,
+): void {
+  let result: void = undefined;
+  const holdingLines = parsedTables.holding_lines ?? [];
+  if (holdingLines.length === 0) {
+    return result;
+  }
+
+  const findExisting = sqlite.prepare(
+    `SELECT id
+     FROM holding_lines
+     WHERE snapshot_id = ? AND instrument_id = ? AND account_id = ?
+     LIMIT 1`,
+  );
+  const idMap = new Map<string, string>();
+
+  for (const row of holdingLines) {
+    const backupId = row.id ?? "";
+    if (backupId === "") {
+      continue;
+    }
+
+    const existing = findExisting.get(
+      row.snapshot_id ?? "",
+      row.instrument_id ?? "",
+      row.account_id ?? "",
+    ) as { id: string } | undefined;
+
+    if (!existing) {
+      idMap.set(backupId, backupId);
+      continue;
+    }
+
+    idMap.set(backupId, existing.id);
+    row.id = existing.id;
+  }
+
+  for (const metric of parsedTables.holding_line_metrics ?? []) {
+    const mapped = idMap.get(metric.holding_line_id ?? "");
+    if (!mapped) {
+      continue;
+    }
+    metric.holding_line_id = mapped;
+  }
+
+  return result;
+}
+
 function resolveEffectiveScope(
   options: BackupImportOptions,
   manifest: BackupManifest,
@@ -434,6 +488,10 @@ export function importPortfolioBackup(
   }
 
   const effectiveScope = resolveEffectiveScope(options, manifest);
+
+  if (options.mode === "merge") {
+    remapHoldingLineIdsForMerge(sqlite, parsedTables);
+  }
 
   const tablePreviews = BACKUP_TABLE_NAMES.map((tableName) =>
     buildTablePreview(

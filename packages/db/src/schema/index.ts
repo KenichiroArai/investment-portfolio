@@ -214,7 +214,14 @@ export const holdingLines = sqliteTable(
     bookValueMinor: integer("book_value_minor"), // 簿価
   },
   (table) => {
-    let result = [index("holding_lines_snapshot_account_idx").on(table.snapshotId, table.accountId)];
+    let result = [
+      index("holding_lines_snapshot_account_idx").on(table.snapshotId, table.accountId),
+      unique("holding_lines_snapshot_instrument_account_unique").on(
+        table.snapshotId,
+        table.instrumentId,
+        table.accountId,
+      ),
+    ];
     return result;
   },
 );

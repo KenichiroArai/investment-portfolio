@@ -441,8 +441,10 @@ describe("portfolio repositories", () => {
     expect(await mergeInstruments(db, "missing", [loserOne.id])).toBeNull();
 
     const snapshot = await getCurrentSnapshot(db, "ideco");
-    expect(snapshot?.lines).toHaveLength(3);
-    expect(snapshot?.lines.every((line) => line.instrumentId === canonical.id)).toBe(true);
+    expect(snapshot?.lines).toHaveLength(1);
+    expect(snapshot?.lines[0]?.instrumentId).toBe(canonical.id);
+    expect(snapshot?.lines[0]?.quantity).toBe(6);
+    expect(snapshot?.lines[0]?.marketValueMinor).toBe(6000);
 
     const weights = await listTargetPortfolioWeights(db, "ideco");
     const canonicalWeight = weights.find((weight) => weight.instrumentId === canonical.id);

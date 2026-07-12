@@ -37,6 +37,8 @@ export const BACKUP_DELETE_ORDER: BackupTableName[] = [
 export const BACKUP_MERGE_CONFLICT_COLUMNS: Partial<Record<BackupTableName, string[]>> = {
   instrument_classifications: ["instrument_id", "classification_value_id"],
   instrument_attributes: ["instrument_id", "code"],
+  /** preview / 業務キー照合用。実 insert 前に id を既存行へ remap する（子の holding_line_metrics のため） */
+  holding_lines: ["snapshot_id", "instrument_id", "account_id"],
   holding_line_metrics: ["holding_line_id", "code"],
   portfolio_snapshot_metrics: ["snapshot_id", "code"],
   target_allocation_weights: ["portfolio_id", "scheme_code", "value_code"],

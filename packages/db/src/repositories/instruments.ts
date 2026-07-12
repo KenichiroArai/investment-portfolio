@@ -3,6 +3,7 @@ import { and, eq, inArray, isNull, like, or } from "drizzle-orm";
 import type { AppDatabase } from "../client";
 import { newId, nowIso } from "../id";
 import {
+  holdingLineMetrics,
   holdingLines,
   instrumentAttributes,
   instrumentClassifications,
@@ -388,11 +389,49 @@ export async function mergeInstruments(
     let txResult: void = undefined;
 
     for (const loserId of uniqueLoserIds) {
-      tx
-        .update(holdingLines)
-        .set({ instrumentId: canonicalId })
+      const loserLines = tx
+        .select()
+        .from(holdingLines)
         .where(eq(holdingLines.instrumentId, loserId))
-        .run();
+        .all();
+
+      for (const loserLine of loserLines) {
+        const conflicting = tx
+          .select()
+          .from(holdingLines)
+          .where(
+            and(
+              eq(holdingLines.snapshotId, loserLine.snapshotId),
+              eq(holdingLines.instrumentId, canonicalId),
+              eq(holdingLines.accountId, loserLine.accountId),
+            ),
+          )
+          .all()[0];
+
+        if (conflicting) {
+          tx.update(holdingLines)
+            .set({
+              quantity: conflicting.quantity + loserLine.quantity,
+              marketValueMinor: conflicting.marketValueMinor + loserLine.marketValueMinor,
+              bookValueMinor:
+                conflicting.bookValueMinor === null && loserLine.bookValueMinor === null
+                  ? null
+                  : (conflicting.bookValueMinor ?? 0) + (loserLine.bookValueMinor ?? 0),
+            })
+            .where(eq(holdingLines.id, conflicting.id))
+            .run();
+          tx.delete(holdingLineMetrics)
+            .where(eq(holdingLineMetrics.holdingLineId, loserLine.id))
+            .run();
+          tx.delete(holdingLines).where(eq(holdingLines.id, loserLine.id)).run();
+          continue;
+        }
+
+        tx.update(holdingLines)
+          .set({ instrumentId: canonicalId })
+          .where(eq(holdingLines.id, loserLine.id))
+          .run();
+      }
     }
 
     for (const loserId of uniqueLoserIds) {

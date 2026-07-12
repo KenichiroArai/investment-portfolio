@@ -156,6 +156,64 @@ describe("backup export/import", () => {
     expect(merged.integer_value).toBe(100_000);
   });
 
+  it("merges holding_lines when business key matches but id differs", async () => {
+    const { sqlite, db } = setup();
+    await seedPortfolio(db, "ideco");
+
+    const exported = await exportPortfolioBackup(sqlite, {
+      type: "portfolio",
+      portfolioCode: "ideco",
+    });
+    const zipBuffer = createBackupZipBuffer(exported.manifest, exported.files);
+
+    const existing = sqlite
+      .prepare(
+        `SELECT id, snapshot_id, instrument_id, account_id, quantity
+         FROM holding_lines
+         LIMIT 1`,
+      )
+      .get() as {
+      id: string;
+      snapshot_id: string;
+      instrument_id: string;
+      account_id: string;
+      quantity: number;
+    };
+
+    sqlite.pragma("foreign_keys = OFF");
+    sqlite.prepare("UPDATE holding_lines SET id = ?, quantity = 9 WHERE id = ?").run(
+      "regen-holding-line-id",
+      existing.id,
+    );
+    sqlite
+      .prepare("UPDATE holding_line_metrics SET holding_line_id = ? WHERE holding_line_id = ?")
+      .run("regen-holding-line-id", existing.id);
+    sqlite.pragma("foreign_keys = ON");
+
+    const imported = importPortfolioBackup(sqlite, zipBuffer, {
+      mode: "merge",
+      scope: { type: "portfolio", portfolioCode: "ideco" },
+      dryRun: false,
+    });
+
+    expect(imported.ok).toBe(true);
+
+    const lines = sqlite
+      .prepare(
+        `SELECT id, quantity
+         FROM holding_lines
+         WHERE snapshot_id = ? AND instrument_id = ? AND account_id = ?`,
+      )
+      .all(existing.snapshot_id, existing.instrument_id, existing.account_id) as Array<{
+      id: string;
+      quantity: number;
+    }>;
+
+    expect(lines).toHaveLength(1);
+    expect(lines[0]?.id).toBe("regen-holding-line-id");
+    expect(lines[0]?.quantity).toBe(existing.quantity);
+  });
+
   it("exports and imports a single portfolio with replace mode", async () => {
     const { sqlite, db } = setup();
     await seedPortfolio(db, "ideco");

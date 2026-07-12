@@ -88,8 +88,19 @@ export function buildMergeUpsertStatement(
       "id",
     ];
   const conflictColumnSet = new Set(conflictColumns);
+  // holding_lines は子テーブルが id を参照するため、業務キー衝突時も id は既存行を維持する。
+  // （import 側で backup id → 既存 id へ remap 済みである前提）
+  const preserveIdOnConflict = tableName === "holding_lines";
   const updateAssignments = columns
-    .filter((column) => !conflictColumnSet.has(column))
+    .filter((column) => {
+      if (conflictColumnSet.has(column)) {
+        return false;
+      }
+      if (preserveIdOnConflict && column === "id") {
+        return false;
+      }
+      return true;
+    })
     .map((column) => `${column} = excluded.${column}`)
     .join(", ");
 
