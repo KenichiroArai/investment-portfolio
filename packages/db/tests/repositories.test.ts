@@ -460,6 +460,103 @@ describe("portfolio repositories", () => {
     ]);
   });
 
+  it("moves holding lines when accounts differ and keeps null book values on merge", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+
+    const canonical = await createInstrument(db, { name: "Canonical Fund" });
+    const loserSameAccount = await createInstrument(db, { name: "Loser Same" });
+    const loserOtherAccount = await createInstrument(db, { name: "Loser Other" });
+    const loserPartialBook = await createInstrument(db, { name: "Loser Partial Book" });
+    const loserNullBook = await createInstrument(db, { name: "Loser Null Book" });
+
+    await replaceCurrentSnapshot(db, {
+      portfolioCode: "ideco",
+      asOfDate: "2026-06-01",
+      lines: [
+        {
+          instrumentId: canonical.id,
+          accountId: "ideco:a",
+          accountName: "A",
+          quantity: 1,
+          marketValueMinor: 1000,
+          bookValueMinor: null,
+        },
+        {
+          instrumentId: loserSameAccount.id,
+          accountId: "ideco:a",
+          accountName: "A",
+          quantity: 2,
+          marketValueMinor: 2000,
+          bookValueMinor: null,
+        },
+        {
+          instrumentId: loserOtherAccount.id,
+          accountId: "ideco:b",
+          accountName: "B",
+          quantity: 3,
+          marketValueMinor: 3000,
+          bookValueMinor: 100,
+        },
+        {
+          instrumentId: loserPartialBook.id,
+          accountId: "ideco:a",
+          accountName: "A",
+          quantity: 1,
+          marketValueMinor: 500,
+          bookValueMinor: 50,
+        },
+      ],
+    });
+
+    const merged = await mergeInstruments(db, canonical.id, [
+      loserSameAccount.id,
+      loserOtherAccount.id,
+      loserPartialBook.id,
+    ]);
+    expect(merged).toEqual({ canonicalId: canonical.id, mergedCount: 3 });
+
+    const snapshot = await getCurrentSnapshot(db, "ideco");
+    expect(snapshot?.lines).toHaveLength(2);
+    const accountA = snapshot?.lines.find((line) => line.accountId === "ideco:a");
+    const accountB = snapshot?.lines.find((line) => line.accountId === "ideco:b");
+    expect(accountA?.quantity).toBe(4);
+    expect(accountA?.bookValueMinor).toBe(50);
+    expect(accountB?.instrumentId).toBe(canonical.id);
+    expect(accountB?.quantity).toBe(3);
+
+    await replaceCurrentSnapshot(db, {
+      portfolioCode: "ideco",
+      asOfDate: "2026-06-02",
+      lines: [
+        {
+          instrumentId: canonical.id,
+          accountId: "ideco:a",
+          accountName: "A",
+          quantity: 1,
+          marketValueMinor: 1000,
+          bookValueMinor: 80,
+        },
+        {
+          instrumentId: loserNullBook.id,
+          accountId: "ideco:a",
+          accountName: "A",
+          quantity: 1,
+          marketValueMinor: 200,
+          bookValueMinor: null,
+        },
+      ],
+    });
+
+    await mergeInstruments(db, canonical.id, [loserNullBook.id]);
+    const afterNullLoser = await getCurrentSnapshot(db, "ideco");
+    expect(afterNullLoser?.lines[0]?.bookValueMinor).toBe(80);
+  });
+
   it("moves target portfolio weights when canonical has no existing weight", async () => {
     const db = setup();
     await createPortfolio(db, {

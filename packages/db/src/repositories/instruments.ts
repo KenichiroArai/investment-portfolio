@@ -414,9 +414,10 @@ export async function mergeInstruments(
               quantity: conflicting.quantity + loserLine.quantity,
               marketValueMinor: conflicting.marketValueMinor + loserLine.marketValueMinor,
               bookValueMinor:
-                conflicting.bookValueMinor === null && loserLine.bookValueMinor === null
+                conflicting.bookValueMinor == null && loserLine.bookValueMinor == null
                   ? null
-                  : (conflicting.bookValueMinor ?? 0) + (loserLine.bookValueMinor ?? 0),
+                  : (conflicting.bookValueMinor == null ? 0 : conflicting.bookValueMinor) +
+                    (loserLine.bookValueMinor == null ? 0 : loserLine.bookValueMinor),
             })
             .where(eq(holdingLines.id, conflicting.id))
             .run();

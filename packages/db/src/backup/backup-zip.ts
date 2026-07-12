@@ -54,7 +54,8 @@ export function extractBackupZipBuffer(zipBuffer: Buffer): {
   const decoder = new TextDecoder("utf-8");
 
   for (const [name, bytes] of Object.entries(unzipped)) {
-    const normalizedName = name.replace(/\\/g, "/").split("/").pop() ?? name;
+    const segments = name.replace(/\\/g, "/").split("/");
+    const normalizedName = segments.at(-1) || name;
     const content = decoder.decode(bytes);
 
     if (normalizedName === "manifest.json") {

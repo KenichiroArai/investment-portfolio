@@ -397,16 +397,10 @@ async function buildSnapshotDto(
 
   lineDtos.sort((a, b) => {
     let sortResult = 0;
-    if (a.sortOrder !== null && b.sortOrder !== null && a.sortOrder !== b.sortOrder) {
-      sortResult = a.sortOrder - b.sortOrder;
-      return sortResult;
-    }
-    if (a.sortOrder !== null && b.sortOrder === null) {
-      sortResult = -1;
-      return sortResult;
-    }
-    if (a.sortOrder === null && b.sortOrder !== null) {
-      sortResult = 1;
+    const aRank = a.sortOrder === null ? Number.POSITIVE_INFINITY : a.sortOrder;
+    const bRank = b.sortOrder === null ? Number.POSITIVE_INFINITY : b.sortOrder;
+    if (aRank !== bRank) {
+      sortResult = aRank - bRank;
       return sortResult;
     }
     sortResult = a.instrumentName.localeCompare(b.instrumentName);

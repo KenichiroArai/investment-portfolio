@@ -66,8 +66,9 @@ function validateManifest(manifest: BackupManifest, options: BackupImportOptions
     }
 
     if (manifest.portfolioCode !== options.scope.portfolioCode) {
+      const backupCode = manifest.portfolioCode == null ? "不明" : manifest.portfolioCode;
       result.push(
-        `バックアップの口座コード (${manifest.portfolioCode ?? "不明"}) と対象口座 (${options.scope.portfolioCode}) が一致しません。`,
+        `バックアップの口座コード (${backupCode}) と対象口座 (${options.scope.portfolioCode}) が一致しません。`,
       );
     }
   }
@@ -107,16 +108,11 @@ function rowKey(tableName: BackupTableName, row: Record<string, string>): string
   const conflictColumns = BACKUP_MERGE_CONFLICT_COLUMNS[tableName];
 
   if (conflictColumns) {
-    result = conflictColumns.map((column) => row[column] ?? "").join("::");
+    result = conflictColumns.map((column) => row[column] || "").join("::");
     return result;
   }
 
-  if (config.hasId) {
-    result = row.id;
-    return result;
-  }
-
-  result = JSON.stringify(row);
+  result = row.id;
   return result;
 }
 
@@ -170,8 +166,8 @@ function buildTablePreview(
     let changed = false;
 
     for (const column of config.columns) {
-      const importValue = (row[column] ?? "").trim();
-      const existingValue = (existing[column] ?? "").trim();
+      const importValue = (row[column] || "").trim();
+      const existingValue = (existing[column] || "").trim();
       if (importValue !== existingValue) {
         changed = true;
         break;
@@ -198,7 +194,7 @@ function buildTablePreview(
 function validateForeignKeys(
   tableName: BackupTableName,
   importRows: Record<string, string>[],
-  importedData: Partial<Record<BackupTableName, Record<string, string>[]>>,
+  importedData: Record<BackupTableName, Record<string, string>[]>,
 ): string[] {
   let result: string[] = [];
 
@@ -218,7 +214,7 @@ function validateForeignKeys(
   };
 
   if (tableName === "classification_schemes") {
-    const portfolioIds = new Set((importedData.portfolios ?? []).map((row) => row.id));
+    const portfolioIds = new Set(importedData.portfolios.map((row) => row.id));
     requireReference(
       "portfolio_id",
       new Set(importRows.map((row) => row.portfolio_id)),
@@ -227,7 +223,7 @@ function validateForeignKeys(
   }
 
   if (tableName === "classification_values") {
-    const schemeIds = new Set((importedData.classification_schemes ?? []).map((row) => row.id));
+    const schemeIds = new Set(importedData.classification_schemes.map((row) => row.id));
     requireReference(
       "scheme_id",
       new Set(importRows.map((row) => row.scheme_id)),
@@ -236,7 +232,7 @@ function validateForeignKeys(
   }
 
   if (tableName === "instruments") {
-    const portfolioIds = new Set((importedData.portfolios ?? []).map((row) => row.id));
+    const portfolioIds = new Set(importedData.portfolios.map((row) => row.id));
     requireReference(
       "portfolio_id",
       new Set(importRows.map((row) => row.portfolio_id)),
@@ -245,8 +241,8 @@ function validateForeignKeys(
   }
 
   if (tableName === "instrument_classifications") {
-    const instrumentIds = new Set((importedData.instruments ?? []).map((row) => row.id));
-    const valueIds = new Set((importedData.classification_values ?? []).map((row) => row.id));
+    const instrumentIds = new Set(importedData.instruments.map((row) => row.id));
+    const valueIds = new Set(importedData.classification_values.map((row) => row.id));
     requireReference(
       "instrument_id",
       new Set(importRows.map((row) => row.instrument_id)),
@@ -260,7 +256,7 @@ function validateForeignKeys(
   }
 
   if (tableName === "instrument_attributes") {
-    const instrumentIds = new Set((importedData.instruments ?? []).map((row) => row.id));
+    const instrumentIds = new Set(importedData.instruments.map((row) => row.id));
     requireReference(
       "instrument_id",
       new Set(importRows.map((row) => row.instrument_id)),
@@ -269,7 +265,7 @@ function validateForeignKeys(
   }
 
   if (tableName === "portfolio_snapshots") {
-    const portfolioIds = new Set((importedData.portfolios ?? []).map((row) => row.id));
+    const portfolioIds = new Set(importedData.portfolios.map((row) => row.id));
     requireReference(
       "portfolio_id",
       new Set(importRows.map((row) => row.portfolio_id)),
@@ -278,8 +274,8 @@ function validateForeignKeys(
   }
 
   if (tableName === "holding_lines") {
-    const snapshotIds = new Set((importedData.portfolio_snapshots ?? []).map((row) => row.id));
-    const instrumentIds = new Set((importedData.instruments ?? []).map((row) => row.id));
+    const snapshotIds = new Set(importedData.portfolio_snapshots.map((row) => row.id));
+    const instrumentIds = new Set(importedData.instruments.map((row) => row.id));
     requireReference(
       "snapshot_id",
       new Set(importRows.map((row) => row.snapshot_id)),
@@ -293,7 +289,7 @@ function validateForeignKeys(
   }
 
   if (tableName === "holding_line_metrics") {
-    const holdingLineIds = new Set((importedData.holding_lines ?? []).map((row) => row.id));
+    const holdingLineIds = new Set(importedData.holding_lines.map((row) => row.id));
     requireReference(
       "holding_line_id",
       new Set(importRows.map((row) => row.holding_line_id)),
@@ -302,7 +298,7 @@ function validateForeignKeys(
   }
 
   if (tableName === "portfolio_snapshot_metrics") {
-    const snapshotIds = new Set((importedData.portfolio_snapshots ?? []).map((row) => row.id));
+    const snapshotIds = new Set(importedData.portfolio_snapshots.map((row) => row.id));
     requireReference(
       "snapshot_id",
       new Set(importRows.map((row) => row.snapshot_id)),
@@ -311,7 +307,7 @@ function validateForeignKeys(
   }
 
   if (tableName === "target_allocation_weights" || tableName === "target_portfolio_weights") {
-    const portfolioIds = new Set((importedData.portfolios ?? []).map((row) => row.id));
+    const portfolioIds = new Set(importedData.portfolios.map((row) => row.id));
     requireReference(
       "portfolio_id",
       new Set(importRows.map((row) => row.portfolio_id)),
@@ -320,7 +316,7 @@ function validateForeignKeys(
   }
 
   if (tableName === "target_portfolio_weights") {
-    const instrumentIds = new Set((importedData.instruments ?? []).map((row) => row.id));
+    const instrumentIds = new Set(importedData.instruments.map((row) => row.id));
     requireReference(
       "instrument_id",
       new Set(importRows.map((row) => row.instrument_id)),
@@ -379,7 +375,7 @@ function remapHoldingLineIdsForMerge(
   parsedTables: Record<BackupTableName, Record<string, string>[]>,
 ): void {
   let result: void = undefined;
-  const holdingLines = parsedTables.holding_lines ?? [];
+  const holdingLines = parsedTables.holding_lines;
   if (holdingLines.length === 0) {
     return result;
   }
@@ -393,15 +389,15 @@ function remapHoldingLineIdsForMerge(
   const idMap = new Map<string, string>();
 
   for (const row of holdingLines) {
-    const backupId = row.id ?? "";
+    const backupId = row.id || "";
     if (backupId === "") {
       continue;
     }
 
     const existing = findExisting.get(
-      row.snapshot_id ?? "",
-      row.instrument_id ?? "",
-      row.account_id ?? "",
+      row.snapshot_id || "",
+      row.instrument_id || "",
+      row.account_id || "",
     ) as { id: string } | undefined;
 
     if (!existing) {
@@ -413,12 +409,9 @@ function remapHoldingLineIdsForMerge(
     row.id = existing.id;
   }
 
-  for (const metric of parsedTables.holding_line_metrics ?? []) {
-    const mapped = idMap.get(metric.holding_line_id ?? "");
-    if (!mapped) {
-      continue;
-    }
-    metric.holding_line_id = mapped;
+  for (const metric of parsedTables.holding_line_metrics) {
+    const mapped = idMap.get(metric.holding_line_id || "");
+    metric.holding_line_id = mapped ?? metric.holding_line_id;
   }
 
   return result;
@@ -469,11 +462,7 @@ export function importPortfolioBackup(
   const parsedTables = {} as Record<BackupTableName, Record<string, string>[]>;
 
   for (const tableName of BACKUP_TABLE_NAMES) {
-    const content = extracted.files[tableName];
-    if (!content) {
-      continue;
-    }
-
+    const content = extracted.files[tableName] as string;
     const parsed = parseCsvTable(content);
     warnings.push(...validateHeaders(tableName, parsed.headers));
     parsedTables[tableName] = parsed.rows;
@@ -512,9 +501,10 @@ export function importPortfolioBackup(
     preview.warnings = [];
   }
 
-  if (manifest.scope === "portfolio" && options.scope.type === "all") {
+    if (manifest.scope === "portfolio" && options.scope.type === "all") {
+    const portfolioLabel = manifest.portfolioCode == null ? "不明" : manifest.portfolioCode;
     preview.warnings.push(
-      `口座単位のバックアップ (${manifest.portfolioCode ?? "不明"}) を全口座インポートとして取り込みます。`,
+      `口座単位のバックアップ (${portfolioLabel}) を全口座インポートとして取り込みます。`,
     );
   }
 

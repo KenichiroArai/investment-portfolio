@@ -32,4 +32,16 @@ describe("csv-utils", () => {
     expect(parsed.headers).toEqual(["id", "name"]);
     expect(parsed.rows).toEqual([]);
   });
+
+  it("returns empty headers and rows for blank CSV", () => {
+    const parsed = parseCsvTable("\n\n");
+    expect(parsed.headers).toEqual([]);
+    expect(parsed.rows).toEqual([]);
+  });
+
+  it("fills missing cells with empty strings", () => {
+    const parsed = parseCsvTable("id,name,note\n1,only-id\n");
+    expect(parsed.rows).toHaveLength(1);
+    expect(parsed.rows[0]).toEqual({ id: "1", name: "only-id", note: "" });
+  });
 });
