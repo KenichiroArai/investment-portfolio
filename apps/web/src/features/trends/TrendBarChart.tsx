@@ -11,6 +11,7 @@ import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
 import {
   resolveTrendChartSlotWidth,
   resolveXLabelAnchor,
+  truncateTrendChartLabel,
 } from "@/features/trends/resolve-trend-chart-slot-width";
 import { useTrendYAxis } from "@/features/trends/use-trend-y-axis";
 import { formatTrendChartTooltipValue } from "@/features/trends/format-trend-chart-tooltip";
@@ -70,7 +71,8 @@ export function TrendBarChart({
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const plotHeight = height - PADDING.top - PADDING.bottom;
-  const barSlotWidth = resolveTrendChartSlotWidth(labels);
+  const displayLabels = labels.map((label) => truncateTrendChartLabel(label));
+  const barSlotWidth = resolveTrendChartSlotWidth(displayLabels);
   const plotWidth = Math.max(320, barSlotWidth * labels.length);
   const chartWidth = plotWidth + PADDING.left + PADDING.right;
 
@@ -199,6 +201,7 @@ export function TrendBarChart({
               className="trend-bar-chart__axis"
             />
             {labels.map((label, bucketIndex) => {
+              const displayLabel = displayLabels[bucketIndex] ?? label;
               const slotX = bucketIndex * barSlotWidth;
               const centerX = slotX + barSlotWidth / 2;
               const anchor = resolveXLabelAnchor(bucketIndex, labels.length);
@@ -275,7 +278,7 @@ export function TrendBarChart({
                       textAnchor={anchor}
                       className="trend-bar-chart__x-label"
                     >
-                      {label}
+                      {displayLabel}
                     </text>
                   </g>
                 );
@@ -339,7 +342,7 @@ export function TrendBarChart({
                     textAnchor={anchor}
                     className="trend-bar-chart__x-label"
                   >
-                    {label}
+                    {displayLabel}
                   </text>
                 </g>
               );

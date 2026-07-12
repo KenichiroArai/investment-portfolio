@@ -1,7 +1,11 @@
 const MIN_SLOT_WIDTH = 56;
 const DEFAULT_TARGET_WIDTH = 640;
-const LABEL_CHAR_WIDTH = 6.5;
+const ASCII_CHAR_WIDTH = 6.5;
+const WIDE_CHAR_WIDTH = 11;
 const LABEL_PAIR_PADDING = 8;
+/** X 軸ラベルの表示幅上限（長い銘柄名は省略し、ツールチップで全文を見せる） */
+const MAX_X_LABEL_DISPLAY_WIDTH = 132;
+const ELLIPSIS = "…";
 
 export function resolveXLabelAnchor(
   index: number,
@@ -19,8 +23,73 @@ export function resolveXLabelAnchor(
   return result;
 }
 
-function estimateTrendChartLabelWidth(label: string): number {
-  let result = label.length * LABEL_CHAR_WIDTH;
+function isWideChar(char: string): boolean {
+  let result = false;
+  const code = char.codePointAt(0);
+  if (code === undefined) {
+    return result;
+  }
+
+  // CJK / 全角記号など、等幅に近い広い文字
+  if (
+    (code >= 0x1100 && code <= 0x11ff) ||
+    (code >= 0x2e80 && code <= 0x9fff) ||
+    (code >= 0xa960 && code <= 0xa97f) ||
+    (code >= 0xac00 && code <= 0xd7ff) ||
+    (code >= 0xf900 && code <= 0xfaff) ||
+    (code >= 0xfe10 && code <= 0xfe1f) ||
+    (code >= 0xfe30 && code <= 0xfe4f) ||
+    (code >= 0xff00 && code <= 0xffef) ||
+    (code >= 0x20000 && code <= 0x2fa1f)
+  ) {
+    result = true;
+    return result;
+  }
+
+  return result;
+}
+
+export function estimateTrendChartLabelWidth(label: string): number {
+  let result = 0;
+  for (const char of label) {
+    if (isWideChar(char)) {
+      result += WIDE_CHAR_WIDTH;
+      continue;
+    }
+    result += ASCII_CHAR_WIDTH;
+  }
+  return result;
+}
+
+export function truncateTrendChartLabel(
+  label: string,
+  maxWidth: number = MAX_X_LABEL_DISPLAY_WIDTH,
+): string {
+  let result = label;
+
+  if (estimateTrendChartLabelWidth(label) <= maxWidth) {
+    return result;
+  }
+
+  const ellipsisWidth = estimateTrendChartLabelWidth(ELLIPSIS);
+  let width = 0;
+  let cutIndex = 0;
+
+  for (const char of label) {
+    const charWidth = isWideChar(char) ? WIDE_CHAR_WIDTH : ASCII_CHAR_WIDTH;
+    if (width + charWidth + ellipsisWidth > maxWidth) {
+      break;
+    }
+    width += charWidth;
+    cutIndex += char.length;
+  }
+
+  if (cutIndex <= 0) {
+    result = ELLIPSIS;
+    return result;
+  }
+
+  result = `${label.slice(0, cutIndex)}${ELLIPSIS}`;
   return result;
 }
 

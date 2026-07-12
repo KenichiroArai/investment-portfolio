@@ -205,4 +205,37 @@ describe("TrendBarChart", () => {
     expect(axisLabels).toEqual(["0.00%", "25.00%", "50.00%", "75.00%", "100.00%"]);
     expect(container.querySelector(".trend-chart__y-unit")).toBeNull();
   });
+
+  it("truncates long x-axis instrument labels while keeping full name in tooltip", async () => {
+    const user = userEvent.setup();
+    const fullLabel = "三菱ＵＦＪ 純金ファンド（愛称：純金積立）";
+    const { container } = render(
+      <TrendBarChart
+        labels={[fullLabel, "SBI・V・全世界株式インデックス・ファンド"]}
+        valueKind="yen"
+        series={[
+          {
+            key: "market-value",
+            label: "評価額",
+            color: "#2563eb",
+            values: [900_000, 700_000],
+          },
+        ]}
+      />,
+    );
+
+    const xLabels = Array.from(
+      container.querySelectorAll(".trend-bar-chart__x-label"),
+    ).map((node) => node.textContent);
+    expect(xLabels[0]).not.toBe(fullLabel);
+    expect(xLabels[0]?.endsWith("…")).toBe(true);
+
+    const hitArea = within(container).getByRole("button", {
+      name: `${fullLabel} の詳細`,
+    });
+    await user.hover(hitArea);
+    expect(container.querySelector(".trend-bar-chart__tooltip-title")?.textContent).toBe(
+      fullLabel,
+    );
+  });
 });
