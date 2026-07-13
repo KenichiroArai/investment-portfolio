@@ -38,6 +38,63 @@ export type GlobalInstrumentStackChart = {
   series: GlobalInstrumentStackSeries[];
 };
 
+export type GlobalInstrumentRankingMetric =
+  | "market-value"
+  | "gain"
+  | "gain-rate";
+
+export function resolveGlobalInstrumentRankingMetricValue(
+  row: GlobalInstrumentRow,
+  metric: GlobalInstrumentRankingMetric,
+): number | null {
+  let result: number | null = null;
+
+  if (metric === "market-value") {
+    result = row.marketValueMinor;
+    return result;
+  }
+
+  if (metric === "gain") {
+    result = row.unrealizedGainMinor;
+    return result;
+  }
+
+  result = row.unrealizedGainRate;
+  return result;
+}
+
+export function sortGlobalInstrumentRows(
+  rows: GlobalInstrumentRow[],
+  metric: GlobalInstrumentRankingMetric,
+): GlobalInstrumentRow[] {
+  let result = [...rows];
+
+  result.sort((left, right) => {
+    let order = 0;
+    const leftValue = resolveGlobalInstrumentRankingMetricValue(left, metric);
+    const rightValue = resolveGlobalInstrumentRankingMetricValue(right, metric);
+
+    if (leftValue === null && rightValue === null) {
+      order = 0;
+    } else if (leftValue === null) {
+      order = 1;
+    } else if (rightValue === null) {
+      order = -1;
+    } else {
+      order = rightValue - leftValue;
+    }
+
+    if (order !== 0) {
+      return order;
+    }
+
+    order = left.instrumentName.localeCompare(right.instrumentName, "ja");
+    return order;
+  });
+
+  return result;
+}
+
 type InstrumentAccumulator = {
   instrumentKey: string;
   instrumentName: string;
@@ -300,11 +357,12 @@ export function toPortfolioAllocationSlices(
 
 export function buildGlobalInstrumentRankingValues(
   rows: GlobalInstrumentRow[],
+  metric: GlobalInstrumentRankingMetric = "market-value",
 ): Array<number | null> {
   let result: Array<number | null> = [];
 
   for (const row of rows) {
-    result.push(row.marketValueMinor);
+    result.push(resolveGlobalInstrumentRankingMetricValue(row, metric));
   }
 
   return result;

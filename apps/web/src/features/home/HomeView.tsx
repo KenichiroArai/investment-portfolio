@@ -5,14 +5,10 @@ import {
   buildGlobalPortfolioSlices,
   computeSnapshotGainRate,
   computeSnapshotPortfolioGainMinor,
-  aggregateTrendPointsByCalendarMonth,
-  resolvePeriodBoundsForPreset,
   resolveSnapshotTotalContributions,
   sumSnapshotMarketValue,
   toPortfolioAllocationSlices,
-  type AggregatedTrendPoint,
   type CurrentSnapshotDto,
-  type SnapshotTrendPointDto,
   type SnapshotTrendsDto,
 } from "@repo/shared";
 import { ArrowRight, BarChart3, List } from "lucide-react";
@@ -23,13 +19,15 @@ import { LoadingSkeleton } from "@/components/loading-skeleton";
 import { WritableOnly } from "@/components/WritableOnly";
 import { StatCard } from "@/components/stat-card";
 import { GlobalAllocationDonutCard } from "@/features/analysis/GlobalAllocationDonutCard";
-import { getAllocationChartColor } from "@/features/analysis/chart-colors";
 import { AccountManagePanel } from "@/features/manage/AccountManagePanel";
 import { BackupPanel } from "@/features/backup/BackupPanel";
 import {
-  buildTrendChartBuckets,
-} from "@/features/trends/trend-chart-buckets";
-import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
+  buildPortfolioMarketValueGainRateComboChart,
+  PORTFOLIO_COMBO_TREND_CAPTION,
+  PORTFOLIO_COMBO_TREND_MONTH_LIMIT,
+  PORTFOLIO_COMBO_TREND_TARGET_PLOT_WIDTH,
+  type PortfolioTrendSeriesInput,
+} from "@/features/trends/build-portfolio-combo-chart";
 import { TrendComboChart } from "@/features/trends/TrendComboChart";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -55,18 +53,6 @@ import {
 } from "@/lib/data-source";
 import { cn } from "@/lib/utils";
 
-/** ホーム右カラム内におさまるプロット幅の目安 */
-const HOME_TREND_TARGET_PLOT_WIDTH = 360;
-/** ホームに表示する月次ポイント数（直近1年） */
-const HOME_TREND_MONTH_LIMIT = 12;
-const HOME_TREND_CAPTION = "直近1年・期末・万円 / 月 / %";
-
-type PortfolioTrendSeries = {
-  code: string;
-  name: string;
-  points: SnapshotTrendPointDto[];
-};
-
 type PortfolioCard = {
   code: string;
   name: string;
@@ -77,57 +63,13 @@ type PortfolioCard = {
   hasSnapshot: boolean;
 };
 
-function resolveTrendPointGainRateOnAssetBalance(point: {
-  totalMarketValueMinor: number;
-  totalBookValueMinor: number;
-  totalContributionsMinor: number | null;
-}): number | null {
-  let result: number | null = null;
-  const costBasis =
-    point.totalContributionsMinor ?? point.totalBookValueMinor;
-  result = computeSnapshotGainRate(
-    computeSnapshotPortfolioGainMinor(point.totalMarketValueMinor, costBasis),
-    point.totalMarketValueMinor,
-  );
-  return result;
-}
-
-function formatHomeTrendMonthNumber(bucketKey: string): string {
-  let result = bucketKey;
-  const match = /^(\d{4})-(\d{2})$/.exec(bucketKey);
-  if (!match) {
-    return result;
-  }
-  result = String(Number(match[2]));
-  return result;
-}
-
-function alignPortfolioMonthValues(
-  monthKeys: string[],
-  monthlyPoints: AggregatedTrendPoint[],
-  mapper: (point: AggregatedTrendPoint) => number | null,
-): Array<number | null> {
-  let result: Array<number | null> = [];
-  const byKey = new Map(
-    monthlyPoints.map((point) => [point.bucketKey, point] as const),
-  );
-  result = monthKeys.map((monthKey) => {
-    const point = byKey.get(monthKey);
-    if (!point) {
-      return null;
-    }
-    return mapper(point);
-  });
-  return result;
-}
-
 export function HomeView() {
   const [cards, setCards] = useState<PortfolioCard[]>([]);
   const [portfolios, setPortfolios] = useState<PortfolioListItem[]>([]);
   const [snapshots, setSnapshots] = useState<CurrentSnapshotDto[]>([]);
-  const [portfolioTrends, setPortfolioTrends] = useState<PortfolioTrendSeries[]>(
-    [],
-  );
+  const [portfolioTrends, setPortfolioTrends] = useState<
+    PortfolioTrendSeriesInput[]
+  >([]);
   const [reloadKey, setReloadKey] = useState(0);
   const [totalMarketValueMinor, setTotalMarketValueMinor] = useState(0);
   const [totalPortfolioGainMinor, setTotalPortfolioGainMinor] = useState(0);
@@ -160,7 +102,7 @@ export function HomeView() {
         setPortfolios(portfolioRows);
         const nextCards: PortfolioCard[] = [];
         const nextSnapshots: CurrentSnapshotDto[] = [];
-        const nextPortfolioTrends: PortfolioTrendSeries[] = [];
+        const nextPortfolioTrends: PortfolioTrendSeriesInput[] = [];
         let total = 0;
         let totalGain = 0;
         let snapshotCount = 0;
@@ -265,138 +207,9 @@ export function HomeView() {
   }, [snapshots]);
 
   const marketValueTrendChart = useMemo(() => {
-    let result: {
-      labels: string[];
-      sourceDates: string[];
-      sourceDateLabels: string[];
-      barSeries: TrendChartSeries[];
-      lineSeries: TrendChartSeries[];
-    } | null = null;
-
-    if (portfolioTrends.length === 0) {
-      return result;
-    }
-
-    const availableDates = portfolioTrends.flatMap((series) =>
-      series.points.map((point) => point.asOfDate),
-    );
-    const bounds = resolvePeriodBoundsForPreset("12m", availableDates);
-    if (!bounds) {
-      return result;
-    }
-
-    const monthKeySet = new Set<string>();
-    const monthlyByPortfolio = portfolioTrends.map((series) => {
-      const monthlyPoints = aggregateTrendPointsByCalendarMonth(
-        series.points,
-        bounds.from,
-        bounds.to,
-        { pick: "last" },
-      );
-      for (const point of monthlyPoints) {
-        monthKeySet.add(point.bucketKey);
-      }
-      return {
-        ...series,
-        monthlyPoints,
-      };
+    let result = buildPortfolioMarketValueGainRateComboChart(portfolioTrends, {
+      monthLimit: PORTFOLIO_COMBO_TREND_MONTH_LIMIT,
     });
-
-    const monthKeys = [...monthKeySet]
-      .sort((left, right) => left.localeCompare(right))
-      .slice(-HOME_TREND_MONTH_LIMIT);
-    if (monthKeys.length === 0) {
-      return result;
-    }
-
-    const axisPoints: AggregatedTrendPoint[] = monthKeys.map((monthKey) => {
-      let axisPoint: AggregatedTrendPoint = {
-        asOfDate: `${monthKey}-01`,
-        totalMarketValueMinor: 0,
-        totalBookValueMinor: 0,
-        unrealizedGainMinor: 0,
-        gainRateOnBook: null,
-        totalContributionsMinor: null,
-        gainRateOnContributions: null,
-        allocationsByScheme: {},
-        bucketKey: monthKey,
-        bucketLabel: formatHomeTrendMonthNumber(monthKey),
-        sourceAsOfDate: `${monthKey}-01`,
-      };
-
-      for (const series of monthlyByPortfolio) {
-        const point = series.monthlyPoints.find(
-          (item) => item.bucketKey === monthKey,
-        );
-        if (!point) {
-          continue;
-        }
-        if (point.sourceAsOfDate > axisPoint.sourceAsOfDate) {
-          axisPoint = {
-            ...axisPoint,
-            asOfDate: point.asOfDate,
-            sourceAsOfDate: point.sourceAsOfDate,
-          };
-        }
-      }
-
-      return axisPoint;
-    });
-
-    const chartBuckets = buildTrendChartBuckets({
-      displayPoints: axisPoints,
-      baselinePoint: null,
-      trendDisplayUnit: "1m",
-    });
-
-    const barSeries: TrendChartSeries[] = [];
-    const lineSeries: TrendChartSeries[] = [];
-
-    monthlyByPortfolio.forEach((series, index) => {
-      const color = getAllocationChartColor(index);
-      const marketValues = alignPortfolioMonthValues(
-        monthKeys,
-        series.monthlyPoints,
-        (point) => point.totalMarketValueMinor,
-      );
-      const gainRates = alignPortfolioMonthValues(
-        monthKeys,
-        series.monthlyPoints,
-        (point) => resolveTrendPointGainRateOnAssetBalance(point),
-      );
-
-      if (marketValues.some((value) => value !== null && Number.isFinite(value))) {
-        barSeries.push({
-          key: `market-${series.code}`,
-          label: series.name,
-          color,
-          values: marketValues,
-          formatValue: (value) => formatYen(value),
-        });
-      }
-
-      if (gainRates.some((value) => value !== null && Number.isFinite(value))) {
-        lineSeries.push({
-          key: `gain-${series.code}`,
-          label: series.name,
-          color,
-          values: gainRates,
-          formatValue: (value) => formatPercent(value),
-        });
-      }
-    });
-
-    if (barSeries.length === 0 && lineSeries.length === 0) {
-      return result;
-    }
-
-    result = {
-      labels: chartBuckets.chartPoints.map((point) => point.bucketLabel),
-      sourceDates: chartBuckets.sourceDates,
-      sourceDateLabels: chartBuckets.sourceDateLabels,
-      barSeries,
-      lineSeries,
-    };
     return result;
   }, [portfolioTrends]);
 
@@ -468,12 +281,12 @@ export function HomeView() {
                 <CardContent className="pt-6">
                   <TrendComboChart
                     title="評価額・利益率の変化"
-                    caption={HOME_TREND_CAPTION}
+                    caption={PORTFOLIO_COMBO_TREND_CAPTION}
                     labels={marketValueTrendChart.labels}
                     sourceDates={marketValueTrendChart.sourceDates}
                     sourceDateLabels={marketValueTrendChart.sourceDateLabels}
-                    targetPlotWidth={HOME_TREND_TARGET_PLOT_WIDTH}
-                    reservedSlotCount={HOME_TREND_MONTH_LIMIT}
+                    targetPlotWidth={PORTFOLIO_COMBO_TREND_TARGET_PLOT_WIDTH}
+                    reservedSlotCount={PORTFOLIO_COMBO_TREND_MONTH_LIMIT}
                     height={240}
                     barSeries={marketValueTrendChart.barSeries}
                     lineSeries={marketValueTrendChart.lineSeries}

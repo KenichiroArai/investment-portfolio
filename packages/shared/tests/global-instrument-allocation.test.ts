@@ -2,11 +2,13 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildGlobalInstrumentPortfolioStack,
+  buildGlobalInstrumentRankingValues,
   buildGlobalInstrumentRows,
   buildGlobalPortfolioSlices,
   collapseGlobalInstrumentRows,
   GLOBAL_INSTRUMENT_EMPTY_NAME_LABEL,
   GLOBAL_INSTRUMENT_OTHER_VALUE_CODE,
+  sortGlobalInstrumentRows,
   toInstrumentAllocationSlices,
   toPortfolioAllocationSlices,
 } from "../src/global-instrument-allocation";
@@ -178,6 +180,122 @@ describe("buildGlobalInstrumentRows", () => {
   it("returns empty for no snapshots", () => {
     let result = buildGlobalInstrumentRows([]);
     expect(result).toEqual([]);
+  });
+});
+
+describe("sortGlobalInstrumentRows", () => {
+  it("sorts by gain descending and keeps nulls last", () => {
+    const snapshots = [
+      makeSnapshot({
+        portfolioCode: "a",
+        portfolioName: "A",
+        lines: [
+          makeLine({
+            id: "l1",
+            instrumentName: "高損益",
+            marketValueMinor: 100,
+            bookValueMinor: 50,
+          }),
+          makeLine({
+            id: "l2",
+            instrumentName: "低損益",
+            marketValueMinor: 200,
+            bookValueMinor: 190,
+          }),
+          makeLine({
+            id: "l3",
+            instrumentName: "簿価なし",
+            marketValueMinor: 300,
+            bookValueMinor: null,
+          }),
+        ],
+      }),
+    ];
+    const rows = buildGlobalInstrumentRows(snapshots);
+
+    let result = sortGlobalInstrumentRows(rows, "gain");
+
+    expect(result.map((row) => row.instrumentName)).toEqual([
+      "高損益",
+      "低損益",
+      "簿価なし",
+    ]);
+    expect(result[0]?.unrealizedGainMinor).toBe(50);
+    expect(result[2]?.unrealizedGainMinor).toBeNull();
+  });
+
+  it("sorts by gain-rate descending", () => {
+    const snapshots = [
+      makeSnapshot({
+        portfolioCode: "a",
+        portfolioName: "A",
+        lines: [
+          makeLine({
+            id: "l1",
+            instrumentName: "高率",
+            marketValueMinor: 120,
+            bookValueMinor: 100,
+          }),
+          makeLine({
+            id: "l2",
+            instrumentName: "低率",
+            marketValueMinor: 300,
+            bookValueMinor: 280,
+          }),
+          makeLine({
+            id: "l3",
+            instrumentName: "不明",
+            marketValueMinor: 500,
+            bookValueMinor: null,
+          }),
+        ],
+      }),
+    ];
+    const rows = buildGlobalInstrumentRows(snapshots);
+
+    let result = sortGlobalInstrumentRows(rows, "gain-rate");
+
+    expect(result.map((row) => row.instrumentName)).toEqual([
+      "高率",
+      "低率",
+      "不明",
+    ]);
+  });
+});
+
+describe("buildGlobalInstrumentRankingValues", () => {
+  it("extracts values for the selected metric", () => {
+    const snapshots = [
+      makeSnapshot({
+        portfolioCode: "a",
+        portfolioName: "A",
+        lines: [
+          makeLine({
+            id: "l1",
+            instrumentName: "A",
+            marketValueMinor: 150,
+            bookValueMinor: 100,
+          }),
+          makeLine({
+            id: "l2",
+            instrumentName: "B",
+            marketValueMinor: 80,
+            bookValueMinor: null,
+          }),
+        ],
+      }),
+    ];
+    const rows = buildGlobalInstrumentRows(snapshots);
+
+    expect(buildGlobalInstrumentRankingValues(rows, "market-value")).toEqual([
+      150, 80,
+    ]);
+    expect(buildGlobalInstrumentRankingValues(rows, "gain")).toEqual([
+      50, null,
+    ]);
+    expect(buildGlobalInstrumentRankingValues(rows, "gain-rate")).toEqual([
+      0.5, null,
+    ]);
   });
 });
 

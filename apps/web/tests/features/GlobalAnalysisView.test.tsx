@@ -1,5 +1,4 @@
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { GlobalAnalysisView } from "@/features/analysis/GlobalAnalysisView";
@@ -20,7 +19,7 @@ const snapshotFixture = {
       accountName: "不明口座",
       quantity: 1,
       marketValueMinor: 100_000,
-      bookValueMinor: null,
+      bookValueMinor: 80_000,
       metrics: [],
       instrumentAttributes: [],
       tags: [
@@ -34,6 +33,60 @@ const snapshotFixture = {
     },
   ],
 };
+
+const trendsFixture = {
+  portfolioCode: "ideco",
+  points: [
+    {
+      asOfDate: "2026-01-31",
+      totalMarketValueMinor: 90_000,
+      totalBookValueMinor: 80_000,
+      unrealizedGainMinor: 10_000,
+      gainRateOnBook: 0.125,
+      totalContributionsMinor: 80_000,
+      gainRateOnContributions: 0.125,
+      allocationsByScheme: {},
+    },
+    {
+      asOfDate: "2026-06-01",
+      totalMarketValueMinor: 100_000,
+      totalBookValueMinor: 80_000,
+      unrealizedGainMinor: 20_000,
+      gainRateOnBook: 0.25,
+      totalContributionsMinor: 80_000,
+      gainRateOnContributions: 0.25,
+      allocationsByScheme: {},
+    },
+  ],
+};
+
+function stubSuccessfulFetch(
+  portfolios: Array<{ id: string; code: string; name: string; kind: string }>,
+  snapshot: typeof snapshotFixture,
+) {
+  let result = vi.fn(async (url: string) => {
+    if (url.includes("portfolios.json") || url.endsWith("/portfolios")) {
+      return {
+        ok: true,
+        status: 200,
+        json: async () => portfolios,
+      };
+    }
+    if (url.includes("/trends") || url.includes("trends-summary.json")) {
+      return {
+        ok: true,
+        status: 200,
+        json: async () => trendsFixture,
+      };
+    }
+    return {
+      ok: true,
+      status: 200,
+      json: async () => snapshot,
+    };
+  });
+  return result;
+}
 
 describe("GlobalAnalysisView", () => {
   beforeEach(() => {
@@ -52,149 +105,48 @@ describe("GlobalAnalysisView", () => {
     expect(container.querySelector(".animate-pulse")).toBeTruthy();
   });
 
-  it("renders merged allocation table", async () => {
+  it("renders layout with combo chart, instrument donut values, and scrollable table", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn(async (url: string) => {
-        if (url.includes("portfolios.json") || url.endsWith("/portfolios")) {
-          return {
-            ok: true,
-            status: 200,
-            json: async () => [
-              {
-                id: "p1",
-                code: "ideco",
-                name: "iDeCo",
-                kind: "ideco",
-              },
-            ],
-          };
-        }
-        return {
-          ok: true,
-          status: 200,
-          json: async () => snapshotFixture,
-        };
-      }),
+      stubSuccessfulFetch(
+        [
+          {
+            id: "p1",
+            code: "ideco",
+            name: "iDeCo",
+            kind: "ideco",
+          },
+        ],
+        snapshotFixture,
+      ),
     );
-    render(<GlobalAnalysisView />);
+
+    const { container } = render(<GlobalAnalysisView />);
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "全口座の資産配分" })).toBeInTheDocument();
-    });
-    expect(screen.getByText("口座別内訳")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "iDeCo" })).toHaveAttribute(
-      "href",
-      "/portfolios/ideco/analysis",
-    );
-    expect(screen.getByText("2026/06/01")).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "地域分類" })).toBeInTheDocument();
-  });
-
-  it("switches scheme tabs and expands allocation with portfolio column", async () => {
-    const user = userEvent.setup();
-    const multiSchemeSnapshot = {
-      ...snapshotFixture,
-      analysisSchemes: [
-        { schemeCode: "ideco_region", schemeName: "地域分類" },
-        { schemeCode: "ideco_asset_class", schemeName: "資産分類" },
-      ],
-      lines: [
-        {
-          ...snapshotFixture.lines[0],
-          tags: [
-            {
-              schemeCode: "ideco_region",
-              schemeName: "地域分類",
-              valueCode: "domestic",
-              valueName: "国内",
-            },
-            {
-              schemeCode: "ideco_asset_class",
-              schemeName: "資産分類",
-              valueCode: "equity",
-              valueName: "株式",
-            },
-          ],
-        },
-      ],
-    };
-
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(async (url: string) => {
-        if (url.includes("portfolios.json") || url.endsWith("/portfolios")) {
-          return {
-            ok: true,
-            status: 200,
-            json: async () => [
-              {
-                id: "p1",
-                code: "ideco",
-                name: "iDeCo",
-                kind: "ideco",
-              },
-            ],
-          };
-        }
-        return {
-          ok: true,
-          status: 200,
-          json: async () => multiSchemeSnapshot,
-        };
-      }),
-    );
-
-    render(<GlobalAnalysisView />);
-    await waitFor(() => {
-      expect(screen.getByRole("tab", { name: "資産分類" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "全口座" })).toBeInTheDocument();
     });
 
-    await user.click(screen.getByRole("tab", { name: "資産分類" }));
-    await user.click(
-      screen.getByRole("button", { name: "株式 の内訳を開く" }),
-    );
-    expect(screen.getAllByRole("columnheader", { name: "口座" }).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText("テスト銘柄")).toBeInTheDocument();
-  });
+    expect(screen.getByText("口座別構成")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "評価額・利益率の変化" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("銘柄別構成")).toBeInTheDocument();
+    expect(screen.queryByText("銘柄ランキング")).not.toBeInTheDocument();
+    expect(screen.getByText("銘柄一覧")).toBeInTheDocument();
+    expect(screen.getAllByText("テスト銘柄").length).toBeGreaterThan(0);
 
-  it("shows message when no classification axes are available", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(async (url: string) => {
-        if (url.includes("portfolios.json") || url.endsWith("/portfolios")) {
-          return {
-            ok: true,
-            status: 200,
-            json: async () => [
-              {
-                id: "p1",
-                code: "generic",
-                name: "一般口座",
-                kind: "generic",
-              },
-            ],
-          };
-        }
-        return {
-          ok: true,
-          status: 200,
-          json: async () => ({
-            ...snapshotFixture,
-            portfolioCode: "generic",
-            portfolioName: "一般口座",
-            analysisSchemes: [],
-            lines: [],
-          }),
-        };
-      }),
+    const legendMetrics = container.querySelector(
+      ".allocation-chart__legend-metrics",
     );
+    expect(legendMetrics).toBeTruthy();
+    expect(legendMetrics?.textContent).toContain("100,000");
+    expect(legendMetrics?.textContent).toContain("100.00%");
 
-    render(<GlobalAnalysisView />);
-    await waitFor(() => {
-      expect(
-        screen.getByText("横断分析に利用できる分類軸がありません。"),
-      ).toBeInTheDocument();
-    });
+    const scrollContainer = container.querySelector(
+      ".overflow-auto",
+    ) as HTMLElement | null;
+    expect(scrollContainer).toBeTruthy();
+    expect(scrollContainer?.style.maxHeight).toBe("24rem");
   });
 
   it("shows error when portfolio list fetch fails", async () => {
@@ -239,9 +191,7 @@ describe("GlobalAnalysisView", () => {
     );
     render(<GlobalAnalysisView />);
     await waitFor(() => {
-      expect(
-        screen.getByText("資産配分の対象となる明細がありません。"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("表示できる明細がありません。")).toBeInTheDocument();
     });
   });
 });

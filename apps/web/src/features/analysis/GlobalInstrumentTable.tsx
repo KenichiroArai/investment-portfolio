@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 
 type GlobalInstrumentTableProps = {
   rows: GlobalInstrumentRow[];
+  maxHeight?: string;
 };
 
 function formatNullableYen(value: number | null): string {
@@ -44,7 +45,10 @@ function formatNullableRate(value: number | null): string {
   return result;
 }
 
-export function GlobalInstrumentTable({ rows }: GlobalInstrumentTableProps) {
+export function GlobalInstrumentTable({
+  rows,
+  maxHeight,
+}: GlobalInstrumentTableProps) {
   const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
 
   function handleToggle(instrumentKey: string): void {
@@ -64,9 +68,12 @@ export function GlobalInstrumentTable({ rows }: GlobalInstrumentTableProps) {
   }
 
   let result: ReactNode = (
-    <div className="overflow-x-auto">
+    <div
+      className="overflow-auto"
+      style={maxHeight ? { maxHeight } : undefined}
+    >
       <Table>
-        <TableHeader>
+        <TableHeader className="sticky top-0 z-10 bg-card">
           <TableRow>
             <TableHead className="w-10" />
             <TableHead>銘柄</TableHead>

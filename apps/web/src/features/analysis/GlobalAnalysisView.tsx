@@ -1,8 +1,6 @@
 "use client";
 
 import {
-  buildGlobalInstrumentPortfolioStack,
-  buildGlobalInstrumentRankingValues,
   buildGlobalInstrumentRows,
   buildGlobalPortfolioSlices,
   collapseGlobalInstrumentRows,
@@ -13,18 +11,24 @@ import {
   toInstrumentAllocationSlices,
   toPortfolioAllocationSlices,
   type CurrentSnapshotDto,
+  type SnapshotTrendsDto,
 } from "@repo/shared";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { GlobalAllocationDonutCard } from "@/features/analysis/GlobalAllocationDonutCard";
 import { GlobalInstrumentTable } from "@/features/analysis/GlobalInstrumentTable";
-import { getAllocationChartColor } from "@/features/analysis/chart-colors";
 import { LoadingSkeleton } from "@/components/loading-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
 import { StatCard } from "@/components/stat-card";
-import { TrendBarChart } from "@/features/trends/TrendBarChart";
-import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
+import {
+  buildPortfolioMarketValueGainRateComboChart,
+  PORTFOLIO_COMBO_TREND_CAPTION,
+  PORTFOLIO_COMBO_TREND_MONTH_LIMIT,
+  PORTFOLIO_COMBO_TREND_TARGET_PLOT_WIDTH,
+  type PortfolioTrendSeriesInput,
+} from "@/features/trends/build-portfolio-combo-chart";
+import { TrendComboChart } from "@/features/trends/TrendComboChart";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatPercent, formatYen } from "@/lib/format-yen";
@@ -32,13 +36,18 @@ import {
   getPortfoliosFetchUrl,
   getSnapshotFetchUrl,
   getSnapshotLoadErrorMessage,
+  getSnapshotTrendsFetchUrl,
   type PortfolioListItem,
 } from "@/lib/data-source";
 
 const CHART_INSTRUMENT_LIMIT = 12;
+const INSTRUMENT_TABLE_MAX_HEIGHT = "24rem";
 
 export function GlobalAnalysisView() {
   const [snapshots, setSnapshots] = useState<CurrentSnapshotDto[]>([]);
+  const [portfolioTrends, setPortfolioTrends] = useState<
+    PortfolioTrendSeriesInput[]
+  >([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -66,22 +75,38 @@ export function GlobalAnalysisView() {
           (await portfolioResponse.json()) as PortfolioListItem[];
 
         const loadedSnapshots: CurrentSnapshotDto[] = [];
+        const loadedTrends: PortfolioTrendSeriesInput[] = [];
+
         for (const portfolio of portfolioRows) {
-          const snapshotResponse = await fetch(
-            getSnapshotFetchUrl(portfolio.code),
-          );
+          const [snapshotResponse, trendsResponse] = await Promise.all([
+            fetch(getSnapshotFetchUrl(portfolio.code)),
+            fetch(getSnapshotTrendsFetchUrl(portfolio.code)),
+          ]);
           if (cancelled) {
             return result;
           }
           if (!snapshotResponse.ok) {
             continue;
           }
-          loadedSnapshots.push(
-            (await snapshotResponse.json()) as CurrentSnapshotDto,
-          );
+
+          const snapshot =
+            (await snapshotResponse.json()) as CurrentSnapshotDto;
+          loadedSnapshots.push(snapshot);
+
+          if (trendsResponse.ok) {
+            const trends = (await trendsResponse.json()) as SnapshotTrendsDto;
+            if (trends.points.length > 0) {
+              loadedTrends.push({
+                code: portfolio.code,
+                name: portfolio.name,
+                points: trends.points,
+              });
+            }
+          }
         }
 
         setSnapshots(loadedSnapshots);
+        setPortfolioTrends(loadedTrends);
       } catch {
         if (!cancelled) {
           setError(getSnapshotLoadErrorMessage());
@@ -131,46 +156,12 @@ export function GlobalAnalysisView() {
     return result;
   }, [instrumentChartRows]);
 
-  const rankingLabels = useMemo(() => {
-    let result = instrumentChartRows.map((row) => row.instrumentName);
-    return result;
-  }, [instrumentChartRows]);
-
-  const rankingSeries = useMemo(() => {
-    let result: TrendChartSeries[] = [
-      {
-        key: "marketValue",
-        label: "評価額",
-        color: getAllocationChartColor(0),
-        values: buildGlobalInstrumentRankingValues(instrumentChartRows),
-        formatValue: (value) => formatYen(value),
-      },
-    ];
-    return result;
-  }, [instrumentChartRows]);
-
-  const stackChart = useMemo(() => {
-    let result = buildGlobalInstrumentPortfolioStack(
-      instrumentRows,
-      portfolioSummary.portfolios,
-      CHART_INSTRUMENT_LIMIT,
-    );
-    return result;
-  }, [instrumentRows, portfolioSummary.portfolios]);
-
-  const stackSeries = useMemo(() => {
-    let result: TrendChartSeries[] = stackChart.series.map((item, index) => {
-      let series: TrendChartSeries = {
-        key: item.key,
-        label: item.label,
-        color: getAllocationChartColor(index),
-        values: item.values,
-        formatValue: (value) => formatYen(value),
-      };
-      return series;
+  const marketValueTrendChart = useMemo(() => {
+    let result = buildPortfolioMarketValueGainRateComboChart(portfolioTrends, {
+      monthLimit: PORTFOLIO_COMBO_TREND_MONTH_LIMIT,
     });
     return result;
-  }, [stackChart.series]);
+  }, [portfolioTrends]);
 
   const totalPortfolioGainMinor = useMemo(() => {
     let result = 0;
@@ -269,51 +260,45 @@ export function GlobalAnalysisView() {
             />
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <GlobalAllocationDonutCard
-              title="銘柄別構成"
-              slices={instrumentSlices}
-            />
-          </CardContent>
-        </Card>
+        {marketValueTrendChart !== null ? (
+          <Card>
+            <CardContent className="pt-6">
+              <TrendComboChart
+                title="評価額・利益率の変化"
+                caption={PORTFOLIO_COMBO_TREND_CAPTION}
+                labels={marketValueTrendChart.labels}
+                sourceDates={marketValueTrendChart.sourceDates}
+                sourceDateLabels={marketValueTrendChart.sourceDateLabels}
+                targetPlotWidth={PORTFOLIO_COMBO_TREND_TARGET_PLOT_WIDTH}
+                reservedSlotCount={PORTFOLIO_COMBO_TREND_MONTH_LIMIT}
+                height={240}
+                barSeries={marketValueTrendChart.barSeries}
+                lineSeries={marketValueTrendChart.lineSeries}
+              />
+            </CardContent>
+          </Card>
+        ) : null}
       </div>
 
       <Card className="mb-6">
         <CardContent className="pt-6">
-          <TrendBarChart
-            title="銘柄ランキング"
-            caption={`評価額上位 ${CHART_INSTRUMENT_LIMIT} 銘柄（超過分はその他）`}
-            labels={rankingLabels}
-            series={rankingSeries}
-            valueKind="yen"
-            height={280}
+          <GlobalAllocationDonutCard
+            title="銘柄別構成"
+            slices={instrumentSlices}
+            showLegendValues
           />
         </CardContent>
       </Card>
-
-      {stackSeries.length > 0 && stackChart.labels.length > 0 ? (
-        <Card className="mb-6">
-          <CardContent className="pt-6">
-            <TrendBarChart
-              title="口座×銘柄"
-              caption="上位銘柄ごとの口座別評価額"
-              labels={stackChart.labels}
-              series={stackSeries}
-              mode="stacked"
-              valueKind="yen"
-              height={300}
-            />
-          </CardContent>
-        </Card>
-      ) : null}
 
       <Card>
         <CardHeader>
           <CardTitle className="text-base">銘柄一覧</CardTitle>
         </CardHeader>
         <CardContent className="p-0 pt-0">
-          <GlobalInstrumentTable rows={instrumentRows} />
+          <GlobalInstrumentTable
+            rows={instrumentRows}
+            maxHeight={INSTRUMENT_TABLE_MAX_HEIGHT}
+          />
         </CardContent>
       </Card>
     </PageContainer>

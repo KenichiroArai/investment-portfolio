@@ -20,6 +20,8 @@ type GlobalAllocationDonutCardProps = {
   title: string;
   slices: AllocationSliceWithLines[];
   emptyMessage?: string;
+  /** 凡例の右側に評価額・構成比を表示する */
+  showLegendValues?: boolean;
 };
 
 function formatNullableYen(value: number | null): string {
@@ -46,6 +48,7 @@ export function GlobalAllocationDonutCard({
   title,
   slices,
   emptyMessage = "表示できるデータがありません。",
+  showLegendValues = false,
 }: GlobalAllocationDonutCardProps) {
   const [highlightedValueCode, setHighlightedValueCode] = useState<string | null>(
     null,
@@ -92,6 +95,7 @@ export function GlobalAllocationDonutCard({
             highlightedValueCode={highlightedValueCode}
             onSliceHover={handleSliceHover}
             onSliceLeave={handleSliceLeave}
+            showLegendValues={showLegendValues}
           />
           {tooltip ? (
             <div

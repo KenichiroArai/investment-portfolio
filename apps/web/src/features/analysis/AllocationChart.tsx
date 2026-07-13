@@ -1,6 +1,10 @@
 import type { AllocationSliceWithLines } from "@repo/shared";
 
 import { getAllocationChartColor } from "@/features/analysis/chart-colors";
+import {
+  formatAllocationPercent,
+  formatYen,
+} from "@/lib/format-yen";
 
 const CHART_SIZE = 192;
 const CHART_CENTER = CHART_SIZE / 2;
@@ -12,6 +16,8 @@ type AllocationChartProps = {
   highlightedValueCode: string | null;
   onSliceHover: (valueCode: string, clientX: number, clientY: number) => void;
   onSliceLeave: () => void;
+  /** 凡例の右側に評価額・構成比を表示する */
+  showLegendValues?: boolean;
 };
 
 type DonutSegment = {
@@ -115,6 +121,7 @@ export function AllocationChart({
   highlightedValueCode,
   onSliceHover,
   onSliceLeave,
+  showLegendValues = false,
 }: AllocationChartProps) {
   const segments = buildDonutSegments(slices);
 
@@ -206,7 +213,19 @@ export function AllocationChart({
                   backgroundColor: getAllocationChartColor(index),
                 }}
               />
-              <span>{slice.valueName}</span>
+              <span className="allocation-chart__legend-label">
+                {slice.valueName}
+              </span>
+              {showLegendValues ? (
+                <span className="allocation-chart__legend-metrics">
+                  <span className="allocation-chart__legend-metric">
+                    {formatYen(slice.marketValueMinor)}
+                  </span>
+                  <span className="allocation-chart__legend-metric allocation-chart__legend-metric--muted">
+                    {formatAllocationPercent(slice.weight)}
+                  </span>
+                </span>
+              ) : null}
             </li>
           );
           return item;
