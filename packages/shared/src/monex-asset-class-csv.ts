@@ -121,33 +121,25 @@ function normalizeBreakdownEntries(
   return result;
 }
 
-export function buildMonexInstrumentAssetClassBreakdown(
-  entries: Array<{ fileName: string; content: string }>,
-  fileMap: Record<string, { code: string; name: string }>,
+export function buildMonexInstrumentAssetClassBreakdownFromMarketValues(
+  rows: Array<{
+    instrumentName: string;
+    valueCode: string;
+    marketValueMinor: number;
+  }>,
   aliasMap: Map<string, string[]> = new Map(),
 ): Map<string, MonexInstrumentAssetClassBreakdownEntry[]> {
   let result = new Map<string, MonexInstrumentAssetClassBreakdownEntry[]>();
   const totals = new Map<string, Map<string, number>>();
 
-  for (const entry of entries) {
-    const assetClass = fileMap[entry.fileName];
-    if (!assetClass) {
-      continue;
-    }
-
-    const parsed = parseMonexAssetClassCsv(entry.content);
-    for (const row of parsed.rows) {
-      const canonicalName = resolveCanonicalInstrumentName(
-        row.instrumentName,
-        aliasMap,
-      );
-      addMarketValueByInstrumentName(
-        totals,
-        canonicalName,
-        assetClass.code,
-        row.marketValueMinor,
-      );
-    }
+  for (const row of rows) {
+    const canonicalName = resolveCanonicalInstrumentName(row.instrumentName, aliasMap);
+    addMarketValueByInstrumentName(
+      totals,
+      canonicalName,
+      row.valueCode,
+      row.marketValueMinor,
+    );
   }
 
   for (const [instrumentName, marketValueByClass] of totals) {
@@ -160,6 +152,38 @@ export function buildMonexInstrumentAssetClassBreakdown(
     result.set(instrumentName, breakdown);
   }
 
+  return result;
+}
+
+export function buildMonexInstrumentAssetClassBreakdown(
+  entries: Array<{ fileName: string; content: string }>,
+  fileMap: Record<string, { code: string; name: string }>,
+  aliasMap: Map<string, string[]> = new Map(),
+): Map<string, MonexInstrumentAssetClassBreakdownEntry[]> {
+  let result = new Map<string, MonexInstrumentAssetClassBreakdownEntry[]>();
+  const rows: Array<{
+    instrumentName: string;
+    valueCode: string;
+    marketValueMinor: number;
+  }> = [];
+
+  for (const entry of entries) {
+    const assetClass = fileMap[entry.fileName];
+    if (!assetClass) {
+      continue;
+    }
+
+    const parsed = parseMonexAssetClassCsv(entry.content);
+    for (const row of parsed.rows) {
+      rows.push({
+        instrumentName: row.instrumentName,
+        valueCode: assetClass.code,
+        marketValueMinor: row.marketValueMinor,
+      });
+    }
+  }
+
+  result = buildMonexInstrumentAssetClassBreakdownFromMarketValues(rows, aliasMap);
   return result;
 }
 

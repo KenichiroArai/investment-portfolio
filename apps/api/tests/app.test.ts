@@ -706,4 +706,64 @@ describe("API app", () => {
 
     sqlite.close();
   });
+
+  it("supports monex paste instruments and asset class weights", async () => {
+    const { db, sqlite } = createTestDb();
+    const app = createApp({ getDb: () => db });
+
+    const createPortfolioRes = await app.request("/portfolios", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        code: "monex",
+        name: "マネックス証券",
+        kind: "monex",
+      }),
+    });
+    expect(createPortfolioRes.status).toBe(201);
+
+    const instrumentRes = await app.request("/instruments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        portfolioCode: "monex",
+        accountId: "monex:特定:普通預り",
+        name: "テストファンド",
+      }),
+    });
+    expect(instrumentRes.status).toBe(201);
+    const instrument = (await instrumentRes.json()) as { id: string };
+
+    const pasteRes = await app.request("/portfolios/monex/instruments-for-paste");
+    expect(pasteRes.status).toBe(200);
+    const pasteRows = (await pasteRes.json()) as Array<{ id: string; name: string }>;
+    expect(pasteRows.some((row) => row.id === instrument.id)).toBe(true);
+
+    const weightsRes = await app.request("/portfolios/monex/monex-asset-class-weights", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        assignments: [
+          {
+            instrumentId: instrument.id,
+            weights: [
+              { valueCode: "emerging_equity", allocationWeight: 0.7 },
+              { valueCode: "other", allocationWeight: 0.3 },
+            ],
+          },
+        ],
+      }),
+    });
+    expect(weightsRes.status).toBe(200);
+    expect(await weightsRes.json()).toEqual({ updatedInstrumentCount: 1 });
+
+    const unsupported = await app.request("/portfolios/ideco/monex-asset-class-weights", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ assignments: [] }),
+    });
+    expect(unsupported.status).toBe(404);
+
+    sqlite.close();
+  });
 });

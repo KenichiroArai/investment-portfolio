@@ -8,6 +8,7 @@ export * from "./repositories/classifications";
 export * from "./repositories/snapshots";
 export * from "./repositories/target-allocations";
 export * from "./repositories/target-portfolio-weights";
+export * from "./apply-monex-asset-class-weights";
 export * from "./backup/export-portfolio-backup";
 export * from "./backup/import-portfolio-backup";
 export * from "./backup/backup-zip";

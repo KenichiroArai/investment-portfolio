@@ -683,6 +683,12 @@ export type IdecoPasteInstrumentRow = {
   shortName: string | null;
 };
 
+export type MonexPasteInstrumentRow = {
+  id: string;
+  name: string;
+  ticker: string | null;
+};
+
 export async function listIdecoInstrumentsForPaste(db: AppDatabase) {
   let result: IdecoPasteInstrumentRow[] = [];
 
@@ -704,6 +710,36 @@ export async function listIdecoInstrumentsForPaste(db: AppDatabase) {
       id: row.id,
       name: row.name,
       shortName: shortNameAttribute?.textValue ?? null,
+    };
+    result.push(item);
+  }
+
+  return result;
+}
+
+export async function listMonexInstrumentsForPaste(db: AppDatabase) {
+  let result: MonexPasteInstrumentRow[] = [];
+
+  const portfolio = await findPortfolioByCode(db, "monex");
+  if (!portfolio) {
+    return result;
+  }
+
+  const rows = await db
+    .select()
+    .from(instruments)
+    .where(eq(instruments.portfolioId, portfolio.id))
+    .orderBy(instruments.name);
+  const instrumentIds = rows.map((row) => row.id);
+  const attributesByInstrumentId = await getAttributesForInstruments(db, instrumentIds);
+
+  for (const row of rows) {
+    const attributes = attributesByInstrumentId.get(row.id) ?? [];
+    const tickerAttribute = attributes.find((attribute) => attribute.code === "ticker");
+    let item: MonexPasteInstrumentRow = {
+      id: row.id,
+      name: row.name,
+      ticker: tickerAttribute?.textValue ?? null,
     };
     result.push(item);
   }

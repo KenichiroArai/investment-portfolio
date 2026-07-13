@@ -32,11 +32,13 @@ import {
   getAttributesForInstruments,
   listInstruments,
   listIdecoInstrumentsForPaste,
+  listMonexInstrumentsForPaste,
   mergeInstruments,
   setInstrumentAttributes,
   updateInstrument,
   upsertInstrument,
 } from "../src/repositories/instruments";
+import { applyMonexAssetClassWeights } from "../src/apply-monex-asset-class-weights";
 import {
   createPortfolio,
   deletePortfolio,
@@ -1089,6 +1091,47 @@ describe("portfolio repositories", () => {
     expect(rows).toEqual([
       { id: withShortName.id, name: "Alpha Fund", shortName: "Alpha" },
       expect.objectContaining({ name: "Beta Fund", shortName: null }),
+    ]);
+  });
+
+  it("lists monex paste instruments and applies weighted asset class tags", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "monex",
+      name: "マネックス証券",
+      kind: "monex",
+    });
+    const instrument = await createInstrument(db, {
+      portfolioCode: "monex",
+      accountId: "monex:特定:普通預り",
+      name: "テストファンド",
+    });
+    await setInstrumentAttributes(db, instrument.id, [
+      { code: "ticker", textValue: "TEST" },
+    ]);
+
+    const rows = await listMonexInstrumentsForPaste(db);
+    expect(rows).toEqual([
+      { id: instrument.id, name: "テストファンド", ticker: "TEST" },
+    ]);
+
+    const applied = await applyMonexAssetClassWeights(db, [
+      {
+        instrumentId: instrument.id,
+        weights: [
+          { valueCode: "emerging_equity", allocationWeight: 0.6 },
+          { valueCode: "other", allocationWeight: 0.4 },
+        ],
+      },
+    ]);
+    expect(applied.updatedInstrumentCount).toBe(1);
+
+    const tags = await getTagsForInstruments(db, [instrument.id]);
+    const instrumentTags = tags.get(instrument.id) ?? [];
+    expect(instrumentTags).toHaveLength(2);
+    expect(instrumentTags.map((tag) => tag.valueCode).sort()).toEqual([
+      "emerging_equity",
+      "other",
     ]);
   });
 

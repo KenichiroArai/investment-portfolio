@@ -13,6 +13,7 @@ import type {
   PortfolioDto,
   ReplaceCurrentSnapshotInput,
   SetInstrumentClassificationsInput,
+  ApplyMonexAssetClassWeightsInput,
   TargetAllocationsBySchemeDto,
   TargetAllocationWeightDto,
   TargetPortfolioWeightDto,
@@ -524,6 +525,20 @@ export async function replaceCurrentSnapshot(
 ) {
   let result = await requestWritableJson<CurrentSnapshotDto>(
     `/portfolios/${encodePortfolioCodeForPath(portfolioCode)}/snapshot/current`,
+    {
+      method: "PUT",
+      body: JSON.stringify(input),
+    },
+  );
+  return result;
+}
+
+export async function applyMonexAssetClassWeights(
+  portfolioCode: string,
+  input: ApplyMonexAssetClassWeightsInput,
+) {
+  let result = await requestWritableJson<{ updatedInstrumentCount: number }>(
+    `/portfolios/${encodePortfolioCodeForPath(portfolioCode)}/monex-asset-class-weights`,
     {
       method: "PUT",
       body: JSON.stringify(input),

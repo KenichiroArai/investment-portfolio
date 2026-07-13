@@ -177,3 +177,27 @@ export type TargetPortfolioWeightInput = z.infer<
 export type ReplaceTargetPortfolioWeightsInput = z.infer<
   typeof replaceTargetPortfolioWeightsSchema
 >;
+
+export const monexAssetClassWeightEntrySchema = z.object({
+  valueCode: z.string().min(1).max(64),
+  allocationWeight: z.number().positive(),
+});
+
+export const monexAssetClassWeightAssignmentSchema = z.object({
+  instrumentId: z.string().uuid(),
+  weights: z.array(monexAssetClassWeightEntrySchema).min(1),
+});
+
+export const applyMonexAssetClassWeightsSchema = z.object({
+  assignments: z.array(monexAssetClassWeightAssignmentSchema),
+});
+
+export type MonexAssetClassWeightEntryInput = z.infer<
+  typeof monexAssetClassWeightEntrySchema
+>;
+export type MonexAssetClassWeightAssignmentInput = z.infer<
+  typeof monexAssetClassWeightAssignmentSchema
+>;
+export type ApplyMonexAssetClassWeightsInput = z.infer<
+  typeof applyMonexAssetClassWeightsSchema
+>;

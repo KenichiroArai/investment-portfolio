@@ -6,6 +6,7 @@ import { DataManageView } from "@/features/manage/DataManageView";
 import { ManageAsOfDateField } from "@/features/manage/ManageAsOfDateField";
 import {
   createManageFetchMock,
+  MANAGE_INSTRUMENT,
   MANAGE_SNAPSHOT,
 } from "../helpers/manage-api-test-utils";
 
@@ -16,6 +17,7 @@ vi.mock("sonner", () => ({
   toast: {
     success: toastSuccess,
     error: toastError,
+    warning: vi.fn(),
   },
 }));
 
@@ -186,6 +188,80 @@ describe("DataManageView", () => {
     await user.click(screen.getByRole("button", { name: "一括登録" }));
     await waitFor(() => {
       expect(toastSuccess).toHaveBeenCalledWith("保有明細を登録しました。");
+    });
+  });
+
+  it("imports monex holdings paste and registers draft with asset class", async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal(
+      "fetch",
+      createManageFetchMock({
+        snapshot: {
+          ...MANAGE_SNAPSHOT,
+          portfolioCode: "monex",
+          portfolioName: "マネックス証券",
+          metrics: [],
+        },
+        instruments: [
+          {
+            ...MANAGE_INSTRUMENT,
+            accountId: "monex:特定:普通預り",
+            name: "ｅＭＡＸＩＳ　Ｓｌｉｍ　新興国株式インデックス",
+          },
+        ],
+      }),
+    );
+    render(<DataManageView portfolioCode="monex" initialTab="monex-bulk-import" />);
+    await waitForLoaded();
+
+    await user.click(screen.getByRole("tab", { name: "マネックス一括取り込み" }));
+
+    const pasteText = `銘柄	口座区分
+預り区分	基準価額（円）
+保有数（口）	平均取得単価
+評価損益率	取引
+ｅＭＡＸＩＳ　Ｓｌｉｍ　新興国株式インデックス	特定
+普通預り	27,406
+-101	再投資コース
+再投資中
+（変更）	1,357	29,138	3,718
+-236
+-5.94%	買付
+売却
+
+銘柄
+▼
+保有比率
+▼
+評価額
+▼
+新興国株式全体
+3,718
+0
+(0.00%)
+---
+(---%)
+ｅＭＡＸＩＳ　Ｓｌｉｍ　新興国株式インデックス
+100.00%
+3,718
+0
+(0.00%)
+---
+(---%)`;
+
+    fireEvent.change(
+      screen.getByPlaceholderText("マネックス証券の保有明細・資産クラスをここに貼り付けてください"),
+      { target: { value: pasteText } },
+    );
+    await user.click(screen.getByRole("button", { name: "取り込み" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("取り込み下書き一覧")).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole("button", { name: "一括登録" }));
+    await waitFor(() => {
+      expect(toastSuccess).toHaveBeenCalledWith("保有明細と資産クラスを登録しました。");
     });
   });
 

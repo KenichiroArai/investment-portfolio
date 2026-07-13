@@ -171,8 +171,13 @@ export function createManageFetchMock(options: ManageFetchMockOptions = {}) {
           id: item.id,
           name: item.name,
           shortName: null,
+          ticker: null,
         })),
       );
+    }
+
+    if (url.includes("/monex-asset-class-weights") && method === "PUT") {
+      return okResponse({ updatedInstrumentCount: 1 });
     }
 
     if (url.endsWith("/instruments") && method === "POST") {

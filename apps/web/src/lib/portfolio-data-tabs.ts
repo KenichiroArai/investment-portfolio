@@ -24,6 +24,13 @@ export const PORTFOLIO_KIND_EXTRA_DATA_TABS: Record<string, PortfolioKindExtraDa
       insertAfter: "holding",
     },
   ],
+  monex: [
+    {
+      id: "monex-bulk-import",
+      label: "マネックス一括取り込み",
+      insertAfter: "holding",
+    },
+  ],
 };
 
 export function buildDataManageTabs(portfolioKind: string): DataManageTabItem[] {

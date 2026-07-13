@@ -4,6 +4,7 @@ import { join } from "node:path";
 import {
   MONEX_ASSET_CLASS_CSV_FILES,
   MONEX_ASSET_CLASS_FILE_MAP,
+  MONEX_ASSET_CLASS_VALUES,
   MONEX_INSTRUMENT_ATTRIBUTE_CODES,
   MONEX_SCHEME_CODES,
   buildMonexAssetClassNameMap,
@@ -99,14 +100,7 @@ async function syncMonexAssetClassValues(db: AppDatabase, schemeId: string) {
   let result: void = undefined;
 
   let sortOrder = 0;
-  for (const fileName of MONEX_ASSET_CLASS_CSV_FILES) {
-    const assetClass = MONEX_ASSET_CLASS_FILE_MAP[fileName];
-    /* v8 ignore start */
-    if (!assetClass) {
-      continue;
-    }
-    /* v8 ignore stop */
-
+  for (const assetClass of MONEX_ASSET_CLASS_VALUES) {
     const existing = await findClassificationValueBySchemeAndCode(
       db,
       schemeId,

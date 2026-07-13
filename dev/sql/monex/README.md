@@ -9,6 +9,7 @@
 | `monex_asset_class` | 資産クラス | `domestic_equity` | 国内株式 |
 | | | `developed_equity` | 先進国株式 |
 | | | `emerging_equity` | 新興国株式 |
+| | | `other` | その他資産 |
 
 資産クラスは ON COMPASS エクスポートの資産クラス別 CSV ファイル名から導出します（例: `先進国株式.csv` → `developed_equity`）。
 

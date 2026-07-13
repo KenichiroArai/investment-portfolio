@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 
 import { IdecoBulkImportTab } from "@/features/ideco/bulk-import/IdecoBulkImportTab";
+import { MonexBulkImportTab } from "@/features/monex/bulk-import/MonexBulkImportTab";
 
 type PortfolioExtraDataTabContentProps = {
   tabId: string;
@@ -24,6 +25,17 @@ export function PortfolioExtraDataTabContent({
   if (tabId === "ideco-bulk-import") {
     result = (
       <IdecoBulkImportTab
+        portfolioCode={portfolioCode}
+        asOfDate={asOfDate}
+        disabled={disabled}
+        onReload={onReload}
+      />
+    );
+  }
+
+  if (tabId === "monex-bulk-import") {
+    result = (
+      <MonexBulkImportTab
         portfolioCode={portfolioCode}
         asOfDate={asOfDate}
         disabled={disabled}

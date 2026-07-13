@@ -1,4 +1,5 @@
 import {
+  applyMonexAssetClassWeights,
   createClassificationScheme,
   createClassificationValue,
   createPortfolio,
@@ -20,6 +21,7 @@ import {
   listInstrumentClassificationValueIds,
   listInstruments,
   listIdecoInstrumentsForPaste,
+  listMonexInstrumentsForPaste,
   listPortfolios,
   listSchemesWithValuesForPortfolio,
   listSnapshotDates,
@@ -38,6 +40,7 @@ import {
   type AppDatabase,
 } from "@repo/db";
 import {
+  applyMonexAssetClassWeightsSchema,
   backupImportModeSchema,
   buildSnapshotTrends,
   createClassificationSchemeSchema,
@@ -689,14 +692,54 @@ export function createApp(options?: CreateAppOptions) {
       return result;
     }
 
-    if (portfolio.kind !== "ideco") {
+    if (portfolio.kind === "ideco") {
+      const rows = await listIdecoInstrumentsForPaste(db);
+      result = c.json(rows);
+      return result;
+    }
+
+    if (portfolio.kind === "monex") {
+      const rows = await listMonexInstrumentsForPaste(db);
+      result = c.json(rows);
+      return result;
+    }
+
+    result = c.json({ error: "Not supported for this portfolio kind" }, 404);
+    return result;
+  });
+
+  app.put("/portfolios/:code/monex-asset-class-weights", async (c) => {
+    let result!: Response;
+
+    const portfolioCode = c.req.param("code");
+    const db = resolveDb();
+    const portfolio = await findPortfolioByCode(db, portfolioCode);
+    if (!portfolio) {
+      result = c.json({ error: "Portfolio not found" }, 404);
+      return result;
+    }
+
+    if (portfolio.kind !== "monex" || portfolio.code !== "monex") {
       result = c.json({ error: "Not supported for this portfolio kind" }, 404);
       return result;
     }
 
-    const rows = await listIdecoInstrumentsForPaste(db);
-    result = c.json(rows);
-    return result;
+    const body = await c.req.json();
+    const parsed = applyMonexAssetClassWeightsSchema.safeParse(body);
+    if (!parsed.success) {
+      result = c.json({ error: parsed.error.flatten() }, 400);
+      return result;
+    }
+
+    try {
+      const applied = await applyMonexAssetClassWeights(db, parsed.data.assignments);
+      result = c.json(applied);
+      return result;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "資産クラスの更新に失敗しました";
+      result = c.json({ error: message }, 400);
+      return result;
+    }
   });
 
   app.get("/portfolios/:code/snapshot/current", async (c) => {

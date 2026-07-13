@@ -185,5 +185,15 @@ describe("layout components", () => {
       );
       expect(screen.getByRole("button", { name: "設定メニュー" })).toBeInTheDocument();
     });
+
+    it("renders monex data settings children including bulk import", () => {
+      usePathname.mockReturnValue("/portfolios/monex/settings/data/");
+      render(<SettingsSidebar portfolioCode="monex" portfolioKind="monex" />);
+
+      expect(screen.getByRole("link", { name: "マネックス一括取り込み" })).toHaveAttribute(
+        "href",
+        "/portfolios/monex/settings/data?tab=monex-bulk-import",
+      );
+    });
   });
 });
