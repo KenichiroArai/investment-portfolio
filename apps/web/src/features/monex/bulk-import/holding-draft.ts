@@ -1,6 +1,7 @@
 import {
   buildMonexHoldingMetrics,
   matchMonexInstrumentId,
+  normalizeIdecoInstrumentMatchKey,
   resolveMonexInstrumentAssetClassBreakdown,
   type HoldingLineInput,
   type MonexHoldingPasteRow,
@@ -185,5 +186,133 @@ export function sourceLabel(source: MonexHoldingPasteRow["source"]): string {
     return result;
   }
 
+  return result;
+}
+
+export type UnmatchedInstrumentCandidate = {
+  instrumentName: string;
+  source: MonexHoldingPasteRow["source"];
+  ticker: string | null;
+};
+
+export function listUnmatchedInstrumentCandidates(
+  drafts: MonexHoldingDraftRow[],
+): UnmatchedInstrumentCandidate[] {
+  let result: UnmatchedInstrumentCandidate[] = [];
+  const seen = new Set<string>();
+
+  for (const draft of drafts) {
+    if (draft.instrumentId) {
+      continue;
+    }
+    if (seen.has(draft.instrumentName)) {
+      continue;
+    }
+    seen.add(draft.instrumentName);
+    result.push({
+      instrumentName: draft.instrumentName,
+      source: draft.source,
+      ticker: draft.source === "us" ? draft.ticker : null,
+    });
+  }
+
+  return result;
+}
+
+export function rematchDraftRows(
+  drafts: MonexHoldingDraftRow[],
+  instruments: PasteInstrumentDto[],
+): MonexHoldingDraftRow[] {
+  let result: MonexHoldingDraftRow[] = [];
+
+  for (const draft of drafts) {
+    if (draft.instrumentId) {
+      result.push(draft);
+      continue;
+    }
+
+    const instrumentId = matchMonexInstrumentId(
+      instruments,
+      draft.instrumentName,
+      additionalMatchNamesForRow(draft),
+    );
+    result.push({
+      ...draft,
+      instrumentId,
+    });
+  }
+
+  return result;
+}
+
+export function filterInstrumentsByQuery(
+  instruments: PasteInstrumentDto[],
+  query: string,
+): PasteInstrumentDto[] {
+  let result: PasteInstrumentDto[] = [];
+  const normalizedQuery = normalizeIdecoInstrumentMatchKey(query);
+
+  if (normalizedQuery === "") {
+    result = [...instruments];
+    return result;
+  }
+
+  for (const instrument of instruments) {
+    const nameKey = normalizeIdecoInstrumentMatchKey(instrument.name);
+    const tickerKey = instrument.ticker
+      ? normalizeIdecoInstrumentMatchKey(instrument.ticker)
+      : "";
+    if (
+      nameKey.includes(normalizedQuery) ||
+      tickerKey.includes(normalizedQuery) ||
+      normalizedQuery.includes(nameKey)
+    ) {
+      result.push(instrument);
+    }
+  }
+
+  return result;
+}
+
+export function findSimilarInstruments(
+  instruments: PasteInstrumentDto[],
+  instrumentName: string,
+  limit = 5,
+): PasteInstrumentDto[] {
+  let result: PasteInstrumentDto[] = [];
+  const pasteKey = normalizeIdecoInstrumentMatchKey(instrumentName);
+  if (pasteKey === "") {
+    return result;
+  }
+
+  const scored: Array<{ instrument: PasteInstrumentDto; score: number }> = [];
+  for (const instrument of instruments) {
+    const nameKey = normalizeIdecoInstrumentMatchKey(instrument.name);
+    if (nameKey === "") {
+      continue;
+    }
+
+    let score = 0;
+    if (nameKey === pasteKey) {
+      score = 1000;
+    } else if (nameKey.startsWith(pasteKey) || pasteKey.startsWith(nameKey)) {
+      score = Math.min(nameKey.length, pasteKey.length);
+    } else {
+      const prefixLength = Math.min(8, pasteKey.length, nameKey.length);
+      for (let size = prefixLength; size >= 3; size -= 1) {
+        if (nameKey.includes(pasteKey.slice(0, size))) {
+          score = size;
+          break;
+        }
+      }
+    }
+
+    if (score > 0) {
+      scored.push({ instrument, score });
+    }
+  }
+
+  scored.sort((left, right) => right.score - left.score);
+  result = scored.slice(0, limit).map((item) => item.instrument);
   return result;
 }

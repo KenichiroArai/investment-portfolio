@@ -17,20 +17,41 @@ export function stripMonexTickerSuffix(name: string): string {
   return result;
 }
 
+/** 為替ヘッジあり/なしの表記ゆれを除いたキー用名称 */
+export function stripMonexFxHedgeVariant(name: string): string {
+  let result = name.trim();
+  result = result.replace(/＜為替ヘッジ(?:あり|なし)＞/gu, "");
+  result = result.replace(/<為替ヘッジ(?:あり|なし)>/gu, "");
+  result = result.replace(/\s+/g, " ").trim();
+  return result;
+}
+
 export function buildMonexInstrumentMatchKeys(name: string): string[] {
   let result: string[] = [];
   const keys = new Set<string>();
 
-  const normalized = normalizeIdecoInstrumentMatchKey(name);
-  if (normalized !== "") {
-    keys.add(normalized);
+  const addKey = (raw: string): void => {
+    let addResult: void = undefined;
+    const normalized = normalizeIdecoInstrumentMatchKey(raw);
+    if (normalized !== "") {
+      keys.add(normalized);
+    }
+    return addResult;
+  };
+
+  addKey(name);
+
+  const strippedTicker = stripMonexTickerSuffix(name);
+  if (strippedTicker !== name) {
+    addKey(strippedTicker);
   }
 
-  const stripped = stripMonexTickerSuffix(name);
-  if (stripped !== name) {
-    const strippedKey = normalizeIdecoInstrumentMatchKey(stripped);
-    if (strippedKey !== "") {
-      keys.add(strippedKey);
+  const strippedHedge = stripMonexFxHedgeVariant(name);
+  if (strippedHedge !== name) {
+    addKey(strippedHedge);
+    const strippedHedgeTicker = stripMonexTickerSuffix(strippedHedge);
+    if (strippedHedgeTicker !== strippedHedge) {
+      addKey(strippedHedgeTicker);
     }
   }
 

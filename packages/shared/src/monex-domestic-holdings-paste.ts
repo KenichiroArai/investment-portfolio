@@ -63,7 +63,7 @@ function isDomesticHeaderLine(line: string): boolean {
 function isDomesticFundStart(line: string): boolean {
   let result = false;
 
-  if (isMonexNoiseLine(line) || isDomesticHeaderLine(line)) {
+  if (isMonexNoiseLine(line)) {
     return result;
   }
 
@@ -226,7 +226,7 @@ export function parseMonexDomesticHoldingsPaste(
   let index = 0;
   while (index < lines.length) {
     const line = lines[index];
-    if (isMonexNoiseLine(line) || isDomesticHeaderLine(line) || !isDomesticFundStart(line)) {
+    if (isMonexNoiseLine(line) || !isDomesticFundStart(line)) {
       index += 1;
       continue;
     }

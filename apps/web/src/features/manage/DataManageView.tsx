@@ -97,6 +97,7 @@ export function DataManageView({
   const [snapshot, setSnapshot] = useState<CurrentSnapshotDto | null>(null);
   const [instruments, setInstruments] = useState<InstrumentListItemDto[]>([]);
   const [loading, setLoading] = useState(true);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [schemeOptions, setSchemeOptions] = useState<
     Array<{ schemeName: string; values: Array<{ id: string; name: string }> }>
@@ -150,6 +151,7 @@ export function DataManageView({
     }
 
     setLoading(false);
+    setInitialLoadDone(true);
     return result;
   }, [portfolioCode]);
 
@@ -347,10 +349,10 @@ export function DataManageView({
         onChange={setAsOfDate}
       />
 
-      {loading ? <LoadingSkeleton variant="table" /> : null}
+      {loading && !initialLoadDone ? <LoadingSkeleton variant="table" /> : null}
 
       <WritableGuard>
-        {!loading ? (
+        {initialLoadDone ? (
           <Tabs value={activeTab} onValueChange={onTabValueChange}>
             <TabsList>
               {dataTabs.map((tab) => {

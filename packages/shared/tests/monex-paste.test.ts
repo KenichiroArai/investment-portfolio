@@ -138,6 +138,41 @@ describe("monex paste parsers", () => {
     expect(parsed.rows[1].accountType).toBe("一般");
   });
 
+  it("parses fund names that contain 分配金 in the product name", () => {
+    const content = `銘柄	口座区分
+預り区分	基準価額（円）
+保有数（口）	平均取得単価
+評価損益率	取引
+ＷＣＭ　世界成長株厳選ファンド（予想分配金提示型）	特定
+普通預り	13,135
++150	再投資コース
+再投資中
+（変更）	742	13,478	974	
+-26
+-2.54%	買付
+売却
+
+次世代通信関連　世界株式戦略ファンド（予想分配金提示型）	特定
+普通預り	16,273
++364	再投資コース
+再投資中
+（変更）	303	16,238	493	
++1
++0.21%	買付
+売却`;
+
+    const parsed = parseMonexDomesticHoldingsPaste(splitMonexPasteLines(content));
+    expect(parsed.rows).toHaveLength(2);
+    expect(parsed.rows[0].instrumentName).toBe(
+      "ＷＣＭ　世界成長株厳選ファンド（予想分配金提示型）",
+    );
+    expect(parsed.rows[0].quantity).toBe(742);
+    expect(parsed.rows[1].instrumentName).toBe(
+      "次世代通信関連　世界株式戦略ファンド（予想分配金提示型）",
+    );
+    expect(parsed.rows[1].quantity).toBe(303);
+  });
+
   it("parses us stocks paste using yen values", () => {
     const parsed = parseMonexUsStocksPaste(splitMonexPasteLines(usSample));
 

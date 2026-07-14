@@ -7,7 +7,7 @@ import type {
   PortfolioSnapshotMetricInput,
 } from "@repo/shared";
 import { MonexCsvError, parseMonexPaste } from "@repo/shared";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -19,6 +19,7 @@ import {
 } from "@/features/manage/snapshot-input";
 import {
   applyMonexAssetClassWeights,
+  createInstrument,
   fetchCurrentSnapshot,
   replaceCurrentSnapshot,
 } from "@/lib/api-client";
@@ -28,10 +29,14 @@ import {
   buildAssetClassAssignments,
   draftRowsToHoldingInputs,
   hasUnmatchedDraftRows,
+  listUnmatchedInstrumentCandidates,
   pasteRowsToDrafts,
+  rematchDraftRows,
+  type UnmatchedInstrumentCandidate,
 } from "./holding-draft";
 import { MonexBulkImportDraftTable } from "./MonexBulkImportDraftTable";
 import { MonexBulkImportPasteCard } from "./MonexBulkImportPasteCard";
+import { MonexUnmatchedInstrumentsPanel } from "./MonexUnmatchedInstrumentsPanel";
 import type { MonexHoldingDraftRow, PasteInstrumentDto } from "./types";
 
 type MonexBulkImportTabProps = {
@@ -105,6 +110,13 @@ export function MonexBulkImportTab({
 
   const isDraftMode = drafts !== null && drafts.length > 0;
   const hasUnmatched = drafts !== null && hasUnmatchedDraftRows(drafts);
+  const unmatchedCandidates = useMemo(() => {
+    let result: UnmatchedInstrumentCandidate[] = [];
+    if (drafts) {
+      result = listUnmatchedInstrumentCandidates(drafts);
+    }
+    return result;
+  }, [drafts]);
   const isBusy = disabled || loading || submitting;
 
   async function saveSnapshot(
@@ -153,7 +165,9 @@ export function MonexBulkImportTab({
       setAssetClassBreakdown(parsed.assetClassBreakdownByInstrumentName);
 
       if (hasUnmatchedDraftRows(nextDrafts)) {
-        toast.warning("一部の銘柄を自動マッチできませんでした。銘柄を選択してください。");
+        toast.warning(
+          "一部の銘柄を自動マッチできませんでした。下の候補から銘柄登録するか、一覧で選択してください。",
+        );
       } else {
         toast.success(`${nextDrafts.length} 件の明細を取り込みました。`);
       }
@@ -175,6 +189,45 @@ export function MonexBulkImportTab({
     return result;
   }
 
+  async function handleCreateUnmatchedInstrument(candidate: UnmatchedInstrumentCandidate) {
+    let result: void = undefined;
+
+    const isUs = candidate.source === "us";
+    const response = await createInstrument({
+      portfolioCode,
+      accountId: `${portfolioCode}:unknown`,
+      name: candidate.instrumentName,
+      instrumentType: isUs ? "equity" : "mutual_fund",
+      currency: isUs ? "USD" : "JPY",
+      externalId: candidate.ticker,
+    });
+
+    if (!response.ok) {
+      toast.error(response.message);
+      return result;
+    }
+
+    const instrumentsResponse = await fetchPasteInstruments(portfolioCode);
+    if (!instrumentsResponse.ok) {
+      toast.error(instrumentsResponse.message);
+      return result;
+    }
+
+    const nextInstruments = instrumentsResponse.data;
+    setInstruments(nextInstruments);
+    setDrafts((current) => {
+      let nextDrafts: MonexHoldingDraftRow[] | null = current;
+      if (current) {
+        nextDrafts = rematchDraftRows(current, nextInstruments);
+      }
+      return nextDrafts;
+    });
+
+    toast.success(`銘柄「${candidate.instrumentName}」を登録しました。`);
+    await onReload();
+    return result;
+  }
+
   async function handleRegisterDraft() {
     let result: void = undefined;
 
@@ -183,7 +236,9 @@ export function MonexBulkImportTab({
     }
 
     if (hasUnmatchedDraftRows(drafts)) {
-      toast.error("未割当の銘柄があります。すべての行で銘柄を選択してください。");
+      toast.error(
+        "未割当の銘柄があります。先に銘柄登録するか、すべての行で銘柄を選択してください。",
+      );
       return result;
     }
 
@@ -222,13 +277,24 @@ export function MonexBulkImportTab({
     <div className="space-y-6">
       <MonexBulkImportPasteCard disabled={isBusy} onImport={handleImport} />
 
+      {isDraftMode && unmatchedCandidates.length > 0 ? (
+        <MonexUnmatchedInstrumentsPanel
+          candidates={unmatchedCandidates}
+          instruments={instruments}
+          disabled={isBusy}
+          onCreate={handleCreateUnmatchedInstrument}
+        />
+      ) : null}
+
       {isDraftMode ? (
         <>
           <Alert>
             <AlertTitle>下書き編集中</AlertTitle>
             <AlertDescription>
               取り込んだ明細はまだ登録されていません。内容を確認・編集して「一括登録」を押すと、登録済み明細をすべて置き換え、資産クラス按分も更新します。
-              {hasUnmatched ? " 未割当の銘柄がある行は赤枠で表示されます。" : null}
+              {hasUnmatched
+                ? " 未割当がある場合は、上の候補から銘柄登録するか、下書きで銘柄を選択してください。"
+                : null}
             </AlertDescription>
           </Alert>
           <Card>

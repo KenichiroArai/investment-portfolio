@@ -32,6 +32,15 @@ describe("monex-instrument-match", () => {
     ).toBe("inst-2");
   });
 
+  it("matches fx hedgeあり/なし as the same instrument key", () => {
+    expect(
+      matchMonexInstrumentId(
+        [{ id: "invesco", name: "インベスコ　世界厳選株式オープン＜為替ヘッジなし＞（毎月決算型）" }],
+        "インベスコ　世界厳選株式オープン＜為替ヘッジあり＞（毎月決算型）",
+      ),
+    ).toBe("invesco");
+  });
+
   it("returns null for empty or unmatched names", () => {
     expect(matchMonexInstrumentId([], "  ")).toBeNull();
     expect(matchMonexInstrumentId([{ id: "x", name: "A" }], "B")).toBeNull();
