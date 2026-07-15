@@ -600,6 +600,18 @@ describe("portfolio repositories", () => {
       externalId: "",
     });
     expect(found?.id).toBe(created.id);
+
+    const withExternal = await createInstrument(db, {
+      portfolioCode: "ideco",
+      name: "With External",
+      externalId: "ext-code",
+    });
+    const foundExternal = await findInstrumentByIdentity(db, {
+      portfolioCode: "ideco",
+      name: "With External",
+      externalId: "ext-code",
+    });
+    expect(foundExternal?.id).toBe(withExternal.id);
   });
 
   it("returns null when scheme portfolio is missing", async () => {

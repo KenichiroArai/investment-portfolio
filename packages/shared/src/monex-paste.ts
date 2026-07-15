@@ -1,5 +1,5 @@
-import { buildMonexInstrumentAssetClassBreakdownFromMarketValues } from "./monex-asset-class-csv";
-import type { MonexInstrumentAssetClassBreakdownEntry } from "./monex-asset-class-csv";
+import { buildMonexInstrumentAssetClassBreakdownFromMarketValues } from "./monex-asset-class-breakdown";
+import type { MonexInstrumentAssetClassBreakdownEntry } from "./monex-asset-class-breakdown";
 import { parseMonexAssetClassPaste } from "./monex-asset-class-paste";
 import { parseMonexCompassFundPaste } from "./monex-compass-fund-paste";
 import type { MonexCompassFundPasteRow } from "./monex-compass-fund-paste";

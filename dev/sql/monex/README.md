@@ -11,7 +11,7 @@
 | | | `emerging_equity` | 新興国株式 |
 | | | `other` | その他資産 |
 
-資産クラスは ON COMPASS エクスポートの資産クラス別 CSV ファイル名から導出します（例: `先進国株式.csv` → `developed_equity`）。
+資産クラスは Web の設定画面（マネックス証券 一括取り込み）に貼り付けた資産クラス別の内訳から導出します（例: 「先進国株式全体」→ `developed_equity`）。
 
 ## 銘柄属性（`instrument_attributes`）
 
@@ -36,7 +36,7 @@
 
 ## 保有明細の列対応
 
-| CSV 項目 | 保存先 |
+| 貼り付け項目 | 保存先 |
 | --- | --- |
 | 銘柄 / ファンド名 / 銘柄名 | `instruments.name` |
 | 保有数(口) / 保有株数 | `holding_lines.quantity` |
@@ -45,19 +45,15 @@
 | 口座区分・預り区分・分配金 | `holding_line_metrics`（text） |
 | 基準価額・平均取得単価 | `holding_line_metrics`（integer） |
 
-## CSV インポート
+## データ投入
 
-```bash
-npm run db:import:monex -- data/imports/monex
-```
+ローカル API 接続時に Web の設定画面（マネックス証券 一括取り込み）から、マネックス証券サイトの保有残高ページの内容を貼り付けて取り込みます。
 
 取り込み対象:
 
-| ファイル | 用途 |
+| 貼り付けセクション | 用途 |
 | --- | --- |
-| `国内株等.csv` | 国内銘柄・投信の保有明細 |
-| `米国株.csv` | 米国株の保有明細 |
-| `ON COMPASS.csv` | ON COMPASS ファンド明細 |
-| 資産クラス別 CSV | 銘柄の資産クラス分類タグ付け |
-
-CSV は Shift_JIS（CP932）です。
+| 国内株式・投信等 | 国内銘柄・投信の保有明細 |
+| 米国株 | 米国株の保有明細 |
+| ON COMPASS ファンド | ON COMPASS ファンド明細 |
+| 資産クラス別内訳 | 銘柄の資産クラス分類タグ付け |

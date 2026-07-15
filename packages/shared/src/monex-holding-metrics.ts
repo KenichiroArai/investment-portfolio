@@ -3,7 +3,7 @@ import {
   type HoldingLineMetricInput,
 } from "./holding-line-metrics";
 
-/** Monex 明細 CSV 投入時に holding_line_metrics へ書き込む code */
+/** Monex 明細の投入時に holding_line_metrics へ書き込む code */
 export const MONEX_HOLDING_METRIC_CODES = {
   unitPriceMinor: "unit_price_minor",
   avgCostMinor: "avg_cost_minor",
