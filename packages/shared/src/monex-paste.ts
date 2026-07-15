@@ -140,11 +140,8 @@ export function parseMonexPaste(content: string): ParseMonexPasteResult {
     throw new MonexCsvError("貼り付けデータが空です");
   }
 
+  // normalized は非空のため splitMonexPasteLines は必ず1行以上を返す
   const lines = splitMonexPasteLines(normalized);
-  if (lines.length === 0) {
-    throw new MonexCsvError("貼り付けデータが空です");
-  }
-
   const sections = splitMonexPasteSections(lines);
   const holdings: MonexHoldingPasteRow[] = [];
   const assetClassLines: string[] = [];

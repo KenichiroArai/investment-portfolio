@@ -264,4 +264,281 @@ describe("monex paste parsers", () => {
   it("throws when paste is empty", () => {
     expect(() => parseMonexPaste("")).toThrow(MonexCsvError);
   });
+
+  it("throws when paste has no holdings sections", () => {
+    expect(() => parseMonexPaste("ただのテキスト\n意味のない行")).toThrow(MonexCsvError);
+  });
+
+  it("drops unknown leading lines before the first section header", () => {
+    const parsed = parseMonexPaste(["乗換", assetClassSample, domesticSample].join("\n"));
+    expect(parsed.holdings.filter((row) => row.source === "domestic")).toHaveLength(2);
+  });
+
+  it("keeps detectable leading lines before the first section header", () => {
+    const parsed = parseMonexPaste(
+      ["平均取得単価\t基準価額", assetClassSample, domesticSample].join("\n"),
+    );
+    expect(parsed.holdings.filter((row) => row.source === "domestic")).toHaveLength(2);
+  });
+
+  it("skips asset class rows with invalid ratio, value, or name", () => {
+    const parsed = parseMonexAssetClassPaste([
+      "国内株式全体",
+      "6,325",
+      "銘柄A",
+      "---%",
+      "100",
+      "銘柄B",
+      "10.00%",
+      "---",
+      "銘柄C",
+      "20.00%",
+      "0",
+      " ",
+      "30.00%",
+      "100",
+    ]);
+    expect(parsed.rows).toHaveLength(0);
+  });
+
+  it("skips header and unknown lines around asset class totals", () => {
+    const parsed = parseMonexAssetClassPaste([
+      "ようこそ",
+      "国内株式全体",
+      "▼",
+      "6,325",
+      "その他資産全体",
+      "990",
+      "銘柄Y",
+      "50.00%",
+      "990",
+    ]);
+    expect(parsed.rows).toHaveLength(1);
+    expect(parsed.rows[0]).toMatchObject({
+      valueCode: "other",
+      instrumentName: "銘柄Y",
+      marketValueMinor: 990,
+    });
+  });
+
+  it("ignores stray lines that are not fund starts", () => {
+    expect(parseMonexCompassFundPaste(["単独行"]).rows).toHaveLength(0);
+    expect(parseMonexDomesticHoldingsPaste(["単独行", "\t特定"]).rows).toHaveLength(0);
+    expect(parseMonexUsStocksPaste(["概算評価額", "日本語銘柄行"]).rows).toHaveLength(0);
+  });
+
+  it("stops asset class parsing when input ends mid-block", () => {
+    const nameOnly = parseMonexAssetClassPaste(["国内株式全体", "6,325", "銘柄X"]);
+    expect(nameOnly.rows).toHaveLength(0);
+
+    const ratioOnly = parseMonexAssetClassPaste([
+      "国内株式全体",
+      "6,325",
+      "銘柄X",
+      "10.00%",
+    ]);
+    expect(ratioOnly.rows).toHaveLength(0);
+  });
+
+  it("throws for truncated compass fund blocks", () => {
+    expect(() => parseMonexCompassFundPaste(["ファンドA\t特定"])).toThrow(MonexCsvError);
+    expect(() =>
+      parseMonexCompassFundPaste(["ファンドA\t特定", "普通預り\t100\t受取"]),
+    ).toThrow(MonexCsvError);
+    expect(() =>
+      parseMonexCompassFundPaste(["ファンドA\t特定", "普通預り\t100\t受取", "3,431"]),
+    ).toThrow(MonexCsvError);
+    expect(() =>
+      parseMonexCompassFundPaste([
+        "ファンドA\t特定",
+        "普通預り\t100\t受取",
+        "3,431",
+        "abc",
+      ]),
+    ).toThrow(MonexCsvError);
+    expect(() =>
+      parseMonexCompassFundPaste([
+        "ファンドA\t特定",
+        "普通預り\t100\t受取",
+        "---",
+        "1\t2\t3",
+      ]),
+    ).toThrow(MonexCsvError);
+  });
+
+  it("falls back compass unit price and rate when values are missing", () => {
+    const parsed = parseMonexCompassFundPaste([
+      "\t特定",
+      "ファンドA\t特定",
+      "普通預り\t---\t受取",
+      "3,431",
+      "0\t10,122\t+122",
+    ]);
+    expect(parsed.rows).toHaveLength(1);
+    expect(parsed.rows[0].unitPriceMinor).toBe(0);
+    expect(parsed.rows[0].bookValueMinor).toBe(0);
+    expect(parsed.rows[0].unrealizedGainRate).toBe(0);
+  });
+
+  it("parses compass block when custody line has a single cell", () => {
+    const parsed = parseMonexCompassFundPaste([
+      "ファンドA\t特定",
+      "普通預り",
+      "3,431",
+      "29,147\t10,122\t+122",
+    ]);
+    expect(parsed.rows).toHaveLength(1);
+    expect(parsed.rows[0].unitPriceMinor).toBe(0);
+    expect(parsed.rows[0].dividendOption).toBe("");
+  });
+
+  it("skips standalone change markers and non-percent gain cells in domestic paste", () => {
+    const parsed = parseMonexDomesticHoldingsPaste([
+      "ファンドA\t特定",
+      "普通預り\t27,406",
+      "受取中",
+      "（変更）",
+      "1,357\t29,138\t3,718",
+      "-236\tメモ",
+      "-5.94%",
+    ]);
+    expect(parsed.rows).toHaveLength(1);
+    expect(parsed.rows[0].dividendOption).toBe("受取中");
+    expect(parsed.rows[0].unrealizedGainRate).toBeCloseTo(-0.0594, 4);
+  });
+
+  it("throws for us stock blocks with missing cells", () => {
+    expect(() =>
+      parseMonexUsStocksPaste(["JEPQ", "名前\t米国\t特定", "保護"]),
+    ).toThrow(MonexCsvError);
+    expect(() =>
+      parseMonexUsStocksPaste([
+        "JEPQ",
+        "名前\t米国\t特定",
+        "保護\t1",
+        "9,913円\t9,913円",
+        "9,789円",
+        "-1.25%",
+      ]),
+    ).toThrow(MonexCsvError);
+  });
+
+  it("skips us-stock-like and noise lines in domestic paste", () => {
+    const parsed = parseMonexDomesticHoldingsPaste([
+      "銘柄X\t米国\t特定",
+      "ファンドA\t特定",
+      "乗換",
+      "普通預り\t27,406",
+      "(変更)\t1,357\t29,138\t3,718",
+      "-236\t-5.94%",
+    ]);
+    expect(parsed.rows).toHaveLength(1);
+    expect(parsed.rows[0].quantity).toBe(1357);
+    expect(parsed.rows[0].dividendOption).toBe("");
+    expect(parsed.rows[0].unrealizedGainRate).toBeCloseTo(-0.0594, 4);
+  });
+
+  it("parses domestic gain rate from a single percent line and missing unit price", () => {
+    const parsed = parseMonexDomesticHoldingsPaste([
+      "ファンドA\t特定",
+      "普通預り",
+      "1,357\t29,138\t3,718",
+      "-236%",
+    ]);
+    expect(parsed.rows).toHaveLength(1);
+    expect(parsed.rows[0].unitPriceMinor).toBe(0);
+    expect(parsed.rows[0].unrealizedGainRate).toBeCloseTo(-2.36, 4);
+  });
+
+  it("throws for truncated domestic blocks", () => {
+    expect(() => parseMonexDomesticHoldingsPaste(["ファンドA\t特定"])).toThrow(
+      MonexCsvError,
+    );
+    expect(() =>
+      parseMonexDomesticHoldingsPaste(["ファンドA\t特定", "普通預り\t27,406", "再投資中"]),
+    ).toThrow(MonexCsvError);
+    expect(() =>
+      parseMonexDomesticHoldingsPaste([
+        "ファンドA\t特定",
+        "普通預り\t27,406",
+        "1,357\t29,138",
+      ]),
+    ).toThrow(MonexCsvError);
+    expect(() =>
+      parseMonexDomesticHoldingsPaste([
+        "ファンドA\t特定",
+        "普通預り\t27,406",
+        "1\t2\t3",
+      ]),
+    ).toThrow(MonexCsvError);
+    expect(() =>
+      parseMonexDomesticHoldingsPaste([
+        "ファンドA\t特定",
+        "普通預り\t27,406",
+        "1\t2\t3",
+        "-236",
+      ]),
+    ).toThrow(MonexCsvError);
+  });
+
+  it("throws for truncated us stock blocks", () => {
+    expect(() => parseMonexUsStocksPaste(["JEPQ"])).toThrow(MonexCsvError);
+    expect(() => parseMonexUsStocksPaste(["JEPQ", "名前\t米国"])).toThrow(MonexCsvError);
+    expect(() => parseMonexUsStocksPaste(["JEPQ", "名前\t米国\t不明"])).toThrow(
+      MonexCsvError,
+    );
+    expect(() => parseMonexUsStocksPaste(["JEPQ", "名前\t米国\t特定"])).toThrow(
+      MonexCsvError,
+    );
+    expect(() =>
+      parseMonexUsStocksPaste(["JEPQ", "名前\t米国\t特定", "保護\t1"]),
+    ).toThrow(MonexCsvError);
+    expect(() =>
+      parseMonexUsStocksPaste([
+        "JEPQ",
+        "名前\t米国\t特定",
+        "保護\t1",
+        "9,913円\t9,913円",
+      ]),
+    ).toThrow(MonexCsvError);
+    expect(() =>
+      parseMonexUsStocksPaste([
+        "JEPQ",
+        "名前\t米国\t特定",
+        "保護\t1",
+        "9,913円",
+        "9,789円\t-124円",
+      ]),
+    ).toThrow(MonexCsvError);
+  });
+
+  it("skips percent-only lines and trailing trade actions in us stock paste", () => {
+    const parsed = parseMonexUsStocksPaste([
+      "JEPQ",
+      "名前\t米国\t特定",
+      "保護\t1",
+      "-1.01%",
+      "0.5%\t9,913円",
+      "9,789円\t-124円",
+      "-1.25%",
+      "買付",
+      "売却",
+    ]);
+    expect(parsed.rows).toHaveLength(1);
+    expect(parsed.rows[0].bookValueMinor).toBe(0);
+    expect(parsed.rows[0].avgCostMinor).toBe(9913);
+  });
+
+  it("falls back us stock avg cost when the value is invalid", () => {
+    const parsed = parseMonexUsStocksPaste([
+      "JEPQ",
+      "名前\t米国\t特定",
+      "保護\t1",
+      "9,913円\t---",
+      "9,789円\t-124円",
+      "-1.25%",
+    ]);
+    expect(parsed.rows).toHaveLength(1);
+    expect(parsed.rows[0].avgCostMinor).toBe(9913);
+  });
 });

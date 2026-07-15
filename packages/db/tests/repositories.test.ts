@@ -1135,6 +1135,74 @@ describe("portfolio repositories", () => {
     ]);
   });
 
+  it("returns empty monex paste instruments when monex portfolio is missing", async () => {
+    const db = setup();
+    expect(await listMonexInstrumentsForPaste(db)).toEqual([]);
+  });
+
+  it("throws when applying monex asset class weights without monex portfolio", async () => {
+    const db = setup();
+    await expect(applyMonexAssetClassWeights(db, [])).rejects.toThrow(
+      "マネックス証券ポートフォリオが見つかりません",
+    );
+  });
+
+  it("skips invalid monex weight assignments and reuses existing scheme on repeated runs", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "monex",
+      name: "マネックス証券",
+      kind: "monex",
+    });
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+    const monexInstrument = await createInstrument(db, {
+      portfolioCode: "monex",
+      name: "Monex Fund",
+    });
+    const idecoInstrument = await createInstrument(db, {
+      portfolioCode: "ideco",
+      name: "iDeCo Fund",
+    });
+
+    const first = await applyMonexAssetClassWeights(db, [
+      {
+        instrumentId: "missing",
+        weights: [{ valueCode: "other", allocationWeight: 1 }],
+      },
+      {
+        instrumentId: idecoInstrument.id,
+        weights: [{ valueCode: "other", allocationWeight: 1 }],
+      },
+      {
+        instrumentId: monexInstrument.id,
+        weights: [
+          { valueCode: "unknown_code", allocationWeight: 1 },
+          { valueCode: "other", allocationWeight: Number.NaN },
+          { valueCode: "other", allocationWeight: 0 },
+        ],
+      },
+    ]);
+    expect(first.updatedInstrumentCount).toBe(0);
+    expect(await listInstrumentClassificationValueIds(db, monexInstrument.id)).toEqual([]);
+
+    const second = await applyMonexAssetClassWeights(db, [
+      {
+        instrumentId: monexInstrument.id,
+        weights: [{ valueCode: "other", allocationWeight: 1 }],
+      },
+    ]);
+    expect(second.updatedInstrumentCount).toBe(1);
+
+    const tags = await getTagsForInstruments(db, [monexInstrument.id]);
+    expect((tags.get(monexInstrument.id) ?? []).map((tag) => tag.valueCode)).toEqual([
+      "other",
+    ]);
+  });
+
   it("supports instrument search, upsert, update, attributes, and delete guards", async () => {
     const db = setup();
     await createPortfolio(db, {

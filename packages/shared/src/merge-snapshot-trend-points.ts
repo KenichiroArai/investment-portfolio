@@ -65,10 +65,6 @@ export function mergeSnapshotTrendPoints(
       contributionsSum += point.totalContributionsMinor;
     }
 
-    if (activeCount === 0) {
-      continue;
-    }
-
     const unrealizedGainMinor = totalMarketValueMinor - totalBookValueMinor;
     const totalContributionsMinor = contributionsComplete ? contributionsSum : null;
     const gainRateOnContributions =

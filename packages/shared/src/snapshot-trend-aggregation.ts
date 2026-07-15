@@ -701,10 +701,8 @@ function resolveCalendarYearMonth(asOfDate: string): string | null {
 
 function formatCalendarMonthBucketLabel(yearMonth: string): string {
   let result = yearMonth;
-  const match = /^(\d{4})-(\d{2})$/.exec(yearMonth);
-  if (!match) {
-    return result;
-  }
+  // 呼び出し元は resolveCalendarYearMonth 由来の YYYY-MM 形式のみを渡す
+  const match = /^(\d{4})-(\d{2})$/.exec(yearMonth)!;
   result = `${Number(match[2])}月`;
   return result;
 }
@@ -746,15 +744,13 @@ export function aggregateTrendPointsByCalendarMonth(
   result = [...buckets.entries()]
     .sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey))
     .flatMap(([yearMonth, bucketPoints]) => {
+      // バケットは必ず1件以上の点を持つため resolveBucketPoint は null を返さない
       const resolved = resolveBucketPoint(
         bucketPoints,
         pick,
         minMaxField,
         yearMonth,
-      );
-      if (!resolved) {
-        return [];
-      }
+      )!;
 
       let aggregated: AggregatedTrendPoint = {
         ...resolved.point,

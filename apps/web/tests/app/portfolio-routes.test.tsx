@@ -126,6 +126,13 @@ describe("portfolio routes", () => {
             json: async () => snapshotFixture,
           };
         }
+        if (url.includes("trends-summary.json") || url.includes("/trends")) {
+          return {
+            ok: true,
+            status: 200,
+            json: async () => ({ points: [] }),
+          };
+        }
         return {
           ok: true,
           status: 200,
@@ -137,7 +144,7 @@ describe("portfolio routes", () => {
     const page = GlobalAnalysisPage();
     render(page);
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "全口座の資産配分" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "全口座" })).toBeInTheDocument();
     });
     expect(page).toEqual(<GlobalAnalysisView />);
   });

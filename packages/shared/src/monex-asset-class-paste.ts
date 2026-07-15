@@ -59,7 +59,7 @@ function skipAssetClassSummary(lines: string[], startIndex: number): number {
       continue;
     }
     const asInt = parseMonexPasteInteger(line);
-    if (Number.isFinite(asInt) || line === "---") {
+    if (Number.isFinite(asInt)) {
       result += 1;
       continue;
     }
@@ -74,29 +74,10 @@ function skipInstrumentTrailingMeta(lines: string[], startIndex: number): number
 
   while (result < lines.length) {
     const line = lines[result];
-    if (
-      line === "---" ||
-      line.startsWith("(") ||
-      line === "0" ||
-      /^\(?[+\-]?\d/.test(line)
-    ) {
-      const looksLikeName =
-        !line.includes("%") &&
-        !line.includes("％") &&
-        !line.startsWith("(") &&
-        line !== "---" &&
-        line !== "0" &&
-        !/^[+\-]?\d/.test(line.replace(/,/g, ""));
-      if (looksLikeName && !Number.isFinite(parseMonexPasteInteger(line))) {
-        break;
-      }
-      if (isAssetClassTotalLine(line) || isAssetClassHeaderLine(line)) {
-        break;
-      }
-      result += 1;
-      continue;
+    if (line !== "---" && !line.startsWith("(") && !/^\(?[+\-]?\d/.test(line)) {
+      break;
     }
-    break;
+    result += 1;
   }
 
   return result;

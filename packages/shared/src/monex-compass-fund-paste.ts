@@ -100,7 +100,7 @@ function parseCompassFundBlock(
   }
 
   const custodyCells = splitMonexPasteCells(lines[index]);
-  const custodyType = custodyCells[0] ?? "";
+  const custodyType = custodyCells[0];
   const unitPriceMinor = parseMonexPasteInteger(custodyCells[1] ?? "");
   const dividendOption = custodyCells[2] ?? "";
   index += 1;
@@ -128,9 +128,9 @@ function parseCompassFundBlock(
     throw new MonexCsvError(`ON COMPASS「${instrumentName}」の評価額行が不正です`);
   }
 
-  const avgCostMinor = parseMonexPasteInteger(valueCells[0] ?? "");
-  const marketValueMinor = parseMonexPasteInteger(valueCells[1] ?? "");
-  const unrealizedGainMinor = parseMonexPasteInteger(valueCells[2] ?? "");
+  const avgCostMinor = parseMonexPasteInteger(valueCells[0]);
+  const marketValueMinor = parseMonexPasteInteger(valueCells[1]);
+  const unrealizedGainMinor = parseMonexPasteInteger(valueCells[2]);
   index += 1;
 
   if (
@@ -179,7 +179,7 @@ export function parseMonexCompassFundPaste(
   let index = 0;
   while (index < lines.length) {
     const line = lines[index];
-    if (isMonexNoiseLine(line) || isCompassHeaderLine(line) || !isCompassFundStart(line)) {
+    if (!isCompassFundStart(line)) {
       index += 1;
       continue;
     }

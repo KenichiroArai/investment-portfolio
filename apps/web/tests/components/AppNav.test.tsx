@@ -15,7 +15,7 @@ describe("TopBar", () => {
   it("renders global navigation links", () => {
     render(<TopBar />);
     expect(screen.getByRole("link", { name: "ホーム" })).toHaveAttribute("href", "/");
-    expect(screen.getByRole("link", { name: "全口座分析" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "全口座" })).toHaveAttribute(
       "href",
       "/analysis",
     );

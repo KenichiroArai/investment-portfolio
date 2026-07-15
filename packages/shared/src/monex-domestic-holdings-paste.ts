@@ -33,33 +33,6 @@ export type ParseMonexDomesticHoldingsPasteResult = {
   rows: MonexDomesticHoldingsPasteRow[];
 };
 
-function isDomesticHeaderLine(line: string): boolean {
-  let result = false;
-
-  if (
-    line.includes("銘柄") ||
-    line.includes("口座区分") ||
-    line.includes("預り区分") ||
-    line.includes("基準価額") ||
-    line.includes("前日比") ||
-    line.includes("分配金") ||
-    line.includes("保有数") ||
-    line.includes("平均取得単価") ||
-    line.includes("概算評価額") ||
-    line.includes("評価損益") ||
-    line.includes("取扱い") ||
-    line.includes("（円）") ||
-    line.includes("(円)") ||
-    line.includes("取引") ||
-    line.includes("時価総額") ||
-    line.includes("銘柄名")
-  ) {
-    result = true;
-  }
-
-  return result;
-}
-
 function isDomesticFundStart(line: string): boolean {
   let result = false;
 
@@ -113,7 +86,7 @@ function parseDomesticFundBlock(
   }
 
   const custodyCells = splitMonexPasteCells(lines[index]);
-  const custodyType = custodyCells[0] ?? "";
+  const custodyType = custodyCells[0];
   const unitPriceMinor = parseMonexPasteInteger(custodyCells[1] ?? "");
   index += 1;
 
@@ -151,9 +124,9 @@ function parseDomesticFundBlock(
     throw new MonexCsvError(`国内株等「${instrumentName}」の数量・評価額行が不正です`);
   }
 
-  const quantity = parseMonexPasteInteger(quantityCells[0] ?? "");
-  const avgCostMinor = parseMonexPasteInteger(quantityCells[1] ?? "");
-  const marketValueMinor = parseMonexPasteInteger(quantityCells[2] ?? "");
+  const quantity = parseMonexPasteInteger(quantityCells[0]);
+  const avgCostMinor = parseMonexPasteInteger(quantityCells[1]);
+  const marketValueMinor = parseMonexPasteInteger(quantityCells[2]);
   index += 1;
 
   if (index >= lines.length) {
@@ -162,7 +135,7 @@ function parseDomesticFundBlock(
 
   const gainLine = lines[index];
   const gainCells = splitMonexPasteCells(gainLine);
-  let unrealizedGainMinor = parseMonexPasteInteger(gainCells[0] ?? "");
+  let unrealizedGainMinor = parseMonexPasteInteger(gainCells[0]);
   let unrealizedGainRate = Number.NaN;
 
   if (gainCells.length >= 2 && (gainCells[1].includes("%") || gainCells[1].includes("％"))) {
@@ -226,7 +199,7 @@ export function parseMonexDomesticHoldingsPaste(
   let index = 0;
   while (index < lines.length) {
     const line = lines[index];
-    if (isMonexNoiseLine(line) || !isDomesticFundStart(line)) {
+    if (!isDomesticFundStart(line)) {
       index += 1;
       continue;
     }

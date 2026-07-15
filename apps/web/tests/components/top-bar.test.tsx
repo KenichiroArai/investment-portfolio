@@ -29,7 +29,7 @@ describe("TopBar", () => {
     render(<TopBar />);
 
     const homeLink = screen.getByRole("link", { name: "ホーム" });
-    const analysisLink = screen.getByRole("link", { name: "全口座分析" });
+    const analysisLink = screen.getByRole("link", { name: "全口座" });
     expect(homeLink.className).toContain("text-muted-foreground");
     expect(homeLink.className).not.toContain("bg-surface text-foreground");
     expect(analysisLink.className).toContain("bg-surface text-foreground");

@@ -50,7 +50,7 @@ export function parseMonexPastePercentRate(value: string): number {
     withoutSuffix = trimmed.slice(0, -1).trim();
   }
 
-  const cell = withoutSuffix.split("\t")[0]?.trim() ?? "";
+  const cell = withoutSuffix.split("\t")[0].trim();
   const normalized = cell.replace(/,/g, "").replace(/^\+/, "");
   if (normalized === "" || normalized === "-" || normalized.startsWith("---")) {
     return result;

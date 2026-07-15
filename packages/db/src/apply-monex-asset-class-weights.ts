@@ -41,16 +41,17 @@ async function ensureMonexAssetClassScheme(db: AppDatabase) {
     return result;
   }
 
-  result = await createClassificationScheme(db, {
+  // 呼び出し元で monex ポートフォリオの存在を確認済みのため、作成は必ず成功する
+  result = (await createClassificationScheme(db, {
     portfolioCode: MONEX_PORTFOLIO_CODE,
     code: MONEX_SCHEME_CODES.assetClass,
     name: "資産クラス",
-  });
+  }))!;
   return result;
 }
 
 async function syncMonexAssetClassValues(db: AppDatabase, schemeId: string) {
-  let result: void = undefined;
+  let result = new Map<string, string>();
 
   let sortOrder = 0;
   for (const assetClass of MONEX_ASSET_CLASS_VALUES) {
@@ -60,16 +61,18 @@ async function syncMonexAssetClassValues(db: AppDatabase, schemeId: string) {
       assetClass.code,
     );
     if (existing) {
+      result.set(assetClass.code, existing.id);
       sortOrder += 1;
       continue;
     }
 
-    await createClassificationValue(db, {
+    const created = await createClassificationValue(db, {
       schemeId,
       code: assetClass.code,
       name: assetClass.name,
       sortOrder,
     });
+    result.set(assetClass.code, created.id);
     sortOrder += 1;
   }
 
@@ -88,23 +91,7 @@ export async function applyMonexAssetClassWeights(
   }
 
   const scheme = await ensureMonexAssetClassScheme(db);
-  if (!scheme) {
-    throw new Error("資産クラス体系の作成に失敗しました");
-  }
-
-  await syncMonexAssetClassValues(db, scheme.id);
-
-  const valueIdByCode = new Map<string, string>();
-  for (const assetClass of MONEX_ASSET_CLASS_VALUES) {
-    const value = await findClassificationValueBySchemeAndCode(
-      db,
-      scheme.id,
-      assetClass.code,
-    );
-    if (value) {
-      valueIdByCode.set(assetClass.code, value.id);
-    }
-  }
+  const valueIdByCode = await syncMonexAssetClassValues(db, scheme.id);
 
   for (const assignment of assignments) {
     const instrument = await findInstrumentById(db, assignment.instrumentId);

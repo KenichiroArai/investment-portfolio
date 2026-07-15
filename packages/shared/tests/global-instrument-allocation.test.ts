@@ -181,6 +181,60 @@ describe("buildGlobalInstrumentRows", () => {
     let result = buildGlobalInstrumentRows([]);
     expect(result).toEqual([]);
   });
+
+  it("breaks market value ties by instrument name", () => {
+    const snapshots = [
+      makeSnapshot({
+        portfolioCode: "a",
+        portfolioName: "A",
+        lines: [
+          makeLine({
+            id: "l1",
+            instrumentName: "銘柄B",
+            marketValueMinor: 100,
+            bookValueMinor: 100,
+          }),
+          makeLine({
+            id: "l2",
+            instrumentName: "銘柄A",
+            marketValueMinor: 100,
+            bookValueMinor: 100,
+          }),
+        ],
+      }),
+    ];
+
+    let result = buildGlobalInstrumentRows(snapshots);
+    expect(result.map((row) => row.instrumentKey)).toEqual(["銘柄A", "銘柄B"]);
+  });
+
+  it("falls back weights to zero when total market value is zero", () => {
+    const snapshots = [
+      makeSnapshot({
+        portfolioCode: "a",
+        portfolioName: "A",
+        lines: [
+          makeLine({
+            id: "l1",
+            instrumentName: "無価値",
+            marketValueMinor: 0,
+            bookValueMinor: 0,
+          }),
+        ],
+      }),
+    ];
+
+    let rows = buildGlobalInstrumentRows(snapshots);
+    expect(rows[0]?.weight).toBe(0);
+    expect(rows[0]?.portfolios[0]?.weightInInstrument).toBe(0);
+    expect(rows[0]?.bookValueMinor).toBe(0);
+    expect(rows[0]?.unrealizedGainMinor).toBe(0);
+    expect(rows[0]?.unrealizedGainRate).toBeNull();
+
+    let slices = buildGlobalPortfolioSlices(snapshots);
+    expect(slices.totalMarketValueMinor).toBe(0);
+    expect(slices.portfolios[0]?.weight).toBe(0);
+  });
 });
 
 describe("sortGlobalInstrumentRows", () => {
@@ -261,6 +315,63 @@ describe("sortGlobalInstrumentRows", () => {
       "不明",
     ]);
   });
+
+  it("moves a null metric row after a valued row", () => {
+    const snapshots = [
+      makeSnapshot({
+        portfolioCode: "a",
+        portfolioName: "A",
+        lines: [
+          makeLine({
+            id: "l1",
+            instrumentName: "評価あり",
+            marketValueMinor: 200,
+            bookValueMinor: 100,
+          }),
+          makeLine({
+            id: "l2",
+            instrumentName: "簿価なし",
+            marketValueMinor: 100,
+            bookValueMinor: null,
+          }),
+        ],
+      }),
+    ];
+    const rows = buildGlobalInstrumentRows(snapshots);
+
+    let result = sortGlobalInstrumentRows(rows, "gain");
+    expect(result.map((row) => row.instrumentName)).toEqual([
+      "評価あり",
+      "簿価なし",
+    ]);
+  });
+
+  it("orders all-null metric rows by instrument name", () => {
+    const snapshots = [
+      makeSnapshot({
+        portfolioCode: "a",
+        portfolioName: "A",
+        lines: [
+          makeLine({
+            id: "l1",
+            instrumentName: "銘柄B",
+            marketValueMinor: 100,
+            bookValueMinor: null,
+          }),
+          makeLine({
+            id: "l2",
+            instrumentName: "銘柄A",
+            marketValueMinor: 50,
+            bookValueMinor: null,
+          }),
+        ],
+      }),
+    ];
+    const rows = buildGlobalInstrumentRows(snapshots);
+
+    let result = sortGlobalInstrumentRows(rows, "gain");
+    expect(result.map((row) => row.instrumentName)).toEqual(["銘柄A", "銘柄B"]);
+  });
 });
 
 describe("buildGlobalInstrumentRankingValues", () => {
@@ -340,6 +451,97 @@ describe("collapseGlobalInstrumentRows", () => {
     expect(result[2]?.instrumentKey).toBe(GLOBAL_INSTRUMENT_OTHER_VALUE_CODE);
     expect(result[2]?.marketValueMinor).toBe(300);
     expect(result[2]?.weight).toBeCloseTo(0.3);
+  });
+
+  it("nulls other row gains when a collapsed row misses book value", () => {
+    const snapshots = [
+      makeSnapshot({
+        portfolioCode: "a",
+        portfolioName: "A",
+        lines: [
+          makeLine({
+            id: "l1",
+            instrumentName: "A",
+            marketValueMinor: 300,
+            bookValueMinor: 300,
+          }),
+          makeLine({
+            id: "l2",
+            instrumentName: "B",
+            marketValueMinor: 200,
+            bookValueMinor: 200,
+          }),
+          makeLine({
+            id: "l3",
+            instrumentName: "C",
+            marketValueMinor: 100,
+            bookValueMinor: null,
+          }),
+        ],
+      }),
+    ];
+    const rows = buildGlobalInstrumentRows(snapshots);
+    let result = collapseGlobalInstrumentRows(rows, 1);
+
+    expect(result[1]?.instrumentKey).toBe(GLOBAL_INSTRUMENT_OTHER_VALUE_CODE);
+    expect(result[1]?.bookValueMinor).toBeNull();
+    expect(result[1]?.unrealizedGainMinor).toBeNull();
+    expect(result[1]?.unrealizedGainRate).toBeNull();
+  });
+
+  it("keeps other row rate null when collapsed book values sum to zero", () => {
+    const snapshots = [
+      makeSnapshot({
+        portfolioCode: "a",
+        portfolioName: "A",
+        lines: [
+          makeLine({
+            id: "l1",
+            instrumentName: "A",
+            marketValueMinor: 300,
+            bookValueMinor: 300,
+          }),
+          makeLine({
+            id: "l2",
+            instrumentName: "B",
+            marketValueMinor: 200,
+            bookValueMinor: 0,
+          }),
+          makeLine({
+            id: "l3",
+            instrumentName: "C",
+            marketValueMinor: 100,
+            bookValueMinor: 0,
+          }),
+        ],
+      }),
+    ];
+    const rows = buildGlobalInstrumentRows(snapshots);
+    let result = collapseGlobalInstrumentRows(rows, 1);
+
+    expect(result[1]?.bookValueMinor).toBe(0);
+    expect(result[1]?.unrealizedGainMinor).toBe(300);
+    expect(result[1]?.unrealizedGainRate).toBeNull();
+  });
+
+  it("returns rows unchanged when limit is below one", () => {
+    const snapshots = [
+      makeSnapshot({
+        portfolioCode: "a",
+        portfolioName: "A",
+        lines: [
+          makeLine({
+            id: "l1",
+            instrumentName: "A",
+            marketValueMinor: 100,
+            bookValueMinor: 100,
+          }),
+        ],
+      }),
+    ];
+    const rows = buildGlobalInstrumentRows(snapshots);
+    let result = collapseGlobalInstrumentRows(rows, 0);
+    expect(result).toEqual(rows);
   });
 });
 

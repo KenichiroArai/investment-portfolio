@@ -103,7 +103,7 @@ function parseUsStockBlock(
   }
 
   const qtyCells = splitMonexPasteCells(lines[index]);
-  const custodyType = qtyCells[0] ?? "";
+  const custodyType = qtyCells[0];
   const quantity = parseMonexPasteInteger(qtyCells[1] ?? "");
   index += 1;
 
@@ -127,10 +127,10 @@ function parseUsStockBlock(
   }
 
   const bookCells = splitMonexPasteCells(lines[index]);
-  const bookValueMinor = parseMonexPasteInteger(bookCells[0] ?? "");
+  const bookValueMinor = parseMonexPasteInteger(bookCells[0]);
   const avgCostMinor =
     bookCells.length >= 2
-      ? parseMonexPasteInteger(bookCells[1] ?? "")
+      ? parseMonexPasteInteger(bookCells[1])
       : bookValueMinor;
   index += 1;
 
@@ -139,7 +139,7 @@ function parseUsStockBlock(
   }
 
   const marketCells = splitMonexPasteCells(lines[index]);
-  const marketValueMinor = parseMonexPasteInteger(marketCells[0] ?? "");
+  const marketValueMinor = parseMonexPasteInteger(marketCells[0]);
   const unrealizedGainMinor = parseMonexPasteInteger(marketCells[1] ?? "");
   index += 1;
 
@@ -192,7 +192,7 @@ export function parseMonexUsStocksPaste(lines: string[]): ParseMonexUsStocksPast
   let index = 0;
   while (index < lines.length) {
     const line = lines[index];
-    if (isMonexNoiseLine(line) || isUsHeaderLine(line) || !isTickerLine(line)) {
+    if (!isTickerLine(line)) {
       index += 1;
       continue;
     }

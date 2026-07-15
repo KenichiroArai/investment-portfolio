@@ -783,4 +783,48 @@ describe("snapshot-trend-aggregation", () => {
     expect(aggregated).toHaveLength(1);
     expect(aggregated[0].bucketLabel).toBe("1月");
   });
+
+  it("returns empty calendar month aggregation for no points", () => {
+    expect(
+      aggregateTrendPointsByCalendarMonth([], "2026-01-01", "2026-12-31"),
+    ).toEqual([]);
+  });
+
+  it("skips calendar month points with invalid date format", () => {
+    const points = [
+      createPoint("2026-06-1x", 100),
+      createPoint("2026-06-15", 110),
+    ];
+    const aggregated = aggregateTrendPointsByCalendarMonth(
+      points,
+      "2026-01-01",
+      "2026-12-31",
+    );
+    expect(aggregated).toHaveLength(1);
+    expect(aggregated[0]).toMatchObject({
+      bucketKey: "2026-06",
+      totalMarketValueMinor: 110,
+    });
+  });
+
+  it("uses year-month as source date for averaged calendar month buckets", () => {
+    const points = [
+      createPoint("2026-01-10", 100),
+      createPoint("2026-01-20", 200),
+    ];
+    const aggregated = aggregateTrendPointsByCalendarMonth(
+      points,
+      "2026-01-01",
+      "2026-12-31",
+      { pick: "average" },
+    );
+    expect(aggregated).toHaveLength(1);
+    expect(aggregated[0]).toMatchObject({
+      asOfDate: "2026-01",
+      sourceAsOfDate: "2026-01",
+      bucketKey: "2026-01",
+      totalMarketValueMinor: 150,
+      isAveraged: true,
+    });
+  });
 });
