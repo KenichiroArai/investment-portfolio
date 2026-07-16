@@ -57,8 +57,9 @@
 | scheme code | 軸名 | 用途 |
 | --- | --- | --- |
 | `rakuten_product_type` | 種別 | 貼り付けの「種別」（国内株式・投資信託など） |
+| `rakuten_account_type` | 口座区分 | 明細の口座区分（特定・一般・楽ラップ） |
 
-分類値（`classification_values.code`）:
+### 種別（`rakuten_product_type`）
 
 | code | name |
 | --- | --- |
@@ -69,13 +70,25 @@
 | `domestic_bond` | 国内債券 |
 | `rakuten_wrap` | 楽ラップ |
 
-一時投入（既存銘柄へのタグ付け込み）:
-
 ```powershell
 python dev/sql/rakuten/seed_product_type_classifications.py
 ```
 
-冪等です。軸・分類値が既にあればスキップし、未タグの銘柄だけ追加します。
+### 口座区分（`rakuten_account_type`）
+
+| code | name | 明細 `account_id` |
+| --- | --- | --- |
+| `tokutei` | 特定 | `rakuten:特定` |
+| `general` | 一般 | `rakuten:一般` |
+| `wrap` | 楽ラップ | `rakuten:ラップ` |
+
+最新スナップショットの `holding_lines.account_id` に合わせてタグ付けします。同一銘柄が特定・一般の両方にある場合は時価比で `allocation_weight` を付けます。
+
+```powershell
+python dev/sql/rakuten/seed_account_type_classifications.py
+```
+
+いずれも冪等です。軸・分類値が既にあればスキップし、未タグ／ウェイト差分だけ反映します。
 
 ## データ投入
 

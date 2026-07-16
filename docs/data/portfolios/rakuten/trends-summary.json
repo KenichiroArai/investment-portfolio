@@ -50,6 +50,26 @@
             "ratio": 0.007039799261169583
           }
         ],
+        "rakuten_account_type": [
+          {
+            "valueCode": "tokutei",
+            "valueName": "特定",
+            "marketValueMinor": 272591,
+            "ratio": 0.8636300271833833
+          },
+          {
+            "valueCode": "general",
+            "valueName": "一般",
+            "marketValueMinor": 32983,
+            "ratio": 0.1044976143254529
+          },
+          {
+            "valueCode": "wrap",
+            "valueName": "楽ラップ",
+            "marketValueMinor": 10060,
+            "ratio": 0.031872358491163814
+          }
+        ],
         "__portfolio_instruments__": [
           {
             "valueCode": "96850e4b-6ffc-4403-b4d9-be81ab467ac9",

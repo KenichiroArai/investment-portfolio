@@ -8,6 +8,10 @@
     {
       "schemeCode": "rakuten_product_type",
       "schemeName": "種別"
+    },
+    {
+      "schemeCode": "rakuten_account_type",
+      "schemeName": "口座区分"
     }
   ],
   "metrics": [],
@@ -56,6 +60,13 @@
       ],
       "instrumentAttributes": [],
       "tags": [
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "tokutei",
+          "valueName": "特定",
+          "allocationWeight": null
+        },
         {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
@@ -110,6 +121,13 @@
       "instrumentAttributes": [],
       "tags": [
         {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "tokutei",
+          "valueName": "特定",
+          "allocationWeight": null
+        },
+        {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
           "valueCode": "domestic_equity",
@@ -162,6 +180,13 @@
       ],
       "instrumentAttributes": [],
       "tags": [
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "tokutei",
+          "valueName": "特定",
+          "allocationWeight": null
+        },
         {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
@@ -216,6 +241,13 @@
       "instrumentAttributes": [],
       "tags": [
         {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "tokutei",
+          "valueName": "特定",
+          "allocationWeight": null
+        },
+        {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
           "valueCode": "domestic_equity",
@@ -268,6 +300,13 @@
       ],
       "instrumentAttributes": [],
       "tags": [
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "tokutei",
+          "valueName": "特定",
+          "allocationWeight": null
+        },
         {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
@@ -322,6 +361,20 @@
       "instrumentAttributes": [],
       "tags": [
         {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "tokutei",
+          "valueName": "特定",
+          "allocationWeight": 0.5
+        },
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "general",
+          "valueName": "一般",
+          "allocationWeight": 0.5
+        },
+        {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
           "valueCode": "domestic_equity",
@@ -374,6 +427,20 @@
       ],
       "instrumentAttributes": [],
       "tags": [
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "tokutei",
+          "valueName": "特定",
+          "allocationWeight": 0.5
+        },
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "general",
+          "valueName": "一般",
+          "allocationWeight": 0.5
+        },
         {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
@@ -428,6 +495,13 @@
       "instrumentAttributes": [],
       "tags": [
         {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "tokutei",
+          "valueName": "特定",
+          "allocationWeight": null
+        },
+        {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
           "valueCode": "domestic_equity",
@@ -480,6 +554,20 @@
       ],
       "instrumentAttributes": [],
       "tags": [
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "tokutei",
+          "valueName": "特定",
+          "allocationWeight": 0.5
+        },
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "general",
+          "valueName": "一般",
+          "allocationWeight": 0.5
+        },
         {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
@@ -534,6 +622,20 @@
       "instrumentAttributes": [],
       "tags": [
         {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "tokutei",
+          "valueName": "特定",
+          "allocationWeight": 0.5
+        },
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "general",
+          "valueName": "一般",
+          "allocationWeight": 0.5
+        },
+        {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
           "valueCode": "domestic_equity",
@@ -586,6 +688,13 @@
       ],
       "instrumentAttributes": [],
       "tags": [
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "tokutei",
+          "valueName": "特定",
+          "allocationWeight": null
+        },
         {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
@@ -640,6 +749,13 @@
       "instrumentAttributes": [],
       "tags": [
         {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "tokutei",
+          "valueName": "特定",
+          "allocationWeight": null
+        },
+        {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
           "valueCode": "mutual_fund",
@@ -692,6 +808,13 @@
       ],
       "instrumentAttributes": [],
       "tags": [
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "general",
+          "valueName": "一般",
+          "allocationWeight": null
+        },
         {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
@@ -746,6 +869,13 @@
       "instrumentAttributes": [],
       "tags": [
         {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "general",
+          "valueName": "一般",
+          "allocationWeight": null
+        },
+        {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
           "valueCode": "mutual_fund",
@@ -798,6 +928,13 @@
       ],
       "instrumentAttributes": [],
       "tags": [
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "general",
+          "valueName": "一般",
+          "allocationWeight": null
+        },
         {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
@@ -852,6 +989,13 @@
       "instrumentAttributes": [],
       "tags": [
         {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "tokutei",
+          "valueName": "特定",
+          "allocationWeight": null
+        },
+        {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
           "valueCode": "mutual_fund",
@@ -904,6 +1048,13 @@
       ],
       "instrumentAttributes": [],
       "tags": [
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "general",
+          "valueName": "一般",
+          "allocationWeight": null
+        },
         {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
@@ -958,6 +1109,13 @@
       "instrumentAttributes": [],
       "tags": [
         {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "tokutei",
+          "valueName": "特定",
+          "allocationWeight": null
+        },
+        {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
           "valueCode": "mutual_fund",
@@ -1010,6 +1168,13 @@
       ],
       "instrumentAttributes": [],
       "tags": [
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "tokutei",
+          "valueName": "特定",
+          "allocationWeight": null
+        },
         {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
@@ -1064,6 +1229,13 @@
       "instrumentAttributes": [],
       "tags": [
         {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "tokutei",
+          "valueName": "特定",
+          "allocationWeight": null
+        },
+        {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
           "valueCode": "rakuten_money_fund",
@@ -1116,6 +1288,13 @@
       ],
       "instrumentAttributes": [],
       "tags": [
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "tokutei",
+          "valueName": "特定",
+          "allocationWeight": null
+        },
         {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
@@ -1170,6 +1349,13 @@
       "instrumentAttributes": [],
       "tags": [
         {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "tokutei",
+          "valueName": "特定",
+          "allocationWeight": null
+        },
+        {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
           "valueCode": "foreign_mmf",
@@ -1222,6 +1408,13 @@
       ],
       "instrumentAttributes": [],
       "tags": [
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "tokutei",
+          "valueName": "特定",
+          "allocationWeight": null
+        },
         {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
@@ -1276,6 +1469,13 @@
       "instrumentAttributes": [],
       "tags": [
         {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "general",
+          "valueName": "一般",
+          "allocationWeight": null
+        },
+        {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
           "valueCode": "domestic_bond",
@@ -1328,6 +1528,13 @@
       ],
       "instrumentAttributes": [],
       "tags": [
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        },
         {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
@@ -1382,6 +1589,13 @@
       "instrumentAttributes": [],
       "tags": [
         {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        },
+        {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
@@ -1434,6 +1648,13 @@
       ],
       "instrumentAttributes": [],
       "tags": [
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        },
         {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
@@ -1488,6 +1709,13 @@
       "instrumentAttributes": [],
       "tags": [
         {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        },
+        {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
@@ -1540,6 +1768,13 @@
       ],
       "instrumentAttributes": [],
       "tags": [
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        },
         {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
@@ -1594,6 +1829,13 @@
       "instrumentAttributes": [],
       "tags": [
         {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        },
+        {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
@@ -1646,6 +1888,13 @@
       ],
       "instrumentAttributes": [],
       "tags": [
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        },
         {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
@@ -1700,6 +1949,13 @@
       "instrumentAttributes": [],
       "tags": [
         {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        },
+        {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
@@ -1752,6 +2008,13 @@
       ],
       "instrumentAttributes": [],
       "tags": [
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        },
         {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
@@ -1806,6 +2069,13 @@
       "instrumentAttributes": [],
       "tags": [
         {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        },
+        {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
@@ -1858,6 +2128,13 @@
       ],
       "instrumentAttributes": [],
       "tags": [
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        },
         {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
@@ -1912,6 +2189,13 @@
       "instrumentAttributes": [],
       "tags": [
         {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        },
+        {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
@@ -1964,6 +2248,13 @@
       ],
       "instrumentAttributes": [],
       "tags": [
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        },
         {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
@@ -2018,6 +2309,13 @@
       "instrumentAttributes": [],
       "tags": [
         {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        },
+        {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
@@ -2070,6 +2368,13 @@
       ],
       "instrumentAttributes": [],
       "tags": [
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        },
         {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
@@ -2124,6 +2429,13 @@
       "instrumentAttributes": [],
       "tags": [
         {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        },
+        {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
@@ -2176,6 +2488,13 @@
       ],
       "instrumentAttributes": [],
       "tags": [
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        },
         {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
@@ -2230,6 +2549,13 @@
       "instrumentAttributes": [],
       "tags": [
         {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        },
+        {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
@@ -2282,6 +2608,13 @@
       ],
       "instrumentAttributes": [],
       "tags": [
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        },
         {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
@@ -2336,6 +2669,13 @@
       "instrumentAttributes": [],
       "tags": [
         {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        },
+        {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
@@ -2388,6 +2728,13 @@
       ],
       "instrumentAttributes": [],
       "tags": [
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        },
         {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
@@ -2442,6 +2789,13 @@
       "instrumentAttributes": [],
       "tags": [
         {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        },
+        {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
@@ -2495,6 +2849,13 @@
       "instrumentAttributes": [],
       "tags": [
         {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        },
+        {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
@@ -2547,6 +2908,13 @@
       ],
       "instrumentAttributes": [],
       "tags": [
+        {
+          "schemeCode": "rakuten_account_type",
+          "schemeName": "口座区分",
+          "valueCode": "wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        },
         {
           "schemeCode": "rakuten_product_type",
           "schemeName": "種別",
