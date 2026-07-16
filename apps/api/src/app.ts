@@ -22,6 +22,7 @@ import {
   listInstruments,
   listIdecoInstrumentsForPaste,
   listMonexInstrumentsForPaste,
+  listRakutenInstrumentsForPaste,
   listPortfolios,
   listSchemesWithValuesForPortfolio,
   listSnapshotDates,
@@ -700,6 +701,12 @@ export function createApp(options?: CreateAppOptions) {
 
     if (portfolio.kind === "monex") {
       const rows = await listMonexInstrumentsForPaste(db);
+      result = c.json(rows);
+      return result;
+    }
+
+    if (portfolio.kind === "rakuten") {
+      const rows = await listRakutenInstrumentsForPaste(db);
       result = c.json(rows);
       return result;
     }

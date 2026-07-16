@@ -13,6 +13,31 @@ import {
 } from "../schema/index";
 import { findPortfolioByCode } from "./portfolios";
 
+function extractRakutenTickerFromExternalId(
+  externalId: string | null | undefined,
+): string | null {
+  let result: string | null = null;
+  const raw = externalId?.trim() ?? "";
+
+  if (raw === "" || raw.startsWith("account:")) {
+    return result;
+  }
+
+  const separatorIndex = raw.indexOf("__");
+  if (separatorIndex === -1) {
+    result = raw;
+    return result;
+  }
+
+  const ticker = raw.slice(0, separatorIndex).trim();
+  if (ticker === "") {
+    return result;
+  }
+
+  result = ticker;
+  return result;
+}
+
 export type CreateInstrumentParams = {
   portfolioCode?: string;
   accountId?: string;
@@ -689,6 +714,13 @@ export type MonexPasteInstrumentRow = {
   ticker: string | null;
 };
 
+export type RakutenPasteInstrumentRow = {
+  id: string;
+  name: string;
+  ticker: string | null;
+  accountId: string;
+};
+
 export async function listIdecoInstrumentsForPaste(db: AppDatabase) {
   let result: IdecoPasteInstrumentRow[] = [];
 
@@ -740,6 +772,39 @@ export async function listMonexInstrumentsForPaste(db: AppDatabase) {
       id: row.id,
       name: row.name,
       ticker: tickerAttribute?.textValue ?? null,
+    };
+    result.push(item);
+  }
+
+  return result;
+}
+
+export async function listRakutenInstrumentsForPaste(db: AppDatabase) {
+  let result: RakutenPasteInstrumentRow[] = [];
+
+  const portfolio = await findPortfolioByCode(db, "rakuten");
+  if (!portfolio) {
+    return result;
+  }
+
+  const rows = await db
+    .select()
+    .from(instruments)
+    .where(eq(instruments.portfolioId, portfolio.id))
+    .orderBy(instruments.name);
+  const instrumentIds = rows.map((row) => row.id);
+  const attributesByInstrumentId = await getAttributesForInstruments(db, instrumentIds);
+
+  for (const row of rows) {
+    const attributes = attributesByInstrumentId.get(row.id) ?? [];
+    const tickerAttribute = attributes.find((attribute) => attribute.code === "ticker");
+    const tickerFromAttribute = tickerAttribute?.textValue ?? null;
+    const tickerFromExternal = extractRakutenTickerFromExternalId(row.externalId);
+    let item: RakutenPasteInstrumentRow = {
+      id: row.id,
+      name: row.name,
+      ticker: tickerFromAttribute ?? tickerFromExternal,
+      accountId: row.accountId,
     };
     result.push(item);
   }

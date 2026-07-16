@@ -4,8 +4,8 @@ import { redirect } from "next/navigation";
 import { PageContainer } from "@/components/layout/page-container";
 import { SettingsSidebar } from "@/components/layout/settings-sidebar";
 import { isWritableDataSource } from "@/lib/data-source";
-import { findPortfolioByCode } from "@/lib/portfolio-catalog";
 import { buildPortfolioPath, resolvePortfolioCodeParam } from "@/lib/portfolio-path";
+import { resolvePortfolioKind } from "@/lib/resolve-portfolio-kind";
 
 type SettingsLayoutProps = {
   children: ReactNode;
@@ -14,7 +14,7 @@ type SettingsLayoutProps = {
 
 export default async function SettingsLayout({ children, params }: SettingsLayoutProps) {
   const code = await resolvePortfolioCodeParam(params);
-  const portfolioKind = findPortfolioByCode(code)?.kind ?? "";
+  const portfolioKind = resolvePortfolioKind(code);
 
   if (!isWritableDataSource()) {
     let result: never = redirect(buildPortfolioPath(code)) as never;

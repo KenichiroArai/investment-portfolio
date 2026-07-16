@@ -1,0 +1,2171 @@
+{
+  "id": "acaf7b8d-5c41-48af-ad18-fe91ad47dede",
+  "portfolioCode": "rakuten",
+  "portfolioName": "楽天証券",
+  "portfolioKind": "rakuten",
+  "asOfDate": "2026-07-16",
+  "analysisSchemes": [],
+  "metrics": [],
+  "lines": [
+    {
+      "id": "ab00d369-b109-4bf5-9f8c-adb459871d8f",
+      "instrumentId": "96850e4b-6ffc-4403-b4d9-be81ab467ac9",
+      "instrumentName": "ＮＦ日経高配当５０",
+      "accountId": "rakuten:特定",
+      "accountName": "特定",
+      "sortOrder": 1,
+      "quantity": 1,
+      "marketValueMinor": 3329,
+      "bookValueMinor": 3285,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 3285,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 3329,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 44,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.013300000000000001,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "1dbf5a47-b6f4-42fe-88f3-3a052d6c8578",
+      "instrumentId": "23e56e63-7e1a-450e-8dbc-bd122590f79a",
+      "instrumentName": "ＧＸＮＤＸカバコ",
+      "accountId": "rakuten:特定",
+      "accountName": "特定",
+      "sortOrder": 2,
+      "quantity": 7,
+      "marketValueMinor": 9107,
+      "bookValueMinor": 9135,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 1305,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 1301,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -28,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.003,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "9765d8bb-e6e0-4c76-bb44-4b6d28fd9000",
+      "instrumentId": "49668919-3a94-498a-a0ee-dbcb38401b78",
+      "instrumentName": "ＧＸＳＰＸカバコ",
+      "accountId": "rakuten:特定",
+      "accountName": "特定",
+      "sortOrder": 3,
+      "quantity": 8,
+      "marketValueMinor": 9256,
+      "bookValueMinor": 9200,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 1150,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 1157,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 56,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.006,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "390bb53f-fe0f-4624-b66e-f84a955656fd",
+      "instrumentId": "67d3827d-3f96-4401-9668-1d74974e3c05",
+      "instrumentName": "ＩＳＳ＆Ｐ５００カバコ",
+      "accountId": "rakuten:特定",
+      "accountName": "特定",
+      "sortOrder": 4,
+      "quantity": 10,
+      "marketValueMinor": 8300,
+      "bookValueMinor": 8240,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 824,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 830,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 60,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0070999999999999995,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "9747ae9e-b9a2-40fa-9333-cf2b31a39ff4",
+      "instrumentId": "f85f80ae-1d4e-424f-936c-03594624c283",
+      "instrumentName": "ＩＳ米債２０＋カバコ",
+      "accountId": "rakuten:特定",
+      "accountName": "特定",
+      "sortOrder": 5,
+      "quantity": 10,
+      "marketValueMinor": 7890,
+      "bookValueMinor": 8020,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 802,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 789,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -130,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0166,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "f6f9a691-0733-4e5a-830d-f180c5d3eb14",
+      "instrumentId": "440a8794-a4b1-40e6-8ab6-5b8d1e2f98c4",
+      "instrumentName": "ＣＩＪ",
+      "accountId": "rakuten:特定",
+      "accountName": "特定",
+      "sortOrder": 6,
+      "quantity": 2,
+      "marketValueMinor": 1006,
+      "bookValueMinor": 968,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 484,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 503,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 38,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0392,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "6f2a0081-716f-449e-9b73-4d36f341d99b",
+      "instrumentId": "440a8794-a4b1-40e6-8ab6-5b8d1e2f98c4",
+      "instrumentName": "ＣＩＪ",
+      "accountId": "rakuten:一般",
+      "accountName": "一般",
+      "sortOrder": 7,
+      "quantity": 2,
+      "marketValueMinor": 1006,
+      "bookValueMinor": 1014,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "一般"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 507,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 503,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -8,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0069,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "5dee779a-a2c9-42f1-afc4-212ffdc2a6e5",
+      "instrumentId": "f0a59fa6-9ae4-44c0-84d7-ce114ca2b904",
+      "instrumentName": "ＧＸＮＡＳ１００Ｄカバコ",
+      "accountId": "rakuten:特定",
+      "accountName": "特定",
+      "sortOrder": 8,
+      "quantity": 9,
+      "marketValueMinor": 9837,
+      "bookValueMinor": 10026,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 1114,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 1093,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -189,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.018799999999999997,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "12a09a2a-8d6d-4de9-b480-da8bff946dcf",
+      "instrumentId": "d96ed35d-960b-434c-b66f-8b222359d9b5",
+      "instrumentName": "ＮＴＴ",
+      "accountId": "rakuten:特定",
+      "accountName": "特定",
+      "sortOrder": 9,
+      "quantity": 2,
+      "marketValueMinor": 301,
+      "bookValueMinor": 296,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 148,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 151,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 5,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0168,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "6d2cec52-eab5-47d4-b22a-caba4a922782",
+      "instrumentId": "d96ed35d-960b-434c-b66f-8b222359d9b5",
+      "instrumentName": "ＮＴＴ",
+      "accountId": "rakuten:一般",
+      "accountName": "一般",
+      "sortOrder": 10,
+      "quantity": 2,
+      "marketValueMinor": 301,
+      "bookValueMinor": 310,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "一般"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 155,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 151,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -9,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0226,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "ff8b4a25-d977-4b50-9103-e49a40d3a86e",
+      "instrumentId": "dddd5a01-2d8f-4fe5-a905-107d8bd7cdcc",
+      "instrumentName": "ソフトバンク",
+      "accountId": "rakuten:特定",
+      "accountName": "特定",
+      "sortOrder": 11,
+      "quantity": 2,
+      "marketValueMinor": 439,
+      "bookValueMinor": 420,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 210,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 220,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 19,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0452,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "dcc0f462-ebc5-4e80-aec3-946bb3d52b15",
+      "instrumentId": "5d1c1e62-ff81-410b-80e3-731e898fb97b",
+      "instrumentName": "インベスコ 世界厳選株式オープン＜為替ヘッジなし＞(毎月決算型)(世界のベスト)",
+      "accountId": "rakuten:特定",
+      "accountName": "特定",
+      "sortOrder": 12,
+      "quantity": 1629,
+      "marketValueMinor": 1510,
+      "bookValueMinor": 1499,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 9202,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 9269,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 11,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0072,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "9af1eb31-5d85-4e1b-9dab-fb0350a2cb4a",
+      "instrumentId": "2a3b0df8-cffe-42bd-b2fd-027fec43d8e6",
+      "instrumentName": "たわらノーロード フォーカス 防衛・航空宇宙",
+      "accountId": "rakuten:一般",
+      "accountName": "一般",
+      "sortOrder": 13,
+      "quantity": 189,
+      "marketValueMinor": 219,
+      "bookValueMinor": 208,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "一般"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 11005,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 11579,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 11,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0521,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "3ed3e52a-92b8-4fb5-9838-a6e74347f8d4",
+      "instrumentId": "fe504205-e337-42db-ab10-1a382bb41357",
+      "instrumentName": "楽天・プラス・SOXインデックス・ファンド(楽天・プラス・SOX)",
+      "accountId": "rakuten:一般",
+      "accountName": "一般",
+      "sortOrder": 14,
+      "quantity": 246,
+      "marketValueMinor": 791,
+      "bookValueMinor": 742,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "一般"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 30163,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 32136,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 49,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0654,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "3052df70-3ece-409a-9ca8-6b1fdca67da1",
+      "instrumentId": "efc9caa7-fd85-497a-9b1a-9c4121660013",
+      "instrumentName": "【ウェルスナビ×R専用】ウェルスナビ×R(リスク許容度4)",
+      "accountId": "rakuten:一般",
+      "accountName": "一般",
+      "sortOrder": 15,
+      "quantity": 6454,
+      "marketValueMinor": 10020,
+      "bookValueMinor": 10000,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "一般"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 15494,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 15525,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 20,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0019,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "8cab42e0-58d2-420b-b187-248cbc9ef21b",
+      "instrumentId": "daecc52c-7c73-4699-a0aa-27baaffca5b4",
+      "instrumentName": "楽天・米国成長株式・プレミアム・インカム・ファンド(毎月決算型)(楽天・JEPQ)",
+      "accountId": "rakuten:特定",
+      "accountName": "特定",
+      "sortOrder": 16,
+      "quantity": 82801,
+      "marketValueMinor": 99179,
+      "bookValueMinor": 99999,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 12077,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 11978,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -820,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.008199999999999999,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "b351ef00-c0ab-4d41-869b-bd4ce4fbabb9",
+      "instrumentId": "1085faae-7e96-4645-bd1a-93b50656a77a",
+      "instrumentName": "Tracers NASDAQ100ゴールドプラス",
+      "accountId": "rakuten:一般",
+      "accountName": "一般",
+      "sortOrder": 17,
+      "quantity": 351,
+      "marketValueMinor": 647,
+      "bookValueMinor": 741,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "一般"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 21111,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 18420,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -94,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.1274,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "31daa2d4-8ee7-411d-9bb4-4867f1b6ddac",
+      "instrumentId": "20553c09-f3f9-44d7-acd2-d2927fd91194",
+      "instrumentName": "SMT 日本株式モメンタムファンド(トレンドランキング・日本株)",
+      "accountId": "rakuten:特定",
+      "accountName": "特定",
+      "sortOrder": 18,
+      "quantity": 73,
+      "marketValueMinor": 97,
+      "bookValueMinor": 115,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 15753,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 13297,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -18,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.1559,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "defd5a2e-4dd3-4bdc-a57b-74e763d79a2a",
+      "instrumentId": "ced2952d-071e-48d1-baa6-1664ee0f1025",
+      "instrumentName": "SMT 全世界株式モメンタムファンド(トレンドランキング・全世界株)",
+      "accountId": "rakuten:特定",
+      "accountName": "特定",
+      "sortOrder": 19,
+      "quantity": 106,
+      "marketValueMinor": 100,
+      "bookValueMinor": 115,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 10849,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 9406,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -15,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.133,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "49883ae1-e30c-4034-b9c1-0c3090f1d80a",
+      "instrumentId": "e7509a11-ff00-4e32-8239-c517c0c17652",
+      "instrumentName": "楽天・マネーファンド",
+      "accountId": "rakuten:特定",
+      "accountName": "特定",
+      "sortOrder": 20,
+      "quantity": 100000,
+      "marketValueMinor": 100017,
+      "bookValueMinor": 100017,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 0,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 0,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 0,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "90698abb-52d9-4aad-a3f2-3e5c4950647c",
+      "instrumentId": "ef7f1f01-83fc-4ddc-8182-311496a77b59",
+      "instrumentName": "GS米ドルファンド",
+      "accountId": "rakuten:特定",
+      "accountName": "特定",
+      "sortOrder": 21,
+      "quantity": 1101,
+      "marketValueMinor": 1786,
+      "bookValueMinor": 1796,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 16312,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 162,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -10,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0055000000000000005,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "8b0790fa-453f-40ac-b12a-b4ce33641e36",
+      "instrumentId": "d4a4a106-2d1e-45af-865e-735ecd198a70",
+      "instrumentName": "ノーザン・トラスト・米ドル・リクイディティ・ファンド(楽天・米ドルMMF)",
+      "accountId": "rakuten:特定",
+      "accountName": "特定",
+      "sortOrder": 22,
+      "quantity": 269,
+      "marketValueMinor": 436,
+      "bookValueMinor": 438,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 16283,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 162,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -2,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0045000000000000005,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "29be348f-dbf4-4897-bc78-aa5cb143b73a",
+      "instrumentId": "20208708-5652-47a0-aa92-0ea80ddb5726",
+      "instrumentName": "個人国債　変動10年　第195回",
+      "accountId": "rakuten:特定",
+      "accountName": "特定",
+      "sortOrder": 23,
+      "quantity": 20000,
+      "marketValueMinor": 20000,
+      "bookValueMinor": 20000,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "特定"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 100,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 100,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 0,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "9a9ae841-336f-43cc-92fb-90226529fc07",
+      "instrumentId": "6d1daa71-65e2-4e89-8f2a-56342d3270bd",
+      "instrumentName": "個人国債　変動10年　第194回",
+      "accountId": "rakuten:一般",
+      "accountName": "一般",
+      "sortOrder": 24,
+      "quantity": 20000,
+      "marketValueMinor": 20000,
+      "bookValueMinor": 20000,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "一般"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 100,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 100,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 0,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "41a35689-cbdb-4802-ab57-322ecc05faea",
+      "instrumentId": "115a2a50-2795-4a35-a74b-51b396e1c188",
+      "instrumentName": "【楽ラップ専用】たわらノーロード 国内株式＜ラップ専用＞",
+      "accountId": "rakuten:ラップ",
+      "accountName": "楽ラップ",
+      "sortOrder": 25,
+      "quantity": 131,
+      "marketValueMinor": 545,
+      "bookValueMinor": 520,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ラップ"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 39695,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 41651,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 25,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0492,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "7def23bf-f643-4166-9c28-8fb143371c27",
+      "instrumentId": "604fd146-7888-4ebd-923b-3fd63f19d62d",
+      "instrumentName": "【楽ラップ専用】たわらノーロード 先進国株式(為替ヘッジあり)＜ラップ専用＞",
+      "accountId": "rakuten:ラップ",
+      "accountName": "楽ラップ",
+      "sortOrder": 26,
+      "quantity": 213,
+      "marketValueMinor": 595,
+      "bookValueMinor": 595,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ラップ"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 27934,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 27950,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 0,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "971bf099-ad30-4992-9219-58adac5c5236",
+      "instrumentId": "9e36a308-f13e-4e94-80a0-7237c2244f6b",
+      "instrumentName": "【楽ラップ専用】たわらノーロード 先進国株式(為替ヘッジなし)＜ラップ専用＞",
+      "accountId": "rakuten:ラップ",
+      "accountName": "楽ラップ",
+      "sortOrder": 27,
+      "quantity": 27,
+      "marketValueMinor": 188,
+      "bookValueMinor": 185,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ラップ"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 68519,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 69689,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 3,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.017,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "48390cc4-813f-475d-9353-dc1dc7b37296",
+      "instrumentId": "c131d97c-5a40-46bd-942d-ef6682d77ff0",
+      "instrumentName": "【楽ラップ専用】たわらノーロード 新興国株式＜ラップ専用＞",
+      "accountId": "rakuten:ラップ",
+      "accountName": "楽ラップ",
+      "sortOrder": 28,
+      "quantity": 80,
+      "marketValueMinor": 247,
+      "bookValueMinor": 262,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ラップ"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 32750,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 30903,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -15,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.056299999999999996,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "5f5e267b-b722-4bd7-9900-406cebc7a75a",
+      "instrumentId": "1a261364-c640-4ca4-98a6-06cb08d98e3d",
+      "instrumentName": "【楽ラップ専用】たわらノーロード 国内債券＜ラップ専用＞",
+      "accountId": "rakuten:ラップ",
+      "accountName": "楽ラップ",
+      "sortOrder": 29,
+      "quantity": 571,
+      "marketValueMinor": 584,
+      "bookValueMinor": 586,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ラップ"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 10263,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 10228,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -2,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0033,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "8f772840-486f-41bb-a089-29fb14380a3a",
+      "instrumentId": "eb142884-1de3-48b1-a26c-bccbb31b69e4",
+      "instrumentName": "【楽ラップ専用】たわらノーロード 外国債券(為替ヘッジあり)＜ラップ専用＞",
+      "accountId": "rakuten:ラップ",
+      "accountName": "楽ラップ",
+      "sortOrder": 30,
+      "quantity": 1113,
+      "marketValueMinor": 935,
+      "bookValueMinor": 940,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ラップ"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 8446,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 8401,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -5,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0052,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "379031c6-323c-4af0-8231-bb8ba34d4458",
+      "instrumentId": "5eef0d2e-b9ce-4c0f-a687-aa71264c8005",
+      "instrumentName": "【楽ラップ専用】たわらノーロード 外国債券(為替ヘッジなし)＜ラップ専用＞",
+      "accountId": "rakuten:ラップ",
+      "accountName": "楽ラップ",
+      "sortOrder": 31,
+      "quantity": 27,
+      "marketValueMinor": 49,
+      "bookValueMinor": 49,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ラップ"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 18148,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 18186,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 0,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "77c074c4-49c0-4736-9a80-51ac27c29a7f",
+      "instrumentId": "e49b9fa3-7ac3-44fb-b30e-77f33876b466",
+      "instrumentName": "【楽ラップ専用】たわらノーロード 新興国現地通貨建債券＜ラップ専用＞",
+      "accountId": "rakuten:ラップ",
+      "accountName": "楽ラップ",
+      "sortOrder": 32,
+      "quantity": 148,
+      "marketValueMinor": 222,
+      "bookValueMinor": 219,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ラップ"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 14797,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 15060,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 3,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0177,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "a6dd9cef-3d77-4c43-8d0e-4467bb4bc8a0",
+      "instrumentId": "d60acd09-6ef6-495d-b2ea-6cdf8d5aa550",
+      "instrumentName": "【楽ラップ専用】たわらノーロード 国内リート＜ラップ専用＞",
+      "accountId": "rakuten:ラップ",
+      "accountName": "楽ラップ",
+      "sortOrder": 33,
+      "quantity": 384,
+      "marketValueMinor": 630,
+      "bookValueMinor": 599,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ラップ"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 15599,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 16419,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 31,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0525,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "67c05ca3-4450-49ab-aec9-4161c7f5ab15",
+      "instrumentId": "9e9370ff-1d14-4e60-8de4-1d122739fbea",
+      "instrumentName": "【楽ラップ専用】たわらノーロード 先進国リート(為替ヘッジなし)＜ラップ専用＞",
+      "accountId": "rakuten:ラップ",
+      "accountName": "楽ラップ",
+      "sortOrder": 34,
+      "quantity": 220,
+      "marketValueMinor": 519,
+      "bookValueMinor": 488,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ラップ"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 22182,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 23623,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 31,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0649,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "cad62278-370f-45c6-87c1-f65e29da28aa",
+      "instrumentId": "24f00a78-744c-4c68-8186-e106e5a9fb68",
+      "instrumentName": "【楽ラップ専用】楽天・USハイイールド社債インデックス(為替ヘッジ)ファンド(ラップ向け)",
+      "accountId": "rakuten:ラップ",
+      "accountName": "楽ラップ",
+      "sortOrder": 35,
+      "quantity": 470,
+      "marketValueMinor": 498,
+      "bookValueMinor": 499,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ラップ"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 10617,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 10607,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -1,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.002004008016032064,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "fd42a7bf-dc60-48ac-8165-b74eb3f2a4d9",
+      "instrumentId": "28c6d1ee-f2ed-4b8b-a462-05be7cb3349f",
+      "instrumentName": "【楽ラップ専用】楽天・米国社債1-5年インデックス(為替ヘッジ)ファンド(ラップ向け)",
+      "accountId": "rakuten:ラップ",
+      "accountName": "楽ラップ",
+      "sortOrder": 36,
+      "quantity": 391,
+      "marketValueMinor": 353,
+      "bookValueMinor": 355,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ラップ"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 9079,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 9048,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -2,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0034000000000000002,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "4e713f1a-1838-4a86-9cbd-6b4671c074d8",
+      "instrumentId": "ec517c2b-108d-49b3-a009-5b4ed6183767",
+      "instrumentName": "【楽ラップ専用】楽天・米国社債5-10年インデックス(為替ヘッジ)ファンド(ラップ向け)",
+      "accountId": "rakuten:ラップ",
+      "accountName": "楽ラップ",
+      "sortOrder": 37,
+      "quantity": 826,
+      "marketValueMinor": 702,
+      "bookValueMinor": 708,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ラップ"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 8571,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 8499,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -6,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0084,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "2e1aaf14-9b56-465c-afe5-e232d09df5cf",
+      "instrumentId": "140623f5-0d88-495a-9ed5-6cf9fbb170e4",
+      "instrumentName": "【楽ラップ専用】ステート・ストリート日本株式インデックス・オープン",
+      "accountId": "rakuten:ラップ",
+      "accountName": "楽ラップ",
+      "sortOrder": 38,
+      "quantity": 140,
+      "marketValueMinor": 543,
+      "bookValueMinor": 521,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ラップ"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 37214,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 38841,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 22,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0437,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "31d931d9-6049-45b9-b015-cdf3a14aac3d",
+      "instrumentId": "97cf04e1-903c-4687-8123-bbc41a921220",
+      "instrumentName": "【楽ラップ専用】ステート・ストリート日本債券インデックス・オープン",
+      "accountId": "rakuten:ラップ",
+      "accountName": "楽ラップ",
+      "sortOrder": 39,
+      "quantity": 706,
+      "marketValueMinor": 585,
+      "bookValueMinor": 587,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ラップ"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 8314,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 8291,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -2,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0028000000000000004,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "af4793bc-771e-406f-a552-9541415ce354",
+      "instrumentId": "dc257e53-796f-48af-9c6d-c92d434606b7",
+      "instrumentName": "【楽ラップ専用】ステート・ストリート先進国株式インデックス・オープン",
+      "accountId": "rakuten:ラップ",
+      "accountName": "楽ラップ",
+      "sortOrder": 40,
+      "quantity": 35,
+      "marketValueMinor": 189,
+      "bookValueMinor": 185,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ラップ"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 52857,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 54091,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 4,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0233,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "26d6fce4-8276-408c-a17c-4d2a30d05c11",
+      "instrumentId": "4688abfd-7056-4bc3-bcd2-d2c8c83ee4e1",
+      "instrumentName": "【楽ラップ専用】ステート・ストリート先進国株式インデックス・オープン(為替ヘッジあり)",
+      "accountId": "rakuten:ラップ",
+      "accountName": "楽ラップ",
+      "sortOrder": 41,
+      "quantity": 210,
+      "marketValueMinor": 594,
+      "bookValueMinor": 596,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ラップ"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 28381,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 28329,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -2,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0018,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "72f67f7f-3f28-4937-a71d-f041990dd6ba",
+      "instrumentId": "e332993d-d39d-492d-a978-4551d8a8c1e9",
+      "instrumentName": "【楽ラップ専用】ステート・ストリート先進国債券インデックス・オープン",
+      "accountId": "rakuten:ラップ",
+      "accountName": "楽ラップ",
+      "sortOrder": 42,
+      "quantity": 32,
+      "marketValueMinor": 49,
+      "bookValueMinor": 49,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ラップ"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 15313,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 15587,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 0,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0179,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "3f636c95-c42f-4220-9479-bf2953aa8dc0",
+      "instrumentId": "ababdd4a-98e1-4f95-8da1-1ef68bc1b075",
+      "instrumentName": "【楽ラップ専用】ステート・ストリート先進国債券インデックス・オープン(為替ヘッジあり)",
+      "accountId": "rakuten:ラップ",
+      "accountName": "楽ラップ",
+      "sortOrder": 43,
+      "quantity": 1130,
+      "marketValueMinor": 935,
+      "bookValueMinor": 941,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ラップ"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 8327,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 8279,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -6,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0058,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "5dcf033c-1e71-4019-9740-301d339f115c",
+      "instrumentId": "0a57e947-c3da-4960-8098-ed1f32175622",
+      "instrumentName": "【楽ラップ専用】ステート・ストリート新興国株式インデックス・オープン",
+      "accountId": "rakuten:ラップ",
+      "accountName": "楽ラップ",
+      "sortOrder": 44,
+      "quantity": 67,
+      "marketValueMinor": 250,
+      "bookValueMinor": 263,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ラップ"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 39254,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 37340,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -13,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0487,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "58441ae5-eb2e-4042-9e6b-ec90bfef8789",
+      "instrumentId": "c90a88af-26c9-48d1-a9af-1e728946bef8",
+      "instrumentName": "【楽ラップ専用】ステート・ストリート新興国債券インデックス・オープン",
+      "accountId": "rakuten:ラップ",
+      "accountName": "楽ラップ",
+      "sortOrder": 45,
+      "quantity": 125,
+      "marketValueMinor": 222,
+      "bookValueMinor": 219,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ラップ"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 17520,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 17767,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 3,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.013999999999999999,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "b535a416-bb82-4eab-876f-d2ce59650a5f",
+      "instrumentId": "e36b8cd5-397f-4627-bbf4-2392af7ada07",
+      "instrumentName": "【楽ラップ専用】ステート・ストリート米国社債インデックス・オープン(為替ヘッジあり)",
+      "accountId": "rakuten:ラップ",
+      "accountName": "楽ラップ",
+      "sortOrder": 46,
+      "quantity": 118,
+      "marketValueMinor": 116,
+      "bookValueMinor": 117,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ラップ"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 9915,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 9882,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -1,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.008547008547008548,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "1fabbd0b-9550-4db6-a0cb-2c17f88f9577",
+      "instrumentId": "c5ee2767-d949-4c49-bc41-3f1ba04cef50",
+      "instrumentName": "【楽ラップ専用】ステート・ストリート米国社債インデックス・オープン2",
+      "accountId": "rakuten:ラップ",
+      "accountName": "楽ラップ",
+      "sortOrder": 47,
+      "quantity": 106,
+      "marketValueMinor": 197,
+      "bookValueMinor": 194,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ラップ"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 18302,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 18599,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 3,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.016200000000000003,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    },
+    {
+      "id": "713a32dd-ad55-4bda-911f-eca5f217d899",
+      "instrumentId": "b3f37e19-4e18-4436-8787-c0e6ffadc158",
+      "instrumentName": "現金等",
+      "accountId": "rakuten:ラップ",
+      "accountName": "楽ラップ",
+      "sortOrder": 48,
+      "quantity": 1,
+      "marketValueMinor": 313,
+      "bookValueMinor": 313,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ラップ"
+        },
+        {
+          "code": "avg_cost_minor",
+          "integerValue": 313,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unit_price_minor",
+          "integerValue": 313,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 0,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0,
+          "textValue": null
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": []
+    }
+  ]
+}

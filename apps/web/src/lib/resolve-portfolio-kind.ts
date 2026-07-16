@@ -24,5 +24,15 @@ export function resolvePortfolioKind(
     return result;
   }
 
+  if (portfolioCode === "rakuten") {
+    result = "rakuten";
+    return result;
+  }
+
+  if (portfolioCode === "ideco") {
+    result = "ideco";
+    return result;
+  }
+
   return result;
 }

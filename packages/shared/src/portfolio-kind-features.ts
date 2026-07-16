@@ -1,5 +1,6 @@
 import { IDECO_PORTFOLIO_METRIC_CODES } from "./ideco-portfolio-metrics";
 import { MONEX_INSTRUMENT_ATTRIBUTE_CODES } from "./monex-holding-metrics";
+import { RAKUTEN_INSTRUMENT_ATTRIBUTE_CODES } from "./rakuten-holding-metrics";
 
 export type HoldingLineColumnId =
   | "portfolioName"
@@ -77,6 +78,23 @@ const KIND_FEATURES: Record<string, PortfolioKindFeatures> = {
       MONEX_INSTRUMENT_ATTRIBUTE_CODES.market,
       MONEX_INSTRUMENT_ATTRIBUTE_CODES.ticker,
     ],
+    portfolioMetrics: [],
+  },
+  rakuten: {
+    showContributions: false,
+    showGainRateOnContributions: false,
+    holdingLineColumns: [
+      "instrumentName",
+      "accountType",
+      "quantity",
+      "unitPrice",
+      "avgCost",
+      "marketValue",
+      "bookValue",
+      "gain",
+      "gainRate",
+    ],
+    instrumentAttributes: [RAKUTEN_INSTRUMENT_ATTRIBUTE_CODES.ticker],
     portfolioMetrics: [],
   },
 };

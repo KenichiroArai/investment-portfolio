@@ -6,6 +6,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { useResolvedPortfolioKind } from "@/hooks/use-resolved-portfolio-kind";
 import { buildPortfolioPath } from "@/lib/portfolio-path";
 import {
   buildSettingsCategories,
@@ -137,10 +138,11 @@ function SettingsNavLinks({
 export function SettingsSidebar({ portfolioCode, portfolioKind }: SettingsSidebarProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const resolvedKind = useResolvedPortfolioKind(portfolioCode, portfolioKind);
   const mode = resolveSettingsViewMode(pathname);
   const activeCategory = resolveActiveCategory(pathname);
   const queryTab = searchParams.get("tab") ?? "";
-  const settingsCategories = buildSettingsCategories(portfolioKind);
+  const settingsCategories = buildSettingsCategories(resolvedKind);
   const desktopTitle =
     mode === "category"
       ? settingsCategories.find((category) => category.segment === activeCategory)?.label ?? "設定"
@@ -171,7 +173,7 @@ export function SettingsSidebar({ portfolioCode, portfolioKind }: SettingsSideba
               ) : null}
               <SettingsNavLinks
                 portfolioCode={portfolioCode}
-                portfolioKind={portfolioKind}
+                portfolioKind={resolvedKind}
                 pathname={pathname}
                 queryTab={queryTab}
                 mode={mode}
@@ -195,7 +197,7 @@ export function SettingsSidebar({ portfolioCode, portfolioKind }: SettingsSideba
         ) : null}
         <SettingsNavLinks
           portfolioCode={portfolioCode}
-          portfolioKind={portfolioKind}
+          portfolioKind={resolvedKind}
           pathname={pathname}
           queryTab={queryTab}
           mode={mode}

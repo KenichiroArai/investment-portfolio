@@ -54,6 +54,7 @@ import {
 import { WritableGuard } from "@/features/manage/WritableGuard";
 import { BackupPanel } from "@/features/backup/BackupPanel";
 import { PortfolioExtraDataTabContent } from "@/features/portfolios/PortfolioExtraDataTabContent";
+import { useResolvedPortfolioKind } from "@/hooks/use-resolved-portfolio-kind";
 import {
   createInstrument,
   deleteInstrument,
@@ -65,7 +66,6 @@ import {
   updateInstrument,
 } from "@/lib/api-client";
 import { formatYen } from "@/lib/format-yen";
-import { findPortfolioByCode } from "@/lib/portfolio-catalog";
 import {
   BASE_DATA_MANAGE_TABS,
   buildDataManageTabs,
@@ -86,7 +86,7 @@ export function DataManageView({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const portfolioKind = portfolioKindProp ?? findPortfolioByCode(portfolioCode)?.kind ?? "";
+  const portfolioKind = useResolvedPortfolioKind(portfolioCode, portfolioKindProp);
   const dataTabs = buildDataManageTabs(portfolioKind);
   const resolvedInitialTab = resolveDataManageTab(initialTab, portfolioKind);
   const activeTab = resolveDataManageTab(

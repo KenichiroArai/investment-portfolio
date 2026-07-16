@@ -1,6 +1,6 @@
 import { DataManageView } from "@/features/manage/DataManageView";
-import { findPortfolioByCode } from "@/lib/portfolio-catalog";
 import { resolvePortfolioCodeParam } from "@/lib/portfolio-path";
+import { resolvePortfolioKind } from "@/lib/resolve-portfolio-kind";
 
 type DataManagePageProps = {
   params: Promise<{ code: string }>;
@@ -8,7 +8,7 @@ type DataManagePageProps = {
 
 export default async function DataManagePage({ params }: DataManagePageProps) {
   const code = await resolvePortfolioCodeParam(params);
-  const portfolioKind = findPortfolioByCode(code)?.kind;
+  const portfolioKind = resolvePortfolioKind(code);
 
   let result = <DataManageView portfolioCode={code} portfolioKind={portfolioKind} />;
   return result;

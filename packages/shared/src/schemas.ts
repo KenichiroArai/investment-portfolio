@@ -5,6 +5,7 @@ import { findDuplicateInstrumentAccountPair } from "./snapshot-line-validation";
 const portfolioKindSchema = z.enum([
   "ideco",
   "monex",
+  "rakuten",
   "nisa",
   "taxable",
   "satellite",

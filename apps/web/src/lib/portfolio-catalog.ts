@@ -12,6 +12,12 @@ export const STATIC_PORTFOLIOS: PortfolioDto[] = [
     "code": "monex",
     "name": "マネックス証券",
     "kind": "monex"
+  },
+  {
+    "id": "f8754882-2d04-4422-ab44-e4c08d633ded",
+    "code": "rakuten",
+    "name": "楽天証券",
+    "kind": "rakuten"
   }
 ];
 

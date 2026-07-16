@@ -31,6 +31,13 @@ export const PORTFOLIO_KIND_EXTRA_DATA_TABS: Record<string, PortfolioKindExtraDa
       insertAfter: "holding",
     },
   ],
+  rakuten: [
+    {
+      id: "rakuten-bulk-import",
+      label: "楽天証券一括取り込み",
+      insertAfter: "holding",
+    },
+  ],
 };
 
 export function buildDataManageTabs(portfolioKind: string): DataManageTabItem[] {

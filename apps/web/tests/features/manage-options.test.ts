@@ -12,9 +12,10 @@ import { IDECO_PORTFOLIO_METRIC_CODES } from "@repo/shared";
 
 describe("portfolio-kind-options", () => {
   it("exports all portfolio kind options", () => {
-    expect(PORTFOLIO_KIND_OPTIONS).toHaveLength(5);
+    expect(PORTFOLIO_KIND_OPTIONS).toHaveLength(6);
     expect(getPortfolioKindLabel("ideco")).toBe("iDeCo");
     expect(getPortfolioKindLabel("monex")).toBe("マネックス証券");
+    expect(getPortfolioKindLabel("rakuten")).toBe("楽天証券");
     expect(getPortfolioKindLabel("nisa")).toBe("NISA");
     expect(getPortfolioKindLabel("taxable")).toBe("課税口座");
     expect(getPortfolioKindLabel("satellite")).toBe("サテライト");
