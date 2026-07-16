@@ -52,6 +52,31 @@
 | 簿価（株式: 平均取得×株数、投信: 平均取得×口数/10000） | `holding_lines.book_value_minor` |
 | 口座区分・単価・平均取得・損益 | `holding_line_metrics` |
 
+## 分析軸（分類体系）
+
+| scheme code | 軸名 | 用途 |
+| --- | --- | --- |
+| `rakuten_product_type` | 種別 | 貼り付けの「種別」（国内株式・投資信託など） |
+
+分類値（`classification_values.code`）:
+
+| code | name |
+| --- | --- |
+| `domestic_equity` | 国内株式 |
+| `mutual_fund` | 投資信託 |
+| `rakuten_money_fund` | 楽天・マネーファンド |
+| `foreign_mmf` | 外貨建MMF |
+| `domestic_bond` | 国内債券 |
+| `rakuten_wrap` | 楽ラップ |
+
+一時投入（既存銘柄へのタグ付け込み）:
+
+```powershell
+python dev/sql/rakuten/seed_product_type_classifications.py
+```
+
+冪等です。軸・分類値が既にあればスキップし、未タグの銘柄だけ追加します。
+
 ## データ投入
 
 1. ホームで口座を追加: code `rakuten` / kind「楽天証券」 / name「楽天証券」

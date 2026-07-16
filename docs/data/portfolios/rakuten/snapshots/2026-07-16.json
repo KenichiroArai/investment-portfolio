@@ -4,7 +4,12 @@
   "portfolioName": "楽天証券",
   "portfolioKind": "rakuten",
   "asOfDate": "2026-07-16",
-  "analysisSchemes": [],
+  "analysisSchemes": [
+    {
+      "schemeCode": "rakuten_product_type",
+      "schemeName": "種別"
+    }
+  ],
   "metrics": [],
   "lines": [
     {
@@ -50,7 +55,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "1dbf5a47-b6f4-42fe-88f3-3a052d6c8578",
@@ -95,7 +108,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "9765d8bb-e6e0-4c76-bb44-4b6d28fd9000",
@@ -140,7 +161,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "390bb53f-fe0f-4624-b66e-f84a955656fd",
@@ -185,7 +214,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "9747ae9e-b9a2-40fa-9333-cf2b31a39ff4",
@@ -230,7 +267,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "f6f9a691-0733-4e5a-830d-f180c5d3eb14",
@@ -275,7 +320,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "6f2a0081-716f-449e-9b73-4d36f341d99b",
@@ -320,7 +373,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "5dee779a-a2c9-42f1-afc4-212ffdc2a6e5",
@@ -365,7 +426,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "12a09a2a-8d6d-4de9-b480-da8bff946dcf",
@@ -410,7 +479,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "6d2cec52-eab5-47d4-b22a-caba4a922782",
@@ -455,7 +532,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "ff8b4a25-d977-4b50-9103-e49a40d3a86e",
@@ -500,7 +585,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "dcc0f462-ebc5-4e80-aec3-946bb3d52b15",
@@ -545,7 +638,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "mutual_fund",
+          "valueName": "投資信託",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "9af1eb31-5d85-4e1b-9dab-fb0350a2cb4a",
@@ -590,7 +691,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "mutual_fund",
+          "valueName": "投資信託",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "3ed3e52a-92b8-4fb5-9838-a6e74347f8d4",
@@ -635,7 +744,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "mutual_fund",
+          "valueName": "投資信託",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "3052df70-3ece-409a-9ca8-6b1fdca67da1",
@@ -680,7 +797,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "mutual_fund",
+          "valueName": "投資信託",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "8cab42e0-58d2-420b-b187-248cbc9ef21b",
@@ -725,7 +850,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "mutual_fund",
+          "valueName": "投資信託",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "b351ef00-c0ab-4d41-869b-bd4ce4fbabb9",
@@ -770,7 +903,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "mutual_fund",
+          "valueName": "投資信託",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "31daa2d4-8ee7-411d-9bb4-4867f1b6ddac",
@@ -815,7 +956,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "mutual_fund",
+          "valueName": "投資信託",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "defd5a2e-4dd3-4bdc-a57b-74e763d79a2a",
@@ -860,7 +1009,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "mutual_fund",
+          "valueName": "投資信託",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "49883ae1-e30c-4034-b9c1-0c3090f1d80a",
@@ -905,7 +1062,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_money_fund",
+          "valueName": "楽天・マネーファンド",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "90698abb-52d9-4aad-a3f2-3e5c4950647c",
@@ -950,7 +1115,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "foreign_mmf",
+          "valueName": "外貨建MMF",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "8b0790fa-453f-40ac-b12a-b4ce33641e36",
@@ -995,7 +1168,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "foreign_mmf",
+          "valueName": "外貨建MMF",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "29be348f-dbf4-4897-bc78-aa5cb143b73a",
@@ -1040,7 +1221,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "domestic_bond",
+          "valueName": "国内債券",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "9a9ae841-336f-43cc-92fb-90226529fc07",
@@ -1085,7 +1274,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "domestic_bond",
+          "valueName": "国内債券",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "41a35689-cbdb-4802-ab57-322ecc05faea",
@@ -1130,7 +1327,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "7def23bf-f643-4166-9c28-8fb143371c27",
@@ -1175,7 +1380,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "971bf099-ad30-4992-9219-58adac5c5236",
@@ -1220,7 +1433,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "48390cc4-813f-475d-9353-dc1dc7b37296",
@@ -1265,7 +1486,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "5f5e267b-b722-4bd7-9900-406cebc7a75a",
@@ -1310,7 +1539,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "8f772840-486f-41bb-a089-29fb14380a3a",
@@ -1355,7 +1592,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "379031c6-323c-4af0-8231-bb8ba34d4458",
@@ -1400,7 +1645,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "77c074c4-49c0-4736-9a80-51ac27c29a7f",
@@ -1445,7 +1698,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "a6dd9cef-3d77-4c43-8d0e-4467bb4bc8a0",
@@ -1490,7 +1751,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "67c05ca3-4450-49ab-aec9-4161c7f5ab15",
@@ -1535,7 +1804,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "cad62278-370f-45c6-87c1-f65e29da28aa",
@@ -1580,7 +1857,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "fd42a7bf-dc60-48ac-8165-b74eb3f2a4d9",
@@ -1625,7 +1910,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "4e713f1a-1838-4a86-9cbd-6b4671c074d8",
@@ -1670,7 +1963,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "2e1aaf14-9b56-465c-afe5-e232d09df5cf",
@@ -1715,7 +2016,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "31d931d9-6049-45b9-b015-cdf3a14aac3d",
@@ -1760,7 +2069,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "af4793bc-771e-406f-a552-9541415ce354",
@@ -1805,7 +2122,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "26d6fce4-8276-408c-a17c-4d2a30d05c11",
@@ -1850,7 +2175,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "72f67f7f-3f28-4937-a71d-f041990dd6ba",
@@ -1895,7 +2228,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "3f636c95-c42f-4220-9479-bf2953aa8dc0",
@@ -1940,7 +2281,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "5dcf033c-1e71-4019-9740-301d339f115c",
@@ -1985,7 +2334,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "58441ae5-eb2e-4042-9e6b-ec90bfef8789",
@@ -2030,7 +2387,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "b535a416-bb82-4eab-876f-d2ce59650a5f",
@@ -2075,7 +2440,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "1fabbd0b-9550-4db6-a0cb-2c17f88f9577",
@@ -2120,7 +2493,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        }
+      ]
     },
     {
       "id": "713a32dd-ad55-4bda-911f-eca5f217d899",
@@ -2165,7 +2546,15 @@
         }
       ],
       "instrumentAttributes": [],
-      "tags": []
+      "tags": [
+        {
+          "schemeCode": "rakuten_product_type",
+          "schemeName": "種別",
+          "valueCode": "rakuten_wrap",
+          "valueName": "楽ラップ",
+          "allocationWeight": null
+        }
+      ]
     }
   ]
 }

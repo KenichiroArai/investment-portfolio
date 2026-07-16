@@ -12,6 +12,44 @@
       "totalContributionsMinor": null,
       "gainRateOnContributions": null,
       "allocationsByScheme": {
+        "rakuten_product_type": [
+          {
+            "valueCode": "mutual_fund",
+            "valueName": "投資信託",
+            "marketValueMinor": 112563,
+            "ratio": 0.35662507841360563
+          },
+          {
+            "valueCode": "rakuten_money_fund",
+            "valueName": "楽天・マネーファンド",
+            "marketValueMinor": 100017,
+            "ratio": 0.31687650886786595
+          },
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 50772,
+            "ratio": 0.16085719535918183
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 40000,
+            "ratio": 0.1267290596070132
+          },
+          {
+            "valueCode": "rakuten_wrap",
+            "valueName": "楽ラップ",
+            "marketValueMinor": 10060,
+            "ratio": 0.031872358491163814
+          },
+          {
+            "valueCode": "foreign_mmf",
+            "valueName": "外貨建MMF",
+            "marketValueMinor": 2222,
+            "ratio": 0.007039799261169583
+          }
+        ],
         "__portfolio_instruments__": [
           {
             "valueCode": "96850e4b-6ffc-4403-b4d9-be81ab467ac9",
