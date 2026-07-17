@@ -721,6 +721,12 @@ export type RakutenPasteInstrumentRow = {
   accountId: string;
 };
 
+export type SbiWrapPasteInstrumentRow = {
+  id: string;
+  name: string;
+  accountId: string;
+};
+
 export async function listIdecoInstrumentsForPaste(db: AppDatabase) {
   let result: IdecoPasteInstrumentRow[] = [];
 
@@ -804,6 +810,32 @@ export async function listRakutenInstrumentsForPaste(db: AppDatabase) {
       id: row.id,
       name: row.name,
       ticker: tickerFromAttribute ?? tickerFromExternal,
+      accountId: row.accountId,
+    };
+    result.push(item);
+  }
+
+  return result;
+}
+
+export async function listSbiWrapInstrumentsForPaste(db: AppDatabase) {
+  let result: SbiWrapPasteInstrumentRow[] = [];
+
+  const portfolio = await findPortfolioByCode(db, "sbi-wrap");
+  if (!portfolio) {
+    return result;
+  }
+
+  const rows = await db
+    .select()
+    .from(instruments)
+    .where(eq(instruments.portfolioId, portfolio.id))
+    .orderBy(instruments.name);
+
+  for (const row of rows) {
+    let item: SbiWrapPasteInstrumentRow = {
+      id: row.id,
+      name: row.name,
       accountId: row.accountId,
     };
     result.push(item);

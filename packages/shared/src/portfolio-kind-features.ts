@@ -97,6 +97,19 @@ const KIND_FEATURES: Record<string, PortfolioKindFeatures> = {
     instrumentAttributes: [RAKUTEN_INSTRUMENT_ATTRIBUTE_CODES.ticker],
     portfolioMetrics: [],
   },
+  "sbi-wrap": {
+    showContributions: false,
+    showGainRateOnContributions: false,
+    holdingLineColumns: [
+      "instrumentName",
+      "accountType",
+      "quantity",
+      "marketValue",
+      "weight",
+    ],
+    instrumentAttributes: [],
+    portfolioMetrics: [],
+  },
 };
 
 const DEFAULT_FEATURES: PortfolioKindFeatures = {

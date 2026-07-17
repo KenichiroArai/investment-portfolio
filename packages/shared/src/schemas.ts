@@ -6,6 +6,7 @@ const portfolioKindSchema = z.enum([
   "ideco",
   "monex",
   "rakuten",
+  "sbi-wrap",
   "nisa",
   "taxable",
   "satellite",

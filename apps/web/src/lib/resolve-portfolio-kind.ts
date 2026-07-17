@@ -29,6 +29,11 @@ export function resolvePortfolioKind(
     return result;
   }
 
+  if (portfolioCode === "sbi-wrap") {
+    result = "sbi-wrap";
+    return result;
+  }
+
   if (portfolioCode === "ideco") {
     result = "ideco";
     return result;

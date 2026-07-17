@@ -1,0 +1,857 @@
+{
+  "id": "4fc032bb-3abf-4bc9-863b-37ddb9f96a2e",
+  "portfolioCode": "sbi-wrap",
+  "portfolioName": "SBIラップ",
+  "portfolioKind": "sbi-wrap",
+  "asOfDate": "2026-07-17",
+  "analysisSchemes": [
+    {
+      "schemeCode": "sbi_wrap_product",
+      "schemeName": "商品"
+    }
+  ],
+  "metrics": [],
+  "lines": [
+    {
+      "id": "df3db7c8-49ae-4ef5-9f74-c9cf8638c22d",
+      "instrumentId": "be130054-4a39-4f7d-a592-7caced43660e",
+      "instrumentName": "（ラップ専用）ＳＢＩ・米国株式",
+      "accountId": "sbi-wrap:AI投資",
+      "accountName": "AI投資",
+      "sortOrder": 1,
+      "quantity": 1,
+      "marketValueMinor": 1617,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "AI投資"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "ai_investment",
+          "valueName": "AI投資",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "98108931-7e56-4d91-b45b-6576a3a8275a",
+      "instrumentId": "1973a843-04e8-4e5a-b1cc-db53be314619",
+      "instrumentName": "（ラップ専用）ＳＢＩ・先進国株式",
+      "accountId": "sbi-wrap:AI投資",
+      "accountName": "AI投資",
+      "sortOrder": 2,
+      "quantity": 1,
+      "marketValueMinor": 2527,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "AI投資"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "ai_investment",
+          "valueName": "AI投資",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "3b61e6ad-25d6-45e2-aa91-0b08a3ea7db2",
+      "instrumentId": "c5e07a2d-bbdb-43f0-8902-d69d48ef5e79",
+      "instrumentName": "（ラップ専用）ＳＢＩ・新興国株式",
+      "accountId": "sbi-wrap:AI投資",
+      "accountName": "AI投資",
+      "sortOrder": 3,
+      "quantity": 1,
+      "marketValueMinor": 298,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "AI投資"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "ai_investment",
+          "valueName": "AI投資",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "89419087-6c5d-47f3-b2cc-cab14d11645e",
+      "instrumentId": "53b66a8c-98c9-4867-afe5-16ee4ec8af97",
+      "instrumentName": "（ラップ専用）ＳＢＩ・米国債券",
+      "accountId": "sbi-wrap:AI投資",
+      "accountName": "AI投資",
+      "sortOrder": 4,
+      "quantity": 1,
+      "marketValueMinor": 1416,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "AI投資"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "ai_investment",
+          "valueName": "AI投資",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "aa2827f9-1b5e-4b44-96f4-eb01c60d09e1",
+      "instrumentId": "6ba16261-ad73-44e9-9d9a-f98b599cd314",
+      "instrumentName": "（ラップ専用）ＳＢＩ・米国ハイイールド債券",
+      "accountId": "sbi-wrap:AI投資",
+      "accountName": "AI投資",
+      "sortOrder": 5,
+      "quantity": 1,
+      "marketValueMinor": 286,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "AI投資"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "ai_investment",
+          "valueName": "AI投資",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "ad1740e9-f014-429f-bb7f-e441068a9c59",
+      "instrumentId": "30404871-5f1a-4420-a3e5-08899b895c37",
+      "instrumentName": "（ラップ専用）ＳＢＩ・新興国債券",
+      "accountId": "sbi-wrap:AI投資",
+      "accountName": "AI投資",
+      "sortOrder": 6,
+      "quantity": 1,
+      "marketValueMinor": 679,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "AI投資"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "ai_investment",
+          "valueName": "AI投資",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "986c5bea-358c-43e2-8318-ceeabe2b2539",
+      "instrumentId": "4bf617e7-8528-428e-b354-b3dd7969d4ef",
+      "instrumentName": "（ラップ専用）ＳＢＩ・米国不動産",
+      "accountId": "sbi-wrap:AI投資",
+      "accountName": "AI投資",
+      "sortOrder": 7,
+      "quantity": 1,
+      "marketValueMinor": 1601,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "AI投資"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "ai_investment",
+          "valueName": "AI投資",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "68d0a975-a50b-465a-9d18-06325d8ee13f",
+      "instrumentId": "eec2ca58-abcd-438e-9ab8-d9e328093ace",
+      "instrumentName": "（ラップ専用）ＳＢＩ・ゴールド",
+      "accountId": "sbi-wrap:AI投資",
+      "accountName": "AI投資",
+      "sortOrder": 8,
+      "quantity": 1,
+      "marketValueMinor": 1468,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "AI投資"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "ai_investment",
+          "valueName": "AI投資",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "537cb043-88f6-4bb7-86ab-edc783d80565",
+      "instrumentId": "b8cae33b-1ee5-40ef-be9e-b6232829e0fa",
+      "instrumentName": "現金",
+      "accountId": "sbi-wrap:AI投資",
+      "accountName": "AI投資",
+      "sortOrder": 9,
+      "quantity": 1,
+      "marketValueMinor": 208,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "AI投資"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "ai_investment",
+          "valueName": "AI投資",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "75ef8e99-9a75-4d19-8596-a3a0417d04c3",
+      "instrumentId": "52ca9074-a9e1-479c-a193-fd63a43c3ee0",
+      "instrumentName": "ラップ専用・世界株式アクティブ（グローバル・マルチテーマ）",
+      "accountId": "sbi-wrap:匠の運用",
+      "accountName": "匠の運用",
+      "sortOrder": 10,
+      "quantity": 1,
+      "marketValueMinor": 2979,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "匠の運用"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "takumi",
+          "valueName": "匠の運用",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "466c917b-c0fa-4152-ba07-46f112b088f6",
+      "instrumentId": "a140700b-49db-4c7f-a31f-f5be82af58f9",
+      "instrumentName": "ラップ専用・世界株式アクティブ（グローバル・バリュー）",
+      "accountId": "sbi-wrap:匠の運用",
+      "accountName": "匠の運用",
+      "sortOrder": 11,
+      "quantity": 1,
+      "marketValueMinor": 2768,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "匠の運用"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "takumi",
+          "valueName": "匠の運用",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "bbd9085e-a83c-4a3b-8ee0-e406497da28c",
+      "instrumentId": "d12440f6-c903-49ce-8e81-27e0e286ecd8",
+      "instrumentName": "ラップ専用・日本株式アクティブ（セレクト・オポチュニティ）",
+      "accountId": "sbi-wrap:匠の運用",
+      "accountName": "匠の運用",
+      "sortOrder": 12,
+      "quantity": 1,
+      "marketValueMinor": 783,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "匠の運用"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "takumi",
+          "valueName": "匠の運用",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "12aaec20-8384-4c2f-9587-5296f7d605b9",
+      "instrumentId": "00e9627e-bc24-4ecf-a462-95ea62f5eeb4",
+      "instrumentName": "ラップ専用・外国債券アクティブ",
+      "accountId": "sbi-wrap:匠の運用",
+      "accountName": "匠の運用",
+      "sortOrder": 13,
+      "quantity": 1,
+      "marketValueMinor": 501,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "匠の運用"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "takumi",
+          "valueName": "匠の運用",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "3272f808-af47-4bcb-90d8-12868b90388d",
+      "instrumentId": "298cc58f-dc4a-43dc-82d8-94cc92da5ca5",
+      "instrumentName": "ラップ専用・外国国債アクティブ（為替ヘッジあり）",
+      "accountId": "sbi-wrap:匠の運用",
+      "accountName": "匠の運用",
+      "sortOrder": 14,
+      "quantity": 1,
+      "marketValueMinor": 798,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "匠の運用"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "takumi",
+          "valueName": "匠の運用",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "1c9c9e4f-582c-47e9-9340-d0000086ebe5",
+      "instrumentId": "4f9a5ae4-27cc-4d1e-9703-6efad2ed747c",
+      "instrumentName": "ラップ専用・米国ハイ・イールド債券アクティブ",
+      "accountId": "sbi-wrap:匠の運用",
+      "accountName": "匠の運用",
+      "sortOrder": 15,
+      "quantity": 1,
+      "marketValueMinor": 501,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "匠の運用"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "takumi",
+          "valueName": "匠の運用",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "176fed72-1ceb-4d8e-9d24-1173522a2481",
+      "instrumentId": "69f53616-5ebe-4e40-94d9-2aa5488404bf",
+      "instrumentName": "ラップ専用・日本債券アクティブ（クレジット戦略型）",
+      "accountId": "sbi-wrap:匠の運用",
+      "accountName": "匠の運用",
+      "sortOrder": 16,
+      "quantity": 1,
+      "marketValueMinor": 501,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "匠の運用"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "takumi",
+          "valueName": "匠の運用",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "eff58e13-1a2d-4db5-aa11-bbbdf72ef9f5",
+      "instrumentId": "bada9d28-5773-4cff-9b5b-72216bfba22e",
+      "instrumentName": "ラップ専用・グローバルＲＥＩＴアクティブ",
+      "accountId": "sbi-wrap:匠の運用",
+      "accountName": "匠の運用",
+      "sortOrder": 17,
+      "quantity": 1,
+      "marketValueMinor": 655,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "匠の運用"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "takumi",
+          "valueName": "匠の運用",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "574764ba-8da4-4725-8fef-c9951e1ca022",
+      "instrumentId": "5a433ccb-6e44-4a9d-bf09-cd2f60c20173",
+      "instrumentName": "ラップ専用・Ｊ−ＲＥＩＴアクティブ",
+      "accountId": "sbi-wrap:匠の運用",
+      "accountName": "匠の運用",
+      "sortOrder": 18,
+      "quantity": 1,
+      "marketValueMinor": 502,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "匠の運用"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "takumi",
+          "valueName": "匠の運用",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "491dc8d5-6172-4340-8ef4-b435b64cbbb0",
+      "instrumentId": "314d78fe-b09c-462b-8b2a-33c6ac5b3ed5",
+      "instrumentName": "現金",
+      "accountId": "sbi-wrap:匠の運用",
+      "accountName": "匠の運用",
+      "sortOrder": 19,
+      "quantity": 1,
+      "marketValueMinor": 107,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "匠の運用"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "takumi",
+          "valueName": "匠の運用",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "3b96f371-c5d1-411c-8a64-91f944a1a8dd",
+      "instrumentId": "50602be0-20aa-4d9a-91b7-7240a6ceccb3",
+      "instrumentName": "マルチアセット戦略ファンド・トリプル（ラップ専用）",
+      "accountId": "sbi-wrap:レバナビ",
+      "accountName": "レバナビ",
+      "sortOrder": 20,
+      "quantity": 1,
+      "marketValueMinor": 1914,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "レバナビ"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "rebanavi",
+          "valueName": "レバナビ",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "d1ed6c2a-b15d-4737-8657-b91e45f1766d",
+      "instrumentId": "5ccedcdf-2879-4898-97cf-c9c77ef840e9",
+      "instrumentName": "マルチアセット戦略ファンド・シングル（ラップ専用）",
+      "accountId": "sbi-wrap:レバナビ",
+      "accountName": "レバナビ",
+      "sortOrder": 21,
+      "quantity": 1,
+      "marketValueMinor": 8171,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "レバナビ"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "rebanavi",
+          "valueName": "レバナビ",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "817414bf-f631-4fa4-a514-9784525920f8",
+      "instrumentId": "9d7796fc-d9b0-4e67-95fc-4e7deccf2123",
+      "instrumentName": "現金",
+      "accountId": "sbi-wrap:レバナビ",
+      "accountName": "レバナビ",
+      "sortOrder": 22,
+      "quantity": 1,
+      "marketValueMinor": 103,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "レバナビ"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "rebanavi",
+          "valueName": "レバナビ",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "19847603-f17c-41cf-bb89-bbc194727c2a",
+      "instrumentId": "b9ccb308-8676-4e6f-a41c-6d26b0513a8b",
+      "instrumentName": "マルチアセット戦略ファンド・トリプル（ラップ専用）",
+      "accountId": "sbi-wrap:レバチョイス",
+      "accountName": "レバチョイス",
+      "sortOrder": 23,
+      "quantity": 1,
+      "marketValueMinor": 9440,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "レバチョイス"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "reba_choice",
+          "valueName": "レバチョイス",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "f2dfe02a-7e81-4fac-ae16-f06f42b2df1c",
+      "instrumentId": "c586196d-6679-40a2-9636-1ef710ce6815",
+      "instrumentName": "マルチアセット戦略ファンド・シングル（ラップ専用）",
+      "accountId": "sbi-wrap:レバチョイス",
+      "accountName": "レバチョイス",
+      "sortOrder": 24,
+      "quantity": 1,
+      "marketValueMinor": 869,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "レバチョイス"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "reba_choice",
+          "valueName": "レバチョイス",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "d70abdb1-dc9b-47de-9b24-a2dbad903ef9",
+      "instrumentId": "96e1cc99-ae4a-4a97-91d4-f31648c675ee",
+      "instrumentName": "現金",
+      "accountId": "sbi-wrap:レバチョイス",
+      "accountName": "レバチョイス",
+      "sortOrder": 25,
+      "quantity": 1,
+      "marketValueMinor": 106,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "レバチョイス"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "reba_choice",
+          "valueName": "レバチョイス",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "d15c7fca-14ac-4a28-bb0c-abe61fce4a5c",
+      "instrumentId": "d77cad81-0b4d-40dc-bc7c-4c145dcd865d",
+      "instrumentName": "ラップ専用・三井住友ＤＳ・米国株式セクター戦略ファンド",
+      "accountId": "sbi-wrap:ALL株式",
+      "accountName": "ALL株式",
+      "sortOrder": 26,
+      "quantity": 1,
+      "marketValueMinor": 2806,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ALL株式"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "all_equity",
+          "valueName": "ALL株式",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "a3ced5de-8914-40c3-a809-d9bdf45e2dff",
+      "instrumentId": "3715f0c2-3fa7-4dbe-9cc4-f626d698b512",
+      "instrumentName": "ラップ専用・三井住友ＤＳ・米国株式ファクター戦略ファンド",
+      "accountId": "sbi-wrap:ALL株式",
+      "accountName": "ALL株式",
+      "sortOrder": 27,
+      "quantity": 1,
+      "marketValueMinor": 4160,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ALL株式"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "all_equity",
+          "valueName": "ALL株式",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "69716fbe-9dbf-4bb7-8ece-3afd502b468e",
+      "instrumentId": "9701c1b8-29b3-4f5e-99b4-b7eb05f6e23a",
+      "instrumentName": "ラップ専用・三井住友ＤＳ・グローバル株式（除く米国）戦略ファンド",
+      "accountId": "sbi-wrap:ALL株式",
+      "accountName": "ALL株式",
+      "sortOrder": 28,
+      "quantity": 1,
+      "marketValueMinor": 2988,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ALL株式"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "all_equity",
+          "valueName": "ALL株式",
+          "allocationWeight": 1
+        }
+      ]
+    },
+    {
+      "id": "f2bfba6e-9702-4b6e-88cf-a748178987a9",
+      "instrumentId": "0c02eed3-d4cb-4f1e-96b9-4e08313e7c3b",
+      "instrumentName": "現金",
+      "accountId": "sbi-wrap:ALL株式",
+      "accountName": "ALL株式",
+      "sortOrder": 29,
+      "quantity": 1,
+      "marketValueMinor": 105,
+      "bookValueMinor": null,
+      "metrics": [
+        {
+          "code": "account_type",
+          "integerValue": null,
+          "realValue": null,
+          "textValue": "ALL株式"
+        }
+      ],
+      "instrumentAttributes": [],
+      "tags": [
+        {
+          "schemeCode": "sbi_wrap_product",
+          "schemeName": "商品",
+          "valueCode": "all_equity",
+          "valueName": "ALL株式",
+          "allocationWeight": 1
+        }
+      ]
+    }
+  ]
+}

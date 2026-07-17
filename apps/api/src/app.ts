@@ -23,6 +23,7 @@ import {
   listIdecoInstrumentsForPaste,
   listMonexInstrumentsForPaste,
   listRakutenInstrumentsForPaste,
+  listSbiWrapInstrumentsForPaste,
   listPortfolios,
   listSchemesWithValuesForPortfolio,
   listSnapshotDates,
@@ -707,6 +708,12 @@ export function createApp(options?: CreateAppOptions) {
 
     if (portfolio.kind === "rakuten") {
       const rows = await listRakutenInstrumentsForPaste(db);
+      result = c.json(rows);
+      return result;
+    }
+
+    if (portfolio.kind === "sbi-wrap") {
+      const rows = await listSbiWrapInstrumentsForPaste(db);
       result = c.json(rows);
       return result;
     }

@@ -16,5 +16,11 @@
     "code": "rakuten",
     "name": "楽天証券",
     "kind": "rakuten"
+  },
+  {
+    "id": "72eae394-3323-4164-aca4-d7449d346f92",
+    "code": "sbi-wrap",
+    "name": "SBIラップ",
+    "kind": "sbi-wrap"
   }
 ]

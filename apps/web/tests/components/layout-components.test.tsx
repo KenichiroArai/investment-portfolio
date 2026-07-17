@@ -195,5 +195,15 @@ describe("layout components", () => {
         "/portfolios/monex/settings/data?tab=monex-bulk-import",
       );
     });
+
+    it("renders sbi-wrap data settings children including bulk import", () => {
+      usePathname.mockReturnValue("/portfolios/sbi-wrap/settings/data/");
+      render(<SettingsSidebar portfolioCode="sbi-wrap" portfolioKind="sbi-wrap" />);
+
+      expect(screen.getByRole("link", { name: "SBIラップ一括取り込み" })).toHaveAttribute(
+        "href",
+        "/portfolios/sbi-wrap/settings/data?tab=sbi-wrap-bulk-import",
+      );
+    });
   });
 });

@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { IdecoBulkImportTab } from "@/features/ideco/bulk-import/IdecoBulkImportTab";
 import { MonexBulkImportTab } from "@/features/monex/bulk-import/MonexBulkImportTab";
 import { RakutenBulkImportTab } from "@/features/rakuten/bulk-import/RakutenBulkImportTab";
+import { SbiWrapBulkImportTab } from "@/features/sbi-wrap/bulk-import/SbiWrapBulkImportTab";
 
 type PortfolioExtraDataTabContentProps = {
   tabId: string;
@@ -48,6 +49,17 @@ export function PortfolioExtraDataTabContent({
   if (tabId === "rakuten-bulk-import") {
     result = (
       <RakutenBulkImportTab
+        portfolioCode={portfolioCode}
+        asOfDate={asOfDate}
+        disabled={disabled}
+        onReload={onReload}
+      />
+    );
+  }
+
+  if (tabId === "sbi-wrap-bulk-import") {
+    result = (
+      <SbiWrapBulkImportTab
         portfolioCode={portfolioCode}
         asOfDate={asOfDate}
         disabled={disabled}

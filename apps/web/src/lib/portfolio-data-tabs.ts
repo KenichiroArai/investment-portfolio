@@ -38,6 +38,13 @@ export const PORTFOLIO_KIND_EXTRA_DATA_TABS: Record<string, PortfolioKindExtraDa
       insertAfter: "holding",
     },
   ],
+  "sbi-wrap": [
+    {
+      id: "sbi-wrap-bulk-import",
+      label: "SBIラップ一括取り込み",
+      insertAfter: "holding",
+    },
+  ],
 };
 
 export function buildDataManageTabs(portfolioKind: string): DataManageTabItem[] {

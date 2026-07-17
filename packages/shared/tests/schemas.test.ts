@@ -19,6 +19,13 @@ describe("shared schemas", () => {
     });
     expect(valid.success).toBe(true);
 
+    const sbiWrap = createPortfolioSchema.safeParse({
+      code: "sbi-wrap",
+      name: "SBIラップ",
+      kind: "sbi-wrap",
+    });
+    expect(sbiWrap.success).toBe(true);
+
     const invalid = createPortfolioSchema.safeParse({ code: "", name: "x", kind: "x" });
     expect(invalid.success).toBe(false);
   });
