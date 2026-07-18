@@ -6,9 +6,9 @@
     {
       "asOfDate": "2026-07-17",
       "totalMarketValueMinor": 50857,
-      "totalBookValueMinor": 0,
-      "unrealizedGainMinor": 50857,
-      "gainRateOnBook": null,
+      "totalBookValueMinor": 50000,
+      "unrealizedGainMinor": 857,
+      "gainRateOnBook": 0.01714,
       "totalContributionsMinor": null,
       "gainRateOnContributions": null,
       "allocationsByScheme": {

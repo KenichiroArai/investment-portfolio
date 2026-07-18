@@ -44,6 +44,8 @@ python dev/sql/sbi-wrap/seed_portfolio.py
 | metric code | 説明 | 値の例 |
 | --- | --- | --- |
 | `account_type` | 商品名 | `AI投資` / `レバナビ` |
+| `unrealized_gain_minor` | 評価損益（円） | `market − book` |
+| `unrealized_gain_rate` | 評価損益率 | `gain / book` |
 
 ## 保有明細の列対応
 
@@ -55,7 +57,17 @@ python dev/sql/sbi-wrap/seed_portfolio.py
 | 現金 | 銘柄「現金」、`instrument_type=cash` |
 | マネーファンド（評価額 0） | 取り込み対象外 |
 
-数量・単価が貼り付けに無いため、`quantity = 1`、`book_value_minor` は未設定です。
+数量・単価が貼り付けに無いため、`quantity = 1`。貼り付け内訳に銘柄別の購入金額・損益は無い。
+
+## 購入金額・損益（商品ごと按分）
+
+資産残高貼り付けの商品ブロック先頭の通算損益から、各商品の購入金額は **10,000円**（残高 − 通算損益）とみなせる。銘柄別の損益は貼り付けに無いため、商品ごと 10,000円を同一 `account_id` 内の評価額比率で按分して `book_value_minor` と損益メトリクスを入れる。
+
+```powershell
+python dev/sql/sbi-wrap/seed_book_values_from_product_cost.py
+```
+
+按分後は `npm run pages:export` で静的 JSON を更新する。
 
 ## 貼り付け取込
 
