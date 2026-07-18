@@ -76,6 +76,11 @@ python dev/sql/sbi-wrap/seed_portfolio.py
 | scheme code | 軸名 | 用途 |
 | --- | --- | --- |
 | `sbi_wrap_product` | 商品 | ラップ商品（AI投資など） |
+| `sbi_wrap_ai_investment` | AI投資 | AI投資内の銘柄構成 |
+| `sbi_wrap_takumi` | 匠の運用 | 匠の運用内の銘柄構成 |
+| `sbi_wrap_rebanavi` | レバナビ | レバナビ内の銘柄構成 |
+| `sbi_wrap_reba_choice` | レバチョイス | レバチョイス内の銘柄構成 |
+| `sbi_wrap_all_equity` | ALL株式 | ALL株式内の銘柄構成 |
 
 ### 商品（`sbi_wrap_product`）
 
@@ -91,4 +96,12 @@ python dev/sql/sbi-wrap/seed_portfolio.py
 
 ```powershell
 python dev/sql/sbi-wrap/seed_product_classifications.py
+```
+
+### 商品別銘柄軸（`sbi_wrap_ai_investment` など）
+
+「商品」の各分類を独立した分析軸にし、該当 `account_id` の銘柄だけを銘柄名の分類値としてタグ付けします（分類値の `code` は `instruments.id`）。
+
+```powershell
+python dev/sql/sbi-wrap/seed_product_instrument_axes.py
 ```

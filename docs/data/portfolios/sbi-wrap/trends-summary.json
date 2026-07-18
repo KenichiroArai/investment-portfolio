@@ -44,6 +44,190 @@
             "ratio": 0.1977898814322512
           }
         ],
+        "sbi_wrap_ai_investment": [
+          {
+            "valueCode": "1973a843-04e8-4e5a-b1cc-db53be314619",
+            "valueName": "（ラップ専用）ＳＢＩ・先進国株式",
+            "marketValueMinor": 2527,
+            "ratio": 0.2501980198019802
+          },
+          {
+            "valueCode": "be130054-4a39-4f7d-a592-7caced43660e",
+            "valueName": "（ラップ専用）ＳＢＩ・米国株式",
+            "marketValueMinor": 1617,
+            "ratio": 0.1600990099009901
+          },
+          {
+            "valueCode": "4bf617e7-8528-428e-b354-b3dd7969d4ef",
+            "valueName": "（ラップ専用）ＳＢＩ・米国不動産",
+            "marketValueMinor": 1601,
+            "ratio": 0.15851485148514852
+          },
+          {
+            "valueCode": "eec2ca58-abcd-438e-9ab8-d9e328093ace",
+            "valueName": "（ラップ専用）ＳＢＩ・ゴールド",
+            "marketValueMinor": 1468,
+            "ratio": 0.14534653465346534
+          },
+          {
+            "valueCode": "53b66a8c-98c9-4867-afe5-16ee4ec8af97",
+            "valueName": "（ラップ専用）ＳＢＩ・米国債券",
+            "marketValueMinor": 1416,
+            "ratio": 0.1401980198019802
+          },
+          {
+            "valueCode": "30404871-5f1a-4420-a3e5-08899b895c37",
+            "valueName": "（ラップ専用）ＳＢＩ・新興国債券",
+            "marketValueMinor": 679,
+            "ratio": 0.06722772277227723
+          },
+          {
+            "valueCode": "c5e07a2d-bbdb-43f0-8902-d69d48ef5e79",
+            "valueName": "（ラップ専用）ＳＢＩ・新興国株式",
+            "marketValueMinor": 298,
+            "ratio": 0.029504950495049503
+          },
+          {
+            "valueCode": "6ba16261-ad73-44e9-9d9a-f98b599cd314",
+            "valueName": "（ラップ専用）ＳＢＩ・米国ハイイールド債券",
+            "marketValueMinor": 286,
+            "ratio": 0.028316831683168318
+          },
+          {
+            "valueCode": "b8cae33b-1ee5-40ef-be9e-b6232829e0fa",
+            "valueName": "現金",
+            "marketValueMinor": 208,
+            "ratio": 0.020594059405940595
+          }
+        ],
+        "sbi_wrap_all_equity": [
+          {
+            "valueCode": "3715f0c2-3fa7-4dbe-9cc4-f626d698b512",
+            "valueName": "ラップ専用・三井住友ＤＳ・米国株式ファクター戦略ファンド",
+            "marketValueMinor": 4160,
+            "ratio": 0.41355999602346155
+          },
+          {
+            "valueCode": "9701c1b8-29b3-4f5e-99b4-b7eb05f6e23a",
+            "valueName": "ラップ専用・三井住友ＤＳ・グローバル株式（除く米国）戦略ファンド",
+            "marketValueMinor": 2988,
+            "ratio": 0.29704742022069786
+          },
+          {
+            "valueCode": "d77cad81-0b4d-40dc-bc7c-4c145dcd865d",
+            "valueName": "ラップ専用・三井住友ＤＳ・米国株式セクター戦略ファンド",
+            "marketValueMinor": 2806,
+            "ratio": 0.27895417039467146
+          },
+          {
+            "valueCode": "0c02eed3-d4cb-4f1e-96b9-4e08313e7c3b",
+            "valueName": "現金",
+            "marketValueMinor": 105,
+            "ratio": 0.010438413361169102
+          }
+        ],
+        "sbi_wrap_reba_choice": [
+          {
+            "valueCode": "b9ccb308-8676-4e6f-a41c-6d26b0513a8b",
+            "valueName": "マルチアセット戦略ファンド・トリプル（ラップ専用）",
+            "marketValueMinor": 9440,
+            "ratio": 0.9063850216034566
+          },
+          {
+            "valueCode": "c586196d-6679-40a2-9636-1ef710ce6815",
+            "valueName": "マルチアセット戦略ファンド・シングル（ラップ専用）",
+            "marketValueMinor": 869,
+            "ratio": 0.08343734997599615
+          },
+          {
+            "valueCode": "96e1cc99-ae4a-4a97-91d4-f31648c675ee",
+            "valueName": "現金",
+            "marketValueMinor": 106,
+            "ratio": 0.010177628420547287
+          }
+        ],
+        "sbi_wrap_rebanavi": [
+          {
+            "valueCode": "5ccedcdf-2879-4898-97cf-c9c77ef840e9",
+            "valueName": "マルチアセット戦略ファンド・シングル（ラップ専用）",
+            "marketValueMinor": 8171,
+            "ratio": 0.8020219866509619
+          },
+          {
+            "valueCode": "50602be0-20aa-4d9a-91b7-7240a6ceccb3",
+            "valueName": "マルチアセット戦略ファンド・トリプル（ラップ専用）",
+            "marketValueMinor": 1914,
+            "ratio": 0.1878680800942285
+          },
+          {
+            "valueCode": "9d7796fc-d9b0-4e67-95fc-4e7deccf2123",
+            "valueName": "現金",
+            "marketValueMinor": 103,
+            "ratio": 0.01010993325480958
+          }
+        ],
+        "sbi_wrap_takumi": [
+          {
+            "valueCode": "52ca9074-a9e1-479c-a193-fd63a43c3ee0",
+            "valueName": "ラップ専用・世界株式アクティブ（グローバル・マルチテーマ）",
+            "marketValueMinor": 2979,
+            "ratio": 0.2950965824665676
+          },
+          {
+            "valueCode": "a140700b-49db-4c7f-a31f-f5be82af58f9",
+            "valueName": "ラップ専用・世界株式アクティブ（グローバル・バリュー）",
+            "marketValueMinor": 2768,
+            "ratio": 0.2741951461119366
+          },
+          {
+            "valueCode": "298cc58f-dc4a-43dc-82d8-94cc92da5ca5",
+            "valueName": "ラップ専用・外国国債アクティブ（為替ヘッジあり）",
+            "marketValueMinor": 798,
+            "ratio": 0.07904903417533432
+          },
+          {
+            "valueCode": "d12440f6-c903-49ce-8e81-27e0e286ecd8",
+            "valueName": "ラップ専用・日本株式アクティブ（セレクト・オポチュニティ）",
+            "marketValueMinor": 783,
+            "ratio": 0.07756315007429421
+          },
+          {
+            "valueCode": "bada9d28-5773-4cff-9b5b-72216bfba22e",
+            "valueName": "ラップ専用・グローバルＲＥＩＴアクティブ",
+            "marketValueMinor": 655,
+            "ratio": 0.06488360574541853
+          },
+          {
+            "valueCode": "5a433ccb-6e44-4a9d-bf09-cd2f60c20173",
+            "valueName": "ラップ専用・Ｊ−ＲＥＩＴアクティブ",
+            "marketValueMinor": 502,
+            "ratio": 0.04972758791480931
+          },
+          {
+            "valueCode": "00e9627e-bc24-4ecf-a462-95ea62f5eeb4",
+            "valueName": "ラップ専用・外国債券アクティブ",
+            "marketValueMinor": 501,
+            "ratio": 0.04962852897473997
+          },
+          {
+            "valueCode": "4f9a5ae4-27cc-4d1e-9703-6efad2ed747c",
+            "valueName": "ラップ専用・米国ハイ・イールド債券アクティブ",
+            "marketValueMinor": 501,
+            "ratio": 0.04962852897473997
+          },
+          {
+            "valueCode": "69f53616-5ebe-4e40-94d9-2aa5488404bf",
+            "valueName": "ラップ専用・日本債券アクティブ（クレジット戦略型）",
+            "marketValueMinor": 501,
+            "ratio": 0.04962852897473997
+          },
+          {
+            "valueCode": "314d78fe-b09c-462b-8b2a-33c6ac5b3ed5",
+            "valueName": "現金",
+            "marketValueMinor": 107,
+            "ratio": 0.010599306587419515
+          }
+        ],
         "__portfolio_instruments__": [
           {
             "valueCode": "be130054-4a39-4f7d-a592-7caced43660e",
