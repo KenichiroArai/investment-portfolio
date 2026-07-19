@@ -167,48 +167,9 @@ export function findLargestAllocationShareChange(
 }
 
 export function resolveDefaultTrendDisplayUnit(
-  preset: SnapshotPeriodPreset | null,
-  rangeDayCount?: number | null,
+  _preset: SnapshotPeriodPreset | null,
+  _rangeDayCount?: number | null,
 ): TrendDisplayUnit {
   let result: TrendDisplayUnit = "day";
-
-  if (preset === "1w" || preset === "1m") {
-    result = "day";
-    return result;
-  }
-
-  if (preset === "3m" || preset === "6m") {
-    result = "week";
-    return result;
-  }
-
-  if (preset === "12m" || preset === "all") {
-    if (rangeDayCount !== null && rangeDayCount !== undefined) {
-      if (rangeDayCount <= 31) {
-        result = "day";
-        return result;
-      }
-      if (rangeDayCount <= 186) {
-        result = "week";
-        return result;
-      }
-    }
-    result = "1m";
-    return result;
-  }
-
-  if (rangeDayCount !== null && rangeDayCount !== undefined) {
-    if (rangeDayCount <= 31) {
-      result = "day";
-      return result;
-    }
-    if (rangeDayCount <= 186) {
-      result = "week";
-      return result;
-    }
-    result = "1m";
-    return result;
-  }
-
   return result;
 }

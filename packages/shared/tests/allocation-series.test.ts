@@ -95,24 +95,24 @@ describe("allocation-series", () => {
     expect(largest?.key).toBe("b");
   });
 
-  it("resolves default display unit from period preset", () => {
+  it("resolves default display unit as day regardless of period preset", () => {
     expect(resolveDefaultTrendDisplayUnit("1w")).toBe("day");
     expect(resolveDefaultTrendDisplayUnit("1m")).toBe("day");
-    expect(resolveDefaultTrendDisplayUnit("3m")).toBe("week");
-    expect(resolveDefaultTrendDisplayUnit("6m")).toBe("week");
-    expect(resolveDefaultTrendDisplayUnit("12m")).toBe("1m");
-    expect(resolveDefaultTrendDisplayUnit("all")).toBe("1m");
+    expect(resolveDefaultTrendDisplayUnit("3m")).toBe("day");
+    expect(resolveDefaultTrendDisplayUnit("6m")).toBe("day");
+    expect(resolveDefaultTrendDisplayUnit("12m")).toBe("day");
+    expect(resolveDefaultTrendDisplayUnit("all")).toBe("day");
     expect(resolveDefaultTrendDisplayUnit("all", 11)).toBe("day");
-    expect(resolveDefaultTrendDisplayUnit("all", 60)).toBe("week");
+    expect(resolveDefaultTrendDisplayUnit("all", 60)).toBe("day");
     expect(resolveDefaultTrendDisplayUnit("12m", 20)).toBe("day");
-    expect(resolveDefaultTrendDisplayUnit("12m", 60)).toBe("week");
-    expect(resolveDefaultTrendDisplayUnit("12m", 400)).toBe("1m");
+    expect(resolveDefaultTrendDisplayUnit("12m", 60)).toBe("day");
+    expect(resolveDefaultTrendDisplayUnit("12m", 400)).toBe("day");
   });
 
-  it("resolves default display unit from range day count when preset is null", () => {
+  it("resolves default display unit as day when preset is null", () => {
     expect(resolveDefaultTrendDisplayUnit(null, 14)).toBe("day");
-    expect(resolveDefaultTrendDisplayUnit(null, 90)).toBe("week");
-    expect(resolveDefaultTrendDisplayUnit(null, 400)).toBe("1m");
+    expect(resolveDefaultTrendDisplayUnit(null, 90)).toBe("day");
+    expect(resolveDefaultTrendDisplayUnit(null, 400)).toBe("day");
     expect(resolveDefaultTrendDisplayUnit(null)).toBe("day");
   });
 

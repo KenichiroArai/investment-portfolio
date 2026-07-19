@@ -212,7 +212,7 @@ describe("PortfolioTimeContext", () => {
     });
   });
 
-  it("writes unit=day when day display unit is selected after all preset", async () => {
+  it("writes unit=day when all preset is selected", async () => {
     const user = userEvent.setup();
     usePathname.mockReturnValue("/portfolios/ideco/trends/");
     stubPortfolioFetch({
@@ -238,19 +238,14 @@ describe("PortfolioTimeContext", () => {
 
     await user.click(screen.getByRole("button", { name: "すべて" }));
     await waitFor(() => {
-      expect(replace).toHaveBeenCalledWith(expect.stringContaining("unit=1m"));
-    });
-
-    await user.click(screen.getByRole("button", { name: "1日単位" }));
-    await waitFor(() => {
       expect(replace).toHaveBeenCalledWith(expect.stringContaining("unit=day"));
     });
   });
 
-  it("honors explicit unit=day even when the range would default to 1m", async () => {
+  it("defaults to day display unit for long ranges without explicit unit", async () => {
     usePathname.mockReturnValue("/portfolios/ideco/trends/");
     searchParamsRef.current = new URLSearchParams(
-      "from=2026-01-01&to=2026-06-07&unit=day",
+      "from=2026-01-01&to=2026-06-07",
     );
     stubPortfolioFetch({
       dates: [
