@@ -162,11 +162,11 @@ export function PortfolioAllocationView({
   );
 
   const compositionTabContent = (
-    <Card>
+    <Card className="min-w-0 max-w-full overflow-hidden">
       <CardHeader>
         <CardTitle className="text-base">銘柄別構成比</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="min-w-0">
         <PortfolioAllocationPanel rows={allocationRows} />
       </CardContent>
     </Card>
@@ -215,13 +215,14 @@ export function PortfolioAllocationView({
     <PageContainer>
       <Tabs
         value={mainView}
+        className="min-w-0 w-full"
         onValueChange={(value) => {
           setMainView(value as PortfolioAllocationMainView);
         }}
       >
         <PortfolioAllocationViewControls />
-        <TabsContent value="holdings" className="mt-4">
-          <div className="space-y-4">
+        <TabsContent value="holdings" className="mt-4 min-w-0 max-w-full">
+          <div className="min-w-0 space-y-4">
             <TabSummaryBar segments={holdingsSummarySegments} note={deltaHint} />
             <HoldingsDetailPanel
               portfolioCode={portfolioCode}
@@ -231,14 +232,14 @@ export function PortfolioAllocationView({
             />
           </div>
         </TabsContent>
-        <TabsContent value="composition" className="mt-4">
-          <div className="space-y-4">
+        <TabsContent value="composition" className="mt-4 min-w-0 max-w-full">
+          <div className="min-w-0 space-y-4">
             {renderAllocationOverview()}
             {compositionTabContent}
           </div>
         </TabsContent>
-        <TabsContent value="trends" className="mt-4">
-          <div className="space-y-4">
+        <TabsContent value="trends" className="mt-4 min-w-0 max-w-full">
+          <div className="min-w-0 space-y-4">
             {renderTrendsOverview()}
             <TrendsDetailPanel
               portfolioCode={portfolioCode}
@@ -247,8 +248,8 @@ export function PortfolioAllocationView({
             />
           </div>
         </TabsContent>
-        <TabsContent value="rebalance" className="mt-4">
-          <div className="space-y-4">
+        <TabsContent value="rebalance" className="mt-4 min-w-0 max-w-full">
+          <div className="min-w-0 space-y-4">
             <TabSummaryBar segments={rebalanceSummarySegments} />
             {rebalanceTabContent}
           </div>

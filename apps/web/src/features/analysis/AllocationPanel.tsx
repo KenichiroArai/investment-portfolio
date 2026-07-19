@@ -145,20 +145,22 @@ export function AllocationPanel({
           </div>
         ) : null}
       </div>
-      <AllocationTable
-        slices={slices}
-        highlightedValueCode={highlightedValueCode}
-        expandedValueCodes={expandedValueCodes}
-        showPortfolioColumn={showPortfolioColumn}
-        portfolioCode={portfolioCode}
-        schemeCode={schemeCode}
-        asOfDate={asOfDate}
-        onSliceHover={(valueCode) => {
-          handleHighlight(valueCode);
-        }}
-        onSliceLeave={handleSliceLeave}
-        onToggleExpand={handleToggleExpand}
-      />
+      <div className="allocation-panel__table-scroll">
+        <AllocationTable
+          slices={slices}
+          highlightedValueCode={highlightedValueCode}
+          expandedValueCodes={expandedValueCodes}
+          showPortfolioColumn={showPortfolioColumn}
+          portfolioCode={portfolioCode}
+          schemeCode={schemeCode}
+          asOfDate={asOfDate}
+          onSliceHover={(valueCode) => {
+            handleHighlight(valueCode);
+          }}
+          onSliceLeave={handleSliceLeave}
+          onToggleExpand={handleToggleExpand}
+        />
+      </div>
     </div>
   );
   return result;

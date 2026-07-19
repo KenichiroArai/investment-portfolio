@@ -9,9 +9,17 @@ import {
 import { useMemo, useState, type ReactNode } from "react";
 
 import { TrendChartHeader } from "@/features/trends/TrendChartHeader";
+import {
+  TrendChartExpandButton,
+  TrendChartExpandDialog,
+} from "@/features/trends/TrendChartExpandShell";
 import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
 import {
-  resolveTrendChartSlotWidth,
+  EXPANDED_TREND_CHART_HEIGHT,
+  resolveTrendChartPlotLayout,
+  type TrendChartLayoutMode,
+} from "@/features/trends/trend-chart-layout";
+import {
   resolveXLabelAnchor,
   truncateTrendChartLabel,
 } from "@/features/trends/resolve-trend-chart-slot-width";
@@ -52,6 +60,7 @@ type TrendBarChartProps = {
   title?: string;
   titleLevel?: "h2" | "h3";
   caption?: string;
+  layoutMode?: TrendChartLayoutMode;
 };
 
 const CHART_HEIGHT = 220;
@@ -74,18 +83,29 @@ export function TrendBarChart({
   title,
   titleLevel = "h2",
   caption,
+  layoutMode = "inline",
 }: TrendBarChartProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [expanded, setExpanded] = useState(false);
 
   const plotHeight = height - PADDING.top - PADDING.bottom;
   const displayLabels = labels.map((label) => truncateTrendChartLabel(label));
-  const barSlotWidth = resolveTrendChartSlotWidth(
-    displayLabels,
+  const plotLayout = resolveTrendChartPlotLayout({
+    labels: displayLabels,
+    layoutMode,
     targetPlotWidth,
-  );
-  const minPlotWidth = targetPlotWidth ?? DEFAULT_MIN_PLOT_WIDTH;
-  const plotWidth = Math.max(minPlotWidth, barSlotWidth * labels.length);
+    minPlotWidth: targetPlotWidth ?? DEFAULT_MIN_PLOT_WIDTH,
+    paddingLeft: PADDING.left,
+    paddingRight: PADDING.right,
+  });
+  const {
+    pointSlotWidth: barSlotWidth,
+    plotWidth,
+    visibleLabelIndexes,
+  } = plotLayout;
   const chartWidth = plotWidth + PADDING.left + PADDING.right;
+  const showExpand = layoutMode === "inline";
+  const expandTitle = title ?? "推移棒グラフ";
 
   const activeSeries = series.filter((item) =>
     item.values.some((value) => value !== null && Number.isFinite(value)),
@@ -164,18 +184,34 @@ export function TrendBarChart({
   const barBaselineValue = includesZero ? 0 : minValue;
 
   result = (
-    <div className={className ? `trend-bar-chart ${className}` : "trend-bar-chart"}>
-      {title ? (
-        <TrendChartHeader title={title} titleLevel={titleLevel} caption={caption} />
-      ) : null}
-      <div className="trend-bar-chart__scroll">
-        <svg
-          viewBox={`0 0 ${chartWidth} ${height}`}
-          className="trend-bar-chart__svg"
-          role="img"
-          aria-label="推移棒グラフ"
-          style={{ minWidth: `${chartWidth}px` }}
-        >
+    <>
+      <div className={className ? `trend-bar-chart ${className}` : "trend-bar-chart"}>
+        {title ? (
+          <TrendChartHeader
+            title={title}
+            titleLevel={titleLevel}
+            caption={caption}
+            actions={
+              showExpand ? (
+                <TrendChartExpandButton
+                  onClick={() => {
+                    setExpanded(true);
+                  }}
+                />
+              ) : null
+            }
+          />
+        ) : null}
+        <div className="trend-bar-chart__scroll">
+          <div className="trend-bar-chart__canvas" style={{ width: chartWidth }}>
+            <svg
+              viewBox={`0 0 ${chartWidth} ${height}`}
+              width={chartWidth}
+              height={height}
+              className="trend-bar-chart__svg"
+              role="img"
+              aria-label="推移棒グラフ"
+            >
           <g transform={`translate(${PADDING.left}, ${PADDING.top})`}>
             {yAxisTicks.map((tick, tickIndex) => {
               const y = valueToY(tick);
@@ -279,14 +315,16 @@ export function TrendBarChart({
                       role="button"
                       aria-label={`${label} の詳細`}
                     />
-                    <text
-                      x={centerX}
-                      y={plotHeight + 24}
-                      textAnchor={anchor}
-                      className="trend-bar-chart__x-label"
-                    >
-                      {displayLabel}
-                    </text>
+                    {visibleLabelIndexes === null || visibleLabelIndexes.has(bucketIndex) ? (
+                      <text
+                        x={centerX}
+                        y={plotHeight + 24}
+                        textAnchor={anchor}
+                        className="trend-bar-chart__x-label"
+                      >
+                        {displayLabel}
+                      </text>
+                    ) : null}
                   </g>
                 );
                 return bucket;
@@ -343,20 +381,23 @@ export function TrendBarChart({
                     role="button"
                     aria-label={`${label} の詳細`}
                   />
-                  <text
-                    x={centerX}
-                    y={plotHeight + 24}
-                    textAnchor={anchor}
-                    className="trend-bar-chart__x-label"
-                  >
-                    {displayLabel}
-                  </text>
+                  {visibleLabelIndexes === null || visibleLabelIndexes.has(bucketIndex) ? (
+                    <text
+                      x={centerX}
+                      y={plotHeight + 24}
+                      textAnchor={anchor}
+                      className="trend-bar-chart__x-label"
+                    >
+                      {displayLabel}
+                    </text>
+                  ) : null}
                 </g>
               );
               return bucket;
             })}
           </g>
         </svg>
+          </div>
         {hoveredIndex !== null ? (
           <div
             className="trend-bar-chart__tooltip"
@@ -413,7 +454,33 @@ export function TrendBarChart({
           return legend;
         })}
       </div>
-    </div>
+      </div>
+      {showExpand ? (
+        <TrendChartExpandDialog
+          open={expanded}
+          onOpenChange={setExpanded}
+          title={expandTitle}
+        >
+          {(measuredWidth) => (
+            <TrendBarChart
+              labels={labels}
+              sourceDates={sourceDates}
+              sourceDateLabels={sourceDateLabels}
+              series={series}
+              mode={mode}
+              height={EXPANDED_TREND_CHART_HEIGHT}
+              className={className}
+              valueDomain={valueDomain}
+              domainMode={domainMode}
+              formatYAxis={formatYAxis}
+              valueKind={valueKind}
+              layoutMode="expanded"
+              targetPlotWidth={measuredWidth}
+            />
+          )}
+        </TrendChartExpandDialog>
+      ) : null}
+    </>
   );
   return result;
 }

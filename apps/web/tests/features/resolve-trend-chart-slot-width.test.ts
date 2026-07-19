@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import {
   estimateTrendChartLabelWidth,
+  resolveTrendChartFitSlotWidth,
   resolveTrendChartSlotWidth,
+  resolveVisibleTrendXLabelIndexes,
   resolveXLabelAnchor,
   truncateTrendChartLabel,
 } from "@/features/trends/resolve-trend-chart-slot-width";
@@ -47,6 +49,25 @@ describe("resolveTrendChartSlotWidth", () => {
 
   it("does not truncate short date labels", () => {
     expect(truncateTrendChartLabel("2026/6/5～6/11")).toBe("2026/6/5～6/11");
+  });
+
+  it("fits dense labels into a target plot width for expand mode", () => {
+    const slotWidth = resolveTrendChartFitSlotWidth(100, 800);
+    expect(slotWidth).toBe(8);
+  });
+
+  it("keeps a tiny floor for empty or invalid fit width", () => {
+    expect(resolveTrendChartFitSlotWidth(0, 800)).toBe(2);
+    expect(resolveTrendChartFitSlotWidth(10, 0)).toBe(2);
+  });
+
+  it("always includes first and last labels when thinning x labels", () => {
+    const labels = Array.from({ length: 30 }, (_, index) => `6/${index + 1}`);
+    const visible = resolveVisibleTrendXLabelIndexes(labels, 8);
+    expect(visible[0]).toBe(0);
+    expect(visible[visible.length - 1]).toBe(29);
+    expect(visible.length).toBeGreaterThan(2);
+    expect(visible.length).toBeLessThan(30);
   });
 
   it("sizes slots so truncated instrument labels do not overlap", () => {

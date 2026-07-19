@@ -1,4 +1,5 @@
 const MIN_SLOT_WIDTH = 56;
+const FIT_MIN_SLOT_WIDTH = 2;
 const DEFAULT_TARGET_WIDTH = 640;
 const ASCII_CHAR_WIDTH = 6.5;
 const WIDE_CHAR_WIDTH = 11;
@@ -136,5 +137,132 @@ export function resolveTrendChartSlotWidth(
   }
 
   result = Math.max(result, fitWidth);
+  return result;
+}
+
+/** 拡大表示用: 全バケットを指定幅に収める（MIN_SLOT 未満も許容） */
+export function resolveTrendChartFitSlotWidth(
+  labelCount: number,
+  plotWidth: number,
+): number {
+  let result = FIT_MIN_SLOT_WIDTH;
+
+  if (labelCount <= 0 || !Number.isFinite(plotWidth) || plotWidth <= 0) {
+    return result;
+  }
+
+  result = Math.max(FIT_MIN_SLOT_WIDTH, plotWidth / labelCount);
+  return result;
+}
+
+function resolveLabelCenterX(index: number, slotWidth: number): number {
+  let result = slotWidth / 2;
+  result = index * slotWidth + slotWidth / 2;
+  return result;
+}
+
+function resolveLabelLeftEdge(
+  label: string,
+  index: number,
+  slotWidth: number,
+  total: number,
+): number {
+  let result = 0;
+  const width = estimateTrendChartLabelWidth(label);
+  const centerX = resolveLabelCenterX(index, slotWidth);
+  const anchor = resolveXLabelAnchor(index, total);
+
+  if (anchor === "start") {
+    result = centerX;
+    return result;
+  }
+
+  if (anchor === "end") {
+    result = centerX - width;
+    return result;
+  }
+
+  result = centerX - width / 2;
+  return result;
+}
+
+function resolveLabelRightEdge(
+  label: string,
+  index: number,
+  slotWidth: number,
+  total: number,
+): number {
+  let result = 0;
+  const width = estimateTrendChartLabelWidth(label);
+  const centerX = resolveLabelCenterX(index, slotWidth);
+  const anchor = resolveXLabelAnchor(index, total);
+
+  if (anchor === "start") {
+    result = centerX + width;
+    return result;
+  }
+
+  if (anchor === "end") {
+    result = centerX;
+    return result;
+  }
+
+  result = centerX + width / 2;
+  return result;
+}
+
+/** 拡大表示用: 重ならない X 軸ラベルのインデックス（先頭・末尾は常に含む） */
+export function resolveVisibleTrendXLabelIndexes(
+  labels: string[],
+  slotWidth: number,
+): number[] {
+  let result: number[] = [];
+  const labelCount = labels.length;
+
+  if (labelCount === 0) {
+    return result;
+  }
+
+  if (labelCount === 1) {
+    result = [0];
+    return result;
+  }
+
+  const lastIndex = labelCount - 1;
+  result = [0];
+  let lastRightEdge = resolveLabelRightEdge(labels[0], 0, slotWidth, labelCount);
+
+  for (let index = 1; index < lastIndex; index += 1) {
+    const leftEdge = resolveLabelLeftEdge(labels[index], index, slotWidth, labelCount);
+    if (leftEdge < lastRightEdge + LABEL_PAIR_PADDING) {
+      continue;
+    }
+
+    result.push(index);
+    lastRightEdge = resolveLabelRightEdge(labels[index], index, slotWidth, labelCount);
+  }
+
+  const lastLeftEdge = resolveLabelLeftEdge(
+    labels[lastIndex],
+    lastIndex,
+    slotWidth,
+    labelCount,
+  );
+
+  while (result.length > 1) {
+    const previousIndex = result[result.length - 1];
+    const previousRightEdge = resolveLabelRightEdge(
+      labels[previousIndex],
+      previousIndex,
+      slotWidth,
+      labelCount,
+    );
+    if (lastLeftEdge >= previousRightEdge + LABEL_PAIR_PADDING) {
+      break;
+    }
+    result.pop();
+  }
+
+  result.push(lastIndex);
   return result;
 }

@@ -252,8 +252,8 @@ export function GlobalAnalysisView() {
       </div>
 
       <div className="mb-6 grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardContent className="pt-6">
+        <Card className="min-w-0">
+          <CardContent className="min-w-0 pt-6">
             <GlobalAllocationDonutCard
               title="口座別構成"
               slices={portfolioSlices}
@@ -261,8 +261,8 @@ export function GlobalAnalysisView() {
           </CardContent>
         </Card>
         {marketValueTrendChart !== null ? (
-          <Card>
-            <CardContent className="pt-6">
+          <Card className="min-w-0">
+            <CardContent className="min-w-0 pt-6">
               <TrendComboChart
                 title="評価額・利益率の変化"
                 caption={PORTFOLIO_COMBO_TREND_CAPTION}

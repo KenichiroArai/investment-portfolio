@@ -92,13 +92,15 @@ export function AllocationShareChangeChart({
         <TrendChartHeader title={title} titleLevel={titleLevel} caption={caption} />
       ) : null}
       <div className="allocation-share-change-chart__scroll">
-        <svg
-          viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-          className="allocation-share-change-chart__svg"
-          role="img"
-          aria-label="シェア変化ランキング"
-          style={{ minWidth: `${chartWidth}px` }}
-        >
+        <div style={{ width: chartWidth }}>
+          <svg
+            viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+            width={chartWidth}
+            height={chartHeight}
+            className="allocation-share-change-chart__svg"
+            role="img"
+            aria-label="シェア変化ランキング"
+          >
           <g transform={`translate(${PADDING.left}, ${PADDING.top})`}>
             {ticks.map((tick) => {
               const x = valueToX(tick);
@@ -171,6 +173,7 @@ export function AllocationShareChangeChart({
             })}
           </g>
         </svg>
+        </div>
       </div>
       <p className="allocation-share-change-chart__footnote">
         期首から期末までの構成比変化（%ポイント）。正の値はシェア拡大、負の値はシェア縮小です。

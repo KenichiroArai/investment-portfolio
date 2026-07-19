@@ -16,7 +16,7 @@ export function AnalysisTabPanel({
   renderContent,
 }: AnalysisTabPanelProps) {
   let result: ReactNode = (
-    <div className="space-y-4">
+    <div className="min-w-0 max-w-full space-y-4">
       {renderOverview(activeScheme)}
       {renderContent(activeScheme)}
     </div>

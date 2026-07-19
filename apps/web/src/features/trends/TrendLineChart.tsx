@@ -9,11 +9,17 @@ import {
 import { useMemo, useState, type ReactNode } from "react";
 
 import { TrendChartHeader } from "@/features/trends/TrendChartHeader";
+import {
+  TrendChartExpandButton,
+  TrendChartExpandDialog,
+} from "@/features/trends/TrendChartExpandShell";
 import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
 import {
-  resolveTrendChartSlotWidth,
-  resolveXLabelAnchor,
-} from "@/features/trends/resolve-trend-chart-slot-width";
+  EXPANDED_TREND_CHART_HEIGHT,
+  resolveTrendChartPlotLayout,
+  type TrendChartLayoutMode,
+} from "@/features/trends/trend-chart-layout";
+import { resolveXLabelAnchor } from "@/features/trends/resolve-trend-chart-slot-width";
 import { useTrendYAxis } from "@/features/trends/use-trend-y-axis";
 import { formatTrendChartTooltipValue } from "@/features/trends/format-trend-chart-tooltip";
 import { formatAsOfDateJa } from "@/lib/format-yen";
@@ -45,6 +51,8 @@ type TrendLineChartProps = {
   title?: string;
   titleLevel?: "h2" | "h3";
   caption?: string;
+  layoutMode?: TrendChartLayoutMode;
+  targetPlotWidth?: number;
 };
 
 const CHART_HEIGHT = 220;
@@ -94,12 +102,21 @@ export function TrendLineChart({
   title,
   titleLevel = "h3",
   caption,
+  layoutMode = "inline",
+  targetPlotWidth,
 }: TrendLineChartProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [expanded, setExpanded] = useState(false);
 
   const plotHeight = height - PADDING.top - PADDING.bottom;
-  const pointSlotWidth = resolveTrendChartSlotWidth(labels);
-  const plotWidth = Math.max(320, pointSlotWidth * labels.length);
+  const plotLayout = resolveTrendChartPlotLayout({
+    labels,
+    layoutMode,
+    targetPlotWidth,
+    paddingLeft: PADDING.left,
+    paddingRight: PADDING.right,
+  });
+  const { pointSlotWidth, plotWidth, visibleLabelIndexes, showPointMarkers } = plotLayout;
   const chartWidth = plotWidth + PADDING.left + PADDING.right;
 
   const activeSeries = series.filter((item) =>
@@ -155,188 +172,238 @@ export function TrendLineChart({
   }
 
   const zeroY = valueToY(0);
+  const expandTitle = title ?? "推移折れ線グラフ";
+  const showExpand = layoutMode === "inline";
 
   result = (
-    <div className={className ? `trend-line-chart ${className}` : "trend-line-chart"}>
-      {title ? (
-        <TrendChartHeader title={title} titleLevel={titleLevel} caption={caption} />
-      ) : null}
-      <div className="trend-line-chart__scroll">
-        <svg
-          viewBox={`0 0 ${chartWidth} ${height}`}
-          className="trend-line-chart__svg"
-          role="img"
-          aria-label="推移折れ線グラフ"
-          style={{ minWidth: `${chartWidth}px` }}
-        >
-          <g transform={`translate(${PADDING.left}, ${PADDING.top})`}>
-            {yAxisTicks.map((tick, tickIndex) => {
-              const y = valueToY(tick);
-              let gridLine = (
-                <g key={`${tickIndex}-${tick}`}>
-                  <line
-                    x1={0}
-                    y1={y}
-                    x2={plotWidth}
-                    y2={y}
-                    className="trend-line-chart__grid"
-                  />
-                  <text
-                    x={-8}
-                    y={y + 4}
-                    textAnchor="end"
-                    className="trend-line-chart__y-label"
-                  >
-                    {yAxis.formatTick(tick)}
-                  </text>
-                </g>
-              );
-              return gridLine;
-            })}
-            <line
-              x1={0}
-              y1={zeroY}
-              x2={plotWidth}
-              y2={zeroY}
-              className="trend-line-chart__axis"
-            />
-            {activeSeries.map((item) => {
-              const segments = buildLineSegments(item.values, valueToX, valueToY);
-              let lineGroup = (
-                <g key={item.key}>
-                  {segments.map((segment, segmentIndex) => {
-                    let polyline = (
-                      <polyline
-                        key={`${item.key}-${segmentIndex}`}
-                        points={segment}
-                        fill="none"
-                        stroke={item.color}
-                        strokeWidth={2}
-                        className="trend-line-chart__line"
-                      />
-                    );
-                    return polyline;
-                  })}
-                  {item.values.map((value, bucketIndex) => {
-                    if (value === null || !Number.isFinite(value)) {
-                      return null;
-                    }
-                    let point = (
-                      <circle
-                        key={`${item.key}-${bucketIndex}`}
-                        cx={valueToX(bucketIndex)}
-                        cy={valueToY(value)}
-                        r={POINT_RADIUS}
-                        fill={item.color}
-                        className="trend-line-chart__point"
-                      />
-                    );
-                    return point;
-                  })}
-                </g>
-              );
-              return lineGroup;
-            })}
-            {labels.map((label, bucketIndex) => {
-              const centerX = valueToX(bucketIndex);
-              const anchor = resolveXLabelAnchor(bucketIndex, labels.length);
-
-              let bucket = (
-                <g key={`${label}-${bucketIndex}`}>
-                  <rect
-                    x={bucketIndex * pointSlotWidth}
-                    y={0}
-                    width={pointSlotWidth}
-                    height={plotHeight}
-                    fill="transparent"
-                    className="trend-line-chart__hit"
-                    onMouseEnter={() => {
-                      setHoveredIndex(bucketIndex);
-                    }}
-                    onMouseLeave={() => {
-                      setHoveredIndex(null);
-                    }}
-                    onFocus={() => {
-                      setHoveredIndex(bucketIndex);
-                    }}
-                    onBlur={() => {
-                      setHoveredIndex(null);
-                    }}
-                    tabIndex={0}
-                    role="button"
-                    aria-label={`${label} の詳細`}
-                  />
-                  <text
-                    x={centerX}
-                    y={plotHeight + 24}
-                    textAnchor={anchor}
-                    className="trend-line-chart__x-label"
-                  >
-                    {label}
-                  </text>
-                </g>
-              );
-              return bucket;
-            })}
-          </g>
-        </svg>
-        {hoveredIndex !== null ? (
-          <div
-            className="trend-line-chart__tooltip"
-            style={{
-              left: `${PADDING.left + hoveredIndex * pointSlotWidth + pointSlotWidth / 2}px`,
-            }}
-          >
-            <div className="trend-line-chart__tooltip-title">{labels[hoveredIndex]}</div>
-            {formatSourceDateTooltip(
-              sourceDateLabels?.[hoveredIndex] ?? sourceDates[hoveredIndex],
-            ) ? (
-              <div className="trend-line-chart__tooltip-date">
-                {formatSourceDateTooltip(
-                  sourceDateLabels?.[hoveredIndex] ?? sourceDates[hoveredIndex],
-                )}
-              </div>
-            ) : null}
-            {activeSeries.map((item) => {
-              const value = item.values[hoveredIndex];
-              if (value === null || !Number.isFinite(value)) {
-                return null;
-              }
-
-              const formatted = formatTrendChartTooltipValue(item, hoveredIndex);
-              if (formatted === null) {
-                return null;
-              }
-
-              let row = (
-                <div key={item.key} className="trend-line-chart__tooltip-row">
-                  <span
-                    className="trend-line-chart__tooltip-swatch"
-                    style={{ backgroundColor: item.color }}
-                  />
-                  {item.label}: {formatted}
-                </div>
-              );
-              return row;
-            })}
-          </div>
+    <>
+      <div className={className ? `trend-line-chart ${className}` : "trend-line-chart"}>
+        {title ? (
+          <TrendChartHeader
+            title={title}
+            titleLevel={titleLevel}
+            caption={caption}
+            actions={
+              showExpand ? (
+                <TrendChartExpandButton
+                  onClick={() => {
+                    setExpanded(true);
+                  }}
+                />
+              ) : null
+            }
+          />
         ) : null}
-      </div>
-      <div className="trend-line-chart__legend">
-        {activeSeries.map((item) => {
-          let legend = (
-            <span key={item.key} className="trend-line-chart__legend-item">
-              <span
-                className="trend-line-chart__legend-swatch"
-                style={{ backgroundColor: item.color }}
+        <div className="trend-line-chart__scroll">
+          <div className="trend-line-chart__canvas" style={{ width: chartWidth }}>
+            <svg
+              viewBox={`0 0 ${chartWidth} ${height}`}
+              width={chartWidth}
+              height={height}
+              className="trend-line-chart__svg"
+              role="img"
+              aria-label="推移折れ線グラフ"
+            >
+            <g transform={`translate(${PADDING.left}, ${PADDING.top})`}>
+              {yAxisTicks.map((tick, tickIndex) => {
+                const y = valueToY(tick);
+                let gridLine = (
+                  <g key={`${tickIndex}-${tick}`}>
+                    <line
+                      x1={0}
+                      y1={y}
+                      x2={plotWidth}
+                      y2={y}
+                      className="trend-line-chart__grid"
+                    />
+                    <text
+                      x={-8}
+                      y={y + 4}
+                      textAnchor="end"
+                      className="trend-line-chart__y-label"
+                    >
+                      {yAxis.formatTick(tick)}
+                    </text>
+                  </g>
+                );
+                return gridLine;
+              })}
+              <line
+                x1={0}
+                y1={zeroY}
+                x2={plotWidth}
+                y2={zeroY}
+                className="trend-line-chart__axis"
               />
-              {item.label}
-            </span>
-          );
-          return legend;
-        })}
+              {activeSeries.map((item) => {
+                const segments = buildLineSegments(item.values, valueToX, valueToY);
+                let lineGroup = (
+                  <g key={item.key}>
+                    {segments.map((segment, segmentIndex) => {
+                      let polyline = (
+                        <polyline
+                          key={`${item.key}-${segmentIndex}`}
+                          points={segment}
+                          fill="none"
+                          stroke={item.color}
+                          strokeWidth={2}
+                          className="trend-line-chart__line"
+                        />
+                      );
+                      return polyline;
+                    })}
+                    {showPointMarkers
+                      ? item.values.map((value, bucketIndex) => {
+                          if (value === null || !Number.isFinite(value)) {
+                            return null;
+                          }
+                          let point = (
+                            <circle
+                              key={`${item.key}-${bucketIndex}`}
+                              cx={valueToX(bucketIndex)}
+                              cy={valueToY(value)}
+                              r={POINT_RADIUS}
+                              fill={item.color}
+                              className="trend-line-chart__point"
+                            />
+                          );
+                          return point;
+                        })
+                      : null}
+                  </g>
+                );
+                return lineGroup;
+              })}
+              {labels.map((label, bucketIndex) => {
+                const centerX = valueToX(bucketIndex);
+                const anchor = resolveXLabelAnchor(bucketIndex, labels.length);
+                const showLabel =
+                  visibleLabelIndexes === null || visibleLabelIndexes.has(bucketIndex);
+
+                let bucket = (
+                  <g key={`${label}-${bucketIndex}`}>
+                    <rect
+                      x={bucketIndex * pointSlotWidth}
+                      y={0}
+                      width={pointSlotWidth}
+                      height={plotHeight}
+                      fill="transparent"
+                      className="trend-line-chart__hit"
+                      onMouseEnter={() => {
+                        setHoveredIndex(bucketIndex);
+                      }}
+                      onMouseLeave={() => {
+                        setHoveredIndex(null);
+                      }}
+                      onFocus={() => {
+                        setHoveredIndex(bucketIndex);
+                      }}
+                      onBlur={() => {
+                        setHoveredIndex(null);
+                      }}
+                      tabIndex={0}
+                      role="button"
+                      aria-label={`${label} の詳細`}
+                    />
+                    {showLabel ? (
+                      <text
+                        x={centerX}
+                        y={plotHeight + 24}
+                        textAnchor={anchor}
+                        className="trend-line-chart__x-label"
+                      >
+                        {label}
+                      </text>
+                    ) : null}
+                  </g>
+                );
+                return bucket;
+              })}
+            </g>
+          </svg>
+          </div>
+          {hoveredIndex !== null ? (
+            <div
+              className="trend-line-chart__tooltip"
+              style={{
+                left: `${PADDING.left + hoveredIndex * pointSlotWidth + pointSlotWidth / 2}px`,
+              }}
+            >
+              <div className="trend-line-chart__tooltip-title">{labels[hoveredIndex]}</div>
+              {formatSourceDateTooltip(
+                sourceDateLabels?.[hoveredIndex] ?? sourceDates[hoveredIndex],
+              ) ? (
+                <div className="trend-line-chart__tooltip-date">
+                  {formatSourceDateTooltip(
+                    sourceDateLabels?.[hoveredIndex] ?? sourceDates[hoveredIndex],
+                  )}
+                </div>
+              ) : null}
+              {activeSeries.map((item) => {
+                const value = item.values[hoveredIndex];
+                if (value === null || !Number.isFinite(value)) {
+                  return null;
+                }
+
+                const formatted = formatTrendChartTooltipValue(item, hoveredIndex);
+                if (formatted === null) {
+                  return null;
+                }
+
+                let row = (
+                  <div key={item.key} className="trend-line-chart__tooltip-row">
+                    <span
+                      className="trend-line-chart__tooltip-swatch"
+                      style={{ backgroundColor: item.color }}
+                    />
+                    {item.label}: {formatted}
+                  </div>
+                );
+                return row;
+              })}
+            </div>
+          ) : null}
+        </div>
+        <div className="trend-line-chart__legend">
+          {activeSeries.map((item) => {
+            let legend = (
+              <span key={item.key} className="trend-line-chart__legend-item">
+                <span
+                  className="trend-line-chart__legend-swatch"
+                  style={{ backgroundColor: item.color }}
+                />
+                {item.label}
+              </span>
+            );
+            return legend;
+          })}
+        </div>
       </div>
-    </div>
+      {showExpand ? (
+        <TrendChartExpandDialog
+          open={expanded}
+          onOpenChange={setExpanded}
+          title={expandTitle}
+        >
+          {(measuredWidth) => (
+            <TrendLineChart
+              labels={labels}
+              sourceDates={sourceDates}
+              sourceDateLabels={sourceDateLabels}
+              series={series}
+              height={EXPANDED_TREND_CHART_HEIGHT}
+              className={className}
+              valueDomain={valueDomain}
+              domainMode={domainMode}
+              formatYAxis={formatYAxis}
+              valueKind={valueKind}
+              layoutMode="expanded"
+              targetPlotWidth={measuredWidth}
+            />
+          )}
+        </TrendChartExpandDialog>
+      ) : null}
+    </>
   );
   return result;
 }

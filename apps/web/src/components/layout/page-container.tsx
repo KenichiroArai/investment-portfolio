@@ -16,7 +16,7 @@ export function PageContainer({
   let result = (
     <div
       className={cn(
-        "mx-auto w-full px-4 py-6 md:px-6 md:py-8",
+        "mx-auto w-full min-w-0 px-4 py-6 md:px-6 md:py-8",
         size === "default" ? "max-w-6xl" : "max-w-3xl",
         className,
       )}

@@ -112,18 +112,20 @@ export function PortfolioAllocationPanel({ rows }: PortfolioAllocationPanelProps
           </div>
         ) : null}
       </div>
-      <PortfolioAllocationTable
-        rows={sortedRows}
-        sortColumn={sortColumn}
-        sortDirection={sortDirection}
-        onSort={toggleSort}
-        highlightedHoldingLineId={highlightedHoldingLineId}
-        onRowHover={(holdingLineId) => {
-          setHighlightedHoldingLineId(holdingLineId);
-          setTooltip(null);
-        }}
-        onRowLeave={handleSliceLeave}
-      />
+      <div className="allocation-panel__table-scroll">
+        <PortfolioAllocationTable
+          rows={sortedRows}
+          sortColumn={sortColumn}
+          sortDirection={sortDirection}
+          onSort={toggleSort}
+          highlightedHoldingLineId={highlightedHoldingLineId}
+          onRowHover={(holdingLineId) => {
+            setHighlightedHoldingLineId(holdingLineId);
+            setTooltip(null);
+          }}
+          onRowLeave={handleSliceLeave}
+        />
+      </div>
     </div>
   );
   return result;

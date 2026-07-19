@@ -7,8 +7,19 @@ import {
 import { useMemo, useState, type ReactNode } from "react";
 
 import { TrendChartHeader } from "@/features/trends/TrendChartHeader";
+import {
+  TrendChartExpandButton,
+  TrendChartExpandDialog,
+} from "@/features/trends/TrendChartExpandShell";
 import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
-import { resolveXLabelAnchor } from "@/features/trends/resolve-trend-chart-slot-width";
+import {
+  EXPANDED_TREND_CHART_HEIGHT,
+  type TrendChartLayoutMode,
+} from "@/features/trends/trend-chart-layout";
+import {
+  resolveVisibleTrendXLabelIndexes,
+  resolveXLabelAnchor,
+} from "@/features/trends/resolve-trend-chart-slot-width";
 import { formatTrendChartTooltipValue } from "@/features/trends/format-trend-chart-tooltip";
 import { formatAsOfDateJa, formatYenManAxis } from "@/lib/format-yen";
 
@@ -29,6 +40,7 @@ type TrendComboChartProps = {
   title?: string;
   titleLevel?: "h2" | "h3";
   caption?: string;
+  layoutMode?: TrendChartLayoutMode;
 };
 
 const CHART_HEIGHT = 240;
@@ -130,14 +142,27 @@ export function TrendComboChart({
   title,
   titleLevel = "h3",
   caption,
+  layoutMode = "inline",
 }: TrendComboChartProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [expanded, setExpanded] = useState(false);
 
   const plotHeight = height - PADDING.top - PADDING.bottom;
+  const resolvedTargetPlotWidth =
+    layoutMode === "expanded"
+      ? Math.max(320, targetPlotWidth - PADDING.left - PADDING.right)
+      : targetPlotWidth;
   const slotDenominator = Math.max(labels.length, reservedSlotCount, 1);
-  const slotWidth = targetPlotWidth / slotDenominator;
-  const plotWidth = targetPlotWidth;
+  const slotWidth = resolvedTargetPlotWidth / slotDenominator;
+  const plotWidth = resolvedTargetPlotWidth;
   const chartWidth = plotWidth + PADDING.left + PADDING.right;
+  const visibleLabelIndexes =
+    layoutMode === "expanded"
+      ? new Set(resolveVisibleTrendXLabelIndexes(labels, slotWidth))
+      : null;
+  const showPointMarkers = slotWidth >= 10;
+  const showExpand = layoutMode === "inline";
+  const expandTitle = title ?? "評価額と利益率の複合グラフ";
 
   const activeBarSeries = filterActiveSeries(barSeries);
   const activeLineSeries = filterActiveSeries(lineSeries);
@@ -222,20 +247,34 @@ export function TrendComboChart({
   const legendSeries = [...activeBarSeries];
 
   result = (
-    <div
-      className={className ? `trend-combo-chart ${className}` : "trend-combo-chart"}
-    >
-      {title ? (
-        <TrendChartHeader title={title} titleLevel={titleLevel} caption={caption} />
-      ) : null}
-      <div className="trend-combo-chart__scroll">
-        <svg
-          viewBox={`0 0 ${chartWidth} ${height}`}
-          className="trend-combo-chart__svg"
-          role="img"
-          aria-label="評価額と利益率の複合グラフ"
-          style={{ width: "100%", height: "auto" }}
-        >
+    <>
+      <div
+        className={className ? `trend-combo-chart ${className}` : "trend-combo-chart"}
+      >
+        {title ? (
+          <TrendChartHeader
+            title={title}
+            titleLevel={titleLevel}
+            caption={caption}
+            actions={
+              showExpand ? (
+                <TrendChartExpandButton
+                  onClick={() => {
+                    setExpanded(true);
+                  }}
+                />
+              ) : null
+            }
+          />
+        ) : null}
+        <div className="trend-combo-chart__scroll">
+          <svg
+            viewBox={`0 0 ${chartWidth} ${height}`}
+            className="trend-combo-chart__svg"
+            role="img"
+            aria-label="評価額と利益率の複合グラフ"
+            style={{ width: "100%", height: "auto" }}
+          >
           <g transform={`translate(${PADDING.left}, ${PADDING.top})`}>
             {barDomain.ticks.map((tick, tickIndex) => {
               const y = valueToBarY(tick);
@@ -355,22 +394,24 @@ export function TrendComboChart({
                     );
                     return polyline;
                   })}
-                  {item.values.map((value, bucketIndex) => {
-                    if (value === null || !Number.isFinite(value)) {
-                      return null;
-                    }
-                    let point = (
-                      <circle
-                        key={`${item.key}-pt-${bucketIndex}`}
-                        cx={valueToX(bucketIndex)}
-                        cy={valueToLineY(value)}
-                        r={POINT_RADIUS}
-                        fill={item.color}
-                        className="trend-combo-chart__point"
-                      />
-                    );
-                    return point;
-                  })}
+                  {showPointMarkers
+                    ? item.values.map((value, bucketIndex) => {
+                        if (value === null || !Number.isFinite(value)) {
+                          return null;
+                        }
+                        let point = (
+                          <circle
+                            key={`${item.key}-pt-${bucketIndex}`}
+                            cx={valueToX(bucketIndex)}
+                            cy={valueToLineY(value)}
+                            r={POINT_RADIUS}
+                            fill={item.color}
+                            className="trend-combo-chart__point"
+                          />
+                        );
+                        return point;
+                      })
+                    : null}
                 </g>
               );
               return lineGroup;
@@ -378,6 +419,8 @@ export function TrendComboChart({
             {labels.map((label, bucketIndex) => {
               const centerX = valueToX(bucketIndex);
               const anchor = resolveXLabelAnchor(bucketIndex, labels.length);
+              const showLabel =
+                visibleLabelIndexes === null || visibleLabelIndexes.has(bucketIndex);
               let bucket = (
                 <g key={`slot-${label}-${bucketIndex}`}>
                   <rect
@@ -403,14 +446,16 @@ export function TrendComboChart({
                     role="button"
                     aria-label={`${label} の詳細`}
                   />
-                  <text
-                    x={centerX}
-                    y={plotHeight + 20}
-                    textAnchor={anchor}
-                    className="trend-combo-chart__x-label"
-                  >
-                    {label}
-                  </text>
+                  {showLabel ? (
+                    <text
+                      x={centerX}
+                      y={plotHeight + 20}
+                      textAnchor={anchor}
+                      className="trend-combo-chart__x-label"
+                    >
+                      {label}
+                    </text>
+                  ) : null}
                 </g>
               );
               return bucket;
@@ -482,7 +527,30 @@ export function TrendComboChart({
           return legend;
         })}
       </div>
-    </div>
+      </div>
+      {showExpand ? (
+        <TrendChartExpandDialog
+          open={expanded}
+          onOpenChange={setExpanded}
+          title={expandTitle}
+        >
+          {(measuredWidth) => (
+            <TrendComboChart
+              labels={labels}
+              sourceDates={sourceDates}
+              sourceDateLabels={sourceDateLabels}
+              barSeries={barSeries}
+              lineSeries={lineSeries}
+              height={EXPANDED_TREND_CHART_HEIGHT}
+              className={className}
+              targetPlotWidth={measuredWidth}
+              reservedSlotCount={reservedSlotCount}
+              layoutMode="expanded"
+            />
+          )}
+        </TrendChartExpandDialog>
+      ) : null}
+    </>
   );
   return result;
 }

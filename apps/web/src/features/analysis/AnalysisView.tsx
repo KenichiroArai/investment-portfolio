@@ -405,6 +405,7 @@ export function AnalysisView({
     <PageContainer>
       <Tabs
         value={mainView}
+        className="min-w-0 w-full"
         onValueChange={(value) => {
           setMainView(value as AnalysisMainView);
         }}
@@ -414,14 +415,14 @@ export function AnalysisView({
           activeSchemeCode={activeSchemeCode}
           onSchemeChange={setActiveSchemeCode}
         />
-        <TabsContent value="holdings" className="mt-4">
+        <TabsContent value="holdings" className="mt-4 min-w-0 max-w-full">
           <AnalysisTabPanel
             activeScheme={activeScheme}
             renderOverview={renderHoldingsOverview}
             renderContent={renderHoldingsContent}
           />
         </TabsContent>
-        <TabsContent value="trends" className="mt-4">
+        <TabsContent value="trends" className="mt-4 min-w-0 max-w-full">
           <AnalysisTabPanel
             activeScheme={activeScheme}
             renderOverview={(scheme) => {
@@ -462,14 +463,14 @@ export function AnalysisView({
             )}
           />
         </TabsContent>
-        <TabsContent value="allocation" className="mt-4">
+        <TabsContent value="allocation" className="mt-4 min-w-0 max-w-full">
           <AnalysisTabPanel
             activeScheme={activeScheme}
             renderOverview={renderAllocationOverview}
             renderContent={renderAllocationContent}
           />
         </TabsContent>
-        <TabsContent value="snapshot" className="mt-4">
+        <TabsContent value="snapshot" className="mt-4 min-w-0 max-w-full">
           <AnalysisTabPanel
             activeScheme={activeScheme}
             renderOverview={renderSnapshotOverview}

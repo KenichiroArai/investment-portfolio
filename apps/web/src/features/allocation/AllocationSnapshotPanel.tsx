@@ -21,7 +21,7 @@ export function AllocationSnapshotPanel({
   asOfDate,
 }: AllocationSnapshotPanelProps) {
   let result: ReactNode = (
-    <div className="allocation-snapshot-panel space-y-4">
+    <div className="allocation-snapshot-panel min-w-0 max-w-full space-y-4">
       <AllocationPanel
         slices={slices}
         showPortfolioColumn={showPortfolioColumn}

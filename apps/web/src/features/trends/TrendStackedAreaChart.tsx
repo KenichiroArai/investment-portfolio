@@ -3,11 +3,17 @@
 import { useMemo, useState, type ReactNode } from "react";
 
 import { TrendChartHeader } from "@/features/trends/TrendChartHeader";
+import {
+  TrendChartExpandButton,
+  TrendChartExpandDialog,
+} from "@/features/trends/TrendChartExpandShell";
 import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
 import {
-  resolveTrendChartSlotWidth,
-  resolveXLabelAnchor,
-} from "@/features/trends/resolve-trend-chart-slot-width";
+  EXPANDED_TREND_CHART_HEIGHT,
+  resolveTrendChartPlotLayout,
+  type TrendChartLayoutMode,
+} from "@/features/trends/trend-chart-layout";
+import { resolveXLabelAnchor } from "@/features/trends/resolve-trend-chart-slot-width";
 import {
   formatAsOfDateJa,
   formatPercent,
@@ -44,6 +50,8 @@ type TrendStackedAreaChartProps = {
   caption?: string;
   selectedSeriesKeys?: string[];
   onSeriesToggle?: (key: string) => void;
+  layoutMode?: TrendChartLayoutMode;
+  targetPlotWidth?: number;
 };
 
 const CHART_HEIGHT = 280;
@@ -116,13 +124,24 @@ export function TrendStackedAreaChart({
   caption,
   selectedSeriesKeys = [],
   onSeriesToggle,
+  layoutMode = "inline",
+  targetPlotWidth,
 }: TrendStackedAreaChartProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [expanded, setExpanded] = useState(false);
 
   const plotHeight = height - PADDING.top - PADDING.bottom;
-  const pointSlotWidth = resolveTrendChartSlotWidth(labels);
-  const plotWidth = Math.max(320, pointSlotWidth * labels.length);
+  const plotLayout = resolveTrendChartPlotLayout({
+    labels,
+    layoutMode,
+    targetPlotWidth,
+    paddingLeft: PADDING.left,
+    paddingRight: PADDING.right,
+  });
+  const { pointSlotWidth, plotWidth, visibleLabelIndexes } = plotLayout;
   const chartWidth = plotWidth + PADDING.left + PADDING.right;
+  const showExpand = layoutMode === "inline";
+  const expandTitle = title ?? "構成比積み上げエリアグラフ";
 
   const activeSeries = useMemo(() => {
     let result = series.filter((item) =>
@@ -152,22 +171,38 @@ export function TrendStackedAreaChart({
   }
 
   result = (
-    <div
-      className={
-        className ? `trend-stacked-area-chart ${className}` : "trend-stacked-area-chart"
-      }
-    >
-      {title ? (
-        <TrendChartHeader title={title} titleLevel={titleLevel} caption={caption} />
-      ) : null}
-      <div className="trend-stacked-area-chart__scroll">
-        <svg
-          viewBox={`0 0 ${chartWidth} ${height}`}
-          className="trend-stacked-area-chart__svg"
-          role="img"
-          aria-label="構成比積み上げエリアグラフ"
-          style={{ minWidth: `${chartWidth}px` }}
-        >
+    <>
+      <div
+        className={
+          className ? `trend-stacked-area-chart ${className}` : "trend-stacked-area-chart"
+        }
+      >
+        {title ? (
+          <TrendChartHeader
+            title={title}
+            titleLevel={titleLevel}
+            caption={caption}
+            actions={
+              showExpand ? (
+                <TrendChartExpandButton
+                  onClick={() => {
+                    setExpanded(true);
+                  }}
+                />
+              ) : null
+            }
+          />
+        ) : null}
+        <div className="trend-stacked-area-chart__scroll">
+          <div className="trend-stacked-area-chart__canvas" style={{ width: chartWidth }}>
+            <svg
+              viewBox={`0 0 ${chartWidth} ${height}`}
+              width={chartWidth}
+              height={height}
+              className="trend-stacked-area-chart__svg"
+              role="img"
+              aria-label="構成比積み上げエリアグラフ"
+            >
           <g transform={`translate(${PADDING.left}, ${PADDING.top})`}>
             {Y_AXIS_TICKS.map((tick) => {
               const y = valueToY(tick);
@@ -258,6 +293,8 @@ export function TrendStackedAreaChart({
             {labels.map((label, bucketIndex) => {
               const centerX = valueToX(bucketIndex);
               const anchor = resolveXLabelAnchor(bucketIndex, labels.length);
+              const showLabel =
+                visibleLabelIndexes === null || visibleLabelIndexes.has(bucketIndex);
 
               let bucket = (
                 <g key={`${label}-${bucketIndex}`}>
@@ -284,20 +321,23 @@ export function TrendStackedAreaChart({
                     role="button"
                     aria-label={`${label} の詳細`}
                   />
-                  <text
-                    x={centerX}
-                    y={plotHeight + 24}
-                    textAnchor={anchor}
-                    className="trend-stacked-area-chart__x-label"
-                  >
-                    {label}
-                  </text>
+                  {showLabel ? (
+                    <text
+                      x={centerX}
+                      y={plotHeight + 24}
+                      textAnchor={anchor}
+                      className="trend-stacked-area-chart__x-label"
+                    >
+                      {label}
+                    </text>
+                  ) : null}
                 </g>
               );
               return bucket;
             })}
           </g>
         </svg>
+          </div>
         {hoveredIndex !== null ? (
           <div
             className="trend-stacked-area-chart__tooltip"
@@ -403,7 +443,30 @@ export function TrendStackedAreaChart({
           return legend;
         })}
       </div>
-    </div>
+      </div>
+      {showExpand ? (
+        <TrendChartExpandDialog
+          open={expanded}
+          onOpenChange={setExpanded}
+          title={expandTitle}
+        >
+          {(measuredWidth) => (
+            <TrendStackedAreaChart
+              labels={labels}
+              sourceDates={sourceDates}
+              sourceDateLabels={sourceDateLabels}
+              series={series}
+              height={EXPANDED_TREND_CHART_HEIGHT}
+              className={className}
+              selectedSeriesKeys={selectedSeriesKeys}
+              onSeriesToggle={onSeriesToggle}
+              layoutMode="expanded"
+              targetPlotWidth={measuredWidth}
+            />
+          )}
+        </TrendChartExpandDialog>
+      ) : null}
+    </>
   );
   return result;
 }
