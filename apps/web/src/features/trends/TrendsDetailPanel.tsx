@@ -226,7 +226,10 @@ export function TrendsDetailPanel({
         }
       : schemeCodesList.find((scheme) => scheme.schemeCode === activeSchemeCodeForHooks);
 
-  const periodEndpoints = resolvePeriodEndpoints(displayTrendPoints, baselinePoint);
+  const periodEndpoints =
+    trends !== null
+      ? resolvePeriodEndpoints(trends.points, trends.from, trends.to, baselinePoint)
+      : null;
 
   const allocationSeries =
     activeSchemeCodeForHooks !== ""

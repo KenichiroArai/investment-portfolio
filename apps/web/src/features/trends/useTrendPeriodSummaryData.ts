@@ -82,7 +82,15 @@ export function useTrendPeriodSummaryData({
       return note;
     })();
 
-    const periodEndpoints = resolvePeriodEndpoints(displayTrendPoints, baselinePoint);
+    const periodEndpoints =
+      trends !== null
+        ? resolvePeriodEndpoints(
+            trends.points,
+            trends.from,
+            trends.to,
+            baselinePoint,
+          )
+        : null;
 
     const activeSchemeCodeForSummary =
       mode === "portfolio" ? PORTFOLIO_INSTRUMENT_SCHEME_CODE : schemeCode;

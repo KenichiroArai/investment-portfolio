@@ -42,10 +42,12 @@ function PortfolioTimeConsumer() {
     displayTrendPoints,
     emphasizeAsOf,
     emphasizePeriod,
+    trendDisplayUnit,
     setSelectedAsOfDate,
     jumpToLatest,
     setPeriodPreset,
     setTrendBucketPick,
+    setTrendDisplayUnit,
   } = usePortfolioTime();
 
   let result = (
@@ -60,6 +62,7 @@ function PortfolioTimeConsumer() {
       <span data-testid="display-points">
         {displayTrendPoints.map((point) => point.sourceAsOfDate).join(",")}
       </span>
+      <span data-testid="trend-display-unit">{trendDisplayUnit}</span>
       <span data-testid="emphasize-as-of">{String(emphasizeAsOf)}</span>
       <span data-testid="emphasize-period">{String(emphasizePeriod)}</span>
       <button type="button" onClick={() => setSelectedAsOfDate("2026-05-31")}>
@@ -70,6 +73,12 @@ function PortfolioTimeConsumer() {
       </button>
       <button type="button" onClick={() => setPeriodPreset("1m")}>
         1か月
+      </button>
+      <button type="button" onClick={() => setPeriodPreset("all")}>
+        すべて
+      </button>
+      <button type="button" onClick={() => setTrendDisplayUnit("day")}>
+        1日単位
       </button>
       <button type="button" onClick={() => setTrendBucketPick("first")}>
         期初代表
@@ -200,6 +209,66 @@ describe("PortfolioTimeContext", () => {
       expect(replace).toHaveBeenCalledWith(
         expect.stringContaining("to=2026-06-07"),
       );
+    });
+  });
+
+  it("writes unit=day when day display unit is selected after all preset", async () => {
+    const user = userEvent.setup();
+    usePathname.mockReturnValue("/portfolios/ideco/trends/");
+    stubPortfolioFetch({
+      dates: [
+        { asOfDate: "2026-01-01", isCurrent: false },
+        { asOfDate: "2026-03-01", isCurrent: false },
+        { asOfDate: "2026-05-31", isCurrent: false },
+        { asOfDate: "2026-06-07", isCurrent: true },
+      ],
+    });
+
+    render(
+      <PortfolioTimeProvider portfolioCode="ideco">
+        <PortfolioTimeConsumer />
+      </PortfolioTimeProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("dates")).toHaveTextContent(
+        "2026-01-01,2026-03-01,2026-05-31,2026-06-07",
+      );
+    });
+
+    await user.click(screen.getByRole("button", { name: "すべて" }));
+    await waitFor(() => {
+      expect(replace).toHaveBeenCalledWith(expect.stringContaining("unit=1m"));
+    });
+
+    await user.click(screen.getByRole("button", { name: "1日単位" }));
+    await waitFor(() => {
+      expect(replace).toHaveBeenCalledWith(expect.stringContaining("unit=day"));
+    });
+  });
+
+  it("honors explicit unit=day even when the range would default to 1m", async () => {
+    usePathname.mockReturnValue("/portfolios/ideco/trends/");
+    searchParamsRef.current = new URLSearchParams(
+      "from=2026-01-01&to=2026-06-07&unit=day",
+    );
+    stubPortfolioFetch({
+      dates: [
+        { asOfDate: "2026-01-01", isCurrent: false },
+        { asOfDate: "2026-03-01", isCurrent: false },
+        { asOfDate: "2026-05-31", isCurrent: false },
+        { asOfDate: "2026-06-07", isCurrent: true },
+      ],
+    });
+
+    render(
+      <PortfolioTimeProvider portfolioCode="ideco">
+        <PortfolioTimeConsumer />
+      </PortfolioTimeProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("trend-display-unit")).toHaveTextContent("day");
     });
   });
 

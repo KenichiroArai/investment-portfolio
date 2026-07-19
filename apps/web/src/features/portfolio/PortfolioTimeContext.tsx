@@ -131,7 +131,7 @@ function countInclusiveDays(from: string, to: string): number | null {
 }
 
 function serializeTrendDisplayUnit(unit: TrendDisplayUnit): string | null {
-  let result: string | null = unit === "day" ? null : unit;
+  let result: string | null = unit;
   return result;
 }
 
@@ -340,7 +340,7 @@ export function PortfolioTimeProvider({
     (unit: TrendDisplayUnit) => {
       let result: void = undefined;
       updateSearchParams({
-        unit: unit === "day" ? null : unit,
+        unit: serializeTrendDisplayUnit(unit),
       });
       return result;
     },
