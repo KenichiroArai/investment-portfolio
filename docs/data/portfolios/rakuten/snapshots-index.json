@@ -2,8 +2,12 @@
   "portfolioCode": "rakuten",
   "dates": [
     {
-      "asOfDate": "2026-07-17",
+      "asOfDate": "2026-07-19",
       "isCurrent": true
+    },
+    {
+      "asOfDate": "2026-07-17",
+      "isCurrent": false
     },
     {
       "asOfDate": "2026-07-16",
