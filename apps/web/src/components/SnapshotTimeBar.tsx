@@ -4,6 +4,7 @@ import {
   findAdjacentSnapshotDate,
   listCalendarMonthOptions,
   SNAPSHOT_PERIOD_PRESET_LABELS,
+  TREND_BUCKET_PICK_DESCRIPTIONS,
   TREND_BUCKET_PICK_LABELS,
   TREND_BUCKET_PICKS,
   TREND_DISPLAY_UNIT_LABELS,
@@ -29,6 +30,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { usePortfolioTime } from "@/features/portfolio/PortfolioTimeContext";
 import { formatAsOfDateJa } from "@/lib/format-yen";
@@ -102,6 +109,18 @@ export function SnapshotTimeBar() {
       ? findAdjacentSnapshotDate(availableDates, selectedAsOfDate, "next")
       : null;
   const monthOptions = listCalendarMonthOptions(availableDates);
+  const trendBucketPickDescription =
+    TREND_BUCKET_PICK_DESCRIPTIONS[trendBucketPick];
+
+  const trendBucketPickTrigger = (
+    <SelectTrigger
+      className="w-[9rem]"
+      aria-label="代表値を選択"
+      title={trendBucketPickDescription}
+    >
+      <SelectValue />
+    </SelectTrigger>
+  );
 
   result = (
     <div className="border-b bg-muted/30">
@@ -298,13 +317,29 @@ export function SnapshotTimeBar() {
                     setTrendBucketPick(value as TrendBucketPick);
                   }}
                 >
-                  <SelectTrigger className="w-[9rem]" aria-label="代表値を選択">
-                    <SelectValue />
-                  </SelectTrigger>
+                  {trendBucketPickDescription ? (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          {trendBucketPickTrigger}
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs text-pretty">
+                          {trendBucketPickDescription}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  ) : (
+                    trendBucketPickTrigger
+                  )}
                   <SelectContent>
                     {TREND_BUCKET_PICKS.map((pick) => {
+                      const description = TREND_BUCKET_PICK_DESCRIPTIONS[pick];
                       let item = (
-                        <SelectItem key={pick} value={pick}>
+                        <SelectItem
+                          key={pick}
+                          value={pick}
+                          title={description}
+                        >
                           {TREND_BUCKET_PICK_LABELS[pick]}
                         </SelectItem>
                       );

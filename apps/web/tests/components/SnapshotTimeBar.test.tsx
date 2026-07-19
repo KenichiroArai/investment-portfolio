@@ -33,7 +33,7 @@ function mockPortfolioTime(overrides: Record<string, unknown> = {}) {
     setCalendarMonth: vi.fn(),
     trendDisplayUnit: "day",
     setTrendDisplayUnit: vi.fn(),
-    trendBucketPick: "last",
+    trendBucketPick: "firstLast",
     setTrendBucketPick: vi.fn(),
     trendMinMaxField: "marketValue",
     setTrendMinMaxField: vi.fn(),
@@ -149,6 +149,23 @@ describe("SnapshotTimeBar", () => {
     await user.click(screen.getByRole("button", { name: /表示の詳細設定/ }));
     expect(screen.getByLabelText("代表値を選択")).toBeInTheDocument();
     expect(screen.getByLabelText("比較項目を選択")).toBeInTheDocument();
+  });
+
+  it("shows firstLast pick description on the representative value trigger", async () => {
+    const user = userEvent.setup();
+    usePathname.mockReturnValue("/portfolios/ideco/trends/");
+    mockPortfolioTime({
+      availableDates: ["2026-05-31", "2026-06-07"],
+      trendBucketPick: "firstLast",
+    });
+
+    render(<SnapshotTimeBar />);
+
+    await user.click(screen.getByRole("button", { name: /表示の詳細設定/ }));
+    expect(screen.getByLabelText("代表値を選択")).toHaveAttribute(
+      "title",
+      "表示単位で集約するとき、最初の区間は期初、2つ目以降は期末のスナップショットを代表値にします。",
+    );
   });
 
   it("shows historical badge when viewing past snapshot", () => {

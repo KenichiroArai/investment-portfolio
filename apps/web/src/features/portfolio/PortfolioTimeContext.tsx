@@ -351,7 +351,7 @@ export function PortfolioTimeProvider({
     (pick: TrendBucketPick) => {
       let result: void = undefined;
       const updates: Record<string, string | null> = {
-        pick: pick === "last" ? null : pick,
+        pick: pick === "firstLast" ? null : pick,
       };
       if (pick !== "min" && pick !== "max") {
         updates.minMaxBy = null;

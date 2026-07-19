@@ -14,9 +14,16 @@ export const TREND_DISPLAY_UNITS: TrendDisplayUnit[] = [
   "12m",
 ];
 
-export type TrendBucketPick = "first" | "last" | "min" | "max" | "average";
+export type TrendBucketPick =
+  | "firstLast"
+  | "first"
+  | "last"
+  | "min"
+  | "max"
+  | "average";
 
 export const TREND_BUCKET_PICKS: TrendBucketPick[] = [
+  "firstLast",
   "first",
   "last",
   "min",
@@ -42,11 +49,19 @@ export const TREND_MIN_MAX_FIELDS: TrendMinMaxField[] = [
 ];
 
 export const TREND_BUCKET_PICK_LABELS: Record<TrendBucketPick, string> = {
+  firstLast: "期初・期末",
   first: "期初",
   last: "期末",
   min: "最小",
   max: "最大",
   average: "平均",
+};
+
+export const TREND_BUCKET_PICK_DESCRIPTIONS: Partial<
+  Record<TrendBucketPick, string>
+> = {
+  firstLast:
+    "表示単位で集約するとき、最初の区間は期初、2つ目以降は期末のスナップショットを代表値にします。",
 };
 
 export const TREND_MIN_MAX_FIELD_LABELS: Record<TrendMinMaxField, string> = {
@@ -177,10 +192,25 @@ export function readTrendDisplayUnit(value: string | null): TrendDisplayUnit {
 }
 
 export function readTrendBucketPick(value: string | null): TrendBucketPick {
-  let result: TrendBucketPick = "last";
+  let result: TrendBucketPick = "firstLast";
   if (value && TREND_BUCKET_PICKS.includes(value as TrendBucketPick)) {
     result = value as TrendBucketPick;
   }
+  return result;
+}
+
+function resolveEffectiveBucketPick(
+  pick: TrendBucketPick,
+  bucketIndex: number,
+): Exclude<TrendBucketPick, "firstLast"> {
+  let result: Exclude<TrendBucketPick, "firstLast"> = "last";
+
+  if (pick === "firstLast") {
+    result = bucketIndex === 0 ? "first" : "last";
+    return result;
+  }
+
+  result = pick;
   return result;
 }
 
@@ -514,7 +544,7 @@ type ResolvedBucketPoint = {
 
 function resolveBucketPoint(
   points: SnapshotTrendPointDto[],
-  pick: TrendBucketPick,
+  pick: Exclude<TrendBucketPick, "firstLast">,
   minMaxField: TrendMinMaxField,
   bucketKey: string,
 ): ResolvedBucketPoint | null {
@@ -605,7 +635,7 @@ function resolveAggregationOptions(
   options?: TrendAggregationOptions,
 ): { pick: TrendBucketPick; minMaxField: TrendMinMaxField } {
   let result = {
-    pick: options?.pick ?? ("last" as TrendBucketPick),
+    pick: options?.pick ?? ("firstLast" as TrendBucketPick),
     minMaxField: options?.minMaxField ?? ("marketValue" as TrendMinMaxField),
   };
   return result;
@@ -629,8 +659,14 @@ export function aggregateTrendPoints(
   if (unit === "day") {
     result = [...points]
       .sort((left, right) => left.asOfDate.localeCompare(right.asOfDate))
-      .map((point) => {
-        const resolved = resolveBucketPoint([point], pick, minMaxField, point.asOfDate)!;
+      .map((point, index) => {
+        const effectivePick = resolveEffectiveBucketPick(pick, index);
+        const resolved = resolveBucketPoint(
+          [point],
+          effectivePick,
+          minMaxField,
+          point.asOfDate,
+        )!;
         let aggregated = toAggregatedTrendPoint(
           resolved.point,
           point.asOfDate,
@@ -669,10 +705,11 @@ export function aggregateTrendPoints(
 
   result = [...buckets.entries()]
     .sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey))
-    .flatMap(([bucketKey, entry]) => {
+    .flatMap(([bucketKey, entry], index) => {
+      const effectivePick = resolveEffectiveBucketPick(pick, index);
       const resolved = resolveBucketPoint(
         entry.points,
-        pick,
+        effectivePick,
         minMaxField,
         bucketKey,
       )!;
@@ -708,7 +745,7 @@ function formatCalendarMonthBucketLabel(yearMonth: string): string {
 }
 
 /**
- * 暦月ごとに集約する。既定の pick は期末（その月の最終スナップショット）。
+ * 暦月ごとに集約する。既定の pick は期初・期末。
  */
 export function aggregateTrendPointsByCalendarMonth(
   points: SnapshotTrendPointDto[],
@@ -743,11 +780,12 @@ export function aggregateTrendPointsByCalendarMonth(
 
   result = [...buckets.entries()]
     .sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey))
-    .flatMap(([yearMonth, bucketPoints]) => {
+    .flatMap(([yearMonth, bucketPoints], index) => {
       // バケットは必ず1件以上の点を持つため resolveBucketPoint は null を返さない
+      const effectivePick = resolveEffectiveBucketPick(pick, index);
       const resolved = resolveBucketPoint(
         bucketPoints,
-        pick,
+        effectivePick,
         minMaxField,
         yearMonth,
       )!;

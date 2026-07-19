@@ -66,7 +66,13 @@ describe("snapshot-trend-aggregation", () => {
       createPoint("2026-06-05", 150),
       createPoint("2026-06-09", 200),
     ];
-    const aggregated = aggregateTrendPoints(points, "week", "2026-06-01", "2026-06-30");
+    const aggregated = aggregateTrendPoints(
+      points,
+      "week",
+      "2026-06-01",
+      "2026-06-30",
+      { pick: "last" },
+    );
     expect(aggregated).toHaveLength(2);
     expect(aggregated[0]).toMatchObject({
       bucketKey: "2026-06-07",
@@ -88,7 +94,13 @@ describe("snapshot-trend-aggregation", () => {
       createPoint("2026-06-07", 200),
       createPoint("2026-07-15", 300),
     ];
-    const aggregated = aggregateTrendPoints(points, "1m", "2026-06-01", "2026-07-31");
+    const aggregated = aggregateTrendPoints(
+      points,
+      "1m",
+      "2026-06-01",
+      "2026-07-31",
+      { pick: "last" },
+    );
     expect(aggregated).toHaveLength(2);
     expect(aggregated[0]).toMatchObject({
       bucketKey: "2026-07-01",
@@ -110,7 +122,13 @@ describe("snapshot-trend-aggregation", () => {
       createPoint("2026-05-31", 200),
       createPoint("2026-06-07", 300),
     ];
-    const aggregated = aggregateTrendPoints(points, "3m", "2026-01-15", "2026-06-30");
+    const aggregated = aggregateTrendPoints(
+      points,
+      "3m",
+      "2026-01-15",
+      "2026-06-30",
+      { pick: "last" },
+    );
     expect(aggregated).toHaveLength(2);
     expect(aggregated[0]).toMatchObject({
       bucketKey: "2026-04-15",
@@ -134,7 +152,9 @@ describe("snapshot-trend-aggregation", () => {
       createPoint("2026-06-10", 280),
       createPoint("2026-06-11", 300),
     ];
-    const built = buildTrendDisplayPoints(points, "3m", "2026-03-11", "2026-06-11");
+    const built = buildTrendDisplayPoints(points, "3m", "2026-03-11", "2026-06-11", {
+      pick: "last",
+    });
     expect(built.displayPoints).toHaveLength(1);
     expect(built.displayPoints[0]).toMatchObject({
       bucketKey: "2026-06-11",
@@ -197,10 +217,12 @@ describe("snapshot-trend-aggregation", () => {
   });
 
   it("reads bucket pick and min/max field from query value", () => {
-    expect(readTrendBucketPick(null)).toBe("last");
+    expect(readTrendBucketPick(null)).toBe("firstLast");
     expect(readTrendBucketPick("first")).toBe("first");
+    expect(readTrendBucketPick("last")).toBe("last");
+    expect(readTrendBucketPick("firstLast")).toBe("firstLast");
     expect(readTrendBucketPick("average")).toBe("average");
-    expect(readTrendBucketPick("invalid")).toBe("last");
+    expect(readTrendBucketPick("invalid")).toBe("firstLast");
     expect(readTrendMinMaxField(null)).toBe("marketValue");
     expect(readTrendMinMaxField("unrealizedGain")).toBe("unrealizedGain");
     expect(readTrendMinMaxField("invalid")).toBe("marketValue");
@@ -226,6 +248,30 @@ describe("snapshot-trend-aggregation", () => {
     expect(aggregated[1]).toMatchObject({
       sourceAsOfDate: "2026-06-09",
       totalMarketValueMinor: 200,
+    });
+  });
+
+  it("aggregates firstLast as first bucket opening and later buckets closing", () => {
+    const points = [
+      createPoint("2026-06-02", 100),
+      createPoint("2026-06-05", 150),
+      createPoint("2026-06-09", 200),
+      createPoint("2026-06-12", 250),
+    ];
+    const aggregated = aggregateTrendPoints(
+      points,
+      "week",
+      "2026-06-01",
+      "2026-06-30",
+      { pick: "firstLast" },
+    );
+    expect(aggregated[0]).toMatchObject({
+      sourceAsOfDate: "2026-06-02",
+      totalMarketValueMinor: 100,
+    });
+    expect(aggregated[1]).toMatchObject({
+      sourceAsOfDate: "2026-06-12",
+      totalMarketValueMinor: 250,
     });
   });
 
@@ -385,7 +431,9 @@ describe("snapshot-trend-aggregation", () => {
       createPoint("2026-07-15", 300),
       createPoint("2027-01-15", 400),
     ];
-    const sixMonth = aggregateTrendPoints(points, "6m", "2026-01-15", "2027-01-15");
+    const sixMonth = aggregateTrendPoints(points, "6m", "2026-01-15", "2027-01-15", {
+      pick: "last",
+    });
     expect(sixMonth).toHaveLength(2);
     expect(sixMonth[0]).toMatchObject({
       bucketKey: "2026-07-15",
@@ -398,7 +446,13 @@ describe("snapshot-trend-aggregation", () => {
       totalMarketValueMinor: 400,
     });
 
-    const twelveMonth = aggregateTrendPoints(points, "12m", "2026-01-15", "2027-01-15");
+    const twelveMonth = aggregateTrendPoints(
+      points,
+      "12m",
+      "2026-01-15",
+      "2027-01-15",
+      { pick: "last" },
+    );
     expect(twelveMonth).toHaveLength(1);
     expect(twelveMonth[0]).toMatchObject({
       bucketKey: "2027-01-15",
@@ -620,7 +674,7 @@ describe("snapshot-trend-aggregation", () => {
     const { toAggregatedTrendPoint, resolveAggregationOptions } =
       __snapshotTrendAggregationTesting;
     expect(resolveAggregationOptions()).toEqual({
-      pick: "last",
+      pick: "firstLast",
       minMaxField: "marketValue",
     });
     expect(resolveAggregationOptions({ pick: "first" }).pick).toBe("first");
