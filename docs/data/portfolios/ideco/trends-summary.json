@@ -220,6 +220,56 @@
             "ratio": 0.4246242460859088
           }
         ],
+        "ideco_axis_distributed-combination-1": [
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 130962,
+            "ratio": 0.2084412979951997
+          },
+          {
+            "valueCode": "developed_bond",
+            "valueName": "先進国債券",
+            "marketValueMinor": 127953,
+            "ratio": 0.20365212353491688
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 96469,
+            "ratio": 0.15354166534031946
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 90103,
+            "ratio": 0.14340943383012994
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外不動産",
+            "marketValueMinor": 53579,
+            "ratio": 0.0852772277858066
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内不動産,",
+            "marketValueMinor": 51874,
+            "ratio": 0.0825635214199767
+          },
+          {
+            "valueCode": "emerging_equity",
+            "valueName": "新興国株式",
+            "marketValueMinor": 40692,
+            "ratio": 0.06476606418671572
+          },
+          {
+            "valueCode": "emerging_bond",
+            "valueName": "新興国債券",
+            "marketValueMinor": 36660,
+            "ratio": 0.05834866590693499
+          }
+        ],
         "__portfolio_instruments__": [
           {
             "valueCode": "4a4cde1a-6fcb-43d7-8a89-ffc676a423b4",
@@ -544,6 +594,56 @@
             "valueName": "内外資産複合",
             "marketValueMinor": 732434,
             "ratio": 0.42650621212050627
+          }
+        ],
+        "ideco_axis_distributed-combination-1": [
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 131242,
+            "ratio": 0.2088999177083118
+          },
+          {
+            "valueCode": "developed_bond",
+            "valueName": "先進国債券",
+            "marketValueMinor": 127805,
+            "ratio": 0.20342919174281698
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 96892,
+            "ratio": 0.15422449236215346
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 90198,
+            "ratio": 0.14356954921027038
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外不動産",
+            "marketValueMinor": 53480,
+            "ratio": 0.08512494170342202
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内不動産,",
+            "marketValueMinor": 50990,
+            "ratio": 0.08116157025911536
+          },
+          {
+            "valueCode": "emerging_equity",
+            "valueName": "新興国株式",
+            "marketValueMinor": 40976,
+            "ratio": 0.06522213184815671
+          },
+          {
+            "valueCode": "emerging_bond",
+            "valueName": "新興国債券",
+            "marketValueMinor": 36670,
+            "ratio": 0.058368205165753285
           }
         ],
         "__portfolio_instruments__": [
@@ -872,6 +972,56 @@
             "ratio": 0.43185973739474526
           }
         ],
+        "ideco_axis_distributed-combination-1": [
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 128021,
+            "ratio": 0.2058847652574987
+          },
+          {
+            "valueCode": "developed_bond",
+            "valueName": "先進国債券",
+            "marketValueMinor": 127438,
+            "ratio": 0.2049471783135979
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 94646,
+            "ratio": 0.15221072708822161
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 89944,
+            "ratio": 0.14464891952351927
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外不動産",
+            "marketValueMinor": 53882,
+            "ratio": 0.08665361871571495
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内不動産,",
+            "marketValueMinor": 51406,
+            "ratio": 0.08267168857317922
+          },
+          {
+            "valueCode": "emerging_equity",
+            "valueName": "新興国株式",
+            "marketValueMinor": 40040,
+            "ratio": 0.0643927636943177
+          },
+          {
+            "valueCode": "emerging_bond",
+            "valueName": "新興国債券",
+            "marketValueMinor": 36432,
+            "ratio": 0.058590338833950616
+          }
+        ],
         "__portfolio_instruments__": [
           {
             "valueCode": "4a4cde1a-6fcb-43d7-8a89-ffc676a423b4",
@@ -1196,6 +1346,56 @@
             "valueName": "内外資産複合",
             "marketValueMinor": 724160,
             "ratio": 0.43100887955903966
+          }
+        ],
+        "ideco_axis_distributed-combination-1": [
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 129475,
+            "ratio": 0.20837759194525451
+          },
+          {
+            "valueCode": "developed_bond",
+            "valueName": "先進国債券",
+            "marketValueMinor": 127201,
+            "ratio": 0.20471780709039056
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 94856,
+            "ratio": 0.15266163245073613
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 90241,
+            "ratio": 0.14523423266832758
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外不動産",
+            "marketValueMinor": 53290,
+            "ratio": 0.08576514288289332
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内不動産,",
+            "marketValueMinor": 51233,
+            "ratio": 0.08245459871118922
+          },
+          {
+            "valueCode": "emerging_equity",
+            "valueName": "新興国株式",
+            "marketValueMinor": 38784,
+            "ratio": 0.06241912744548948
+          },
+          {
+            "valueCode": "emerging_bond",
+            "valueName": "新興国債券",
+            "marketValueMinor": 36268,
+            "ratio": 0.05836986680571918
           }
         ],
         "__portfolio_instruments__": [
@@ -1524,6 +1724,56 @@
             "ratio": 0.4380250566919422
           }
         ],
+        "ideco_axis_distributed-combination-1": [
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 127867,
+            "ratio": 0.20523310964266742
+          },
+          {
+            "valueCode": "developed_bond",
+            "valueName": "先進国債券",
+            "marketValueMinor": 127560,
+            "ratio": 0.204740358857396
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 94671,
+            "ratio": 0.15195182277664265
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 90230,
+            "ratio": 0.14482378943009439
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外不動産",
+            "marketValueMinor": 54426,
+            "ratio": 0.08735652846638942
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内不動産,",
+            "marketValueMinor": 51877,
+            "ratio": 0.08326525240236071
+          },
+          {
+            "valueCode": "emerging_equity",
+            "valueName": "新興国株式",
+            "marketValueMinor": 39958,
+            "ratio": 0.06413464455333827
+          },
+          {
+            "valueCode": "emerging_bond",
+            "valueName": "新興国債券",
+            "marketValueMinor": 36444,
+            "ratio": 0.058494493871111164
+          }
+        ],
         "__portfolio_instruments__": [
           {
             "valueCode": "4a4cde1a-6fcb-43d7-8a89-ffc676a423b4",
@@ -1848,6 +2098,56 @@
             "valueName": "内外資産複合",
             "marketValueMinor": 722501,
             "ratio": 0.44482677945857424
+          }
+        ],
+        "ideco_axis_distributed-combination-1": [
+          {
+            "valueCode": "developed_bond",
+            "valueName": "先進国債券",
+            "marketValueMinor": 127568,
+            "ratio": 0.20563543748791024
+          },
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 127290,
+            "ratio": 0.20518731059384873
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 93355,
+            "ratio": 0.1504852021406925
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 90188,
+            "ratio": 0.14538010187632988
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外不動産",
+            "marketValueMinor": 54621,
+            "ratio": 0.08804726287961828
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内不動産,",
+            "marketValueMinor": 51794,
+            "ratio": 0.08349023147849635
+          },
+          {
+            "valueCode": "emerging_equity",
+            "valueName": "新興国株式",
+            "marketValueMinor": 39039,
+            "ratio": 0.06292958927074602
+          },
+          {
+            "valueCode": "emerging_bond",
+            "valueName": "新興国債券",
+            "marketValueMinor": 36505,
+            "ratio": 0.05884486427235799
           }
         ],
         "__portfolio_instruments__": [
@@ -2176,6 +2476,56 @@
             "ratio": 0.4411375348396436
           }
         ],
+        "ideco_axis_distributed-combination-1": [
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 129003,
+            "ratio": 0.2065720407241703
+          },
+          {
+            "valueCode": "developed_bond",
+            "valueName": "先進国債券",
+            "marketValueMinor": 127814,
+            "ratio": 0.20466809929318777
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 94673,
+            "ratio": 0.15159953498352266
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 90473,
+            "ratio": 0.14487409006331525
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外不動産",
+            "marketValueMinor": 54591,
+            "ratio": 0.08741637229501004
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内不動産,",
+            "marketValueMinor": 52264,
+            "ratio": 0.08369015554993323
+          },
+          {
+            "valueCode": "emerging_equity",
+            "valueName": "新興国株式",
+            "marketValueMinor": 39058,
+            "ratio": 0.06254343516510967
+          },
+          {
+            "valueCode": "emerging_bond",
+            "valueName": "新興国債券",
+            "marketValueMinor": 36618,
+            "ratio": 0.05863627192575109
+          }
+        ],
         "__portfolio_instruments__": [
           {
             "valueCode": "4a4cde1a-6fcb-43d7-8a89-ffc676a423b4",
@@ -2502,6 +2852,56 @@
             "ratio": 0.4350817382246055
           }
         ],
+        "ideco_axis_distributed-combination-1": [
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 132909,
+            "ratio": 0.21025613442825752
+          },
+          {
+            "valueCode": "developed_bond",
+            "valueName": "先進国債券",
+            "marketValueMinor": 128091,
+            "ratio": 0.20263427243489857
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 95257,
+            "ratio": 0.15069234286039718
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 90790,
+            "ratio": 0.14362574727626798
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外不動産",
+            "marketValueMinor": 55249,
+            "ratio": 0.08740146394169544
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内不動産,",
+            "marketValueMinor": 52644,
+            "ratio": 0.08328046965097315
+          },
+          {
+            "valueCode": "emerging_equity",
+            "valueName": "新興国株式",
+            "marketValueMinor": 40241,
+            "ratio": 0.06365947456927304
+          },
+          {
+            "valueCode": "emerging_bond",
+            "valueName": "新興国債券",
+            "marketValueMinor": 36948,
+            "ratio": 0.058450094838237134
+          }
+        ],
         "__portfolio_instruments__": [
           {
             "valueCode": "4a4cde1a-6fcb-43d7-8a89-ffc676a423b4",
@@ -2826,6 +3226,56 @@
             "valueName": "内外資産複合",
             "marketValueMinor": 737056,
             "ratio": 0.43544655580263775
+          }
+        ],
+        "ideco_axis_distributed-combination-1": [
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 132629,
+            "ratio": 0.20943912275881235
+          },
+          {
+            "valueCode": "developed_bond",
+            "valueName": "先進国債券",
+            "marketValueMinor": 128288,
+            "ratio": 0.2025840968452037
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 96791,
+            "ratio": 0.15284607537528147
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 90463,
+            "ratio": 0.14285330781450847
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外不動産",
+            "marketValueMinor": 55003,
+            "ratio": 0.08685717353748393
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内不動産,",
+            "marketValueMinor": 51721,
+            "ratio": 0.08167445180321449
+          },
+          {
+            "valueCode": "emerging_equity",
+            "valueName": "新興国株式",
+            "marketValueMinor": 41246,
+            "ratio": 0.06513301055809796
+          },
+          {
+            "valueCode": "emerging_bond",
+            "valueName": "新興国債券",
+            "marketValueMinor": 37117,
+            "ratio": 0.058612761307397614
           }
         ],
         "__portfolio_instruments__": [
@@ -3158,6 +3608,56 @@
             "valueName": "内外資産複合",
             "marketValueMinor": 737732,
             "ratio": 0.4357998444019251
+          }
+        ],
+        "ideco_axis_distributed-combination-1": [
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 135186,
+            "ratio": 0.21316694497925665
+          },
+          {
+            "valueCode": "developed_bond",
+            "valueName": "先進国債券",
+            "marketValueMinor": 128383,
+            "ratio": 0.20243968974059373
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 95550,
+            "ratio": 0.15066724063710718
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 90609,
+            "ratio": 0.14287606495957766
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外不動産",
+            "marketValueMinor": 54119,
+            "ratio": 0.08533710513908534
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内不動産,",
+            "marketValueMinor": 51440,
+            "ratio": 0.0811127457705159
+          },
+          {
+            "valueCode": "emerging_equity",
+            "valueName": "新興国株式",
+            "marketValueMinor": 41704,
+            "ratio": 0.06576061332841358
+          },
+          {
+            "valueCode": "emerging_bond",
+            "valueName": "新興国債券",
+            "marketValueMinor": 37188,
+            "ratio": 0.058639595445449944
           }
         ],
         "__portfolio_instruments__": [
@@ -3499,6 +3999,56 @@
             "ratio": 0.44435250335200505
           }
         ],
+        "ideco_axis_distributed-combination-1": [
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 134418,
+            "ratio": 0.21168722361508321
+          },
+          {
+            "valueCode": "developed_bond",
+            "valueName": "先進国債券",
+            "marketValueMinor": 128562,
+            "ratio": 0.20246494399858894
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 96636,
+            "ratio": 0.15218651178612375
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 90397,
+            "ratio": 0.14236106736547693
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外不動産",
+            "marketValueMinor": 54219,
+            "ratio": 0.085386403436937
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内不動産,",
+            "marketValueMinor": 51655,
+            "ratio": 0.08134850641905937
+          },
+          {
+            "valueCode": "emerging_equity",
+            "valueName": "新興国株式",
+            "marketValueMinor": 42036,
+            "ratio": 0.06620009323069558
+          },
+          {
+            "valueCode": "emerging_bond",
+            "valueName": "新興国債券",
+            "marketValueMinor": 37061,
+            "ratio": 0.05836525014803522
+          }
+        ],
         "__portfolio_instruments__": [
           {
             "valueCode": "4a4cde1a-6fcb-43d7-8a89-ffc676a423b4",
@@ -3832,6 +4382,56 @@
             "ratio": 0.4417470251685514
           }
         ],
+        "ideco_axis_distributed-combination-1": [
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 136080,
+            "ratio": 0.2136683022571148
+          },
+          {
+            "valueCode": "developed_bond",
+            "valueName": "先進国債券",
+            "marketValueMinor": 128685,
+            "ratio": 0.2020569185475957
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 96861,
+            "ratio": 0.15208792934249263
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 90323,
+            "ratio": 0.14182217860647695
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外不動産",
+            "marketValueMinor": 54318,
+            "ratio": 0.0852883218842002
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内不動産,",
+            "marketValueMinor": 51406,
+            "ratio": 0.08071599607458292
+          },
+          {
+            "valueCode": "emerging_equity",
+            "valueName": "新興国株式",
+            "marketValueMinor": 42083,
+            "ratio": 0.06607733071638862
+          },
+          {
+            "valueCode": "emerging_bond",
+            "valueName": "新興国債券",
+            "marketValueMinor": 37119,
+            "ratio": 0.05828302257114818
+          }
+        ],
         "__portfolio_instruments__": [
           {
             "valueCode": "4a4cde1a-6fcb-43d7-8a89-ffc676a423b4",
@@ -4156,6 +4756,56 @@
             "valueName": "内外資産複合",
             "marketValueMinor": 737779,
             "ratio": 0.444412519079923
+          }
+        ],
+        "ideco_axis_distributed-combination-1": [
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 132601,
+            "ratio": 0.2090693802385202
+          },
+          {
+            "valueCode": "developed_bond",
+            "valueName": "先進国債券",
+            "marketValueMinor": 128538,
+            "ratio": 0.20266332830897887
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 96584,
+            "ratio": 0.15228208702013735
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 90323,
+            "ratio": 0.14241049186117646
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外不動産",
+            "marketValueMinor": 54896,
+            "ratio": 0.08655344000100908
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内不動産,",
+            "marketValueMinor": 51611,
+            "ratio": 0.08137404532009763
+          },
+          {
+            "valueCode": "emerging_equity",
+            "valueName": "新興国株式",
+            "marketValueMinor": 42551,
+            "ratio": 0.0670893220905519
+          },
+          {
+            "valueCode": "emerging_bond",
+            "valueName": "新興国債券",
+            "marketValueMinor": 37140,
+            "ratio": 0.05855790515952851
           }
         ],
         "__portfolio_instruments__": [
@@ -4484,6 +5134,56 @@
             "ratio": 0.4460586903332675
           }
         ],
+        "ideco_axis_distributed-combination-1": [
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 131715,
+            "ratio": 0.20871495667716725
+          },
+          {
+            "valueCode": "developed_bond",
+            "valueName": "先進国債券",
+            "marketValueMinor": 128448,
+            "ratio": 0.20353808416102023
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 95271,
+            "ratio": 0.15096596923349961
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 90355,
+            "ratio": 0.14317609923368976
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外不動産",
+            "marketValueMinor": 55378,
+            "ratio": 0.08775171294741045
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内不動産,",
+            "marketValueMinor": 51994,
+            "ratio": 0.08238944279294412
+          },
+          {
+            "valueCode": "emerging_equity",
+            "valueName": "新興国株式",
+            "marketValueMinor": 40953,
+            "ratio": 0.06489392719735816
+          },
+          {
+            "valueCode": "emerging_bond",
+            "valueName": "新興国債券",
+            "marketValueMinor": 36962,
+            "ratio": 0.05856980775691042
+          }
+        ],
         "__portfolio_instruments__": [
           {
             "valueCode": "4a4cde1a-6fcb-43d7-8a89-ffc676a423b4",
@@ -4808,6 +5508,56 @@
             "valueName": "内外資産複合",
             "marketValueMinor": 737255,
             "ratio": 0.45138429701466953
+          }
+        ],
+        "ideco_axis_distributed-combination-1": [
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 131707,
+            "ratio": 0.20755968796785124
+          },
+          {
+            "valueCode": "developed_bond",
+            "valueName": "先進国債券",
+            "marketValueMinor": 129045,
+            "ratio": 0.20336458907887478
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 95338,
+            "ratio": 0.150245055551178
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 90715,
+            "ratio": 0.1429595776534552
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外不動産",
+            "marketValueMinor": 56026,
+            "ratio": 0.08829249074147033
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内不動産,",
+            "marketValueMinor": 53097,
+            "ratio": 0.08367662122764163
+          },
+          {
+            "valueCode": "emerging_equity",
+            "valueName": "新興国株式",
+            "marketValueMinor": 41494,
+            "ratio": 0.065391222125916
+          },
+          {
+            "valueCode": "emerging_bond",
+            "valueName": "新興国債券",
+            "marketValueMinor": 37128,
+            "ratio": 0.05851075565361279
           }
         ],
         "__portfolio_instruments__": [
@@ -5136,6 +5886,56 @@
             "ratio": 0.44825316646653846
           }
         ],
+        "ideco_axis_distributed-combination-1": [
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 132450,
+            "ratio": 0.2087806077572754
+          },
+          {
+            "valueCode": "developed_bond",
+            "valueName": "先進国債券",
+            "marketValueMinor": 129118,
+            "ratio": 0.2035283843896103
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 95197,
+            "ratio": 0.15005879589784332
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 90567,
+            "ratio": 0.1427605383371322
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外不動産",
+            "marketValueMinor": 56600,
+            "ratio": 0.08921844015901689
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内不動産,",
+            "marketValueMinor": 52944,
+            "ratio": 0.08345549639185496
+          },
+          {
+            "valueCode": "emerging_equity",
+            "valueName": "新興国株式",
+            "marketValueMinor": 40324,
+            "ratio": 0.06356262157194695
+          },
+          {
+            "valueCode": "emerging_bond",
+            "valueName": "新興国債券",
+            "marketValueMinor": 37198,
+            "ratio": 0.058635115495319974
+          }
+        ],
         "__portfolio_instruments__": [
           {
             "valueCode": "4a4cde1a-6fcb-43d7-8a89-ffc676a423b4",
@@ -5460,6 +6260,56 @@
             "valueName": "内外資産複合",
             "marketValueMinor": 739048,
             "ratio": 0.45035069010694373
+          }
+        ],
+        "ideco_axis_distributed-combination-1": [
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 132872,
+            "ratio": 0.20869182804818673
+          },
+          {
+            "valueCode": "developed_bond",
+            "valueName": "先進国債券",
+            "marketValueMinor": 129723,
+            "ratio": 0.2037459360128163
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 96633,
+            "ratio": 0.1517740187532394
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 90197,
+            "ratio": 0.14166548869936704
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外不動産",
+            "marketValueMinor": 56697,
+            "ratio": 0.08904961598266033
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内不動産,",
+            "marketValueMinor": 52742,
+            "ratio": 0.08283780175595659
+          },
+          {
+            "valueCode": "emerging_equity",
+            "valueName": "新興国株式",
+            "marketValueMinor": 40473,
+            "ratio": 0.06356782735711257
+          },
+          {
+            "valueCode": "emerging_bond",
+            "valueName": "新興国債券",
+            "marketValueMinor": 37353,
+            "ratio": 0.05866748339066107
           }
         ],
         "__portfolio_instruments__": [
@@ -5788,6 +6638,56 @@
             "ratio": 0.45252720354693515
           }
         ],
+        "ideco_axis_distributed-combination-1": [
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 133432,
+            "ratio": 0.20936486965690598
+          },
+          {
+            "valueCode": "developed_bond",
+            "valueName": "先進国債券",
+            "marketValueMinor": 129747,
+            "ratio": 0.20358282678348957
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 97586,
+            "ratio": 0.15311979263099426
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 90112,
+            "ratio": 0.14139252304187236
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外不動産",
+            "marketValueMinor": 55913,
+            "ratio": 0.08773171321067348
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内不動産,",
+            "marketValueMinor": 52174,
+            "ratio": 0.08186494026529927
+          },
+          {
+            "valueCode": "emerging_equity",
+            "valueName": "新興国株式",
+            "marketValueMinor": 40937,
+            "ratio": 0.06423323992104413
+          },
+          {
+            "valueCode": "emerging_bond",
+            "valueName": "新興国債券",
+            "marketValueMinor": 37417,
+            "ratio": 0.05871009448972099
+          }
+        ],
         "__portfolio_instruments__": [
           {
             "valueCode": "4a4cde1a-6fcb-43d7-8a89-ffc676a423b4",
@@ -6112,6 +7012,56 @@
             "valueName": "内外資産複合",
             "marketValueMinor": 738852,
             "ratio": 0.44224891809872685
+          }
+        ],
+        "ideco_axis_distributed-combination-1": [
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 135195,
+            "ratio": 0.21235406008648408
+          },
+          {
+            "valueCode": "developed_bond",
+            "valueName": "先進国債券",
+            "marketValueMinor": 128530,
+            "ratio": 0.20188518320141868
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 96633,
+            "ratio": 0.15178379295341704
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 89774,
+            "ratio": 0.14101019557087185
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外不動産",
+            "marketValueMinor": 56110,
+            "ratio": 0.08813333563706217
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内不動産,",
+            "marketValueMinor": 53456,
+            "ratio": 0.08396463357360177
+          },
+          {
+            "valueCode": "emerging_equity",
+            "valueName": "新興国株式",
+            "marketValueMinor": 39774,
+            "ratio": 0.062473984880208715
+          },
+          {
+            "valueCode": "emerging_bond",
+            "valueName": "新興国債券",
+            "marketValueMinor": 37177,
+            "ratio": 0.05839481409693567
           }
         ],
         "__portfolio_instruments__": [
@@ -6440,6 +7390,56 @@
             "ratio": 0.44390362253259597
           }
         ],
+        "ideco_axis_distributed-combination-1": [
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 133256,
+            "ratio": 0.20929198883616906
+          },
+          {
+            "valueCode": "developed_bond",
+            "valueName": "先進国債券",
+            "marketValueMinor": 128922,
+            "ratio": 0.20248500468824357
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 97548,
+            "ratio": 0.15320897315686063
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 89245,
+            "ratio": 0.14016827417665176
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外不動産",
+            "marketValueMinor": 56722,
+            "ratio": 0.08908762225164481
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内不動産,",
+            "marketValueMinor": 53429,
+            "ratio": 0.08391563360394787
+          },
+          {
+            "valueCode": "emerging_equity",
+            "valueName": "新興国株式",
+            "marketValueMinor": 40108,
+            "ratio": 0.0629936594843089
+          },
+          {
+            "valueCode": "emerging_bond",
+            "valueName": "新興国債券",
+            "marketValueMinor": 37469,
+            "ratio": 0.058848843802173395
+          }
+        ],
         "__portfolio_instruments__": [
           {
             "valueCode": "4a4cde1a-6fcb-43d7-8a89-ffc676a423b4",
@@ -6766,6 +7766,56 @@
             "ratio": 0.4447984030926836
           }
         ],
+        "ideco_axis_distributed-combination-1": [
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 134246,
+            "ratio": 0.2108415853246743
+          },
+          {
+            "valueCode": "developed_bond",
+            "valueName": "先進国債券",
+            "marketValueMinor": 128660,
+            "ratio": 0.20206842936007477
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 97841,
+            "ratio": 0.1536652976606488
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 89763,
+            "ratio": 0.14097830269429806
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外不動産",
+            "marketValueMinor": 55943,
+            "ratio": 0.08786191624196069
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内不動産,",
+            "marketValueMinor": 53195,
+            "ratio": 0.08354601352253363
+          },
+          {
+            "valueCode": "emerging_equity",
+            "valueName": "新興国株式",
+            "marketValueMinor": 39741,
+            "ratio": 0.06241568048498936
+          },
+          {
+            "valueCode": "emerging_bond",
+            "valueName": "新興国債券",
+            "marketValueMinor": 37326,
+            "ratio": 0.058622774710820384
+          }
+        ],
         "__portfolio_instruments__": [
           {
             "valueCode": "4a4cde1a-6fcb-43d7-8a89-ffc676a423b4",
@@ -7090,6 +8140,56 @@
             "valueName": "内外資産複合",
             "marketValueMinor": 738509,
             "ratio": 0.4500441811855183
+          }
+        ],
+        "ideco_axis_distributed-combination-1": [
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 130349,
+            "ratio": 0.20500992422359857
+          },
+          {
+            "valueCode": "developed_bond",
+            "valueName": "先進国債券",
+            "marketValueMinor": 128979,
+            "ratio": 0.20285521957541308
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 98024,
+            "ratio": 0.15416990396622934
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 90123,
+            "ratio": 0.14174339197694938
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外不動産",
+            "marketValueMinor": 57622,
+            "ratio": 0.09062656294725849
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内不動産,",
+            "marketValueMinor": 53702,
+            "ratio": 0.08446127665464016
+          },
+          {
+            "valueCode": "emerging_equity",
+            "valueName": "新興国株式",
+            "marketValueMinor": 39579,
+            "ratio": 0.06224894545294408
+          },
+          {
+            "valueCode": "emerging_bond",
+            "valueName": "新興国債券",
+            "marketValueMinor": 37440,
+            "ratio": 0.05888477520296689
           }
         ],
         "__portfolio_instruments__": [

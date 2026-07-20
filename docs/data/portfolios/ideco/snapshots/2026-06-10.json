@@ -36,6 +36,10 @@
     {
       "schemeCode": "ideco_axis_4381cf4c",
       "schemeName": "その他"
+    },
+    {
+      "schemeCode": "ideco_axis_distributed-combination-1",
+      "schemeName": "分散組み合わせ（先進国統一、ゴールド除く）"
     }
   ],
   "metrics": [
@@ -109,63 +113,70 @@
           "schemeName": "資産分類",
           "valueCode": "equity",
           "valueName": "株式",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_axis_40470d15",
           "schemeName": "主要資産：資産分類",
           "valueCode": "equity",
           "valueName": "株式",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_axis_7452352e",
           "schemeName": "主要資産：地域分類",
           "valueCode": "domestic",
           "valueName": "国内",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_axis_9b6ea403",
           "schemeName": "主要資産",
           "valueCode": "domestic_equity",
           "valueName": "国内株式",
-          "allocationWeight": null
+          "allocationWeight": 0.1
+        },
+        {
+          "schemeCode": "ideco_axis_distributed-combination-1",
+          "schemeName": "分散組み合わせ（先進国統一、ゴールド除く）",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式",
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_major_category",
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_product_group",
           "schemeName": "商品グループ",
           "valueCode": "major_assets",
           "valueName": "主要資産",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_product_style",
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
           "valueName": "パッシブ",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_product_type",
           "schemeName": "すべて",
           "valueCode": "domestic_equity",
           "valueName": "国内株式",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_region",
           "schemeName": "地域分類",
           "valueCode": "domestic",
           "valueName": "国内",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         }
       ]
     },
@@ -475,63 +486,70 @@
           "schemeName": "資産分類",
           "valueCode": "equity",
           "valueName": "株式",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_axis_40470d15",
           "schemeName": "主要資産：資産分類",
           "valueCode": "equity",
           "valueName": "株式",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_axis_7452352e",
           "schemeName": "主要資産：地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_axis_9b6ea403",
           "schemeName": "主要資産",
           "valueCode": "foreign_equity",
           "valueName": "海外株式",
-          "allocationWeight": null
+          "allocationWeight": 0.1
+        },
+        {
+          "schemeCode": "ideco_axis_distributed-combination-1",
+          "schemeName": "分散組み合わせ（先進国統一、ゴールド除く）",
+          "valueCode": "developed_equity",
+          "valueName": "先進国株式",
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_major_category",
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_product_group",
           "schemeName": "商品グループ",
           "valueCode": "major_assets",
           "valueName": "主要資産",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_product_style",
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
           "valueName": "パッシブ",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_product_type",
           "schemeName": "すべて",
           "valueCode": "foreign_equity",
           "valueName": "海外株式",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_region",
           "schemeName": "地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         }
       ]
     },
@@ -597,63 +615,70 @@
           "schemeName": "資産分類",
           "valueCode": "equity",
           "valueName": "株式",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_axis_40470d15",
           "schemeName": "主要資産：資産分類",
           "valueCode": "equity",
           "valueName": "株式",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_axis_7452352e",
           "schemeName": "主要資産：地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_axis_9b6ea403",
           "schemeName": "主要資産",
           "valueCode": "foreign_equity",
           "valueName": "海外株式",
-          "allocationWeight": null
+          "allocationWeight": 0.1
+        },
+        {
+          "schemeCode": "ideco_axis_distributed-combination-1",
+          "schemeName": "分散組み合わせ（先進国統一、ゴールド除く）",
+          "valueCode": "developed_equity",
+          "valueName": "先進国株式",
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_major_category",
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_product_group",
           "schemeName": "商品グループ",
           "valueCode": "major_assets",
           "valueName": "主要資産",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_product_style",
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
           "valueName": "パッシブ",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_product_type",
           "schemeName": "すべて",
           "valueCode": "foreign_equity",
           "valueName": "海外株式",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_region",
           "schemeName": "地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         }
       ]
     },
@@ -719,63 +744,70 @@
           "schemeName": "資産分類",
           "valueCode": "equity",
           "valueName": "株式",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_axis_40470d15",
           "schemeName": "主要資産：資産分類",
           "valueCode": "equity",
           "valueName": "株式",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_axis_7452352e",
           "schemeName": "主要資産：地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_axis_9b6ea403",
           "schemeName": "主要資産",
           "valueCode": "foreign_equity",
           "valueName": "海外株式",
-          "allocationWeight": null
+          "allocationWeight": 0.1
+        },
+        {
+          "schemeCode": "ideco_axis_distributed-combination-1",
+          "schemeName": "分散組み合わせ（先進国統一、ゴールド除く）",
+          "valueCode": "emerging_equity",
+          "valueName": "新興国株式",
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_major_category",
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_product_group",
           "schemeName": "商品グループ",
           "valueCode": "major_assets",
           "valueName": "主要資産",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_product_style",
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
           "valueName": "パッシブ",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_product_type",
           "schemeName": "すべて",
           "valueCode": "foreign_equity",
           "valueName": "海外株式",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_region",
           "schemeName": "地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         }
       ]
     },
@@ -841,70 +873,77 @@
           "schemeName": "資産分類",
           "valueCode": "bond",
           "valueName": "債券",
-          "allocationWeight": null
+          "allocationWeight": 0.09090909090909091
         },
         {
           "schemeCode": "ideco_axis_40470d15",
           "schemeName": "主要資産：資産分類",
           "valueCode": "bond",
           "valueName": "債券",
-          "allocationWeight": null
+          "allocationWeight": 0.09090909090909091
         },
         {
           "schemeCode": "ideco_axis_7452352e",
           "schemeName": "主要資産：地域分類",
           "valueCode": "domestic",
           "valueName": "国内",
-          "allocationWeight": null
+          "allocationWeight": 0.09090909090909091
         },
         {
           "schemeCode": "ideco_axis_9b6ea403",
           "schemeName": "主要資産",
           "valueCode": "domestic_bond",
           "valueName": "国内債券",
-          "allocationWeight": null
+          "allocationWeight": 0.09090909090909091
+        },
+        {
+          "schemeCode": "ideco_axis_distributed-combination-1",
+          "schemeName": "分散組み合わせ（先進国統一、ゴールド除く）",
+          "valueCode": "domestic_bond",
+          "valueName": "国内債券",
+          "allocationWeight": 0.09090909090909091
         },
         {
           "schemeCode": "ideco_instrument_status",
           "schemeName": "ステータス",
           "valueCode": "exclusion_pending",
           "valueName": "除外手続中",
-          "allocationWeight": null
+          "allocationWeight": 0.09090909090909091
         },
         {
           "schemeCode": "ideco_major_category",
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
-          "allocationWeight": null
+          "allocationWeight": 0.09090909090909091
         },
         {
           "schemeCode": "ideco_product_group",
           "schemeName": "商品グループ",
           "valueCode": "major_assets",
           "valueName": "主要資産",
-          "allocationWeight": null
+          "allocationWeight": 0.09090909090909091
         },
         {
           "schemeCode": "ideco_product_style",
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
           "valueName": "パッシブ",
-          "allocationWeight": null
+          "allocationWeight": 0.09090909090909091
         },
         {
           "schemeCode": "ideco_product_type",
           "schemeName": "すべて",
           "valueCode": "domestic_bond",
           "valueName": "国内債券",
-          "allocationWeight": null
+          "allocationWeight": 0.09090909090909091
         },
         {
           "schemeCode": "ideco_region",
           "schemeName": "地域分類",
           "valueCode": "domestic",
           "valueName": "国内",
-          "allocationWeight": null
+          "allocationWeight": 0.09090909090909091
         }
       ]
     },
@@ -970,63 +1009,70 @@
           "schemeName": "資産分類",
           "valueCode": "bond",
           "valueName": "債券",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_axis_40470d15",
           "schemeName": "主要資産：資産分類",
           "valueCode": "bond",
           "valueName": "債券",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_axis_7452352e",
           "schemeName": "主要資産：地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_axis_9b6ea403",
           "schemeName": "主要資産",
           "valueCode": "foreign_bond",
           "valueName": "海外債券",
-          "allocationWeight": null
+          "allocationWeight": 0.1
+        },
+        {
+          "schemeCode": "ideco_axis_distributed-combination-1",
+          "schemeName": "分散組み合わせ（先進国統一、ゴールド除く）",
+          "valueCode": "developed_bond",
+          "valueName": "先進国債券",
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_major_category",
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_product_group",
           "schemeName": "商品グループ",
           "valueCode": "major_assets",
           "valueName": "主要資産",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_product_style",
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
           "valueName": "パッシブ",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_product_type",
           "schemeName": "すべて",
           "valueCode": "foreign_bond",
           "valueName": "海外債券",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_region",
           "schemeName": "地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         }
       ]
     },
@@ -1092,63 +1138,70 @@
           "schemeName": "資産分類",
           "valueCode": "bond",
           "valueName": "債券",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_axis_40470d15",
           "schemeName": "主要資産：資産分類",
           "valueCode": "bond",
           "valueName": "債券",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_axis_7452352e",
           "schemeName": "主要資産：地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_axis_9b6ea403",
           "schemeName": "主要資産",
           "valueCode": "foreign_bond",
           "valueName": "海外債券",
-          "allocationWeight": null
+          "allocationWeight": 0.1
+        },
+        {
+          "schemeCode": "ideco_axis_distributed-combination-1",
+          "schemeName": "分散組み合わせ（先進国統一、ゴールド除く）",
+          "valueCode": "emerging_bond",
+          "valueName": "新興国債券",
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_major_category",
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_product_group",
           "schemeName": "商品グループ",
           "valueCode": "major_assets",
           "valueName": "主要資産",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_product_style",
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
           "valueName": "パッシブ",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_product_type",
           "schemeName": "すべて",
           "valueCode": "foreign_bond",
           "valueName": "海外債券",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_region",
           "schemeName": "地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         }
       ]
     },
@@ -1214,63 +1267,70 @@
           "schemeName": "資産分類",
           "valueCode": "real_estate",
           "valueName": "不動産",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_axis_40470d15",
           "schemeName": "主要資産：資産分類",
           "valueCode": "real_estate",
           "valueName": "不動産",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_axis_7452352e",
           "schemeName": "主要資産：地域分類",
           "valueCode": "domestic",
           "valueName": "国内",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_axis_9b6ea403",
           "schemeName": "主要資産",
           "valueCode": "domestic_reit",
           "valueName": "国内不動産投信",
-          "allocationWeight": null
+          "allocationWeight": 0.1
+        },
+        {
+          "schemeCode": "ideco_axis_distributed-combination-1",
+          "schemeName": "分散組み合わせ（先進国統一、ゴールド除く）",
+          "valueCode": "domestic_reit",
+          "valueName": "国内不動産,",
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_major_category",
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_product_group",
           "schemeName": "商品グループ",
           "valueCode": "major_assets",
           "valueName": "主要資産",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_product_style",
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
           "valueName": "パッシブ",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_product_type",
           "schemeName": "すべて",
           "valueCode": "domestic_reit",
           "valueName": "国内不動産投信",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_region",
           "schemeName": "地域分類",
           "valueCode": "domestic",
           "valueName": "国内",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         }
       ]
     },
@@ -1336,63 +1396,70 @@
           "schemeName": "資産分類",
           "valueCode": "real_estate",
           "valueName": "不動産",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_axis_40470d15",
           "schemeName": "主要資産：資産分類",
           "valueCode": "real_estate",
           "valueName": "不動産",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_axis_7452352e",
           "schemeName": "主要資産：地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_axis_9b6ea403",
           "schemeName": "主要資産",
           "valueCode": "foreign_reit",
           "valueName": "海外不動産投信",
-          "allocationWeight": null
+          "allocationWeight": 0.1
+        },
+        {
+          "schemeCode": "ideco_axis_distributed-combination-1",
+          "schemeName": "分散組み合わせ（先進国統一、ゴールド除く）",
+          "valueCode": "foreign_reit",
+          "valueName": "海外不動産",
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_major_category",
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_product_group",
           "schemeName": "商品グループ",
           "valueCode": "major_assets",
           "valueName": "主要資産",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_product_style",
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
           "valueName": "パッシブ",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_product_type",
           "schemeName": "すべて",
           "valueCode": "foreign_reit",
           "valueName": "海外不動産投信",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         },
         {
           "schemeCode": "ideco_region",
           "schemeName": "地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
-          "allocationWeight": null
+          "allocationWeight": 0.1
         }
       ]
     },
