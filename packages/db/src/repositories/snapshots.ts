@@ -117,6 +117,37 @@ type CurrentSnapshotDto = {
   lines: LineDto[];
 };
 
+type NormalizedAccount = {
+  accountId: string;
+  accountName: string;
+};
+
+function normalizeAccountForPortfolio(
+  portfolioCode: string,
+  accountId: string,
+  accountName: string,
+): NormalizedAccount {
+  let result: NormalizedAccount = {
+    accountId,
+    accountName,
+  };
+
+  if (portfolioCode !== "ideco") {
+    return result;
+  }
+
+  const isUnknownIdecoAccount = accountId === "ideco:unknown" || accountName === "不明口座";
+  if (!isUnknownIdecoAccount) {
+    return result;
+  }
+
+  result = {
+    accountId: "ideco:default",
+    accountName: "iDeCo",
+  };
+  return result;
+}
+
 async function getMetricsForSnapshot(db: AppDatabase, snapshotId: string) {
   let result: SnapshotMetricRow[] = [];
 
@@ -369,12 +400,18 @@ async function buildSnapshotDto(
         };
         return attributeResult;
       });
+    const normalizedAccount = normalizeAccountForPortfolio(
+      portfolio.code,
+      line.accountId,
+      line.accountName,
+    );
+
     lineResult = {
       id: line.id,
       instrumentId: line.instrumentId,
       instrumentName: line.instrumentName,
-      accountId: line.accountId,
-      accountName: line.accountName,
+      accountId: normalizedAccount.accountId,
+      accountName: normalizedAccount.accountName,
       sortOrder: line.sortOrder,
       quantity: line.quantity,
       marketValueMinor: line.marketValueMinor,
