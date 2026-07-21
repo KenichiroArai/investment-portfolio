@@ -176,9 +176,9 @@ describe("TrendBarChart", () => {
     expect(axisLabels.some((label) => label === "0万円")).toBe(false);
     expect(axisLabels.length).toBeGreaterThan(0);
 
-    const svg = container.querySelector(".trend-bar-chart__svg");
-    const minWidth = svg?.getAttribute("style") ?? "";
-    expect(minWidth).toMatch(/min-width:\s*4\d{2}px/);
+    const canvas = container.querySelector(".trend-bar-chart__canvas");
+    const canvasWidth = canvas?.getAttribute("style") ?? "";
+    expect(canvasWidth).toMatch(/width:\s*4\d{2}px/);
   });
 
   it("shows yen unit on each y-axis tick", () => {

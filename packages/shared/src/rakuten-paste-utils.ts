@@ -119,6 +119,14 @@ export function parseRakutenPastePercentRate(value: string): number {
   return result;
 }
 
+export function finiteOrZero(value: number): number {
+  let result = 0;
+  if (Number.isFinite(value)) {
+    result = value;
+  }
+  return result;
+}
+
 export function isRakutenStockCode(value: string): boolean {
   let result = false;
   const normalized = value.trim().normalize("NFKC");
@@ -135,7 +143,7 @@ export function detectRakutenBlockKind(
   let result: RakutenPasteProductKind | null = null;
   const line = lines[index];
   const cells = splitRakutenPasteCells(line);
-  const first = (cells[0] ?? "").trim().normalize("NFKC");
+  const first = cells[0].trim().normalize("NFKC");
 
   if (first === "国内株式") {
     result = "domestic_equity";

@@ -33,6 +33,8 @@ import {
   listInstruments,
   listIdecoInstrumentsForPaste,
   listMonexInstrumentsForPaste,
+  listRakutenInstrumentsForPaste,
+  listSbiWrapInstrumentsForPaste,
   mergeInstruments,
   setInstrumentAttributes,
   updateInstrument,
@@ -1150,6 +1152,110 @@ describe("portfolio repositories", () => {
   it("returns empty monex paste instruments when monex portfolio is missing", async () => {
     const db = setup();
     expect(await listMonexInstrumentsForPaste(db)).toEqual([]);
+  });
+
+  it("lists rakuten paste instruments with ticker from attribute or external id", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "rakuten",
+      name: "楽天証券",
+      kind: "rakuten",
+    });
+    const withAttribute = await createInstrument(db, {
+      portfolioCode: "rakuten",
+      accountId: "rakuten:特定",
+      name: "ＮＦ日経高配当５０",
+      externalId: "1489__rakuten:特定",
+    });
+    await setInstrumentAttributes(db, withAttribute.id, [
+      { code: "ticker", textValue: "1489" },
+    ]);
+    const fromExternal = await createInstrument(db, {
+      portfolioCode: "rakuten",
+      accountId: "rakuten:一般",
+      name: "ＣＩＪ",
+      externalId: "4826__rakuten:一般",
+    });
+    await createInstrument(db, {
+      portfolioCode: "rakuten",
+      accountId: "rakuten:ラップ",
+      name: "現金等",
+      externalId: "account:rakuten:ラップ",
+    });
+    const bareTicker = await createInstrument(db, {
+      portfolioCode: "rakuten",
+      accountId: "rakuten:特定",
+      name: "ベアティッカー",
+      externalId: "9999",
+    });
+    await createInstrument(db, {
+      portfolioCode: "rakuten",
+      accountId: "rakuten:一般",
+      name: "空ティッカー",
+      externalId: "__rakuten:一般",
+    });
+    const withoutExternalId = await createInstrument(db, {
+      portfolioCode: "rakuten",
+      accountId: "rakuten:特定",
+      name: "属性のみ",
+    });
+
+    const rows = await listRakutenInstrumentsForPaste(db);
+    expect(rows).toHaveLength(6);
+    expect(rows.find((row) => row.id === withAttribute.id)).toEqual({
+      id: withAttribute.id,
+      name: "ＮＦ日経高配当５０",
+      ticker: "1489",
+      accountId: "rakuten:特定",
+    });
+    expect(rows.find((row) => row.id === fromExternal.id)).toEqual({
+      id: fromExternal.id,
+      name: "ＣＩＪ",
+      ticker: "4826",
+      accountId: "rakuten:一般",
+    });
+    expect(rows.find((row) => row.name === "現金等")).toMatchObject({
+      ticker: null,
+      accountId: "rakuten:ラップ",
+    });
+    expect(rows.find((row) => row.id === bareTicker.id)).toMatchObject({
+      ticker: "9999",
+    });
+    expect(rows.find((row) => row.name === "空ティッカー")).toMatchObject({
+      ticker: null,
+    });
+    expect(rows.find((row) => row.id === withoutExternalId.id)).toMatchObject({
+      ticker: null,
+    });
+  });
+
+  it("returns empty rakuten and sbi-wrap paste instruments when portfolio is missing", async () => {
+    const db = setup();
+    expect(await listRakutenInstrumentsForPaste(db)).toEqual([]);
+    expect(await listSbiWrapInstrumentsForPaste(db)).toEqual([]);
+  });
+
+  it("lists sbi-wrap paste instruments", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "sbi-wrap",
+      name: "SBIラップ",
+      kind: "sbi-wrap",
+    });
+    const instrument = await createInstrument(db, {
+      portfolioCode: "sbi-wrap",
+      accountId: "sbi-wrap:AI投資",
+      name: "（ラップ専用）ＳＢＩ・米国株式",
+    });
+
+    const rows = await listSbiWrapInstrumentsForPaste(db);
+    expect(rows).toEqual([
+      {
+        id: instrument.id,
+        name: "（ラップ専用）ＳＢＩ・米国株式",
+        accountId: "sbi-wrap:AI投資",
+      },
+    ]);
   });
 
   it("throws when applying monex asset class weights without monex portfolio", async () => {

@@ -373,3 +373,225 @@ describe("parseSbiWrapPaste", () => {
     expect(matched).toBeNull();
   });
 });
+
+describe("parseSbiWrapPaste error paths", () => {
+  const aiBlock = `資産残高
+2026/07/17 時点
+10,100円
+通算損益
++100円
++1.00%
+評価損益
++24円
++0.24%
+前日比
++27円
++0.26%
+前月比
+-2円
+-0.01%
+購入
+積立
+資産推移
+資産推移情報を読み込む
+資産構成
+資産構成比率
+内訳
+（ラップ専用）ＳＢＩ・米国株式
+評価額
+1,617円
+比率
+16.0%
+現金
+208円
+比率
+2.1%`;
+
+  it("throws when asset balance block is missing", () => {
+    expect(() => parseSbiWrapPaste("内訳\n現金")).toThrow(SbiWrapPasteError);
+  });
+
+  it("throws when uchiwake section is missing", () => {
+    expect(() => parseSbiWrapPaste("資産残高\n2026/07/17 時点\n10,100円")).toThrow(
+      SbiWrapPasteError,
+    );
+  });
+
+  it("throws when cash rows are truncated", () => {
+    expect(() =>
+      parseSbiWrapPaste(`資産残高
+2026/07/17 時点
+10,100円
+内訳
+現金
+invalid`),
+    ).toThrow(SbiWrapPasteError);
+
+    expect(() =>
+      parseSbiWrapPaste(`資産残高
+2026/07/17 時点
+10,100円
+内訳
+現金
+100円
+評価額
+1.0%`),
+    ).toThrow(SbiWrapPasteError);
+  });
+
+  it("throws when fund rows are truncated or malformed", () => {
+    expect(() =>
+      parseSbiWrapPaste(`資産残高
+2026/07/17 時点
+10,100円
+内訳
+（ラップ専用）ＳＢＩ・米国株式
+評価額
+invalid
+比率
+16.0%`),
+    ).toThrow(SbiWrapPasteError);
+
+    expect(() =>
+      parseSbiWrapPaste(`資産残高
+2026/07/17 時点
+10,100円
+内訳
+（ラップ専用）ＳＢＩ・米国株式
+評価額
+1,617円
+invalid
+16.0%`),
+    ).toThrow(SbiWrapPasteError);
+  });
+
+  it("throws when product cannot be detected", () => {
+    expect(() =>
+      parseSbiWrapPaste(`資産残高
+2026/07/17 時点
+10,100円
+内訳
+不明ファンド
+評価額
+1,000円
+比率
+10.0%`),
+    ).toThrow(SbiWrapPasteError);
+  });
+
+  it("throws when the same product appears twice", () => {
+    expect(() => parseSbiWrapPaste(`${aiBlock}\n\n${aiBlock}`)).toThrow(SbiWrapPasteError);
+  });
+
+  it("throws when a block has only skipped zero money funds", () => {
+    expect(() =>
+      parseSbiWrapPaste(`資産残高
+2026/07/17 時点
+10,100円
+内訳
+マルチアセット戦略ファンド・マネーファンド（ラップ専用）
+評価額
+0円
+比率
+--%`),
+    ).toThrow(SbiWrapPasteError);
+  });
+
+  it("accepts invalid weight labels as null and throws for truncated cash rows", () => {
+    const parsed = parseSbiWrapPaste(`資産残高
+2026/07/17 時点
+10,100円
+内訳
+（ラップ専用）ＳＢＩ・米国株式
+評価額
+1,617円
+比率
+invalid%
+現金
+208円
+比率
+2.1%`);
+
+    expect(parsed.holdings[0].weight).toBeNull();
+
+    expect(() =>
+      parseSbiWrapPaste(`資産残高
+2026/07/17 時点
+10,100円
+内訳
+現金
+100円`),
+    ).toThrow(SbiWrapPasteError);
+  });
+
+  it("skips non-holding labels and truncated rows inside a block", () => {
+    const parsed = parseSbiWrapPaste(`資産残高
+2026/07/17 時点
+10,100円
+購入
+積立
+内訳
+（ラップ専用）ＳＢＩ・米国株式
+評価額
+1,617円
+比率
+16.0%
+孤立行
+（ラップ専用）ＳＢＩ・先進国株式
+評価額
+2,527円
+比率
+25.0%
+現金
+208円
+比率
+2.1%`);
+
+    expect(parsed.holdings).toHaveLength(3);
+  });
+
+  it("throws for empty blocks, invalid cash amounts, and truncated fund rows", () => {
+    expect(() =>
+      parseSbiWrapPaste(`資産残高
+資産残高
+2026/07/17 時点
+10,100円
+内訳
+（ラップ専用）ＳＢＩ・米国株式
+評価額
+1,617円
+比率
+16.0%`),
+    ).toThrow(SbiWrapPasteError);
+
+    expect(() =>
+      parseSbiWrapPaste(`資産残高
+2026/07/17 時点
+10,100円
+内訳
+現金
+invalid
+比率
+1.0%`),
+    ).toThrow(SbiWrapPasteError);
+
+    expect(() =>
+      parseSbiWrapPaste(`資産残高
+2026/07/17 時点
+10,100円
+内訳
+（ラップ専用）ＳＢＩ・米国株式
+評価額
+1,617円
+比率`),
+    ).toThrow(SbiWrapPasteError);
+
+    expect(() =>
+      parseSbiWrapPaste(`資産残高
+2026/07/17 時点
+10,100円
+内訳
+現金`),
+    ).toThrow(SbiWrapPasteError);
+  });
+});

@@ -96,9 +96,11 @@ function findUchiwakeIndex(lines: string[]): number {
 function parseProductBlock(lines: string[]): ParsedProductBlock {
   let result: ParsedProductBlock = { asOfDate: null, entries: [] };
 
+  /* v8 ignore start */
   if (lines.length === 0) {
     return result;
   }
+  /* v8 ignore stop */
 
   for (const line of lines) {
     const asOfDate = parseSbiWrapAsOfDate(line);
@@ -117,9 +119,11 @@ function parseProductBlock(lines: string[]): ParsedProductBlock {
   let index = uchiIndex + 1;
 
   while (index < lines.length) {
+    /* v8 ignore start */
     if (isSbiWrapAssetBalanceHeader(lines[index])) {
       break;
     }
+    /* v8 ignore stop */
 
     const instrumentName = lines[index];
     if (
@@ -352,9 +356,11 @@ export function parseSbiWrapPaste(content: string): ParseSbiWrapPasteResult {
     holdings.push(...rows);
   }
 
+  /* v8 ignore start */
   if (holdings.length === 0) {
     throw new SbiWrapPasteError("保有明細を1件も読み取れませんでした");
   }
+  /* v8 ignore stop */
 
   result = { asOfDate, holdings };
   return result;

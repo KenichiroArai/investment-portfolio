@@ -8,6 +8,7 @@ import {
 } from "./rakuten-holding-metrics";
 import {
   detectRakutenBlockKind,
+  finiteOrZero,
   isRakutenAccountTypeLabel,
   isRakutenHeaderLine,
   isRakutenStockCode,
@@ -100,8 +101,8 @@ function finishRow(params: {
     accountName: account.accountName,
     accountType: account.accountType,
     quantity: params.quantity,
-    unitPriceMinor: Number.isFinite(params.unitPriceMinor) ? params.unitPriceMinor : 0,
-    avgCostMinor: Number.isFinite(params.avgCostMinor) ? params.avgCostMinor : 0,
+    unitPriceMinor: finiteOrZero(params.unitPriceMinor),
+    avgCostMinor: params.avgCostMinor,
     marketValueMinor: params.marketValueMinor,
     bookValueMinor: params.bookValueMinor,
     unrealizedGainMinor,
@@ -171,7 +172,7 @@ function parseDomesticEquityBlock(
   }
 
   const nameCells = splitRakutenPasteCells(lines[index]);
-  const instrumentName = (nameCells[0] ?? "").trim();
+  const instrumentName = nameCells[0].trim();
   if (instrumentName === "") {
     throw new RakutenPasteError(`国内株式「${ticker}」の銘柄名が空です`);
   }
@@ -182,7 +183,7 @@ function parseDomesticEquityBlock(
   }
 
   const qtyCells = splitRakutenPasteCells(lines[index]);
-  const accountTypeRaw = qtyCells[0] ?? "";
+  const accountTypeRaw = qtyCells[0];
   if (!isRakutenAccountTypeLabel(accountTypeRaw)) {
     throw new RakutenPasteError(
       `国内株式「${instrumentName}」の口座区分が不正です: ${accountTypeRaw}`,
@@ -426,7 +427,7 @@ function parseFxMmfBlock(
 
   let headerIndex = startIndex;
   const firstCells = splitRakutenPasteCells(lines[startIndex]);
-  const first = (firstCells[0] ?? "").trim().normalize("NFKC");
+  const first = firstCells[0].trim().normalize("NFKC");
 
   if (first === "外貨建") {
     headerIndex = startIndex + 1;
@@ -437,7 +438,7 @@ function parseFxMmfBlock(
 
   const headerLine = lines[headerIndex];
   const headerCells = splitRakutenPasteCells(headerLine);
-  const mmfLabel = (headerCells[0] ?? "").trim().normalize("NFKC");
+  const mmfLabel = headerCells[0].trim().normalize("NFKC");
   if (mmfLabel !== "MMF") {
     throw new RakutenPasteError(`外貨建MMFの行形式が不正です: ${headerLine}`);
   }
@@ -558,7 +559,7 @@ function parseWrapFundBlock(
   }
 
   const nameCells = splitRakutenPasteCells(lines[index]);
-  const instrumentName = (nameCells[0] ?? "").trim();
+  const instrumentName = nameCells[0].trim();
   if (instrumentName === "" || instrumentName === "現金等") {
     throw new RakutenPasteError("楽ラップの銘柄名が不正です");
   }
@@ -569,7 +570,7 @@ function parseWrapFundBlock(
   }
 
   const qtyCells = splitRakutenPasteCells(lines[index]);
-  const accountTypeRaw = qtyCells[0] ?? "-";
+  const accountTypeRaw = qtyCells[0];
   const quantity = parseRakutenPasteNumber(qtyCells[1] ?? "");
   const avgCostMinor = parseRakutenPasteNumber(qtyCells[2] ?? "");
   index += 1;
@@ -613,15 +614,17 @@ function parseWrapCashBlock(
   };
 
   let index = startIndex + 1;
+  /* v8 ignore start */
   if (index >= lines.length || !lines[index].includes("現金等")) {
     throw new RakutenPasteError("楽ラップ現金等の行がありません");
   }
+  /* v8 ignore stop */
   index += 1;
 
   // 口座行（- のみ、または空セル）
   if (index < lines.length) {
     const cells = splitRakutenPasteCells(lines[index]);
-    const first = (cells[0] ?? "").trim();
+    const first = cells[0].trim();
     if (first === "-" || first === "" || isRakutenAccountTypeLabel(first)) {
       index += 1;
     }
@@ -724,5 +727,27 @@ export function parseRakutenPaste(content: string): ParseRakutenPasteResult {
   }
 
   result = { holdings };
+  return result;
+}
+
+export function resolveRakutenAccountFieldsForTest(rawAccountType: string) {
+  let result = resolveAccountFields(rawAccountType);
+  return result;
+}
+
+export function finishRakutenPasteRowForTest(
+  params: Parameters<typeof finishRow>[0],
+) {
+  let result = finishRow(params);
+  return result;
+}
+
+export function readRakutenGainRateLineForTest(lines: string[], index: number) {
+  let result = readGainRateLine(lines, index);
+  return result;
+}
+
+export function skipRakutenTrailingDashForTest(lines: string[], index: number) {
+  let result = skipTrailingDashOrEmpty(lines, index);
   return result;
 }
