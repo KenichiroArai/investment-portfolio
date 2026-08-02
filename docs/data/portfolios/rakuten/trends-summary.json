@@ -1,7 +1,7 @@
 {
   "portfolioCode": "rakuten",
   "from": "2026-07-16",
-  "to": "2026-07-19",
+  "to": "2026-08-02",
   "points": [
     {
       "asOfDate": "2026-07-16",
@@ -1220,6 +1220,406 @@
             "marketValueMinor": 313,
             "ratio": 0.0009981217453418328,
             "sortOrder": 48
+          }
+        ]
+      }
+    },
+    {
+      "asOfDate": "2026-08-02",
+      "totalMarketValueMinor": 318760,
+      "totalBookValueMinor": 325642,
+      "unrealizedGainMinor": -6882,
+      "gainRateOnBook": -0.02113363755289551,
+      "totalContributionsMinor": null,
+      "gainRateOnContributions": null,
+      "allocationsByScheme": {
+        "rakuten_product_type": [
+          {
+            "valueCode": "mutual_fund",
+            "valueName": "投資信託",
+            "marketValueMinor": 107718,
+            "ratio": 0.34873172863687135
+          },
+          {
+            "valueCode": "rakuten_money_fund",
+            "valueName": "楽天・マネーファンド",
+            "marketValueMinor": 100471,
+            "ratio": 0.3252699224630526
+          },
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 48571,
+            "ratio": 0.1572462243229681
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 40000,
+            "ratio": 0.12949803324862003
+          },
+          {
+            "valueCode": "rakuten_wrap",
+            "valueName": "楽ラップ",
+            "marketValueMinor": 9961,
+            "ratio": 0.032248247729737604
+          },
+          {
+            "valueCode": "foreign_mmf",
+            "valueName": "外貨建MMF",
+            "marketValueMinor": 2164,
+            "ratio": 0.007005843598750344
+          }
+        ],
+        "rakuten_account_type": [
+          {
+            "valueCode": "tokutei",
+            "valueName": "特定",
+            "marketValueMinor": 266841,
+            "ratio": 0.8638846172523755
+          },
+          {
+            "valueCode": "general",
+            "valueName": "一般",
+            "marketValueMinor": 32083,
+            "ratio": 0.10386713501788691
+          },
+          {
+            "valueCode": "wrap",
+            "valueName": "楽ラップ",
+            "marketValueMinor": 9961,
+            "ratio": 0.032248247729737604
+          }
+        ],
+        "__portfolio_instruments__": [
+          {
+            "valueCode": "96850e4b-6ffc-4403-b4d9-be81ab467ac9",
+            "valueName": "ＮＦ日経高配当５０",
+            "marketValueMinor": 3436,
+            "ratio": 0.010779269669971139,
+            "sortOrder": 1
+          },
+          {
+            "valueCode": "23e56e63-7e1a-450e-8dbc-bd122590f79a",
+            "valueName": "ＧＸＮＤＸカバコ",
+            "marketValueMinor": 8841,
+            "ratio": 0.027735600451750532,
+            "sortOrder": 2
+          },
+          {
+            "valueCode": "49668919-3a94-498a-a0ee-dbcb38401b78",
+            "valueName": "ＧＸＳＰＸカバコ",
+            "marketValueMinor": 9192,
+            "ratio": 0.02883674237670975,
+            "sortOrder": 3
+          },
+          {
+            "valueCode": "67d3827d-3f96-4401-9668-1d74974e3c05",
+            "valueName": "ＩＳＳ＆Ｐ５００カバコ",
+            "marketValueMinor": 8199,
+            "ratio": 0.025721545990714016,
+            "sortOrder": 4
+          },
+          {
+            "valueCode": "f85f80ae-1d4e-424f-936c-03594624c283",
+            "valueName": "ＩＳ米債２０＋カバコ",
+            "marketValueMinor": 7770,
+            "ratio": 0.02437570586020831,
+            "sortOrder": 5
+          },
+          {
+            "valueCode": "a8b32d5d-1081-4c4c-9d71-41731d08e6be",
+            "valueName": "パーク２４",
+            "marketValueMinor": 9875,
+            "ratio": 0.030979420253482243,
+            "sortOrder": 6
+          },
+          {
+            "valueCode": "440a8794-a4b1-40e6-8ab6-5b8d1e2f98c4",
+            "valueName": "ＣＩＪ",
+            "marketValueMinor": 1032,
+            "ratio": 0.00323754548876898,
+            "sortOrder": 7
+          },
+          {
+            "valueCode": "f0a59fa6-9ae4-44c0-84d7-ce114ca2b904",
+            "valueName": "ＧＸＮＡＳ１００Ｄカバコ",
+            "marketValueMinor": 9351,
+            "ratio": 0.02933555025724683,
+            "sortOrder": 8
+          },
+          {
+            "valueCode": "d96ed35d-960b-434c-b66f-8b222359d9b5",
+            "valueName": "ＮＴＴ",
+            "marketValueMinor": 304,
+            "ratio": 0.0009536955703350483,
+            "sortOrder": 9
+          },
+          {
+            "valueCode": "dddd5a01-2d8f-4fe5-a905-107d8bd7cdcc",
+            "valueName": "ソフトバンク",
+            "marketValueMinor": 446,
+            "ratio": 0.0013991717906889196,
+            "sortOrder": 10
+          },
+          {
+            "valueCode": "5d1c1e62-ff81-410b-80e3-731e898fb97b",
+            "valueName": "インベスコ 世界厳選株式オープン＜為替ヘッジなし＞(毎月決算型)(世界のベスト)",
+            "marketValueMinor": 1513,
+            "ratio": 0.004746517756305684,
+            "sortOrder": 11
+          },
+          {
+            "valueCode": "2a3b0df8-cffe-42bd-b2fd-027fec43d8e6",
+            "valueName": "たわらノーロード フォーカス 防衛・航空宇宙",
+            "marketValueMinor": 221,
+            "ratio": 0.0006933115823817292,
+            "sortOrder": 12
+          },
+          {
+            "valueCode": "fe504205-e337-42db-ab10-1a382bb41357",
+            "valueName": "楽天・プラス・SOXインデックス・ファンド(楽天・プラス・SOX)",
+            "marketValueMinor": 714,
+            "ratio": 0.0022399297276948175,
+            "sortOrder": 13
+          },
+          {
+            "valueCode": "efc9caa7-fd85-497a-9b1a-9c4121660013",
+            "valueName": "【ウェルスナビ×R専用】ウェルスナビ×R(リスク許容度4)",
+            "marketValueMinor": 9864,
+            "ratio": 0.030944911532187227,
+            "sortOrder": 14
+          },
+          {
+            "valueCode": "daecc52c-7c73-4699-a0aa-27baaffca5b4",
+            "valueName": "楽天・米国成長株式・プレミアム・インカム・ファンド(毎月決算型)(楽天・JEPQ)",
+            "marketValueMinor": 94625,
+            "ratio": 0.2968534320491906,
+            "sortOrder": 15
+          },
+          {
+            "valueCode": "1085faae-7e96-4645-bd1a-93b50656a77a",
+            "valueName": "Tracers NASDAQ100ゴールドプラス",
+            "marketValueMinor": 616,
+            "ratio": 0.001932488392521019,
+            "sortOrder": 16
+          },
+          {
+            "valueCode": "20553c09-f3f9-44d7-acd2-d2927fd91194",
+            "valueName": "SMT 日本株式モメンタムファンド(トレンドランキング・日本株)",
+            "marketValueMinor": 88,
+            "ratio": 0.00027606977036014556,
+            "sortOrder": 17
+          },
+          {
+            "valueCode": "ced2952d-071e-48d1-baa6-1664ee0f1025",
+            "valueName": "SMT 全世界株式モメンタムファンド(トレンドランキング・全世界株)",
+            "marketValueMinor": 77,
+            "ratio": 0.00024156104906512737,
+            "sortOrder": 18
+          },
+          {
+            "valueCode": "e7509a11-ff00-4e32-8239-c517c0c17652",
+            "valueName": "楽天・マネーファンド",
+            "marketValueMinor": 100471,
+            "ratio": 0.3151932488392521,
+            "sortOrder": 19
+          },
+          {
+            "valueCode": "ef7f1f01-83fc-4ddc-8182-311496a77b59",
+            "valueName": "GS米ドルファンド",
+            "marketValueMinor": 3,
+            "ratio": 0.00000941146944409587,
+            "sortOrder": 20
+          },
+          {
+            "valueCode": "d4a4a106-2d1e-45af-865e-735ecd198a70",
+            "valueName": "ノーザン・トラスト・米ドル・リクイディティ・ファンド(楽天・米ドルMMF)",
+            "marketValueMinor": 2161,
+            "ratio": 0.006779395156230393,
+            "sortOrder": 21
+          },
+          {
+            "valueCode": "20208708-5652-47a0-aa92-0ea80ddb5726",
+            "valueName": "個人国債　変動10年　第195回",
+            "marketValueMinor": 20000,
+            "ratio": 0.06274312962730581,
+            "sortOrder": 22
+          },
+          {
+            "valueCode": "6d1daa71-65e2-4e89-8f2a-56342d3270bd",
+            "valueName": "個人国債　変動10年　第194回",
+            "marketValueMinor": 20000,
+            "ratio": 0.06274312962730581,
+            "sortOrder": 23
+          },
+          {
+            "valueCode": "115a2a50-2795-4a35-a74b-51b396e1c188",
+            "valueName": "【楽ラップ専用】たわらノーロード 国内株式＜ラップ専用＞",
+            "marketValueMinor": 387,
+            "ratio": 0.0012140795582883674,
+            "sortOrder": 24
+          },
+          {
+            "valueCode": "604fd146-7888-4ebd-923b-3fd63f19d62d",
+            "valueName": "【楽ラップ専用】たわらノーロード 先進国株式(為替ヘッジあり)＜ラップ専用＞",
+            "marketValueMinor": 490,
+            "ratio": 0.0015372066758689924,
+            "sortOrder": 25
+          },
+          {
+            "valueCode": "9e36a308-f13e-4e94-80a0-7237c2244f6b",
+            "valueName": "【楽ラップ専用】たわらノーロード 先進国株式(為替ヘッジなし)＜ラップ専用＞",
+            "marketValueMinor": 116,
+            "ratio": 0.0003639101518383737,
+            "sortOrder": 26
+          },
+          {
+            "valueCode": "c131d97c-5a40-46bd-942d-ef6682d77ff0",
+            "valueName": "【楽ラップ専用】たわらノーロード 新興国株式＜ラップ専用＞",
+            "marketValueMinor": 261,
+            "ratio": 0.0008187978416363408,
+            "sortOrder": 27
+          },
+          {
+            "valueCode": "1a261364-c640-4ca4-98a6-06cb08d98e3d",
+            "valueName": "【楽ラップ専用】たわらノーロード 国内債券＜ラップ専用＞",
+            "marketValueMinor": 768,
+            "ratio": 0.002409336177688543,
+            "sortOrder": 28
+          },
+          {
+            "valueCode": "eb142884-1de3-48b1-a26c-bccbb31b69e4",
+            "valueName": "【楽ラップ専用】たわらノーロード 外国債券(為替ヘッジあり)＜ラップ専用＞",
+            "marketValueMinor": 745,
+            "ratio": 0.0023371815786171414,
+            "sortOrder": 29
+          },
+          {
+            "valueCode": "5eef0d2e-b9ce-4c0f-a687-aa71264c8005",
+            "valueName": "【楽ラップ専用】たわらノーロード 外国債券(為替ヘッジなし)＜ラップ専用＞",
+            "marketValueMinor": 277,
+            "ratio": 0.0008689923453381854,
+            "sortOrder": 30
+          },
+          {
+            "valueCode": "e49b9fa3-7ac3-44fb-b30e-77f33876b466",
+            "valueName": "【楽ラップ専用】たわらノーロード 新興国現地通貨建債券＜ラップ専用＞",
+            "marketValueMinor": 195,
+            "ratio": 0.0006117455138662316,
+            "sortOrder": 31
+          },
+          {
+            "valueCode": "d60acd09-6ef6-495d-b2ea-6cdf8d5aa550",
+            "valueName": "【楽ラップ専用】たわらノーロード 国内リート＜ラップ専用＞",
+            "marketValueMinor": 609,
+            "ratio": 0.001910528297151462,
+            "sortOrder": 32
+          },
+          {
+            "valueCode": "9e9370ff-1d14-4e60-8de4-1d122739fbea",
+            "valueName": "【楽ラップ専用】たわらノーロード 先進国リート(為替ヘッジなし)＜ラップ専用＞",
+            "marketValueMinor": 595,
+            "ratio": 0.0018666081064123478,
+            "sortOrder": 33
+          },
+          {
+            "valueCode": "24f00a78-744c-4c68-8186-e106e5a9fb68",
+            "valueName": "【楽ラップ専用】楽天・USハイイールド社債インデックス(為替ヘッジ)ファンド(ラップ向け)",
+            "marketValueMinor": 496,
+            "ratio": 0.0015560296147571842,
+            "sortOrder": 34
+          },
+          {
+            "valueCode": "28c6d1ee-f2ed-4b8b-a462-05be7cb3349f",
+            "valueName": "【楽ラップ専用】楽天・米国社債1-5年インデックス(為替ヘッジ)ファンド(ラップ向け)",
+            "marketValueMinor": 251,
+            "ratio": 0.000787426276822688,
+            "sortOrder": 35
+          },
+          {
+            "valueCode": "ec517c2b-108d-49b3-a009-5b4ed6183767",
+            "valueName": "【楽ラップ専用】楽天・米国社債5-10年インデックス(為替ヘッジ)ファンド(ラップ向け)",
+            "marketValueMinor": 548,
+            "ratio": 0.001719161751788179,
+            "sortOrder": 36
+          },
+          {
+            "valueCode": "140623f5-0d88-495a-9ed5-6cf9fbb170e4",
+            "valueName": "【楽ラップ専用】ステート・ストリート日本株式インデックス・オープン",
+            "marketValueMinor": 387,
+            "ratio": 0.0012140795582883674,
+            "sortOrder": 37
+          },
+          {
+            "valueCode": "97cf04e1-903c-4687-8123-bbc41a921220",
+            "valueName": "【楽ラップ専用】ステート・ストリート日本債券インデックス・オープン",
+            "marketValueMinor": 768,
+            "ratio": 0.002409336177688543,
+            "sortOrder": 38
+          },
+          {
+            "valueCode": "dc257e53-796f-48af-9c6d-c92d434606b7",
+            "valueName": "【楽ラップ専用】ステート・ストリート先進国株式インデックス・オープン",
+            "marketValueMinor": 117,
+            "ratio": 0.000367047308319739,
+            "sortOrder": 39
+          },
+          {
+            "valueCode": "4688abfd-7056-4bc3-bcd2-d2c8c83ee4e1",
+            "valueName": "【楽ラップ専用】ステート・ストリート先進国株式インデックス・オープン(為替ヘッジあり)",
+            "marketValueMinor": 488,
+            "ratio": 0.0015309323629062617,
+            "sortOrder": 40
+          },
+          {
+            "valueCode": "e332993d-d39d-492d-a978-4551d8a8c1e9",
+            "valueName": "【楽ラップ専用】ステート・ストリート先進国債券インデックス・オープン",
+            "marketValueMinor": 276,
+            "ratio": 0.0008658551888568202,
+            "sortOrder": 41
+          },
+          {
+            "valueCode": "ababdd4a-98e1-4f95-8da1-1ef68bc1b075",
+            "valueName": "【楽ラップ専用】ステート・ストリート先進国債券インデックス・オープン(為替ヘッジあり)",
+            "marketValueMinor": 745,
+            "ratio": 0.0023371815786171414,
+            "sortOrder": 42
+          },
+          {
+            "valueCode": "0a57e947-c3da-4960-8098-ed1f32175622",
+            "valueName": "【楽ラップ専用】ステート・ストリート新興国株式インデックス・オープン",
+            "marketValueMinor": 262,
+            "ratio": 0.0008219349981177061,
+            "sortOrder": 43
+          },
+          {
+            "valueCode": "c90a88af-26c9-48d1-a9af-1e728946bef8",
+            "valueName": "【楽ラップ専用】ステート・ストリート新興国債券インデックス・オープン",
+            "marketValueMinor": 197,
+            "ratio": 0.0006180198268289622,
+            "sortOrder": 44
+          },
+          {
+            "valueCode": "e36b8cd5-397f-4627-bbf4-2392af7ada07",
+            "valueName": "【楽ラップ専用】ステート・ストリート米国社債インデックス・オープン(為替ヘッジあり)",
+            "marketValueMinor": 89,
+            "ratio": 0.00027920692684151087,
+            "sortOrder": 45
+          },
+          {
+            "valueCode": "c5ee2767-d949-4c49-bc41-3f1ba04cef50",
+            "valueName": "【楽ラップ専用】ステート・ストリート米国社債インデックス・オープン2",
+            "marketValueMinor": 574,
+            "ratio": 0.0018007278203036768,
+            "sortOrder": 46
+          },
+          {
+            "valueCode": "b3f37e19-4e18-4436-8787-c0e6ffadc158",
+            "valueName": "現金等",
+            "marketValueMinor": 320,
+            "ratio": 0.001003890074036893,
+            "sortOrder": 47
           }
         ]
       }

@@ -2,8 +2,12 @@
   "portfolioCode": "sbi-wrap",
   "dates": [
     {
-      "asOfDate": "2026-07-17",
+      "asOfDate": "2026-08-02",
       "isCurrent": true
+    },
+    {
+      "asOfDate": "2026-07-17",
+      "isCurrent": false
     }
   ]
 }

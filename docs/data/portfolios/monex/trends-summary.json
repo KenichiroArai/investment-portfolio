@@ -1,7 +1,7 @@
 {
   "portfolioCode": "monex",
   "from": "2026-07-05",
-  "to": "2026-07-13",
+  "to": "2026-08-02",
   "points": [
     {
       "asOfDate": "2026-07-05",
@@ -16,14 +16,14 @@
           {
             "valueCode": "developed_equity",
             "valueName": "先進国株式",
-            "marketValueMinor": 17413,
-            "ratio": 0.4654886655260907
+            "marketValueMinor": 17430,
+            "ratio": 0.46594311377245506
           },
           {
             "valueCode": "domestic_equity",
             "valueName": "国内株式",
-            "marketValueMinor": 5488,
-            "ratio": 0.1467065868263473
+            "marketValueMinor": 5471,
+            "ratio": 0.1462521385799829
           },
           {
             "valueCode": "emerging_equity",
@@ -40,8 +40,8 @@
           {
             "valueCode": "domestic_reit",
             "valueName": "国内REIT",
-            "marketValueMinor": 1750,
-            "ratio": 0.046781437125748504
+            "marketValueMinor": 1752,
+            "ratio": 0.046834901625320786
           },
           {
             "valueCode": "domestic_bond",
@@ -52,8 +52,8 @@
           {
             "valueCode": "foreign_reit",
             "valueName": "海外REIT",
-            "marketValueMinor": 1114,
-            "ratio": 0.02977972626176219
+            "marketValueMinor": 1113,
+            "ratio": 0.029752994011976047
           },
           {
             "valueCode": "commodity",
@@ -70,8 +70,8 @@
           {
             "valueCode": "emerging_bond",
             "valueName": "新興国債券",
-            "marketValueMinor": 730,
-            "ratio": 0.01951454234388366
+            "marketValueMinor": 729,
+            "ratio": 0.01948781009409752
           }
         ],
         "__portfolio_instruments__": [
@@ -329,14 +329,14 @@
           {
             "valueCode": "developed_equity",
             "valueName": "先進国株式",
-            "marketValueMinor": 20059,
-            "ratio": 0.45155553554545047
+            "marketValueMinor": 20076,
+            "ratio": 0.4519382288055468
           },
           {
             "valueCode": "domestic_equity",
             "valueName": "国内株式",
-            "marketValueMinor": 6112,
-            "ratio": 0.1375894826887578
+            "marketValueMinor": 6096,
+            "ratio": 0.13722930079690243
           },
           {
             "valueCode": "emerging_equity",
@@ -347,14 +347,14 @@
           {
             "valueCode": "developed_bond",
             "valueName": "先進国債券",
-            "marketValueMinor": 4655,
-            "ratio": 0.10479041916167664
+            "marketValueMinor": 4654,
+            "ratio": 0.10476790779343569
           },
           {
             "valueCode": "domestic_reit",
             "valueName": "国内REIT",
-            "marketValueMinor": 1863,
-            "ratio": 0.04193867903291162
+            "marketValueMinor": 1865,
+            "ratio": 0.04198370176939355
           },
           {
             "valueCode": "domestic_bond",
@@ -365,8 +365,8 @@
           {
             "valueCode": "foreign_reit",
             "valueName": "海外REIT",
-            "marketValueMinor": 1242,
-            "ratio": 0.027959119355274415
+            "marketValueMinor": 1241,
+            "ratio": 0.02793660798703345
           },
           {
             "valueCode": "other",
@@ -383,8 +383,8 @@
           {
             "valueCode": "emerging_bond",
             "valueName": "新興国債券",
-            "marketValueMinor": 876,
-            "ratio": 0.019719958579082437
+            "marketValueMinor": 875,
+            "ratio": 0.019697447210841476
           },
           {
             "valueCode": "commodity",
@@ -694,6 +694,424 @@
             "marketValueMinor": 10122,
             "ratio": 0.22786006933501418,
             "sortOrder": 43
+          }
+        ]
+      }
+    },
+    {
+      "asOfDate": "2026-08-02",
+      "totalMarketValueMinor": 49511,
+      "totalBookValueMinor": 51475,
+      "unrealizedGainMinor": -1964,
+      "gainRateOnBook": -0.03815444390480816,
+      "totalContributionsMinor": null,
+      "gainRateOnContributions": null,
+      "allocationsByScheme": {
+        "monex_asset_class": [
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 21809,
+            "ratio": 0.44048797236977644
+          },
+          {
+            "valueCode": "developed_bond",
+            "valueName": "先進国債券",
+            "marketValueMinor": 7557,
+            "ratio": 0.1526327482781604
+          },
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 6671,
+            "ratio": 0.13473773504877704
+          },
+          {
+            "valueCode": "emerging_equity",
+            "valueName": "新興国株式",
+            "marketValueMinor": 5604,
+            "ratio": 0.1131869685524429
+          },
+          {
+            "valueCode": "domestic_reit",
+            "valueName": "国内REIT",
+            "marketValueMinor": 1899,
+            "ratio": 0.03835511300519077
+          },
+          {
+            "valueCode": "domestic_bond",
+            "valueName": "国内債券",
+            "marketValueMinor": 1639,
+            "ratio": 0.03310375472117307
+          },
+          {
+            "valueCode": "foreign_reit",
+            "valueName": "海外REIT",
+            "marketValueMinor": 1444,
+            "ratio": 0.029165236008159803
+          },
+          {
+            "valueCode": "commodity",
+            "valueName": "コモディティ",
+            "marketValueMinor": 996,
+            "ratio": 0.020116741734160084
+          },
+          {
+            "valueCode": "emerging_bond",
+            "valueName": "新興国債券",
+            "marketValueMinor": 963,
+            "ratio": 0.019450223182727072
+          },
+          {
+            "valueCode": "high_yield_bond",
+            "valueName": "ハイ・イールド債券",
+            "marketValueMinor": 929,
+            "ratio": 0.01876350709943245
+          }
+        ],
+        "__portfolio_instruments__": [
+          {
+            "valueCode": "a39a69e9-48e3-473f-9716-6f4ce59b2dea",
+            "valueName": "ｅＭＡＸＩＳ Ｓｌｉｍ 新興国株式インデックス",
+            "marketValueMinor": 3445,
+            "ratio": 0.06958049726323444,
+            "sortOrder": 1
+          },
+          {
+            "valueCode": "0b6b9bcf-3d44-4041-88e4-d416cafb4517",
+            "valueName": "ＳＢＩ欧州高配当株式（分配）ファンド（年４回決算型）",
+            "marketValueMinor": 2183,
+            "ratio": 0.04409121205388702,
+            "sortOrder": 2
+          },
+          {
+            "valueCode": "17401cd5-c91b-4e7e-9dd1-42b9735ce69a",
+            "valueName": "インベスコ　世界厳選株式オープン＜為替ヘッジなし＞（毎月決算型）",
+            "marketValueMinor": 1118,
+            "ratio": 0.02258084062127608,
+            "sortOrder": 3
+          },
+          {
+            "valueCode": "2ecc4086-70de-4a2a-b21d-4c925de4e36d",
+            "valueName": "ＳＢＩネクスト・フロンティア高配当株式ファンド（年４回決算型）",
+            "marketValueMinor": 1107,
+            "ratio": 0.02235866777079841,
+            "sortOrder": 4
+          },
+          {
+            "valueCode": "14d2a702-6586-42ec-89c2-e842c21eb10d",
+            "valueName": "ダイワＪ－ＲＥＩＴオープン（毎月分配型）",
+            "marketValueMinor": 1014,
+            "ratio": 0.020480297307669003,
+            "sortOrder": 5
+          },
+          {
+            "valueCode": "4df2214c-2e30-4459-b220-7fb34043de3c",
+            "valueName": "ｅＭＡＸＩＳ Ｓｌｉｍ 国内株式（ＴＯＰＩＸ）",
+            "marketValueMinor": 991,
+            "ratio": 0.020015754074852052,
+            "sortOrder": 6
+          },
+          {
+            "valueCode": "a6168c9b-f82b-435a-9a70-29c991d0ea5c",
+            "valueName": "ｅＭＡＸＩＳ Ｓｌｉｍ バランス（８資産均等型）",
+            "marketValueMinor": 985,
+            "ratio": 0.019894568883682413,
+            "sortOrder": 7
+          },
+          {
+            "valueCode": "268ebaa3-4ee1-49f8-9d8d-be00b7ed5716",
+            "valueName": "高金利先進国債券オープン（毎月分配型）",
+            "marketValueMinor": 980,
+            "ratio": 0.01979358122437438,
+            "sortOrder": 8
+          },
+          {
+            "valueCode": "eaac5411-3ba6-4e28-84c9-565256f0be19",
+            "valueName": "ピクテ・バイオ医薬品ファンド（毎月決算型）為替ヘッジなしコース",
+            "marketValueMinor": 967,
+            "ratio": 0.019531013310173498,
+            "sortOrder": 9
+          },
+          {
+            "valueCode": "bfca6475-dc79-4340-8869-98de4dbcd31a",
+            "valueName": "ＧＳ　日本株・プラス（通貨分散コース）",
+            "marketValueMinor": 945,
+            "ratio": 0.019086667609218153,
+            "sortOrder": 10
+          },
+          {
+            "valueCode": "f3923b26-a8e3-4618-bd7d-b570723f05e6",
+            "valueName": "ＷＣＭ　世界成長株厳選ファンド（予想分配金提示型）",
+            "marketValueMinor": 921,
+            "ratio": 0.018601926844539596,
+            "sortOrder": 11
+          },
+          {
+            "valueCode": "8f9d63cb-de00-494e-ac7c-056b98c44743",
+            "valueName": "ｅＭＡＸＩＳ　日経半導体株インデックス",
+            "marketValueMinor": 911,
+            "ratio": 0.01839995152592353,
+            "sortOrder": 12
+          },
+          {
+            "valueCode": "6609c441-1812-45f1-873c-1518d61cb999",
+            "valueName": "Ｔｒａｃｅｒｓ　日経平均高配当株５０インデックス（奇数月分配型）",
+            "marketValueMinor": 821,
+            "ratio": 0.016582173658378947,
+            "sortOrder": 13
+          },
+          {
+            "valueCode": "1a6c3a57-7971-4505-9f42-5ff8b5db2727",
+            "valueName": "ＳＭＴ　日本株式モメンタムファンド",
+            "marketValueMinor": 727,
+            "ratio": 0.014683605663387934,
+            "sortOrder": 14
+          },
+          {
+            "valueCode": "91d7ce9c-e846-46e0-a8c1-0ec55e0232e7",
+            "valueName": "次世代通信関連　世界株式戦略ファンド（予想分配金提示型）",
+            "marketValueMinor": 644,
+            "ratio": 0.013007210518874594,
+            "sortOrder": 15
+          },
+          {
+            "valueCode": "35162a93-003a-47eb-bf68-fcb3695ce78e",
+            "valueName": "ステート・ストリート国内債券インデックス・オープン（隔月分配型）",
+            "marketValueMinor": 621,
+            "ratio": 0.012542667286057643,
+            "sortOrder": 16
+          },
+          {
+            "valueCode": "9f64177a-d0ce-4087-a5bb-1f5ebe1db53f",
+            "valueName": "ｅＭＡＸＩＳ　Ｓｌｉｍ　国内リートインデックス",
+            "marketValueMinor": 601,
+            "ratio": 0.012138716648825513,
+            "sortOrder": 17
+          },
+          {
+            "valueCode": "683ae3e0-f63a-4118-b7a9-60a085ef684f",
+            "valueName": "ＳＢＩ日本高配当株式（分配）ファンド（年４回決算型）",
+            "marketValueMinor": 585,
+            "ratio": 0.011815556139039809,
+            "sortOrder": 18
+          },
+          {
+            "valueCode": "5a3d64af-6d3b-4936-90f4-bd6589b669eb",
+            "valueName": "ｅＭＡＸＩＳ　Ｓｌｉｍ　先進国リートインデックス（除く日本）",
+            "marketValueMinor": 535,
+            "ratio": 0.010805679545959485,
+            "sortOrder": 19
+          },
+          {
+            "valueCode": "5c7b28cf-eb4f-48e8-ba55-9fd12dc08439",
+            "valueName": "ｉシェアーズ　ハイイールド債券インデックス・ファンド",
+            "marketValueMinor": 491,
+            "ratio": 0.009916988144048797,
+            "sortOrder": 20
+          },
+          {
+            "valueCode": "7948b850-705a-41ff-86c1-917335335370",
+            "valueName": "マネックス・ゴールド・ファンド",
+            "marketValueMinor": 487,
+            "ratio": 0.009836198016602371,
+            "sortOrder": 21
+          },
+          {
+            "valueCode": "bdc4034a-aa05-4bb9-9dfe-028d14101408",
+            "valueName": "日本好配当リバランスオープン",
+            "marketValueMinor": 456,
+            "ratio": 0.009210074528892569,
+            "sortOrder": 22
+          },
+          {
+            "valueCode": "f33ec918-fd60-4e35-8d54-d321cdace033",
+            "valueName": "ｉＦｒｅｅＨＯＬＤ　日本国債（ＪＧＢ２０５６）",
+            "marketValueMinor": 452,
+            "ratio": 0.009129284401446143,
+            "sortOrder": 23
+          },
+          {
+            "valueCode": "f947fcb3-0df0-4ef8-9908-9607a3035aec",
+            "valueName": "財産３分法ファンド（不動産・債券・株式）毎月分配型",
+            "marketValueMinor": 410,
+            "ratio": 0.00828098806325867,
+            "sortOrder": 24
+          },
+          {
+            "valueCode": "29ad4f4e-3a4c-45e7-b81e-c3f696c320d2",
+            "valueName": "ｅＭＡＸＩＳ Ｓｌｉｍ 先進国債券インデックス",
+            "marketValueMinor": 391,
+            "ratio": 0.007897234957888147,
+            "sortOrder": 25
+          },
+          {
+            "valueCode": "268ebaa3-4ee1-49f8-9d8d-be00b7ed5716",
+            "valueName": "高金利先進国債券オープン（毎月分配型）",
+            "marketValueMinor": 382,
+            "ratio": 0.007715457171133687,
+            "sortOrder": 26
+          },
+          {
+            "valueCode": "0485871c-aad3-4ea1-8a9b-a5d6d709813b",
+            "valueName": "ｉＦｒｅｅ 新興国債券インデックス",
+            "marketValueMinor": 381,
+            "ratio": 0.007695259639272081,
+            "sortOrder": 27
+          },
+          {
+            "valueCode": "de131865-8742-4ca1-88de-229cdf5c11ac",
+            "valueName": "ｅＭＡＸＩＳ　Ｎｅｏ　ドローン",
+            "marketValueMinor": 349,
+            "ratio": 0.007048938619700673,
+            "sortOrder": 28
+          },
+          {
+            "valueCode": "7c8aad06-ed36-4cd7-abe2-66085e44af87",
+            "valueName": "ｅＭＡＸＩＳ Ｓｌｉｍ 米国株式（Ｓ＆Ｐ５００）",
+            "marketValueMinor": 316,
+            "ratio": 0.006382420068267658,
+            "sortOrder": 29
+          },
+          {
+            "valueCode": "a6168c9b-f82b-435a-9a70-29c991d0ea5c",
+            "valueName": "ｅＭＡＸＩＳ Ｓｌｉｍ バランス（８資産均等型）",
+            "marketValueMinor": 312,
+            "ratio": 0.006301629940821231,
+            "sortOrder": 30
+          },
+          {
+            "valueCode": "e186e256-a732-4d13-a203-67c525b96a73",
+            "valueName": "ｅＭＡＸＩＳプラス　コモディティインデックス",
+            "marketValueMinor": 300,
+            "ratio": 0.006059259558481953,
+            "sortOrder": 31
+          },
+          {
+            "valueCode": "063392e3-d3e4-4fa0-a36b-edc9579dc7ce",
+            "valueName": "外国債券オープン（毎月決算型）",
+            "marketValueMinor": 278,
+            "ratio": 0.0056149138575266105,
+            "sortOrder": 32
+          },
+          {
+            "valueCode": "3767e685-e58e-47b8-b277-64c2c9501d55",
+            "valueName": "ラサール・グローバルＲＥＩＴファンド（毎月分配型）",
+            "marketValueMinor": 269,
+            "ratio": 0.005433136070772152,
+            "sortOrder": 33
+          },
+          {
+            "valueCode": "b74a0e8b-e5b1-4ef8-b63e-0b705a16349c",
+            "valueName": "フィデリティ・ＵＳ　ハイ・イールド・ファンド（毎月決算型）Ｂ（為替ヘッジなし）",
+            "marketValueMinor": 234,
+            "ratio": 0.004726222455615924,
+            "sortOrder": 34
+          },
+          {
+            "valueCode": "a39a69e9-48e3-473f-9716-6f4ce59b2dea",
+            "valueName": "ｅＭＡＸＩＳ Ｓｌｉｍ 新興国株式インデックス",
+            "marketValueMinor": 226,
+            "ratio": 0.004564642200723072,
+            "sortOrder": 35
+          },
+          {
+            "valueCode": "e186e256-a732-4d13-a203-67c525b96a73",
+            "valueName": "ｅＭＡＸＩＳプラス　コモディティインデックス",
+            "marketValueMinor": 209,
+            "ratio": 0.004221284159075761,
+            "sortOrder": 36
+          },
+          {
+            "valueCode": "b74a0e8b-e5b1-4ef8-b63e-0b705a16349c",
+            "valueName": "フィデリティ・ＵＳ　ハイ・イールド・ファンド（毎月決算型）Ｂ（為替ヘッジなし）",
+            "marketValueMinor": 204,
+            "ratio": 0.004120296499767729,
+            "sortOrder": 37
+          },
+          {
+            "valueCode": "4239669e-65d1-4438-9300-46b56d73e85f",
+            "valueName": "ピクテ新興国インカム株式ファンド（毎月決算型）",
+            "marketValueMinor": 150,
+            "ratio": 0.0030296297792409767,
+            "sortOrder": 38
+          },
+          {
+            "valueCode": "ee9e8c41-73ee-4e5c-bcab-4502d279d7c9",
+            "valueName": "ニッセイＳＯＸ指数インデックスファンド（米国半導体株）＜購入・換金手数料なし＞",
+            "marketValueMinor": 121,
+            "ratio": 0.002443901355254388,
+            "sortOrder": 39
+          },
+          {
+            "valueCode": "bdc4034a-aa05-4bb9-9dfe-028d14101408",
+            "valueName": "日本好配当リバランスオープン",
+            "marketValueMinor": 107,
+            "ratio": 0.002161135909191897,
+            "sortOrder": 40
+          },
+          {
+            "valueCode": "1535eeed-091b-4ba8-9489-7bfb8bc6fa2c",
+            "valueName": "野村新興国債券投信Ｂコース＜為替ヘッジなし＞（毎月分配型）",
+            "marketValueMinor": 105,
+            "ratio": 0.0021207408454686836,
+            "sortOrder": 41
+          },
+          {
+            "valueCode": "e027caaf-c0f1-46ce-9bce-4daabbf2539b",
+            "valueName": "ｅＭＡＸＩＳ　Ｓｌｉｍ　全世界株式（オール・カントリー）",
+            "marketValueMinor": 101,
+            "ratio": 0.0020399507180222575,
+            "sortOrder": 42
+          },
+          {
+            "valueCode": "1535eeed-091b-4ba8-9489-7bfb8bc6fa2c",
+            "valueName": "野村新興国債券投信Ｂコース＜為替ヘッジなし＞（毎月分配型）",
+            "marketValueMinor": 100,
+            "ratio": 0.002019753186160651,
+            "sortOrder": 43
+          },
+          {
+            "valueCode": "5a4c2ffb-60a9-4ce4-a0b4-9c81e856a193",
+            "valueName": "フィデリティ・ＵＳリート・ファンド　Ｂ（為替ヘッジなし）",
+            "marketValueMinor": 100,
+            "ratio": 0.002019753186160651,
+            "sortOrder": 44
+          },
+          {
+            "valueCode": "3767e685-e58e-47b8-b277-64c2c9501d55",
+            "valueName": "ラサール・グローバルＲＥＩＴファンド（毎月分配型）",
+            "marketValueMinor": 100,
+            "ratio": 0.002019753186160651,
+            "sortOrder": 45
+          },
+          {
+            "valueCode": "8f9d63cb-de00-494e-ac7c-056b98c44743",
+            "valueName": "ｅＭＡＸＩＳ　日経半導体株インデックス",
+            "marketValueMinor": 95,
+            "ratio": 0.0019187655268526186,
+            "sortOrder": 46
+          },
+          {
+            "valueCode": "e559e5ab-df75-49bc-8016-b6ef690d7cfb",
+            "valueName": "ＪＰモルガン・ナスダック米国株式・プレミアム・インカムＥＴＦ",
+            "marketValueMinor": 9336,
+            "ratio": 0.1885641574599584,
+            "sortOrder": 47
+          },
+          {
+            "valueCode": "2d3b9f84-c24f-46a1-bbbb-b6dd48118354",
+            "valueName": "グローバルＸ　米国優先証券　ＥＴＦ",
+            "marketValueMinor": 2969,
+            "ratio": 0.05996647209710973,
+            "sortOrder": 48
+          },
+          {
+            "valueCode": "b0f92ebc-865e-4639-bd16-6106a240f82d",
+            "valueName": "ＭＳＶ内外ＥＴＦ資産配分Ｆ・Ｇ",
+            "marketValueMinor": 9979,
+            "ratio": 0.20155117044697138,
+            "sortOrder": 49
           }
         ]
       }
