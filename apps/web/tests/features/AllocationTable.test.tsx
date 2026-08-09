@@ -107,4 +107,36 @@ describe("AllocationTable", () => {
       expect(onSliceLeave).toHaveBeenCalled();
     }
   });
+
+  it("does not aggregate same-name holdings across classification slices", () => {
+    const slices = sampleAllocationSlices.map((slice) => {
+      let result = {
+        ...slice,
+        lines: slice.lines.map((lineInSlice) => {
+          let lineResult = {
+            ...lineInSlice,
+            line: {
+              ...lineInSlice.line,
+              instrumentName: "共通ファンド",
+            },
+          };
+          return lineResult;
+        }),
+      };
+      return result;
+    });
+
+    render(
+      <AllocationTable
+        slices={slices}
+        highlightedValueCode={null}
+        expandedValueCodes={["domestic", "foreign"]}
+        onSliceHover={vi.fn()}
+        onSliceLeave={vi.fn()}
+        onToggleExpand={vi.fn()}
+      />,
+    );
+
+    expect(screen.getAllByText("共通ファンド")).toHaveLength(2);
+  });
 });

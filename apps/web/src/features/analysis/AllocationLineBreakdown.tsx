@@ -68,31 +68,94 @@ function buildAttributedLineMetrics(
   return result;
 }
 
+type AggregatedAllocationLine = {
+  row: HoldingLineDetailRow;
+  unrealizedGainMinor: number | null;
+};
+
+function sumNullableAmount(
+  current: number | null | undefined,
+  incoming: number | null,
+): number | null {
+  let result: number | null = null;
+
+  if (current === null || current === undefined) {
+    result = incoming;
+    return result;
+  }
+
+  if (incoming === null) {
+    result = current;
+    return result;
+  }
+
+  result = current + incoming;
+  return result;
+}
+
+function buildAllocationLineDetailRows(
+  lines: AllocationLineInSlice[],
+): HoldingLineDetailRow[] {
+  let result: HoldingLineDetailRow[] = [];
+  const rowsByInstrument = new Map<string, AggregatedAllocationLine>();
+
+  for (const lineInSlice of lines) {
+    const groupKey = JSON.stringify([
+      lineInSlice.portfolioCode ?? "",
+      lineInSlice.line.instrumentName,
+    ]);
+    const existing = rowsByInstrument.get(groupKey);
+
+    if (existing) {
+      existing.row.quantity += lineInSlice.line.quantity;
+      existing.row.marketValueMinor += lineInSlice.attributedMarketValueMinor;
+      existing.row.bookValueMinor = sumNullableAmount(
+        existing.row.bookValueMinor,
+        lineInSlice.attributedBookValueMinor,
+      );
+      existing.row.weight += lineInSlice.weightInSlice;
+      existing.unrealizedGainMinor = sumNullableAmount(
+        existing.unrealizedGainMinor,
+        lineInSlice.attributedUnrealizedGainMinor,
+      );
+      continue;
+    }
+
+    let aggregated: AggregatedAllocationLine = {
+      row: {
+        id: lineInSlice.line.id,
+        instrumentName: lineInSlice.line.instrumentName,
+        quantity: lineInSlice.line.quantity,
+        marketValueMinor: lineInSlice.attributedMarketValueMinor,
+        bookValueMinor: lineInSlice.attributedBookValueMinor,
+        weight: lineInSlice.weightInSlice,
+        metrics: lineInSlice.line.metrics,
+        portfolioName: lineInSlice.portfolioName,
+      },
+      unrealizedGainMinor: lineInSlice.attributedUnrealizedGainMinor,
+    };
+    rowsByInstrument.set(groupKey, aggregated);
+  }
+
+  for (const aggregated of rowsByInstrument.values()) {
+    aggregated.row.metrics = buildAttributedLineMetrics(
+      aggregated.row.metrics,
+      aggregated.unrealizedGainMinor,
+      aggregated.row.bookValueMinor ?? null,
+    );
+    result.push(aggregated.row);
+  }
+
+  return result;
+}
+
 export function AllocationLineBreakdown({
   lines,
   portfolioKind = "ideco",
   showPortfolioColumn = false,
   className = "allocation-line-breakdown",
 }: AllocationLineBreakdownProps) {
-  const rows: HoldingLineDetailRow[] = [];
-
-  for (const lineInSlice of lines) {
-    let row: HoldingLineDetailRow = {
-      id: lineInSlice.line.id,
-      instrumentName: lineInSlice.line.instrumentName,
-      quantity: lineInSlice.line.quantity,
-      marketValueMinor: lineInSlice.attributedMarketValueMinor,
-      bookValueMinor: lineInSlice.attributedBookValueMinor,
-      weight: lineInSlice.weightInSlice,
-      metrics: buildAttributedLineMetrics(
-        lineInSlice.line.metrics,
-        lineInSlice.attributedUnrealizedGainMinor,
-        lineInSlice.attributedBookValueMinor,
-      ),
-      portfolioName: lineInSlice.portfolioName,
-    };
-    rows.push(row);
-  }
+  const rows = buildAllocationLineDetailRows(lines);
 
   let result = (
     <HoldingLineDetailTable
