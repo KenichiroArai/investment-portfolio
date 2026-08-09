@@ -36,6 +36,7 @@ export * from "./monex-compass-fund-paste";
 export * from "./monex-csv-utils";
 export * from "./monex-domestic-holdings-paste";
 export * from "./monex-holding-metrics";
+export * from "./monex-instrument-aliases";
 export * from "./monex-instrument-match";
 export * from "./monex-paste";
 export * from "./monex-paste-utils";

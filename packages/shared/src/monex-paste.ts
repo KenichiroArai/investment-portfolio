@@ -5,6 +5,7 @@ import { parseMonexCompassFundPaste } from "./monex-compass-fund-paste";
 import type { MonexCompassFundPasteRow } from "./monex-compass-fund-paste";
 import { parseMonexDomesticHoldingsPaste } from "./monex-domestic-holdings-paste";
 import type { MonexDomesticHoldingsPasteRow } from "./monex-domestic-holdings-paste";
+import { buildMonexInstrumentNameAliasMap } from "./monex-instrument-aliases";
 import {
   detectMonexPasteSectionKind,
   MonexCsvError,
@@ -192,7 +193,10 @@ export function parseMonexPaste(content: string): ParseMonexPasteResult {
   result = {
     holdings,
     assetClassBreakdownByInstrumentName:
-      buildMonexInstrumentAssetClassBreakdownFromMarketValues(assetClassRows),
+      buildMonexInstrumentAssetClassBreakdownFromMarketValues(
+        assetClassRows,
+        buildMonexInstrumentNameAliasMap(),
+      ),
   };
 
   return result;

@@ -261,6 +261,64 @@ describe("monex paste parsers", () => {
     expect(gold?.[0]).toMatchObject({ valueCode: "other", allocationWeight: 1 });
   });
 
+  it("maps MSV asset-class alias onto compass holding name in bulk paste", () => {
+    const assetClassWithMsv = `銘柄
+▼
+保有比率
+▼
+評価額
+▼
+先進国株式全体
+6,286
+0
+(0.00%)
+---
+(---%)
+ＭＳＶ内外ＥＴＦ資産配分ファンド（Ｇコース）
+100.00%
+6,286
+0
+(0.00%)
+---
+(---%)
+
+銘柄
+▼
+保有比率
+▼
+評価額
+▼
+先進国債券全体
+1,367
+0
+(0.00%)
+---
+(---%)
+ＭＳＶ内外ＥＴＦ資産配分ファンド（Ｇコース）
+100.00%
+1,367
+0
+(0.00%)
+---
+(---%)`;
+
+    const parsed = parseMonexPaste([compassSample, assetClassWithMsv].join("\n\n"));
+    const msv = parsed.assetClassBreakdownByInstrumentName.get(
+      "ＭＳＶ内外ＥＴＦ資産配分Ｆ・Ｇ",
+    );
+    expect(msv).toBeDefined();
+    expect(parsed.assetClassBreakdownByInstrumentName.has(
+      "ＭＳＶ内外ＥＴＦ資産配分ファンド（Ｇコース）",
+    )).toBe(false);
+    const total = 6286 + 1367;
+    expect(
+      msv?.find((item) => item.valueCode === "developed_equity")?.allocationWeight,
+    ).toBeCloseTo(6286 / total);
+    expect(
+      msv?.find((item) => item.valueCode === "developed_bond")?.allocationWeight,
+    ).toBeCloseTo(1367 / total);
+  });
+
   it("throws when paste is empty", () => {
     expect(() => parseMonexPaste("")).toThrow(MonexCsvError);
   });

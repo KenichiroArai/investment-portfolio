@@ -29,6 +29,7 @@ import {
   buildAssetClassAssignments,
   draftRowsToHoldingInputs,
   hasUnmatchedDraftRows,
+  listUnmatchedAssetClassInstrumentNames,
   listUnmatchedInstrumentCandidates,
   pasteRowsToDrafts,
   rematchDraftRows,
@@ -117,6 +118,13 @@ export function MonexBulkImportTab({
     }
     return result;
   }, [drafts]);
+  const unmatchedAssetClassNames = useMemo(() => {
+    let result: string[] = [];
+    if (drafts) {
+      result = listUnmatchedAssetClassInstrumentNames(drafts, assetClassBreakdown);
+    }
+    return result;
+  }, [drafts, assetClassBreakdown]);
   const isBusy = disabled || loading || submitting;
 
   async function saveSnapshot(
@@ -164,9 +172,17 @@ export function MonexBulkImportTab({
       setDrafts(nextDrafts);
       setAssetClassBreakdown(parsed.assetClassBreakdownByInstrumentName);
 
+      const unmatchedAssetClasses = listUnmatchedAssetClassInstrumentNames(
+        nextDrafts,
+        parsed.assetClassBreakdownByInstrumentName,
+      );
       if (hasUnmatchedDraftRows(nextDrafts)) {
         toast.warning(
           "一部の銘柄を自動マッチできませんでした。下の候補から銘柄登録するか、一覧で選択してください。",
+        );
+      } else if (unmatchedAssetClasses.length > 0) {
+        toast.warning(
+          `明細は取り込みました。資産クラス内訳のうち ${unmatchedAssetClasses.length} 件が保有と紐付きませんでした。`,
         );
       } else {
         toast.success(`${nextDrafts.length} 件の明細を取り込みました。`);
@@ -284,6 +300,22 @@ export function MonexBulkImportTab({
           disabled={isBusy}
           onCreate={handleCreateUnmatchedInstrument}
         />
+      ) : null}
+
+      {isDraftMode && unmatchedAssetClassNames.length > 0 ? (
+        <Alert variant="destructive">
+          <AlertTitle>資産クラス内訳の未紐付け</AlertTitle>
+          <AlertDescription>
+            <p>
+              次の銘柄は資産クラス画面にありますが、保有明細と紐付きませんでした。按分が更新されない可能性があります。
+            </p>
+            <ul className="mt-2 list-disc pl-5">
+              {unmatchedAssetClassNames.map((name) => (
+                <li key={name}>{name}</li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
       ) : null}
 
       {isDraftMode ? (

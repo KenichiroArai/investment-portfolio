@@ -1,3 +1,8 @@
+import {
+  listMonexInstrumentAliasLookupNames,
+  resolveMonexCanonicalInstrumentName,
+} from "./monex-instrument-aliases";
+
 export type MonexInstrumentAssetClassBreakdownEntry = {
   valueCode: string;
   allocationWeight: number;
@@ -30,15 +35,7 @@ function resolveCanonicalInstrumentName(
   instrumentName: string,
   aliasMap: Map<string, string[]>,
 ): string {
-  let result = instrumentName;
-
-  for (const [canonicalName, aliases] of aliasMap) {
-    if (canonicalName === instrumentName || aliases.includes(instrumentName)) {
-      result = canonicalName;
-      return result;
-    }
-  }
-
+  let result = resolveMonexCanonicalInstrumentName(instrumentName, aliasMap);
   return result;
 }
 
@@ -107,19 +104,24 @@ export function resolveMonexInstrumentAssetClassBreakdown(
   breakdownMap: Map<string, MonexInstrumentAssetClassBreakdownEntry[]>,
   instrumentName: string,
   additionalMatchNames: string[],
+  aliasMap: Map<string, string[]> = new Map(),
 ): MonexInstrumentAssetClassBreakdownEntry[] {
   let result: MonexInstrumentAssetClassBreakdownEntry[] = [];
 
-  const direct = breakdownMap.get(instrumentName);
-  if (direct) {
-    result = direct;
-    return result;
-  }
+  const lookupNames = [
+    ...listMonexInstrumentAliasLookupNames(instrumentName, aliasMap),
+    ...additionalMatchNames,
+  ];
+  const seen = new Set<string>();
 
-  for (const aliasName of additionalMatchNames) {
-    const aliasBreakdown = breakdownMap.get(aliasName);
-    if (aliasBreakdown) {
-      result = aliasBreakdown;
+  for (const lookupName of lookupNames) {
+    if (seen.has(lookupName)) {
+      continue;
+    }
+    seen.add(lookupName);
+    const found = breakdownMap.get(lookupName);
+    if (found) {
+      result = found;
       return result;
     }
   }

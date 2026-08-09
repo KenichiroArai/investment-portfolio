@@ -1,5 +1,7 @@
 import {
   buildMonexHoldingMetrics,
+  buildMonexInstrumentNameAliasMap,
+  listMonexInstrumentAliasLookupNames,
   matchMonexInstrumentId,
   normalizeIdecoInstrumentMatchKey,
   resolveMonexInstrumentAssetClassBreakdown,
@@ -9,6 +11,8 @@ import {
 } from "@repo/shared";
 
 import type { MonexHoldingDraftRow, PasteInstrumentDto } from "./types";
+
+const monexInstrumentAliasMap = buildMonexInstrumentNameAliasMap();
 
 export function createHoldingDraftId(): string {
   let result = `draft-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -135,11 +139,15 @@ export function buildAssetClassAssignments(
       continue;
     }
 
-    const additionalNames = additionalMatchNamesForRow(draft);
+    const additionalNames = [
+      ...additionalMatchNamesForRow(draft),
+      ...listMonexInstrumentAliasLookupNames(draft.instrumentName, monexInstrumentAliasMap),
+    ];
     let breakdown = resolveMonexInstrumentAssetClassBreakdown(
       breakdownByInstrumentName,
       draft.instrumentName,
       additionalNames,
+      monexInstrumentAliasMap,
     );
 
     if (breakdown.length === 0) {
@@ -170,6 +178,65 @@ export function buildAssetClassAssignments(
     });
   }
 
+  return result;
+}
+
+/** 資産クラス内訳にあって保有ドラフトへ紐付かない名称（alias 解決後）。 */
+export function listUnmatchedAssetClassInstrumentNames(
+  drafts: MonexHoldingDraftRow[],
+  breakdownByInstrumentName: Map<string, MonexInstrumentAssetClassBreakdownEntry[]>,
+): string[] {
+  let result: string[] = [];
+  const matchedCanonicalNames = new Set<string>();
+
+  for (const draft of drafts) {
+    if (!draft.instrumentId) {
+      continue;
+    }
+
+    const additionalNames = [
+      ...additionalMatchNamesForRow(draft),
+      ...listMonexInstrumentAliasLookupNames(draft.instrumentName, monexInstrumentAliasMap),
+    ];
+    const breakdown = resolveMonexInstrumentAssetClassBreakdown(
+      breakdownByInstrumentName,
+      draft.instrumentName,
+      additionalNames,
+      monexInstrumentAliasMap,
+    );
+    if (breakdown.length > 0) {
+      for (const name of listMonexInstrumentAliasLookupNames(
+        draft.instrumentName,
+        monexInstrumentAliasMap,
+      )) {
+        if (breakdownByInstrumentName.has(name)) {
+          matchedCanonicalNames.add(name);
+        }
+      }
+      continue;
+    }
+
+    for (const [name] of breakdownByInstrumentName) {
+      const matched = matchMonexInstrumentId(
+        [{ id: draft.instrumentId, name: draft.instrumentName }],
+        name,
+        additionalNames,
+      );
+      if (matched) {
+        matchedCanonicalNames.add(name);
+        break;
+      }
+    }
+  }
+
+  for (const name of breakdownByInstrumentName.keys()) {
+    if (matchedCanonicalNames.has(name)) {
+      continue;
+    }
+    result.push(name);
+  }
+
+  result.sort((left, right) => left.localeCompare(right, "ja"));
   return result;
 }
 

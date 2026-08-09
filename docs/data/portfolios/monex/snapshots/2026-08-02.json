@@ -3574,49 +3574,56 @@
           "schemeName": "資産クラス",
           "valueCode": "domestic_equity",
           "valueName": "国内株式",
-          "allocationWeight": 0.06996417197452229
+          "allocationWeight": 0.09102756892230576
         },
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "developed_equity",
           "valueName": "先進国株式",
-          "allocationWeight": 0.5861863057324841
+          "allocationWeight": 0.6301754385964913
         },
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "emerging_equity",
           "valueName": "新興国株式",
-          "allocationWeight": 0.03095143312101911
+          "allocationWeight": 0.04300751879699248
         },
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "foreign_reit",
           "valueName": "海外REIT",
-          "allocationWeight": 0.028960987261146497
+          "allocationWeight": 0.027969924812030075
+        },
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
+          "valueCode": "domestic_reit",
+          "valueName": "国内REIT",
+          "allocationWeight": 0.0019047619047619048
         },
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "developed_bond",
           "valueName": "先進国債券",
-          "allocationWeight": 0.22800557324840764
+          "allocationWeight": 0.13704260651629072
         },
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "domestic_bond",
           "valueName": "国内債券",
-          "allocationWeight": 0.0419984076433121
+          "allocationWeight": 0.059949874686716795
         },
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
           "valueCode": "emerging_bond",
           "valueName": "新興国債券",
-          "allocationWeight": 0.01393312101910828
+          "allocationWeight": 0.008922305764411028
         }
       ]
     }

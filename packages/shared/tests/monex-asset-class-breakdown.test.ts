@@ -4,6 +4,7 @@ import {
   buildMonexInstrumentAssetClassBreakdownFromMarketValues,
   resolveMonexInstrumentAssetClassBreakdown,
 } from "../src/monex-asset-class-breakdown";
+import { buildMonexInstrumentNameAliasMap } from "../src/monex-instrument-aliases";
 
 describe("monex-asset-class-breakdown", () => {
   it("builds instrument asset class breakdown across classes", () => {
@@ -44,6 +45,46 @@ describe("monex-asset-class-breakdown", () => {
     expect(
       merged?.find((item) => item.valueCode === "domestic_equity")?.allocationWeight,
     ).toBeCloseTo(0.6);
+  });
+
+  it("merges MSV asset-class alias into compass holding name", () => {
+    const aliasMap = buildMonexInstrumentNameAliasMap();
+    const breakdown = buildMonexInstrumentAssetClassBreakdownFromMarketValues(
+      [
+        {
+          instrumentName: "ＭＳＶ内外ＥＴＦ資産配分ファンド（Ｇコース）",
+          valueCode: "developed_equity",
+          marketValueMinor: 6286,
+        },
+        {
+          instrumentName: "ＭＳＶ内外ＥＴＦ資産配分ファンド（Ｇコース）",
+          valueCode: "developed_bond",
+          marketValueMinor: 1367,
+        },
+        {
+          instrumentName: "ＭＳＶ内外ＥＴＦ資産配分ファンド（Ｇコース）",
+          valueCode: "domestic_equity",
+          marketValueMinor: 908,
+        },
+      ],
+      aliasMap,
+    );
+
+    expect(breakdown.has("ＭＳＶ内外ＥＴＦ資産配分ファンド（Ｇコース）")).toBe(false);
+    const msv = breakdown.get("ＭＳＶ内外ＥＴＦ資産配分Ｆ・Ｇ");
+    expect(msv).toHaveLength(3);
+    const total = 6286 + 1367 + 908;
+    expect(
+      msv?.find((item) => item.valueCode === "developed_equity")?.allocationWeight,
+    ).toBeCloseTo(6286 / total);
+    expect(
+      resolveMonexInstrumentAssetClassBreakdown(
+        breakdown,
+        "ＭＳＶ内外ＥＴＦ資産配分Ｆ・Ｇ",
+        [],
+        aliasMap,
+      ),
+    ).toHaveLength(3);
   });
 
   it("ignores non-positive and non-finite market values", () => {

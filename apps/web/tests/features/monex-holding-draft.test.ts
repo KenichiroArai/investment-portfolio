@@ -1,9 +1,13 @@
 import { describe, expect, it } from "vitest";
 
+import type { MonexInstrumentAssetClassBreakdownEntry } from "@repo/shared";
+
 import type { MonexHoldingDraftRow, PasteInstrumentDto } from "../../src/features/monex/bulk-import/types";
 import {
+  buildAssetClassAssignments,
   filterInstrumentsByQuery,
   findSimilarInstruments,
+  listUnmatchedAssetClassInstrumentNames,
   listUnmatchedInstrumentCandidates,
   rematchDraftRows,
 } from "../../src/features/monex/bulk-import/holding-draft";
@@ -65,6 +69,52 @@ describe("monex holding-draft helpers", () => {
     expect(filterInstrumentsByQuery(instruments, "Ｓｌｉｍ")).toHaveLength(1);
     expect(findSimilarInstruments(instruments, "ＧＳ　日本株").map((item) => item.id)).toEqual([
       "2",
+    ]);
+  });
+
+  it("assigns MSV multi-class weights via alias map", () => {
+    const drafts = [
+      makeDraft({
+        source: "compass",
+        instrumentName: "ＭＳＶ内外ＥＴＦ資産配分Ｆ・Ｇ",
+        instrumentId: "msv-id",
+        dividendOption: "受取",
+      }),
+    ];
+    const breakdown = new Map<string, MonexInstrumentAssetClassBreakdownEntry[]>([
+      [
+        "ＭＳＶ内外ＥＴＦ資産配分Ｆ・Ｇ",
+        [
+          { valueCode: "developed_equity", allocationWeight: 0.63 },
+          { valueCode: "developed_bond", allocationWeight: 0.37 },
+        ],
+      ],
+    ]);
+
+    const assignments = buildAssetClassAssignments(drafts, breakdown);
+    expect(assignments).toHaveLength(1);
+    expect(assignments[0].instrumentId).toBe("msv-id");
+    expect(assignments[0].weights).toHaveLength(2);
+    expect(listUnmatchedAssetClassInstrumentNames(drafts, breakdown)).toEqual([]);
+  });
+
+  it("lists asset-class names that do not match any draft", () => {
+    const drafts = [
+      makeDraft({
+        instrumentName: "ｅＭＡＸＩＳ　Ｓｌｉｍ　国内株式（ＴＯＰＩＸ）",
+        instrumentId: "eq-id",
+      }),
+    ];
+    const breakdown = new Map<string, MonexInstrumentAssetClassBreakdownEntry[]>([
+      [
+        "ｅＭＡＸＩＳ　Ｓｌｉｍ　国内株式（ＴＯＰＩＸ）",
+        [{ valueCode: "domestic_equity", allocationWeight: 1 }],
+      ],
+      ["お預り金またはMRF", [{ valueCode: "short_term", allocationWeight: 1 }]],
+    ]);
+
+    expect(listUnmatchedAssetClassInstrumentNames(drafts, breakdown)).toEqual([
+      "お預り金またはMRF",
     ]);
   });
 });
