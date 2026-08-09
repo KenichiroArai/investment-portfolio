@@ -29,6 +29,7 @@ import {
   buildAssetClassAssignments,
   draftRowsToHoldingInputs,
   hasUnmatchedDraftRows,
+  instrumentTypeForSource,
   listUnmatchedAssetClassInstrumentNames,
   listUnmatchedInstrumentCandidates,
   pasteRowsToDrafts,
@@ -213,7 +214,7 @@ export function MonexBulkImportTab({
       portfolioCode,
       accountId: `${portfolioCode}:unknown`,
       name: candidate.instrumentName,
-      instrumentType: isUs ? "equity" : "mutual_fund",
+      instrumentType: instrumentTypeForSource(candidate.source),
       currency: isUs ? "USD" : "JPY",
       externalId: candidate.ticker,
     });

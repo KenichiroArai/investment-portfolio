@@ -261,6 +261,46 @@ describe("monex paste parsers", () => {
     expect(gold?.[0]).toMatchObject({ valueCode: "other", allocationWeight: 1 });
   });
 
+  it("creates a cash holding from the short-term asset-class breakdown", () => {
+    const cashAssetClass = `銘柄
+▼
+保有比率
+▼
+評価額
+▼
+短期金融資産全体
+92
+0
+(0.00%)
+---
+(---%)
+お預り金またはMRF
+100.00%
+92
++12
+(15.00%)
+---
+(---%)`;
+    const parsed = parseMonexPaste([domesticSample, cashAssetClass].join("\n\n"));
+    const cash = parsed.holdings.find((row) => row.source === "cash");
+
+    expect(cash).toMatchObject({
+      instrumentName: "お預り金またはMRF",
+      accountId: "monex:cash",
+      accountName: "現金 / MRF",
+      quantity: 1,
+      unitPriceMinor: 92,
+      avgCostMinor: 92,
+      marketValueMinor: 92,
+      bookValueMinor: 92,
+      unrealizedGainMinor: 0,
+      unrealizedGainRate: 0,
+    });
+    expect(parsed.assetClassBreakdownByInstrumentName.get("お預り金またはMRF")).toEqual([
+      { valueCode: "short_term", allocationWeight: 1 },
+    ]);
+  });
+
   it("maps MSV asset-class alias onto compass holding name in bulk paste", () => {
     const assetClassWithMsv = `銘柄
 ▼

@@ -7,6 +7,7 @@ import {
   buildAssetClassAssignments,
   filterInstrumentsByQuery,
   findSimilarInstruments,
+  instrumentTypeForSource,
   listUnmatchedAssetClassInstrumentNames,
   listUnmatchedInstrumentCandidates,
   rematchDraftRows,
@@ -35,7 +36,56 @@ function makeDraft(
     unrealizedGainRate: 0,
     draftId: "draft-1",
     instrumentId: partial.instrumentId,
-    ...partial,
+  };
+  result = { ...result, ...partial } as MonexHoldingDraftRow;
+  return result;
+}
+
+function makeUsDraft(input: {
+  instrumentName: string;
+  instrumentId: string;
+  ticker: string;
+  draftId: string;
+}): MonexHoldingDraftRow {
+  let result: MonexHoldingDraftRow = {
+    source: "us",
+    ticker: input.ticker,
+    instrumentName: input.instrumentName,
+    market: "米国",
+    accountId: "monex:特定:保護",
+    accountName: "特定 / 保護",
+    accountType: "特定",
+    custodyType: "保護",
+    quantity: 1,
+    avgCostMinor: 1000,
+    marketValueMinor: 1000,
+    bookValueMinor: 1000,
+    unrealizedGainMinor: 0,
+    unrealizedGainRate: 0,
+    draftId: input.draftId,
+    instrumentId: input.instrumentId,
+  };
+  return result;
+}
+
+function makeCashDraft(): MonexHoldingDraftRow {
+  let result: MonexHoldingDraftRow = {
+    source: "cash",
+    instrumentName: "お預り金またはMRF",
+    accountId: "monex:cash",
+    accountName: "現金 / MRF",
+    accountType: "現金",
+    custodyType: "MRF",
+    quantity: 1,
+    unitPriceMinor: 92,
+    dividendOption: "",
+    avgCostMinor: 92,
+    marketValueMinor: 92,
+    bookValueMinor: 92,
+    unrealizedGainMinor: 0,
+    unrealizedGainRate: 0,
+    draftId: "draft-cash",
+    instrumentId: "cash-id",
   };
   return result;
 }
@@ -98,12 +148,55 @@ describe("monex holding-draft helpers", () => {
     expect(listUnmatchedAssetClassInstrumentNames(drafts, breakdown)).toEqual([]);
   });
 
-  it("lists asset-class names that do not match any draft", () => {
+  it("matches US ETF asset-class names with ticker suffixes", () => {
+    const jepqName =
+      "ＪＰモルガン・ナスダック米国株式・プレミアム・インカムＥＴＦ";
+    const pffdName = "グローバルＸ　米国優先証券　ＥＴＦ";
+    const drafts = [
+      makeUsDraft({
+        instrumentName: jepqName,
+        instrumentId: "jepq-id",
+        ticker: "JEPQ",
+        draftId: "draft-1",
+      }),
+      makeUsDraft({
+        instrumentName: pffdName,
+        instrumentId: "pffd-id",
+        ticker: "PFFD",
+        draftId: "draft-2",
+      }),
+    ];
+    const breakdown = new Map<string, MonexInstrumentAssetClassBreakdownEntry[]>([
+      [
+        `${jepqName}（JEPQ）`,
+        [{ valueCode: "developed_equity", allocationWeight: 1 }],
+      ],
+      [
+        `${pffdName}（PFFD）`,
+        [{ valueCode: "developed_bond", allocationWeight: 1 }],
+      ],
+    ]);
+
+    expect(buildAssetClassAssignments(drafts, breakdown)).toEqual([
+      {
+        instrumentId: "jepq-id",
+        weights: [{ valueCode: "developed_equity", allocationWeight: 1 }],
+      },
+      {
+        instrumentId: "pffd-id",
+        weights: [{ valueCode: "developed_bond", allocationWeight: 1 }],
+      },
+    ]);
+    expect(listUnmatchedAssetClassInstrumentNames(drafts, breakdown)).toEqual([]);
+  });
+
+  it("assigns cash while listing truly unmatched asset-class names", () => {
     const drafts = [
       makeDraft({
         instrumentName: "ｅＭＡＸＩＳ　Ｓｌｉｍ　国内株式（ＴＯＰＩＸ）",
         instrumentId: "eq-id",
       }),
+      makeCashDraft(),
     ];
     const breakdown = new Map<string, MonexInstrumentAssetClassBreakdownEntry[]>([
       [
@@ -111,10 +204,16 @@ describe("monex holding-draft helpers", () => {
         [{ valueCode: "domestic_equity", allocationWeight: 1 }],
       ],
       ["お預り金またはMRF", [{ valueCode: "short_term", allocationWeight: 1 }]],
+      ["未保有ファンド", [{ valueCode: "other", allocationWeight: 1 }]],
     ]);
 
     expect(listUnmatchedAssetClassInstrumentNames(drafts, breakdown)).toEqual([
-      "お預り金またはMRF",
+      "未保有ファンド",
     ]);
+    expect(buildAssetClassAssignments(drafts, breakdown)).toContainEqual({
+      instrumentId: "cash-id",
+      weights: [{ valueCode: "short_term", allocationWeight: 1 }],
+    });
+    expect(instrumentTypeForSource("cash")).toBe("cash");
   });
 });

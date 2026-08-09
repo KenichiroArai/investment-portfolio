@@ -18,7 +18,25 @@ import type { MonexUsStockPasteRow } from "./monex-us-stocks-paste";
 export type MonexHoldingPasteRow =
   | MonexDomesticHoldingsPasteRow
   | MonexUsStockPasteRow
-  | MonexCompassFundPasteRow;
+  | MonexCompassFundPasteRow
+  | MonexCashPasteRow;
+
+export type MonexCashPasteRow = {
+  source: "cash";
+  instrumentName: string;
+  accountId: string;
+  accountName: string;
+  accountType: string;
+  custodyType: string;
+  quantity: number;
+  unitPriceMinor: number;
+  dividendOption: string;
+  avgCostMinor: number;
+  marketValueMinor: number;
+  bookValueMinor: number;
+  unrealizedGainMinor: number;
+  unrealizedGainRate: number;
+};
 
 export type ParseMonexPasteResult = {
   holdings: MonexHoldingPasteRow[];
@@ -32,6 +50,49 @@ type PasteSection = {
   kind: MonexPasteSectionKind;
   lines: string[];
 };
+
+function buildMonexCashPasteRow(
+  rows: Array<{
+    instrumentName: string;
+    valueCode: string;
+    marketValueMinor: number;
+  }>,
+): MonexCashPasteRow | null {
+  let result: MonexCashPasteRow | null = null;
+  let marketValueMinor = 0;
+
+  for (const row of rows) {
+    if (
+      row.instrumentName !== "お預り金またはMRF" ||
+      row.valueCode !== "short_term"
+    ) {
+      continue;
+    }
+    marketValueMinor += row.marketValueMinor;
+  }
+
+  if (marketValueMinor <= 0) {
+    return result;
+  }
+
+  result = {
+    source: "cash",
+    instrumentName: "お預り金またはMRF",
+    accountId: "monex:cash",
+    accountName: "現金 / MRF",
+    accountType: "現金",
+    custodyType: "MRF",
+    quantity: 1,
+    unitPriceMinor: marketValueMinor,
+    dividendOption: "",
+    avgCostMinor: marketValueMinor,
+    marketValueMinor,
+    bookValueMinor: marketValueMinor,
+    unrealizedGainMinor: 0,
+    unrealizedGainRate: 0,
+  };
+  return result;
+}
 
 function isSectionHeaderStart(lines: string[], index: number): boolean {
   let result = false;
@@ -189,6 +250,10 @@ export function parseMonexPaste(content: string): ParseMonexPasteResult {
     valueCode: row.valueCode,
     marketValueMinor: row.marketValueMinor,
   }));
+  const cashRow = buildMonexCashPasteRow(assetClassRows);
+  if (cashRow) {
+    holdings.push(cashRow);
+  }
 
   result = {
     holdings,

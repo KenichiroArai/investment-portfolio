@@ -4,7 +4,6 @@ import {
   listMonexInstrumentAliasLookupNames,
   matchMonexInstrumentId,
   normalizeIdecoInstrumentMatchKey,
-  resolveMonexInstrumentAssetClassBreakdown,
   type HoldingLineInput,
   type MonexHoldingPasteRow,
   type MonexInstrumentAssetClassBreakdownEntry,
@@ -13,6 +12,11 @@ import {
 import type { MonexHoldingDraftRow, PasteInstrumentDto } from "./types";
 
 const monexInstrumentAliasMap = buildMonexInstrumentNameAliasMap();
+
+type MatchedAssetClassBreakdown = {
+  instrumentName: string;
+  entries: MonexInstrumentAssetClassBreakdownEntry[];
+};
 
 export function createHoldingDraftId(): string {
   let result = `draft-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -24,6 +28,33 @@ function additionalMatchNamesForRow(row: MonexHoldingPasteRow): string[] {
 
   if (row.source === "us") {
     result = [`${row.instrumentName}（${row.ticker}）`, row.ticker];
+  }
+
+  return result;
+}
+
+function findMatchingAssetClassBreakdown(
+  draft: MonexHoldingDraftRow,
+  breakdownByInstrumentName: Map<string, MonexInstrumentAssetClassBreakdownEntry[]>,
+): MatchedAssetClassBreakdown | null {
+  let result: MatchedAssetClassBreakdown | null = null;
+  const additionalNames = [
+    ...additionalMatchNamesForRow(draft),
+    ...listMonexInstrumentAliasLookupNames(draft.instrumentName, monexInstrumentAliasMap),
+  ];
+
+  for (const [instrumentName, entries] of breakdownByInstrumentName) {
+    const matched = matchMonexInstrumentId(
+      [{ id: instrumentName, name: instrumentName }],
+      draft.instrumentName,
+      additionalNames,
+    );
+    if (!matched) {
+      continue;
+    }
+
+    result = { instrumentName, entries };
+    return result;
   }
 
   return result;
@@ -139,39 +170,18 @@ export function buildAssetClassAssignments(
       continue;
     }
 
-    const additionalNames = [
-      ...additionalMatchNamesForRow(draft),
-      ...listMonexInstrumentAliasLookupNames(draft.instrumentName, monexInstrumentAliasMap),
-    ];
-    let breakdown = resolveMonexInstrumentAssetClassBreakdown(
+    const matchedBreakdown = findMatchingAssetClassBreakdown(
+      draft,
       breakdownByInstrumentName,
-      draft.instrumentName,
-      additionalNames,
-      monexInstrumentAliasMap,
     );
-
-    if (breakdown.length === 0) {
-      for (const [name, entries] of breakdownByInstrumentName) {
-        const matched = matchMonexInstrumentId(
-          [{ id: draft.instrumentId, name: draft.instrumentName }],
-          name,
-          additionalNames,
-        );
-        if (matched) {
-          breakdown = entries;
-          break;
-        }
-      }
-    }
-
-    if (breakdown.length === 0) {
+    if (!matchedBreakdown) {
       continue;
     }
 
     seenInstrumentIds.add(draft.instrumentId);
     result.push({
       instrumentId: draft.instrumentId,
-      weights: breakdown.map((entry) => ({
+      weights: matchedBreakdown.entries.map((entry) => ({
         valueCode: entry.valueCode,
         allocationWeight: entry.allocationWeight,
       })),
@@ -194,38 +204,12 @@ export function listUnmatchedAssetClassInstrumentNames(
       continue;
     }
 
-    const additionalNames = [
-      ...additionalMatchNamesForRow(draft),
-      ...listMonexInstrumentAliasLookupNames(draft.instrumentName, monexInstrumentAliasMap),
-    ];
-    const breakdown = resolveMonexInstrumentAssetClassBreakdown(
+    const matchedBreakdown = findMatchingAssetClassBreakdown(
+      draft,
       breakdownByInstrumentName,
-      draft.instrumentName,
-      additionalNames,
-      monexInstrumentAliasMap,
     );
-    if (breakdown.length > 0) {
-      for (const name of listMonexInstrumentAliasLookupNames(
-        draft.instrumentName,
-        monexInstrumentAliasMap,
-      )) {
-        if (breakdownByInstrumentName.has(name)) {
-          matchedCanonicalNames.add(name);
-        }
-      }
-      continue;
-    }
-
-    for (const [name] of breakdownByInstrumentName) {
-      const matched = matchMonexInstrumentId(
-        [{ id: draft.instrumentId, name: draft.instrumentName }],
-        name,
-        additionalNames,
-      );
-      if (matched) {
-        matchedCanonicalNames.add(name);
-        break;
-      }
+    if (matchedBreakdown) {
+      matchedCanonicalNames.add(matchedBreakdown.instrumentName);
     }
   }
 
@@ -250,6 +234,27 @@ export function sourceLabel(source: MonexHoldingPasteRow["source"]): string {
 
   if (source === "compass") {
     result = "ON COMPASS";
+    return result;
+  }
+  if (source === "cash") {
+    result = "現金 / MRF";
+    return result;
+  }
+
+  return result;
+}
+
+export function instrumentTypeForSource(
+  source: MonexHoldingPasteRow["source"],
+): string {
+  let result = "mutual_fund";
+
+  if (source === "us") {
+    result = "equity";
+    return result;
+  }
+  if (source === "cash") {
+    result = "cash";
     return result;
   }
 
