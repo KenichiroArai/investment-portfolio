@@ -148,7 +148,18 @@ export async function listSchemesWithValuesForPortfolio(
           name: value.name,
           sortOrder: value.sortOrder,
         }))
-        .sort((left, right) => left.sortOrder - right.sortOrder),
+        .sort((left, right) => {
+          let result = left.sortOrder - right.sortOrder;
+          if (result !== 0) {
+            return result;
+          }
+          result = left.name.localeCompare(right.name);
+          if (result !== 0) {
+            return result;
+          }
+          result = left.code.localeCompare(right.code);
+          return result;
+        }),
     });
   }
 

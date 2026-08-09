@@ -328,6 +328,43 @@ describe("sortHoldingsDetailLines", () => {
 });
 
 describe("sortAllocationSlices", () => {
+  it("sorts slices by display order then value name", () => {
+    const slices: AllocationSliceWithLines[] = [
+      {
+        valueCode: "gamma",
+        valueName: "Gamma",
+        sortOrder: 1,
+        marketValueMinor: 300,
+        weight: 0.5,
+        lines: [],
+      },
+      {
+        valueCode: "beta",
+        valueName: "Beta",
+        sortOrder: 0,
+        marketValueMinor: 100,
+        weight: 0.2,
+        lines: [],
+      },
+      {
+        valueCode: "alpha",
+        valueName: "Alpha",
+        sortOrder: 1,
+        marketValueMinor: 200,
+        weight: 0.3,
+        lines: [],
+      },
+    ];
+
+    const sorted = sortAllocationSlices(slices, "displayOrder", "asc");
+
+    expect(sorted.map((slice) => slice.valueCode)).toEqual([
+      "beta",
+      "alpha",
+      "gamma",
+    ]);
+  });
+
   it("sorts slices by value name", () => {
     const slices: AllocationSliceWithLines[] = [
       {

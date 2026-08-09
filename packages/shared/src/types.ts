@@ -13,6 +13,7 @@ export type ClassificationTagDto = {
   schemeName: string;
   valueCode: string;
   valueName: string;
+  sortOrder?: number;
   allocationWeight?: number | null;
 };
 

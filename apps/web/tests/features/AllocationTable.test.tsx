@@ -41,6 +41,29 @@ describe("AllocationTable", () => {
     expect(screen.getByRole("columnheader", { name: "損益率" })).toBeInTheDocument();
   });
 
+  it("uses configured display order initially", () => {
+    const slices = sampleAllocationSlices.map((slice) => {
+      let result = {
+        ...slice,
+        sortOrder: slice.valueCode === "foreign" ? 0 : 1,
+      };
+      return result;
+    });
+
+    render(
+      <AllocationTable
+        slices={slices}
+        highlightedValueCode={null}
+        expandedValueCodes={[]}
+        onSliceHover={vi.fn()}
+        onSliceLeave={vi.fn()}
+        onToggleExpand={vi.fn()}
+      />,
+    );
+
+    expect(screen.getAllByRole("row")[1]?.textContent).toContain("海外");
+  });
+
   it("sorts slices and toggles expand", async () => {
     const user = userEvent.setup();
     const onToggleExpand = vi.fn();
@@ -61,7 +84,7 @@ describe("AllocationTable", () => {
     const firstSliceName = () =>
       screen.getAllByRole("row")[1]?.textContent ?? "";
 
-    expect(firstSliceName()).toContain("国内");
+    expect(firstSliceName()).toContain("海外");
 
     await user.click(screen.getByRole("button", { name: "分類" }));
     const afterFirstSort = firstSliceName();

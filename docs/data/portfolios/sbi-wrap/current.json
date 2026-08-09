@@ -57,6 +57,7 @@
           "schemeName": "AI投資",
           "valueCode": "be130054-4a39-4f7d-a592-7caced43660e",
           "valueName": "（ラップ専用）ＳＢＩ・米国株式",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -64,6 +65,7 @@
           "schemeName": "商品",
           "valueCode": "ai_investment",
           "valueName": "AI投資",
+          "sortOrder": 1,
           "allocationWeight": 1
         }
       ]
@@ -93,6 +95,7 @@
           "schemeName": "AI投資",
           "valueCode": "1973a843-04e8-4e5a-b1cc-db53be314619",
           "valueName": "（ラップ専用）ＳＢＩ・先進国株式",
+          "sortOrder": 2,
           "allocationWeight": null
         },
         {
@@ -100,6 +103,7 @@
           "schemeName": "商品",
           "valueCode": "ai_investment",
           "valueName": "AI投資",
+          "sortOrder": 1,
           "allocationWeight": 1
         }
       ]
@@ -129,6 +133,7 @@
           "schemeName": "AI投資",
           "valueCode": "c5e07a2d-bbdb-43f0-8902-d69d48ef5e79",
           "valueName": "（ラップ専用）ＳＢＩ・新興国株式",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -136,6 +141,7 @@
           "schemeName": "商品",
           "valueCode": "ai_investment",
           "valueName": "AI投資",
+          "sortOrder": 1,
           "allocationWeight": 1
         }
       ]
@@ -165,6 +171,7 @@
           "schemeName": "AI投資",
           "valueCode": "53b66a8c-98c9-4867-afe5-16ee4ec8af97",
           "valueName": "（ラップ専用）ＳＢＩ・米国債券",
+          "sortOrder": 4,
           "allocationWeight": null
         },
         {
@@ -172,6 +179,7 @@
           "schemeName": "商品",
           "valueCode": "ai_investment",
           "valueName": "AI投資",
+          "sortOrder": 1,
           "allocationWeight": 1
         }
       ]
@@ -201,6 +209,7 @@
           "schemeName": "AI投資",
           "valueCode": "6ba16261-ad73-44e9-9d9a-f98b599cd314",
           "valueName": "（ラップ専用）ＳＢＩ・米国ハイイールド債券",
+          "sortOrder": 5,
           "allocationWeight": null
         },
         {
@@ -208,6 +217,7 @@
           "schemeName": "商品",
           "valueCode": "ai_investment",
           "valueName": "AI投資",
+          "sortOrder": 1,
           "allocationWeight": 1
         }
       ]
@@ -237,6 +247,7 @@
           "schemeName": "AI投資",
           "valueCode": "30404871-5f1a-4420-a3e5-08899b895c37",
           "valueName": "（ラップ専用）ＳＢＩ・新興国債券",
+          "sortOrder": 6,
           "allocationWeight": null
         },
         {
@@ -244,6 +255,7 @@
           "schemeName": "商品",
           "valueCode": "ai_investment",
           "valueName": "AI投資",
+          "sortOrder": 1,
           "allocationWeight": 1
         }
       ]
@@ -273,6 +285,7 @@
           "schemeName": "AI投資",
           "valueCode": "4bf617e7-8528-428e-b354-b3dd7969d4ef",
           "valueName": "（ラップ専用）ＳＢＩ・米国不動産",
+          "sortOrder": 7,
           "allocationWeight": null
         },
         {
@@ -280,6 +293,7 @@
           "schemeName": "商品",
           "valueCode": "ai_investment",
           "valueName": "AI投資",
+          "sortOrder": 1,
           "allocationWeight": 1
         }
       ]
@@ -309,6 +323,7 @@
           "schemeName": "AI投資",
           "valueCode": "eec2ca58-abcd-438e-9ab8-d9e328093ace",
           "valueName": "（ラップ専用）ＳＢＩ・ゴールド",
+          "sortOrder": 8,
           "allocationWeight": null
         },
         {
@@ -316,6 +331,7 @@
           "schemeName": "商品",
           "valueCode": "ai_investment",
           "valueName": "AI投資",
+          "sortOrder": 1,
           "allocationWeight": 1
         }
       ]
@@ -345,6 +361,7 @@
           "schemeName": "AI投資",
           "valueCode": "b8cae33b-1ee5-40ef-be9e-b6232829e0fa",
           "valueName": "現金",
+          "sortOrder": 9,
           "allocationWeight": null
         },
         {
@@ -352,6 +369,7 @@
           "schemeName": "商品",
           "valueCode": "ai_investment",
           "valueName": "AI投資",
+          "sortOrder": 1,
           "allocationWeight": 1
         }
       ]
@@ -381,6 +399,7 @@
           "schemeName": "商品",
           "valueCode": "takumi",
           "valueName": "匠の運用",
+          "sortOrder": 2,
           "allocationWeight": 1
         },
         {
@@ -388,6 +407,7 @@
           "schemeName": "匠の運用",
           "valueCode": "52ca9074-a9e1-479c-a193-fd63a43c3ee0",
           "valueName": "ラップ専用・世界株式アクティブ（グローバル・マルチテーマ）",
+          "sortOrder": 10,
           "allocationWeight": null
         }
       ]
@@ -417,6 +437,7 @@
           "schemeName": "商品",
           "valueCode": "takumi",
           "valueName": "匠の運用",
+          "sortOrder": 2,
           "allocationWeight": 1
         },
         {
@@ -424,6 +445,7 @@
           "schemeName": "匠の運用",
           "valueCode": "a140700b-49db-4c7f-a31f-f5be82af58f9",
           "valueName": "ラップ専用・世界株式アクティブ（グローバル・バリュー）",
+          "sortOrder": 11,
           "allocationWeight": null
         }
       ]
@@ -453,6 +475,7 @@
           "schemeName": "商品",
           "valueCode": "takumi",
           "valueName": "匠の運用",
+          "sortOrder": 2,
           "allocationWeight": 1
         },
         {
@@ -460,6 +483,7 @@
           "schemeName": "匠の運用",
           "valueCode": "d12440f6-c903-49ce-8e81-27e0e286ecd8",
           "valueName": "ラップ専用・日本株式アクティブ（セレクト・オポチュニティ）",
+          "sortOrder": 12,
           "allocationWeight": null
         }
       ]
@@ -489,6 +513,7 @@
           "schemeName": "商品",
           "valueCode": "takumi",
           "valueName": "匠の運用",
+          "sortOrder": 2,
           "allocationWeight": 1
         },
         {
@@ -496,6 +521,7 @@
           "schemeName": "匠の運用",
           "valueCode": "00e9627e-bc24-4ecf-a462-95ea62f5eeb4",
           "valueName": "ラップ専用・外国債券アクティブ",
+          "sortOrder": 13,
           "allocationWeight": null
         }
       ]
@@ -525,6 +551,7 @@
           "schemeName": "商品",
           "valueCode": "takumi",
           "valueName": "匠の運用",
+          "sortOrder": 2,
           "allocationWeight": 1
         },
         {
@@ -532,6 +559,7 @@
           "schemeName": "匠の運用",
           "valueCode": "298cc58f-dc4a-43dc-82d8-94cc92da5ca5",
           "valueName": "ラップ専用・外国国債アクティブ（為替ヘッジあり）",
+          "sortOrder": 14,
           "allocationWeight": null
         }
       ]
@@ -561,6 +589,7 @@
           "schemeName": "商品",
           "valueCode": "takumi",
           "valueName": "匠の運用",
+          "sortOrder": 2,
           "allocationWeight": 1
         },
         {
@@ -568,6 +597,7 @@
           "schemeName": "匠の運用",
           "valueCode": "4f9a5ae4-27cc-4d1e-9703-6efad2ed747c",
           "valueName": "ラップ専用・米国ハイ・イールド債券アクティブ",
+          "sortOrder": 15,
           "allocationWeight": null
         }
       ]
@@ -597,6 +627,7 @@
           "schemeName": "商品",
           "valueCode": "takumi",
           "valueName": "匠の運用",
+          "sortOrder": 2,
           "allocationWeight": 1
         },
         {
@@ -604,6 +635,7 @@
           "schemeName": "匠の運用",
           "valueCode": "69f53616-5ebe-4e40-94d9-2aa5488404bf",
           "valueName": "ラップ専用・日本債券アクティブ（クレジット戦略型）",
+          "sortOrder": 16,
           "allocationWeight": null
         }
       ]
@@ -633,6 +665,7 @@
           "schemeName": "商品",
           "valueCode": "takumi",
           "valueName": "匠の運用",
+          "sortOrder": 2,
           "allocationWeight": 1
         },
         {
@@ -640,6 +673,7 @@
           "schemeName": "匠の運用",
           "valueCode": "bada9d28-5773-4cff-9b5b-72216bfba22e",
           "valueName": "ラップ専用・グローバルＲＥＩＴアクティブ",
+          "sortOrder": 17,
           "allocationWeight": null
         }
       ]
@@ -669,6 +703,7 @@
           "schemeName": "商品",
           "valueCode": "takumi",
           "valueName": "匠の運用",
+          "sortOrder": 2,
           "allocationWeight": 1
         },
         {
@@ -676,6 +711,7 @@
           "schemeName": "匠の運用",
           "valueCode": "5a433ccb-6e44-4a9d-bf09-cd2f60c20173",
           "valueName": "ラップ専用・Ｊ−ＲＥＩＴアクティブ",
+          "sortOrder": 18,
           "allocationWeight": null
         }
       ]
@@ -705,6 +741,7 @@
           "schemeName": "商品",
           "valueCode": "takumi",
           "valueName": "匠の運用",
+          "sortOrder": 2,
           "allocationWeight": 1
         },
         {
@@ -712,6 +749,7 @@
           "schemeName": "匠の運用",
           "valueCode": "314d78fe-b09c-462b-8b2a-33c6ac5b3ed5",
           "valueName": "現金",
+          "sortOrder": 19,
           "allocationWeight": null
         }
       ]
@@ -741,6 +779,7 @@
           "schemeName": "商品",
           "valueCode": "rebanavi",
           "valueName": "レバナビ",
+          "sortOrder": 3,
           "allocationWeight": 1
         },
         {
@@ -748,6 +787,7 @@
           "schemeName": "レバナビ",
           "valueCode": "50602be0-20aa-4d9a-91b7-7240a6ceccb3",
           "valueName": "マルチアセット戦略ファンド・トリプル（ラップ専用）",
+          "sortOrder": 20,
           "allocationWeight": null
         }
       ]
@@ -777,6 +817,7 @@
           "schemeName": "商品",
           "valueCode": "rebanavi",
           "valueName": "レバナビ",
+          "sortOrder": 3,
           "allocationWeight": 1
         },
         {
@@ -784,6 +825,7 @@
           "schemeName": "レバナビ",
           "valueCode": "5ccedcdf-2879-4898-97cf-c9c77ef840e9",
           "valueName": "マルチアセット戦略ファンド・シングル（ラップ専用）",
+          "sortOrder": 21,
           "allocationWeight": null
         }
       ]
@@ -813,6 +855,7 @@
           "schemeName": "商品",
           "valueCode": "rebanavi",
           "valueName": "レバナビ",
+          "sortOrder": 3,
           "allocationWeight": 1
         },
         {
@@ -820,6 +863,7 @@
           "schemeName": "レバナビ",
           "valueCode": "9d7796fc-d9b0-4e67-95fc-4e7deccf2123",
           "valueName": "現金",
+          "sortOrder": 22,
           "allocationWeight": null
         }
       ]
@@ -849,6 +893,7 @@
           "schemeName": "商品",
           "valueCode": "reba_choice",
           "valueName": "レバチョイス",
+          "sortOrder": 4,
           "allocationWeight": 1
         },
         {
@@ -856,6 +901,7 @@
           "schemeName": "レバチョイス",
           "valueCode": "b9ccb308-8676-4e6f-a41c-6d26b0513a8b",
           "valueName": "マルチアセット戦略ファンド・トリプル（ラップ専用）",
+          "sortOrder": 23,
           "allocationWeight": null
         }
       ]
@@ -885,6 +931,7 @@
           "schemeName": "商品",
           "valueCode": "reba_choice",
           "valueName": "レバチョイス",
+          "sortOrder": 4,
           "allocationWeight": 1
         },
         {
@@ -892,6 +939,7 @@
           "schemeName": "レバチョイス",
           "valueCode": "c586196d-6679-40a2-9636-1ef710ce6815",
           "valueName": "マルチアセット戦略ファンド・シングル（ラップ専用）",
+          "sortOrder": 24,
           "allocationWeight": null
         }
       ]
@@ -921,6 +969,7 @@
           "schemeName": "商品",
           "valueCode": "reba_choice",
           "valueName": "レバチョイス",
+          "sortOrder": 4,
           "allocationWeight": 1
         },
         {
@@ -928,6 +977,7 @@
           "schemeName": "レバチョイス",
           "valueCode": "96e1cc99-ae4a-4a97-91d4-f31648c675ee",
           "valueName": "現金",
+          "sortOrder": 25,
           "allocationWeight": null
         }
       ]
@@ -957,6 +1007,7 @@
           "schemeName": "ALL株式",
           "valueCode": "d77cad81-0b4d-40dc-bc7c-4c145dcd865d",
           "valueName": "ラップ専用・三井住友ＤＳ・米国株式セクター戦略ファンド",
+          "sortOrder": 26,
           "allocationWeight": null
         },
         {
@@ -964,6 +1015,7 @@
           "schemeName": "商品",
           "valueCode": "all_equity",
           "valueName": "ALL株式",
+          "sortOrder": 5,
           "allocationWeight": 1
         }
       ]
@@ -993,6 +1045,7 @@
           "schemeName": "ALL株式",
           "valueCode": "3715f0c2-3fa7-4dbe-9cc4-f626d698b512",
           "valueName": "ラップ専用・三井住友ＤＳ・米国株式ファクター戦略ファンド",
+          "sortOrder": 27,
           "allocationWeight": null
         },
         {
@@ -1000,6 +1053,7 @@
           "schemeName": "商品",
           "valueCode": "all_equity",
           "valueName": "ALL株式",
+          "sortOrder": 5,
           "allocationWeight": 1
         }
       ]
@@ -1029,6 +1083,7 @@
           "schemeName": "ALL株式",
           "valueCode": "9701c1b8-29b3-4f5e-99b4-b7eb05f6e23a",
           "valueName": "ラップ専用・三井住友ＤＳ・グローバル株式（除く米国）戦略ファンド",
+          "sortOrder": 28,
           "allocationWeight": null
         },
         {
@@ -1036,6 +1091,7 @@
           "schemeName": "商品",
           "valueCode": "all_equity",
           "valueName": "ALL株式",
+          "sortOrder": 5,
           "allocationWeight": 1
         }
       ]
@@ -1065,6 +1121,7 @@
           "schemeName": "ALL株式",
           "valueCode": "0c02eed3-d4cb-4f1e-96b9-4e08313e7c3b",
           "valueName": "現金",
+          "sortOrder": 29,
           "allocationWeight": null
         },
         {
@@ -1072,6 +1129,7 @@
           "schemeName": "商品",
           "valueCode": "all_equity",
           "valueName": "ALL株式",
+          "sortOrder": 5,
           "allocationWeight": 1
         }
       ]

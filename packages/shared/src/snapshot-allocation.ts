@@ -34,6 +34,7 @@ function getLineMetricIntegerValueOrNull(
 export type AllocationSlice = {
   valueCode: string;
   valueName: string;
+  sortOrder?: number;
   marketValueMinor: number;
   weight: number;
   unrealizedGainMinor: number | null;
@@ -82,6 +83,24 @@ export type GlobalAnalysisResult = {
   portfolios: GlobalAnalysisPortfolioSlice[];
   allocations: AllocationByScheme[];
 };
+
+function compareAllocationDisplayOrder(
+  left: AllocationSlice,
+  right: AllocationSlice,
+): number {
+  let result = (left.sortOrder ?? 0) - (right.sortOrder ?? 0);
+  if (result !== 0) {
+    return result;
+  }
+
+  result = left.valueName.localeCompare(right.valueName);
+  if (result !== 0) {
+    return result;
+  }
+
+  result = left.valueCode.localeCompare(right.valueCode);
+  return result;
+}
 
 export function sumSnapshotMarketValue(lines: HoldingLineDto[]): number {
   let result = 0;
@@ -341,7 +360,12 @@ export function groupSnapshotLinesByTag(
   let result: AllocationSlice[] = [];
   const totals = new Map<
     string,
-    { valueName: string; marketValueMinor: number; lines: AttributedGainEntry[] }
+    {
+      valueName: string;
+      sortOrder: number;
+      marketValueMinor: number;
+      lines: AttributedGainEntry[];
+    }
   >();
   let taggedTotal = 0;
 
@@ -367,6 +391,7 @@ export function groupSnapshotLinesByTag(
 
       totals.set(attribution.tag.valueCode, {
         valueName: attribution.tag.valueName,
+        sortOrder: attribution.tag.sortOrder ?? 0,
         marketValueMinor: attribution.marketValueMinor,
         lines: [gainEntry],
       });
@@ -378,6 +403,7 @@ export function groupSnapshotLinesByTag(
     let slice: AllocationSlice = {
       valueCode,
       valueName: item.valueName,
+      sortOrder: item.sortOrder,
       marketValueMinor: item.marketValueMinor,
       weight: taggedTotal > 0 ? item.marketValueMinor / taggedTotal : 0,
       unrealizedGainMinor: gainMetrics.unrealizedGainMinor,
@@ -386,7 +412,7 @@ export function groupSnapshotLinesByTag(
     result.push(slice);
   }
 
-  result.sort((left, right) => right.marketValueMinor - left.marketValueMinor);
+  result.sort(compareAllocationDisplayOrder);
   return result;
 }
 
@@ -435,6 +461,7 @@ function groupTaggedLinesByTagWithLines(
     string,
     {
       valueName: string;
+      sortOrder: number;
       marketValueMinor: number;
       lines: AllocationLineInSlice[];
     }
@@ -468,6 +495,7 @@ function groupTaggedLinesByTagWithLines(
 
       totals.set(attribution.tag.valueCode, {
         valueName: attribution.tag.valueName,
+        sortOrder: attribution.tag.sortOrder ?? 0,
         marketValueMinor: attribution.marketValueMinor,
         lines: [lineInSlice],
       });
@@ -497,6 +525,7 @@ function groupTaggedLinesByTagWithLines(
     let slice: AllocationSliceWithLines = {
       valueCode,
       valueName: item.valueName,
+      sortOrder: item.sortOrder,
       marketValueMinor: sliceMarketValueMinor,
       weight: taggedTotal > 0 ? sliceMarketValueMinor / taggedTotal : 0,
       unrealizedGainMinor: gainMetrics.unrealizedGainMinor,
@@ -506,7 +535,7 @@ function groupTaggedLinesByTagWithLines(
     result.push(slice);
   }
 
-  result.sort((left, right) => right.marketValueMinor - left.marketValueMinor);
+  result.sort(compareAllocationDisplayOrder);
   return result;
 }
 

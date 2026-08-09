@@ -14,6 +14,7 @@ import { buildPortfolioPath } from "@/lib/portfolio-path";
 import { cn } from "@/lib/utils";
 
 type AllocationSortColumn =
+  | "displayOrder"
   | "valueName"
   | "marketValue"
   | "weight"
@@ -85,7 +86,7 @@ export function AllocationTable({
   onToggleExpand,
 }: AllocationTableProps) {
   const { sortColumn, sortDirection, toggleSort } =
-    useTableSort<AllocationSortColumn>("marketValue", "desc");
+    useTableSort<AllocationSortColumn>("displayOrder", "asc");
 
   const showGapColumns = slices.some((slice) => slice.targetRatio !== null && slice.targetRatio !== undefined);
 

@@ -65,6 +65,7 @@
           "schemeName": "口座区分",
           "valueCode": "tokutei",
           "valueName": "特定",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -72,6 +73,7 @@
           "schemeName": "種別",
           "valueCode": "domestic_equity",
           "valueName": "国内株式",
+          "sortOrder": 1,
           "allocationWeight": null
         }
       ]
@@ -125,6 +127,7 @@
           "schemeName": "口座区分",
           "valueCode": "tokutei",
           "valueName": "特定",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -132,6 +135,7 @@
           "schemeName": "種別",
           "valueCode": "domestic_equity",
           "valueName": "国内株式",
+          "sortOrder": 1,
           "allocationWeight": null
         }
       ]
@@ -185,6 +189,7 @@
           "schemeName": "口座区分",
           "valueCode": "tokutei",
           "valueName": "特定",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -192,6 +197,7 @@
           "schemeName": "種別",
           "valueCode": "domestic_equity",
           "valueName": "国内株式",
+          "sortOrder": 1,
           "allocationWeight": null
         }
       ]
@@ -245,6 +251,7 @@
           "schemeName": "口座区分",
           "valueCode": "tokutei",
           "valueName": "特定",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -252,6 +259,7 @@
           "schemeName": "種別",
           "valueCode": "domestic_equity",
           "valueName": "国内株式",
+          "sortOrder": 1,
           "allocationWeight": null
         }
       ]
@@ -305,6 +313,7 @@
           "schemeName": "口座区分",
           "valueCode": "tokutei",
           "valueName": "特定",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -312,6 +321,7 @@
           "schemeName": "種別",
           "valueCode": "domestic_equity",
           "valueName": "国内株式",
+          "sortOrder": 1,
           "allocationWeight": null
         }
       ]
@@ -410,6 +420,7 @@
           "schemeName": "口座区分",
           "valueCode": "tokutei",
           "valueName": "特定",
+          "sortOrder": 1,
           "allocationWeight": 0.5
         },
         {
@@ -417,6 +428,7 @@
           "schemeName": "口座区分",
           "valueCode": "general",
           "valueName": "一般",
+          "sortOrder": 2,
           "allocationWeight": 0.5
         },
         {
@@ -424,6 +436,7 @@
           "schemeName": "種別",
           "valueCode": "domestic_equity",
           "valueName": "国内株式",
+          "sortOrder": 1,
           "allocationWeight": null
         }
       ]
@@ -477,6 +490,7 @@
           "schemeName": "口座区分",
           "valueCode": "tokutei",
           "valueName": "特定",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -484,6 +498,7 @@
           "schemeName": "種別",
           "valueCode": "domestic_equity",
           "valueName": "国内株式",
+          "sortOrder": 1,
           "allocationWeight": null
         }
       ]
@@ -537,6 +552,7 @@
           "schemeName": "口座区分",
           "valueCode": "tokutei",
           "valueName": "特定",
+          "sortOrder": 1,
           "allocationWeight": 0.5
         },
         {
@@ -544,6 +560,7 @@
           "schemeName": "口座区分",
           "valueCode": "general",
           "valueName": "一般",
+          "sortOrder": 2,
           "allocationWeight": 0.5
         },
         {
@@ -551,6 +568,7 @@
           "schemeName": "種別",
           "valueCode": "domestic_equity",
           "valueName": "国内株式",
+          "sortOrder": 1,
           "allocationWeight": null
         }
       ]
@@ -604,6 +622,7 @@
           "schemeName": "口座区分",
           "valueCode": "tokutei",
           "valueName": "特定",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -611,6 +630,7 @@
           "schemeName": "種別",
           "valueCode": "domestic_equity",
           "valueName": "国内株式",
+          "sortOrder": 1,
           "allocationWeight": null
         }
       ]
@@ -664,6 +684,7 @@
           "schemeName": "口座区分",
           "valueCode": "tokutei",
           "valueName": "特定",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -671,6 +692,7 @@
           "schemeName": "種別",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
+          "sortOrder": 2,
           "allocationWeight": null
         }
       ]
@@ -724,6 +746,7 @@
           "schemeName": "口座区分",
           "valueCode": "general",
           "valueName": "一般",
+          "sortOrder": 2,
           "allocationWeight": null
         },
         {
@@ -731,6 +754,7 @@
           "schemeName": "種別",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
+          "sortOrder": 2,
           "allocationWeight": null
         }
       ]
@@ -784,6 +808,7 @@
           "schemeName": "口座区分",
           "valueCode": "general",
           "valueName": "一般",
+          "sortOrder": 2,
           "allocationWeight": null
         },
         {
@@ -791,6 +816,7 @@
           "schemeName": "種別",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
+          "sortOrder": 2,
           "allocationWeight": null
         }
       ]
@@ -844,6 +870,7 @@
           "schemeName": "口座区分",
           "valueCode": "general",
           "valueName": "一般",
+          "sortOrder": 2,
           "allocationWeight": null
         },
         {
@@ -851,6 +878,7 @@
           "schemeName": "種別",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
+          "sortOrder": 2,
           "allocationWeight": null
         }
       ]
@@ -904,6 +932,7 @@
           "schemeName": "口座区分",
           "valueCode": "tokutei",
           "valueName": "特定",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -911,6 +940,7 @@
           "schemeName": "種別",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
+          "sortOrder": 2,
           "allocationWeight": null
         }
       ]
@@ -964,6 +994,7 @@
           "schemeName": "口座区分",
           "valueCode": "general",
           "valueName": "一般",
+          "sortOrder": 2,
           "allocationWeight": null
         },
         {
@@ -971,6 +1002,7 @@
           "schemeName": "種別",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
+          "sortOrder": 2,
           "allocationWeight": null
         }
       ]
@@ -1024,6 +1056,7 @@
           "schemeName": "口座区分",
           "valueCode": "tokutei",
           "valueName": "特定",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -1031,6 +1064,7 @@
           "schemeName": "種別",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
+          "sortOrder": 2,
           "allocationWeight": null
         }
       ]
@@ -1084,6 +1118,7 @@
           "schemeName": "口座区分",
           "valueCode": "tokutei",
           "valueName": "特定",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -1091,6 +1126,7 @@
           "schemeName": "種別",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
+          "sortOrder": 2,
           "allocationWeight": null
         }
       ]
@@ -1144,6 +1180,7 @@
           "schemeName": "口座区分",
           "valueCode": "tokutei",
           "valueName": "特定",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -1151,6 +1188,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_money_fund",
           "valueName": "楽天・マネーファンド",
+          "sortOrder": 3,
           "allocationWeight": null
         }
       ]
@@ -1204,6 +1242,7 @@
           "schemeName": "口座区分",
           "valueCode": "tokutei",
           "valueName": "特定",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -1211,6 +1250,7 @@
           "schemeName": "種別",
           "valueCode": "foreign_mmf",
           "valueName": "外貨建MMF",
+          "sortOrder": 4,
           "allocationWeight": null
         }
       ]
@@ -1264,6 +1304,7 @@
           "schemeName": "口座区分",
           "valueCode": "tokutei",
           "valueName": "特定",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -1271,6 +1312,7 @@
           "schemeName": "種別",
           "valueCode": "foreign_mmf",
           "valueName": "外貨建MMF",
+          "sortOrder": 4,
           "allocationWeight": null
         }
       ]
@@ -1324,6 +1366,7 @@
           "schemeName": "口座区分",
           "valueCode": "tokutei",
           "valueName": "特定",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -1331,6 +1374,7 @@
           "schemeName": "種別",
           "valueCode": "domestic_bond",
           "valueName": "国内債券",
+          "sortOrder": 5,
           "allocationWeight": null
         }
       ]
@@ -1384,6 +1428,7 @@
           "schemeName": "口座区分",
           "valueCode": "general",
           "valueName": "一般",
+          "sortOrder": 2,
           "allocationWeight": null
         },
         {
@@ -1391,6 +1436,7 @@
           "schemeName": "種別",
           "valueCode": "domestic_bond",
           "valueName": "国内債券",
+          "sortOrder": 5,
           "allocationWeight": null
         }
       ]
@@ -1444,6 +1490,7 @@
           "schemeName": "口座区分",
           "valueCode": "wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -1451,6 +1498,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 6,
           "allocationWeight": null
         }
       ]
@@ -1504,6 +1552,7 @@
           "schemeName": "口座区分",
           "valueCode": "wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -1511,6 +1560,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 6,
           "allocationWeight": null
         }
       ]
@@ -1564,6 +1614,7 @@
           "schemeName": "口座区分",
           "valueCode": "wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -1571,6 +1622,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 6,
           "allocationWeight": null
         }
       ]
@@ -1624,6 +1676,7 @@
           "schemeName": "口座区分",
           "valueCode": "wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -1631,6 +1684,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 6,
           "allocationWeight": null
         }
       ]
@@ -1684,6 +1738,7 @@
           "schemeName": "口座区分",
           "valueCode": "wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -1691,6 +1746,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 6,
           "allocationWeight": null
         }
       ]
@@ -1744,6 +1800,7 @@
           "schemeName": "口座区分",
           "valueCode": "wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -1751,6 +1808,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 6,
           "allocationWeight": null
         }
       ]
@@ -1804,6 +1862,7 @@
           "schemeName": "口座区分",
           "valueCode": "wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -1811,6 +1870,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 6,
           "allocationWeight": null
         }
       ]
@@ -1864,6 +1924,7 @@
           "schemeName": "口座区分",
           "valueCode": "wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -1871,6 +1932,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 6,
           "allocationWeight": null
         }
       ]
@@ -1924,6 +1986,7 @@
           "schemeName": "口座区分",
           "valueCode": "wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -1931,6 +1994,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 6,
           "allocationWeight": null
         }
       ]
@@ -1984,6 +2048,7 @@
           "schemeName": "口座区分",
           "valueCode": "wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -1991,6 +2056,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 6,
           "allocationWeight": null
         }
       ]
@@ -2044,6 +2110,7 @@
           "schemeName": "口座区分",
           "valueCode": "wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -2051,6 +2118,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 6,
           "allocationWeight": null
         }
       ]
@@ -2104,6 +2172,7 @@
           "schemeName": "口座区分",
           "valueCode": "wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -2111,6 +2180,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 6,
           "allocationWeight": null
         }
       ]
@@ -2164,6 +2234,7 @@
           "schemeName": "口座区分",
           "valueCode": "wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -2171,6 +2242,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 6,
           "allocationWeight": null
         }
       ]
@@ -2224,6 +2296,7 @@
           "schemeName": "口座区分",
           "valueCode": "wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -2231,6 +2304,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 6,
           "allocationWeight": null
         }
       ]
@@ -2284,6 +2358,7 @@
           "schemeName": "口座区分",
           "valueCode": "wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -2291,6 +2366,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 6,
           "allocationWeight": null
         }
       ]
@@ -2344,6 +2420,7 @@
           "schemeName": "口座区分",
           "valueCode": "wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -2351,6 +2428,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 6,
           "allocationWeight": null
         }
       ]
@@ -2404,6 +2482,7 @@
           "schemeName": "口座区分",
           "valueCode": "wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -2411,6 +2490,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 6,
           "allocationWeight": null
         }
       ]
@@ -2464,6 +2544,7 @@
           "schemeName": "口座区分",
           "valueCode": "wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -2471,6 +2552,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 6,
           "allocationWeight": null
         }
       ]
@@ -2524,6 +2606,7 @@
           "schemeName": "口座区分",
           "valueCode": "wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -2531,6 +2614,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 6,
           "allocationWeight": null
         }
       ]
@@ -2584,6 +2668,7 @@
           "schemeName": "口座区分",
           "valueCode": "wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -2591,6 +2676,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 6,
           "allocationWeight": null
         }
       ]
@@ -2644,6 +2730,7 @@
           "schemeName": "口座区分",
           "valueCode": "wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -2651,6 +2738,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 6,
           "allocationWeight": null
         }
       ]
@@ -2704,6 +2792,7 @@
           "schemeName": "口座区分",
           "valueCode": "wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -2711,6 +2800,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 6,
           "allocationWeight": null
         }
       ]
@@ -2764,6 +2854,7 @@
           "schemeName": "口座区分",
           "valueCode": "wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -2771,6 +2862,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 6,
           "allocationWeight": null
         }
       ]
@@ -2824,6 +2916,7 @@
           "schemeName": "口座区分",
           "valueCode": "wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -2831,6 +2924,7 @@
           "schemeName": "種別",
           "valueCode": "rakuten_wrap",
           "valueName": "楽ラップ",
+          "sortOrder": 6,
           "allocationWeight": null
         }
       ]

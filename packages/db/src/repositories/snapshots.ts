@@ -92,6 +92,7 @@ type LineDto = {
     schemeName: string;
     valueCode: string;
     valueName: string;
+    sortOrder: number;
     allocationWeight: number | null;
   }>;
 };
@@ -424,6 +425,7 @@ async function buildSnapshotDto(
           schemeName: tag.schemeName,
           valueCode: tag.valueCode,
           valueName: tag.valueName,
+          sortOrder: tag.sortOrder,
           allocationWeight: tag.allocationWeight,
         };
         return tagResult;

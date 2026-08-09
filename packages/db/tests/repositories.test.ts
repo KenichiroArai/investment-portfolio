@@ -252,6 +252,7 @@ describe("portfolio repositories", () => {
     );
     expect(replaced?.lines[0].tags[0].schemeCode).toBe("currency");
     expect(replaced?.lines[0].tags[1].valueName).toBe("日本");
+    expect(replaced?.lines[0].tags[1].sortOrder).toBe(0);
     expect(replaced?.lines[1].tags).toHaveLength(0);
     expect(replaced?.lines[1].instrumentAttributes).toEqual([]);
     expect(replaced?.metrics).toEqual(
@@ -850,8 +851,24 @@ describe("portfolio repositories", () => {
     const renamedScheme = await findSchemeById(db, scheme!.id);
     expect(renamedScheme?.name).toBe("地域分類");
 
+    await createClassificationValue(db, {
+      schemeId: scheme!.id,
+      code: "zulu",
+      name: "Zulu",
+      sortOrder: 1,
+    });
+    await createClassificationValue(db, {
+      schemeId: scheme!.id,
+      code: "alpha",
+      name: "Alpha",
+      sortOrder: 1,
+    });
     const schemesWithValues = await listSchemesWithValuesForPortfolio(db, "ideco");
-    expect(schemesWithValues[0]?.values[0]?.code).toBe("japan");
+    const tiedValues = schemesWithValues[0]?.values.filter((item) => {
+      let result = ["alpha", "zulu"].includes(item.code);
+      return result;
+    });
+    expect(tiedValues?.map((item) => item.code)).toEqual(["alpha", "zulu"]);
 
     const missingDelete = await deleteClassificationValueById(db, "missing-value");
     expect(missingDelete).toBe(false);

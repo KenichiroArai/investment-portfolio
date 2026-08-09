@@ -113,6 +113,7 @@
           "schemeName": "資産分類",
           "valueCode": "equity",
           "valueName": "株式",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -120,6 +121,7 @@
           "schemeName": "主要資産：資産分類",
           "valueCode": "equity",
           "valueName": "株式",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -127,6 +129,7 @@
           "schemeName": "主要資産：地域分類",
           "valueCode": "domestic",
           "valueName": "国内",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -134,6 +137,7 @@
           "schemeName": "主要資産",
           "valueCode": "domestic_equity",
           "valueName": "国内株式",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -141,6 +145,7 @@
           "schemeName": "分散組み合わせ（先進国統一、ゴールド除く）",
           "valueCode": "domestic_equity",
           "valueName": "国内株式",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -148,6 +153,7 @@
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         },
         {
@@ -155,6 +161,7 @@
           "schemeName": "商品グループ",
           "valueCode": "major_assets",
           "valueName": "主要資産",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -162,6 +169,7 @@
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
           "valueName": "パッシブ",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -169,6 +177,7 @@
           "schemeName": "すべて",
           "valueCode": "domestic_equity",
           "valueName": "国内株式",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -176,6 +185,7 @@
           "schemeName": "地域分類",
           "valueCode": "domestic",
           "valueName": "国内",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         }
       ]
@@ -242,6 +252,7 @@
           "schemeName": "資産分類",
           "valueCode": "equity",
           "valueName": "株式",
+          "sortOrder": 0,
           "allocationWeight": null
         },
         {
@@ -249,6 +260,7 @@
           "schemeName": "主要資産：資産分類",
           "valueCode": "equity",
           "valueName": "株式",
+          "sortOrder": 0,
           "allocationWeight": null
         },
         {
@@ -256,6 +268,7 @@
           "schemeName": "主要資産：地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -263,6 +276,7 @@
           "schemeName": "主要資産",
           "valueCode": "domestic_foreign_equity",
           "valueName": "内外株式",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -270,6 +284,7 @@
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -277,6 +292,7 @@
           "schemeName": "商品グループ",
           "valueCode": "major_assets",
           "valueName": "主要資産",
+          "sortOrder": 0,
           "allocationWeight": null
         },
         {
@@ -284,6 +300,7 @@
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
           "valueName": "パッシブ",
+          "sortOrder": 0,
           "allocationWeight": null
         },
         {
@@ -291,6 +308,7 @@
           "schemeName": "すべて",
           "valueCode": "domestic_foreign_equity",
           "valueName": "内外株式",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -298,6 +316,7 @@
           "schemeName": "地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
+          "sortOrder": 1,
           "allocationWeight": null
         }
       ]
@@ -364,6 +383,7 @@
           "schemeName": "資産分類",
           "valueCode": "equity",
           "valueName": "株式",
+          "sortOrder": 0,
           "allocationWeight": null
         },
         {
@@ -371,6 +391,7 @@
           "schemeName": "主要資産：資産分類",
           "valueCode": "equity",
           "valueName": "株式",
+          "sortOrder": 0,
           "allocationWeight": null
         },
         {
@@ -378,6 +399,7 @@
           "schemeName": "主要資産：地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -385,6 +407,7 @@
           "schemeName": "主要資産",
           "valueCode": "foreign_equity",
           "valueName": "海外株式",
+          "sortOrder": 2,
           "allocationWeight": null
         },
         {
@@ -392,6 +415,7 @@
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -399,6 +423,7 @@
           "schemeName": "商品グループ",
           "valueCode": "major_assets",
           "valueName": "主要資産",
+          "sortOrder": 0,
           "allocationWeight": null
         },
         {
@@ -406,6 +431,7 @@
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
           "valueName": "パッシブ",
+          "sortOrder": 0,
           "allocationWeight": null
         },
         {
@@ -413,6 +439,7 @@
           "schemeName": "すべて",
           "valueCode": "foreign_equity",
           "valueName": "海外株式",
+          "sortOrder": 2,
           "allocationWeight": null
         },
         {
@@ -420,6 +447,7 @@
           "schemeName": "地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
+          "sortOrder": 1,
           "allocationWeight": null
         }
       ]
@@ -486,6 +514,7 @@
           "schemeName": "資産分類",
           "valueCode": "equity",
           "valueName": "株式",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -493,6 +522,7 @@
           "schemeName": "主要資産：資産分類",
           "valueCode": "equity",
           "valueName": "株式",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -500,6 +530,7 @@
           "schemeName": "主要資産：地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         },
         {
@@ -507,6 +538,7 @@
           "schemeName": "主要資産",
           "valueCode": "foreign_equity",
           "valueName": "海外株式",
+          "sortOrder": 2,
           "allocationWeight": 0.1
         },
         {
@@ -514,6 +546,7 @@
           "schemeName": "分散組み合わせ（先進国統一、ゴールド除く）",
           "valueCode": "developed_equity",
           "valueName": "先進国株式",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         },
         {
@@ -521,6 +554,7 @@
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         },
         {
@@ -528,6 +562,7 @@
           "schemeName": "商品グループ",
           "valueCode": "major_assets",
           "valueName": "主要資産",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -535,6 +570,7 @@
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
           "valueName": "パッシブ",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -542,6 +578,7 @@
           "schemeName": "すべて",
           "valueCode": "foreign_equity",
           "valueName": "海外株式",
+          "sortOrder": 2,
           "allocationWeight": 0.1
         },
         {
@@ -549,6 +586,7 @@
           "schemeName": "地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         }
       ]
@@ -615,6 +653,7 @@
           "schemeName": "資産分類",
           "valueCode": "equity",
           "valueName": "株式",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -622,6 +661,7 @@
           "schemeName": "主要資産：資産分類",
           "valueCode": "equity",
           "valueName": "株式",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -629,6 +669,7 @@
           "schemeName": "主要資産：地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         },
         {
@@ -636,6 +677,7 @@
           "schemeName": "主要資産",
           "valueCode": "foreign_equity",
           "valueName": "海外株式",
+          "sortOrder": 2,
           "allocationWeight": 0.1
         },
         {
@@ -643,6 +685,7 @@
           "schemeName": "分散組み合わせ（先進国統一、ゴールド除く）",
           "valueCode": "developed_equity",
           "valueName": "先進国株式",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         },
         {
@@ -650,6 +693,7 @@
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         },
         {
@@ -657,6 +701,7 @@
           "schemeName": "商品グループ",
           "valueCode": "major_assets",
           "valueName": "主要資産",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -664,6 +709,7 @@
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
           "valueName": "パッシブ",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -671,6 +717,7 @@
           "schemeName": "すべて",
           "valueCode": "foreign_equity",
           "valueName": "海外株式",
+          "sortOrder": 2,
           "allocationWeight": 0.1
         },
         {
@@ -678,6 +725,7 @@
           "schemeName": "地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         }
       ]
@@ -744,6 +792,7 @@
           "schemeName": "資産分類",
           "valueCode": "equity",
           "valueName": "株式",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -751,6 +800,7 @@
           "schemeName": "主要資産：資産分類",
           "valueCode": "equity",
           "valueName": "株式",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -758,6 +808,7 @@
           "schemeName": "主要資産：地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         },
         {
@@ -765,6 +816,7 @@
           "schemeName": "主要資産",
           "valueCode": "foreign_equity",
           "valueName": "海外株式",
+          "sortOrder": 2,
           "allocationWeight": 0.1
         },
         {
@@ -772,6 +824,7 @@
           "schemeName": "分散組み合わせ（先進国統一、ゴールド除く）",
           "valueCode": "emerging_equity",
           "valueName": "新興国株式",
+          "sortOrder": 2,
           "allocationWeight": 0.1
         },
         {
@@ -779,6 +832,7 @@
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         },
         {
@@ -786,6 +840,7 @@
           "schemeName": "商品グループ",
           "valueCode": "major_assets",
           "valueName": "主要資産",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -793,6 +848,7 @@
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
           "valueName": "パッシブ",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -800,6 +856,7 @@
           "schemeName": "すべて",
           "valueCode": "foreign_equity",
           "valueName": "海外株式",
+          "sortOrder": 2,
           "allocationWeight": 0.1
         },
         {
@@ -807,6 +864,7 @@
           "schemeName": "地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         }
       ]
@@ -873,6 +931,7 @@
           "schemeName": "資産分類",
           "valueCode": "bond",
           "valueName": "債券",
+          "sortOrder": 1,
           "allocationWeight": 0.09090909090909091
         },
         {
@@ -880,6 +939,7 @@
           "schemeName": "主要資産：資産分類",
           "valueCode": "bond",
           "valueName": "債券",
+          "sortOrder": 1,
           "allocationWeight": 0.09090909090909091
         },
         {
@@ -887,6 +947,7 @@
           "schemeName": "主要資産：地域分類",
           "valueCode": "domestic",
           "valueName": "国内",
+          "sortOrder": 0,
           "allocationWeight": 0.09090909090909091
         },
         {
@@ -894,6 +955,7 @@
           "schemeName": "主要資産",
           "valueCode": "domestic_bond",
           "valueName": "国内債券",
+          "sortOrder": 3,
           "allocationWeight": 0.09090909090909091
         },
         {
@@ -901,6 +963,7 @@
           "schemeName": "分散組み合わせ（先進国統一、ゴールド除く）",
           "valueCode": "domestic_bond",
           "valueName": "国内債券",
+          "sortOrder": 3,
           "allocationWeight": 0.09090909090909091
         },
         {
@@ -908,6 +971,7 @@
           "schemeName": "ステータス",
           "valueCode": "exclusion_pending",
           "valueName": "除外手続中",
+          "sortOrder": 0,
           "allocationWeight": 0.09090909090909091
         },
         {
@@ -915,6 +979,7 @@
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
+          "sortOrder": 1,
           "allocationWeight": 0.09090909090909091
         },
         {
@@ -922,6 +987,7 @@
           "schemeName": "商品グループ",
           "valueCode": "major_assets",
           "valueName": "主要資産",
+          "sortOrder": 0,
           "allocationWeight": 0.09090909090909091
         },
         {
@@ -929,6 +995,7 @@
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
           "valueName": "パッシブ",
+          "sortOrder": 0,
           "allocationWeight": 0.09090909090909091
         },
         {
@@ -936,6 +1003,7 @@
           "schemeName": "すべて",
           "valueCode": "domestic_bond",
           "valueName": "国内債券",
+          "sortOrder": 3,
           "allocationWeight": 0.09090909090909091
         },
         {
@@ -943,6 +1011,7 @@
           "schemeName": "地域分類",
           "valueCode": "domestic",
           "valueName": "国内",
+          "sortOrder": 0,
           "allocationWeight": 0.09090909090909091
         }
       ]
@@ -1009,6 +1078,7 @@
           "schemeName": "資産分類",
           "valueCode": "bond",
           "valueName": "債券",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         },
         {
@@ -1016,6 +1086,7 @@
           "schemeName": "主要資産：資産分類",
           "valueCode": "bond",
           "valueName": "債券",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         },
         {
@@ -1023,6 +1094,7 @@
           "schemeName": "主要資産：地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         },
         {
@@ -1030,6 +1102,7 @@
           "schemeName": "主要資産",
           "valueCode": "foreign_bond",
           "valueName": "海外債券",
+          "sortOrder": 4,
           "allocationWeight": 0.1
         },
         {
@@ -1037,6 +1110,7 @@
           "schemeName": "分散組み合わせ（先進国統一、ゴールド除く）",
           "valueCode": "developed_bond",
           "valueName": "先進国債券",
+          "sortOrder": 4,
           "allocationWeight": 0.1
         },
         {
@@ -1044,6 +1118,7 @@
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         },
         {
@@ -1051,6 +1126,7 @@
           "schemeName": "商品グループ",
           "valueCode": "major_assets",
           "valueName": "主要資産",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -1058,6 +1134,7 @@
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
           "valueName": "パッシブ",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -1065,6 +1142,7 @@
           "schemeName": "すべて",
           "valueCode": "foreign_bond",
           "valueName": "海外債券",
+          "sortOrder": 4,
           "allocationWeight": 0.1
         },
         {
@@ -1072,6 +1150,7 @@
           "schemeName": "地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         }
       ]
@@ -1138,6 +1217,7 @@
           "schemeName": "資産分類",
           "valueCode": "bond",
           "valueName": "債券",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         },
         {
@@ -1145,6 +1225,7 @@
           "schemeName": "主要資産：資産分類",
           "valueCode": "bond",
           "valueName": "債券",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         },
         {
@@ -1152,6 +1233,7 @@
           "schemeName": "主要資産：地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         },
         {
@@ -1159,6 +1241,7 @@
           "schemeName": "主要資産",
           "valueCode": "foreign_bond",
           "valueName": "海外債券",
+          "sortOrder": 4,
           "allocationWeight": 0.1
         },
         {
@@ -1166,6 +1249,7 @@
           "schemeName": "分散組み合わせ（先進国統一、ゴールド除く）",
           "valueCode": "emerging_bond",
           "valueName": "新興国債券",
+          "sortOrder": 5,
           "allocationWeight": 0.1
         },
         {
@@ -1173,6 +1257,7 @@
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         },
         {
@@ -1180,6 +1265,7 @@
           "schemeName": "商品グループ",
           "valueCode": "major_assets",
           "valueName": "主要資産",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -1187,6 +1273,7 @@
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
           "valueName": "パッシブ",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -1194,6 +1281,7 @@
           "schemeName": "すべて",
           "valueCode": "foreign_bond",
           "valueName": "海外債券",
+          "sortOrder": 4,
           "allocationWeight": 0.1
         },
         {
@@ -1201,6 +1289,7 @@
           "schemeName": "地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         }
       ]
@@ -1267,6 +1356,7 @@
           "schemeName": "資産分類",
           "valueCode": "real_estate",
           "valueName": "不動産",
+          "sortOrder": 2,
           "allocationWeight": 0.1
         },
         {
@@ -1274,6 +1364,7 @@
           "schemeName": "主要資産：資産分類",
           "valueCode": "real_estate",
           "valueName": "不動産",
+          "sortOrder": 2,
           "allocationWeight": 0.1
         },
         {
@@ -1281,6 +1372,7 @@
           "schemeName": "主要資産：地域分類",
           "valueCode": "domestic",
           "valueName": "国内",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -1288,6 +1380,7 @@
           "schemeName": "主要資産",
           "valueCode": "domestic_reit",
           "valueName": "国内不動産投信",
+          "sortOrder": 5,
           "allocationWeight": 0.1
         },
         {
@@ -1295,6 +1388,7 @@
           "schemeName": "分散組み合わせ（先進国統一、ゴールド除く）",
           "valueCode": "domestic_reit",
           "valueName": "国内不動産,",
+          "sortOrder": 6,
           "allocationWeight": 0.1
         },
         {
@@ -1302,6 +1396,7 @@
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         },
         {
@@ -1309,6 +1404,7 @@
           "schemeName": "商品グループ",
           "valueCode": "major_assets",
           "valueName": "主要資産",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -1316,6 +1412,7 @@
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
           "valueName": "パッシブ",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -1323,6 +1420,7 @@
           "schemeName": "すべて",
           "valueCode": "domestic_reit",
           "valueName": "国内不動産投信",
+          "sortOrder": 5,
           "allocationWeight": 0.1
         },
         {
@@ -1330,6 +1428,7 @@
           "schemeName": "地域分類",
           "valueCode": "domestic",
           "valueName": "国内",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         }
       ]
@@ -1396,6 +1495,7 @@
           "schemeName": "資産分類",
           "valueCode": "real_estate",
           "valueName": "不動産",
+          "sortOrder": 2,
           "allocationWeight": 0.1
         },
         {
@@ -1403,6 +1503,7 @@
           "schemeName": "主要資産：資産分類",
           "valueCode": "real_estate",
           "valueName": "不動産",
+          "sortOrder": 2,
           "allocationWeight": 0.1
         },
         {
@@ -1410,6 +1511,7 @@
           "schemeName": "主要資産：地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         },
         {
@@ -1417,6 +1519,7 @@
           "schemeName": "主要資産",
           "valueCode": "foreign_reit",
           "valueName": "海外不動産投信",
+          "sortOrder": 6,
           "allocationWeight": 0.1
         },
         {
@@ -1424,6 +1527,7 @@
           "schemeName": "分散組み合わせ（先進国統一、ゴールド除く）",
           "valueCode": "foreign_reit",
           "valueName": "海外不動産",
+          "sortOrder": 7,
           "allocationWeight": 0.1
         },
         {
@@ -1431,6 +1535,7 @@
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         },
         {
@@ -1438,6 +1543,7 @@
           "schemeName": "商品グループ",
           "valueCode": "major_assets",
           "valueName": "主要資産",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -1445,6 +1551,7 @@
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
           "valueName": "パッシブ",
+          "sortOrder": 0,
           "allocationWeight": 0.1
         },
         {
@@ -1452,6 +1559,7 @@
           "schemeName": "すべて",
           "valueCode": "foreign_reit",
           "valueName": "海外不動産投信",
+          "sortOrder": 6,
           "allocationWeight": 0.1
         },
         {
@@ -1459,6 +1567,7 @@
           "schemeName": "地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
+          "sortOrder": 1,
           "allocationWeight": 0.1
         }
       ]
@@ -1525,6 +1634,7 @@
           "schemeName": "資産分類",
           "valueCode": "balanced",
           "valueName": "複合",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -1532,6 +1642,7 @@
           "schemeName": "その他",
           "valueCode": "balanced",
           "valueName": "内外資産複合",
+          "sortOrder": 0,
           "allocationWeight": null
         },
         {
@@ -1539,6 +1650,7 @@
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -1546,6 +1658,7 @@
           "schemeName": "商品グループ",
           "valueCode": "other",
           "valueName": "その他",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -1553,6 +1666,7 @@
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "passive",
           "valueName": "パッシブ",
+          "sortOrder": 0,
           "allocationWeight": null
         },
         {
@@ -1560,6 +1674,7 @@
           "schemeName": "すべて",
           "valueCode": "balanced",
           "valueName": "内外資産複合",
+          "sortOrder": 7,
           "allocationWeight": null
         },
         {
@@ -1567,6 +1682,7 @@
           "schemeName": "地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
+          "sortOrder": 1,
           "allocationWeight": null
         }
       ]
@@ -1633,6 +1749,7 @@
           "schemeName": "資産分類",
           "valueCode": "balanced",
           "valueName": "複合",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -1640,6 +1757,7 @@
           "schemeName": "その他",
           "valueCode": "balanced",
           "valueName": "内外資産複合",
+          "sortOrder": 0,
           "allocationWeight": null
         },
         {
@@ -1647,6 +1765,7 @@
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -1654,6 +1773,7 @@
           "schemeName": "商品グループ",
           "valueCode": "other",
           "valueName": "その他",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -1661,6 +1781,7 @@
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "active",
           "valueName": "アクティブ",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -1668,6 +1789,7 @@
           "schemeName": "すべて",
           "valueCode": "balanced",
           "valueName": "内外資産複合",
+          "sortOrder": 7,
           "allocationWeight": null
         },
         {
@@ -1675,6 +1797,7 @@
           "schemeName": "地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
+          "sortOrder": 1,
           "allocationWeight": null
         }
       ]
@@ -1741,6 +1864,7 @@
           "schemeName": "資産分類",
           "valueCode": "other",
           "valueName": "その他",
+          "sortOrder": 4,
           "allocationWeight": null
         },
         {
@@ -1748,6 +1872,7 @@
           "schemeName": "その他",
           "valueCode": "domestic_other",
           "valueName": "国内その他資産",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -1755,6 +1880,7 @@
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -1762,6 +1888,7 @@
           "schemeName": "商品グループ",
           "valueCode": "other",
           "valueName": "その他",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -1769,6 +1896,7 @@
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "active",
           "valueName": "アクティブ",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -1776,6 +1904,7 @@
           "schemeName": "すべて",
           "valueCode": "domestic_other",
           "valueName": "国内その他資産",
+          "sortOrder": 8,
           "allocationWeight": null
         },
         {
@@ -1783,6 +1912,7 @@
           "schemeName": "地域分類",
           "valueCode": "domestic",
           "valueName": "国内",
+          "sortOrder": 0,
           "allocationWeight": null
         }
       ]
@@ -1849,6 +1979,7 @@
           "schemeName": "資産分類",
           "valueCode": "balanced",
           "valueName": "複合",
+          "sortOrder": 3,
           "allocationWeight": null
         },
         {
@@ -1856,6 +1987,7 @@
           "schemeName": "その他",
           "valueCode": "balanced",
           "valueName": "内外資産複合",
+          "sortOrder": 0,
           "allocationWeight": null
         },
         {
@@ -1863,6 +1995,7 @@
           "schemeName": "大分類",
           "valueCode": "mutual_fund",
           "valueName": "投資信託",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -1870,6 +2003,7 @@
           "schemeName": "商品グループ",
           "valueCode": "other",
           "valueName": "その他",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -1877,6 +2011,7 @@
           "schemeName": "商品タイプ(スタイル)",
           "valueCode": "active",
           "valueName": "アクティブ",
+          "sortOrder": 1,
           "allocationWeight": null
         },
         {
@@ -1884,6 +2019,7 @@
           "schemeName": "すべて",
           "valueCode": "balanced",
           "valueName": "内外資産複合",
+          "sortOrder": 7,
           "allocationWeight": null
         },
         {
@@ -1891,6 +2027,7 @@
           "schemeName": "地域分類",
           "valueCode": "foreign",
           "valueName": "海外",
+          "sortOrder": 1,
           "allocationWeight": null
         }
       ]
@@ -1957,6 +2094,7 @@
           "schemeName": "大分類",
           "valueCode": "standby_cash",
           "valueName": "待機資金",
+          "sortOrder": 2,
           "allocationWeight": null
         },
         {
@@ -1964,6 +2102,7 @@
           "schemeName": "すべて",
           "valueCode": "principal_protected",
           "valueName": "元本確保",
+          "sortOrder": 9,
           "allocationWeight": null
         }
       ]

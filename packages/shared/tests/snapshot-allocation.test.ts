@@ -223,10 +223,12 @@ describe("snapshot-allocation", () => {
 
     const slices = groupSnapshotLinesByTag(lines, "ideco_region");
     expect(slices).toHaveLength(2);
-    expect(slices[0]?.valueName).toBe("海外");
-    expect(slices[0]?.weight).toBeCloseTo(0.75);
-    expect(slices[1]?.valueName).toBe("国内");
-    expect(slices[1]?.weight).toBeCloseTo(0.25);
+    expect(slices.find((slice) => slice.valueName === "海外")?.weight).toBeCloseTo(
+      0.75,
+    );
+    expect(slices.find((slice) => slice.valueName === "国内")?.weight).toBeCloseTo(
+      0.25,
+    );
 
     const emptyTagged = groupSnapshotLinesByTag([], "ideco_region");
     expect(emptyTagged).toEqual([]);
@@ -272,6 +274,55 @@ describe("snapshot-allocation", () => {
     expect(zeroTaggedTotal[0]?.weight).toBe(0);
   });
 
+  it("sorts classifications by configured order then classification name", () => {
+    const lines = [
+      makeLine(100, [
+        {
+          schemeCode: "monex_asset_class",
+          schemeName: "資産クラス",
+          valueCode: "gamma",
+          valueName: "Gamma",
+          sortOrder: 1,
+        },
+      ]),
+      makeLine(300, [
+        {
+          schemeCode: "monex_asset_class",
+          schemeName: "資産クラス",
+          valueCode: "beta",
+          valueName: "Beta",
+          sortOrder: 0,
+        },
+      ]),
+      makeLine(200, [
+        {
+          schemeCode: "monex_asset_class",
+          schemeName: "資産クラス",
+          valueCode: "alpha",
+          valueName: "Alpha",
+          sortOrder: 1,
+        },
+      ]),
+    ];
+
+    const slices = groupSnapshotLinesByTag(lines, "monex_asset_class");
+    const slicesWithLines = groupSnapshotLinesByTagWithLines(
+      lines,
+      "monex_asset_class",
+    );
+
+    expect(slices.map((slice) => slice.valueCode)).toEqual([
+      "beta",
+      "alpha",
+      "gamma",
+    ]);
+    expect(slicesWithLines.map((slice) => slice.valueCode)).toEqual([
+      "beta",
+      "alpha",
+      "gamma",
+    ]);
+  });
+
   it("splits a holding across weighted tags for the same scheme", () => {
     const lines = [
       makeLine(
@@ -282,6 +333,7 @@ describe("snapshot-allocation", () => {
             schemeName: "資産クラス",
             valueCode: "developed_equity",
             valueName: "先進国株式",
+            sortOrder: 0,
             allocationWeight: 0.6,
           },
           {
@@ -289,6 +341,7 @@ describe("snapshot-allocation", () => {
             schemeName: "資産クラス",
             valueCode: "domestic_bond",
             valueName: "国内債券",
+            sortOrder: 1,
             allocationWeight: 0.4,
           },
         ],

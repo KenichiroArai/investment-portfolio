@@ -199,7 +199,13 @@ export function compareAllocationSlices(
 ): number {
   let result = 0;
 
-  if (column === "valueName") {
+  if (column === "displayOrder") {
+    result = compareNullableNumbers(
+      left.sortOrder ?? 0,
+      right.sortOrder ?? 0,
+      direction,
+    );
+  } else if (column === "valueName") {
     result = compareStrings(left.valueName, right.valueName, direction);
   } else if (column === "marketValue") {
     result = compareNullableNumbers(
