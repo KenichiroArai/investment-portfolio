@@ -30,7 +30,38 @@
       "schemeName": "匠の運用"
     }
   ],
-  "metrics": [],
+  "metrics": [
+    {
+      "code": "sbi_wrap_product_cost_ai_investment",
+      "integerValue": 10000,
+      "realValue": null,
+      "textValue": null
+    },
+    {
+      "code": "sbi_wrap_product_cost_all_equity",
+      "integerValue": 10000,
+      "realValue": null,
+      "textValue": null
+    },
+    {
+      "code": "sbi_wrap_product_cost_reba_choice",
+      "integerValue": 10000,
+      "realValue": null,
+      "textValue": null
+    },
+    {
+      "code": "sbi_wrap_product_cost_rebanavi",
+      "integerValue": 10000,
+      "realValue": null,
+      "textValue": null
+    },
+    {
+      "code": "sbi_wrap_product_cost_takumi",
+      "integerValue": 10000,
+      "realValue": null,
+      "textValue": null
+    }
+  ],
   "lines": [
     {
       "id": "baf2527a-2db4-4329-b5d1-be165ce61357",
@@ -41,13 +72,25 @@
       "sortOrder": 1,
       "quantity": 1,
       "marketValueMinor": 1576,
-      "bookValueMinor": null,
+      "bookValueMinor": 1574,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "AI投資"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 2,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0012706480304955528,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -79,13 +122,25 @@
       "sortOrder": 2,
       "quantity": 1,
       "marketValueMinor": 2513,
-      "bookValueMinor": null,
+      "bookValueMinor": 2510,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "AI投資"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 3,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.001195219123505976,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -117,13 +172,25 @@
       "sortOrder": 3,
       "quantity": 1,
       "marketValueMinor": 289,
-      "bookValueMinor": null,
+      "bookValueMinor": 289,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "AI投資"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 0,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -155,13 +222,25 @@
       "sortOrder": 4,
       "quantity": 1,
       "marketValueMinor": 1395,
-      "bookValueMinor": null,
+      "bookValueMinor": 1393,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "AI投資"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 2,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0014357501794687725,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -193,13 +272,25 @@
       "sortOrder": 5,
       "quantity": 1,
       "marketValueMinor": 282,
-      "bookValueMinor": null,
+      "bookValueMinor": 282,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "AI投資"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 0,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -231,13 +322,25 @@
       "sortOrder": 6,
       "quantity": 1,
       "marketValueMinor": 666,
-      "bookValueMinor": null,
+      "bookValueMinor": 665,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "AI投資"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 1,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0015037593984962407,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -269,13 +372,25 @@
       "sortOrder": 7,
       "quantity": 1,
       "marketValueMinor": 1613,
-      "bookValueMinor": null,
+      "bookValueMinor": 1611,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "AI投資"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 2,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.0012414649286157666,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -307,13 +422,25 @@
       "sortOrder": 8,
       "quantity": 1,
       "marketValueMinor": 1474,
-      "bookValueMinor": null,
+      "bookValueMinor": 1472,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "AI投資"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 2,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0.001358695652173913,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -345,13 +472,25 @@
       "sortOrder": 9,
       "quantity": 1,
       "marketValueMinor": 203,
-      "bookValueMinor": null,
+      "bookValueMinor": 204,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "AI投資"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -1,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.004901960784313725,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -383,13 +522,25 @@
       "sortOrder": 10,
       "quantity": 1,
       "marketValueMinor": 2856,
-      "bookValueMinor": null,
+      "bookValueMinor": 2873,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "匠の運用"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -17,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.005917159763313609,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -421,13 +572,25 @@
       "sortOrder": 11,
       "quantity": 1,
       "marketValueMinor": 2766,
-      "bookValueMinor": null,
+      "bookValueMinor": 2782,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "匠の運用"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -16,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.005751258087706686,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -459,13 +622,25 @@
       "sortOrder": 12,
       "quantity": 1,
       "marketValueMinor": 770,
-      "bookValueMinor": null,
+      "bookValueMinor": 774,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "匠の運用"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -4,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.00516795865633075,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -497,13 +672,25 @@
       "sortOrder": 13,
       "quantity": 1,
       "marketValueMinor": 495,
-      "bookValueMinor": null,
+      "bookValueMinor": 498,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "匠の運用"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -3,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.006024096385542169,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -535,13 +722,25 @@
       "sortOrder": 14,
       "quantity": 1,
       "marketValueMinor": 796,
-      "bookValueMinor": null,
+      "bookValueMinor": 801,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "匠の運用"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -5,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.006242197253433208,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -573,13 +772,25 @@
       "sortOrder": 15,
       "quantity": 1,
       "marketValueMinor": 494,
-      "bookValueMinor": null,
+      "bookValueMinor": 497,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "匠の運用"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -3,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.006036217303822937,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -611,13 +822,25 @@
       "sortOrder": 16,
       "quantity": 1,
       "marketValueMinor": 499,
-      "bookValueMinor": null,
+      "bookValueMinor": 502,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "匠の運用"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -3,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.00597609561752988,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -649,13 +872,25 @@
       "sortOrder": 17,
       "quantity": 1,
       "marketValueMinor": 656,
-      "bookValueMinor": null,
+      "bookValueMinor": 660,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "匠の運用"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -4,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.006060606060606061,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -687,13 +922,25 @@
       "sortOrder": 18,
       "quantity": 1,
       "marketValueMinor": 509,
-      "bookValueMinor": null,
+      "bookValueMinor": 512,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "匠の運用"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -3,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.005859375,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -725,13 +972,25 @@
       "sortOrder": 19,
       "quantity": 1,
       "marketValueMinor": 101,
-      "bookValueMinor": null,
+      "bookValueMinor": 101,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "匠の運用"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 0,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -763,13 +1022,25 @@
       "sortOrder": 20,
       "quantity": 1,
       "marketValueMinor": 1834,
-      "bookValueMinor": null,
+      "bookValueMinor": 1837,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "レバナビ"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -3,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.001633097441480675,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -801,13 +1072,25 @@
       "sortOrder": 21,
       "quantity": 1,
       "marketValueMinor": 8051,
-      "bookValueMinor": null,
+      "bookValueMinor": 8066,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "レバナビ"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -15,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.0018596578229605754,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -839,13 +1122,25 @@
       "sortOrder": 22,
       "quantity": 1,
       "marketValueMinor": 97,
-      "bookValueMinor": null,
+      "bookValueMinor": 97,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "レバナビ"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 0,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -877,13 +1172,25 @@
       "sortOrder": 23,
       "quantity": 1,
       "marketValueMinor": 9044,
-      "bookValueMinor": null,
+      "bookValueMinor": 9044,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "レバチョイス"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 0,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -915,13 +1222,25 @@
       "sortOrder": 24,
       "quantity": 1,
       "marketValueMinor": 856,
-      "bookValueMinor": null,
+      "bookValueMinor": 856,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "レバチョイス"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 0,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -953,13 +1272,25 @@
       "sortOrder": 25,
       "quantity": 1,
       "marketValueMinor": 100,
-      "bookValueMinor": null,
+      "bookValueMinor": 100,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "レバチョイス"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": 0,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": 0,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -991,13 +1322,25 @@
       "sortOrder": 26,
       "quantity": 1,
       "marketValueMinor": 2741,
-      "bookValueMinor": null,
+      "bookValueMinor": 2802,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "ALL株式"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -61,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.021770164168451105,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -1029,13 +1372,25 @@
       "sortOrder": 27,
       "quantity": 1,
       "marketValueMinor": 3988,
-      "bookValueMinor": null,
+      "bookValueMinor": 4076,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "ALL株式"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -88,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.021589793915603533,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -1067,13 +1422,25 @@
       "sortOrder": 28,
       "quantity": 1,
       "marketValueMinor": 2956,
-      "bookValueMinor": null,
+      "bookValueMinor": 3021,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "ALL株式"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -65,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.021516054286660046,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],
@@ -1105,13 +1472,25 @@
       "sortOrder": 29,
       "quantity": 1,
       "marketValueMinor": 99,
-      "bookValueMinor": null,
+      "bookValueMinor": 101,
       "metrics": [
         {
           "code": "account_type",
           "integerValue": null,
           "realValue": null,
           "textValue": "ALL株式"
+        },
+        {
+          "code": "unrealized_gain_minor",
+          "integerValue": -2,
+          "realValue": null,
+          "textValue": null
+        },
+        {
+          "code": "unrealized_gain_rate",
+          "integerValue": null,
+          "realValue": -0.019801980198019802,
+          "textValue": null
         }
       ],
       "instrumentAttributes": [],

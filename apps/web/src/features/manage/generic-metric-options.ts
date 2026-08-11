@@ -2,6 +2,8 @@ import {
   getPortfolioKindFeatures,
   IDECO_PORTFOLIO_METRIC_CODES,
   IDECO_PORTFOLIO_METRIC_CSV_LABELS,
+  resolveSbiWrapProductCostMetricLabel,
+  parseSbiWrapProductCodeFromCostMetric,
 } from "@repo/shared";
 
 export type GenericMetricOption = {
@@ -24,6 +26,9 @@ export function listGenericMetricOptions(portfolioKind: string): GenericMetricOp
     if (metricCode === IDECO_PORTFOLIO_METRIC_CODES.totalContributions) {
       label = "拠出金累計";
     }
+    if (parseSbiWrapProductCodeFromCostMetric(metricCode)) {
+      label = resolveSbiWrapProductCostMetricLabel(metricCode);
+    }
     result.push({ code: metricCode, label });
   }
 
@@ -40,6 +45,11 @@ export function resolveGenericMetricLabel(code: string): string {
       result = label;
       return result;
     }
+  }
+
+  if (parseSbiWrapProductCodeFromCostMetric(code)) {
+    result = resolveSbiWrapProductCostMetricLabel(code);
+    return result;
   }
 
   return result;

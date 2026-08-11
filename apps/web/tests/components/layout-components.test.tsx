@@ -204,6 +204,7 @@ describe("layout components", () => {
         "href",
         "/portfolios/sbi-wrap/settings/data?tab=sbi-wrap-bulk-import",
       );
+      expect(screen.queryByRole("link", { name: "商品購入金額" })).not.toBeInTheDocument();
     });
   });
 });

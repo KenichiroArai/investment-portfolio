@@ -39,6 +39,7 @@ import {
   updateClassificationValue,
   updateInstrument,
   updatePortfolio,
+  upsertSnapshotMetricsByDate,
   type AppDatabase,
 } from "@repo/db";
 import {
@@ -59,6 +60,7 @@ import {
   updateClassificationValueSchema,
   updateInstrumentSchema,
   updatePortfolioSchema,
+  upsertSnapshotMetricsSchema,
 } from "@repo/shared";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
@@ -676,6 +678,35 @@ export function createApp(options?: CreateAppOptions) {
     const snapshot = await getSnapshotByDate(db, c.req.param("code"), asOfDate);
     if (!snapshot) {
       result = c.json({ error: "Snapshot not found" }, 404);
+      return result;
+    }
+
+    result = c.json(snapshot);
+    return result;
+  });
+
+  app.put("/portfolios/:code/snapshots/:asOfDate/metrics", async (c) => {
+    let result!: Response;
+
+    const asOfDate = c.req.param("asOfDate");
+    const body = await c.req.json();
+    const parsed = upsertSnapshotMetricsSchema.safeParse({
+      ...body,
+      asOfDate,
+    });
+    if (!parsed.success) {
+      result = c.json({ error: parsed.error.flatten() }, 400);
+      return result;
+    }
+
+    const db = resolveDb();
+    const snapshot = await upsertSnapshotMetricsByDate(db, {
+      portfolioCode: c.req.param("code"),
+      asOfDate: parsed.data.asOfDate,
+      metrics: parsed.data.metrics,
+    });
+    if (!snapshot) {
+      result = c.json({ error: "Portfolio not found" }, 404);
       return result;
     }
 

@@ -39,6 +39,18 @@ describe("generic-metric-options", () => {
     expect(resolveGenericMetricLabel(options[0]?.code ?? "")).toBe("拠出金累計");
   });
 
+  it("lists sbi-wrap product cost metric options", () => {
+    const options = listGenericMetricOptions("sbi-wrap");
+    expect(options).toHaveLength(5);
+    expect(options[0]).toEqual({
+      code: "sbi_wrap_product_cost_ai_investment",
+      label: "AI投資 購入金額",
+    });
+    expect(resolveGenericMetricLabel("sbi_wrap_product_cost_takumi")).toBe(
+      "匠の運用 購入金額",
+    );
+  });
+
   it("returns code when label is unknown", () => {
     expect(resolveGenericMetricLabel("unknown_metric")).toBe("unknown_metric");
   });

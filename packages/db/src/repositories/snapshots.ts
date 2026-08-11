@@ -1,6 +1,11 @@
 import { and, eq, inArray } from "drizzle-orm";
 
-import { assertUniqueSnapshotInstrumentIds } from "@repo/shared";
+import {
+  assertUniqueSnapshotInstrumentIds,
+  readSbiWrapProductCostsFromMetrics,
+  applySbiWrapProductCostsToLines,
+  resolveEffectivePortfolioMetrics,
+} from "@repo/shared";
 
 import type { AppDatabase } from "../client";
 import { newId, nowIso } from "../id";
@@ -149,31 +154,49 @@ function normalizeAccountForPortfolio(
   return result;
 }
 
-async function getMetricsForSnapshot(db: AppDatabase, snapshotId: string) {
+async function getEffectiveMetricsForPortfolioDate(
+  db: AppDatabase,
+  portfolioId: string,
+  asOfDate: string,
+) {
   let result: SnapshotMetricRow[] = [];
 
   const rows = await db
     .select({
+      asOfDate: portfolioSnapshots.asOfDate,
       code: portfolioSnapshotMetrics.code,
       integerValue: portfolioSnapshotMetrics.integerValue,
       realValue: portfolioSnapshotMetrics.realValue,
       textValue: portfolioSnapshotMetrics.textValue,
     })
     .from(portfolioSnapshotMetrics)
-    .where(eq(portfolioSnapshotMetrics.snapshotId, snapshotId));
+    .innerJoin(
+      portfolioSnapshots,
+      eq(portfolioSnapshotMetrics.snapshotId, portfolioSnapshots.id),
+    )
+    .where(eq(portfolioSnapshots.portfolioId, portfolioId));
 
-  result = [...rows]
-    .sort((a, b) => a.code.localeCompare(b.code))
-    .map((row) => {
-      let metric: SnapshotMetricRow = {
-        code: row.code,
-        integerValue: row.integerValue,
-        realValue: row.realValue,
-        textValue: row.textValue,
-      };
-      return metric;
+  const byDate = new Map<string, SnapshotMetricRow[]>();
+  for (const row of rows) {
+    if (row.asOfDate > asOfDate) {
+      continue;
+    }
+    const metrics = byDate.get(row.asOfDate) ?? [];
+    metrics.push({
+      code: row.code,
+      integerValue: row.integerValue,
+      realValue: row.realValue,
+      textValue: row.textValue,
     });
+    byDate.set(row.asOfDate, metrics);
+  }
 
+  const datedMetrics = [...byDate.entries()].map(([date, metrics]) => ({
+    asOfDate: date,
+    metrics,
+  }));
+
+  result = resolveEffectivePortfolioMetrics(datedMetrics, asOfDate);
   return result;
 }
 
@@ -447,7 +470,19 @@ async function buildSnapshotDto(
   });
 
   const analysisSchemes = await listAnalysisSchemesForPortfolio(db, portfolio.code);
-  const snapshotMetrics = await getMetricsForSnapshot(db, snapshot.id);
+  const snapshotMetrics = await getEffectiveMetricsForPortfolioDate(
+    db,
+    portfolio.id,
+    snapshot.asOfDate,
+  );
+
+  let linesWithCosts = lineDtos;
+  if (portfolio.kind === "sbi-wrap") {
+    const productCosts = readSbiWrapProductCostsFromMetrics(snapshotMetrics);
+    if (Object.keys(productCosts).length > 0) {
+      linesWithCosts = applySbiWrapProductCostsToLines(lineDtos, productCosts);
+    }
+  }
 
   result = {
     id: snapshot.id,
@@ -457,7 +492,7 @@ async function buildSnapshotDto(
     asOfDate: snapshot.asOfDate,
     analysisSchemes,
     metrics: snapshotMetrics,
-    lines: lineDtos,
+    lines: linesWithCosts,
   };
   return result;
 }
@@ -704,5 +739,83 @@ export async function replaceCurrentSnapshot(
   });
 
   result = await getCurrentSnapshot(db, params.portfolioCode);
+  return result;
+}
+
+export type UpsertSnapshotMetricsByDateParams = {
+  portfolioCode: string;
+  asOfDate: string;
+  metrics: PortfolioSnapshotMetricInput[];
+};
+
+/**
+ * 指定基準日の汎用指標だけを upsert する。
+ * 明細は触らず、is_current も変更しない（スナップショットが無ければ空明細で作成）。
+ */
+export async function upsertSnapshotMetricsByDate(
+  db: AppDatabase,
+  params: UpsertSnapshotMetricsByDateParams,
+) {
+  let result: CurrentSnapshotDto | null = null;
+
+  const portfolio = await findPortfolioByCode(db, params.portfolioCode);
+  if (!portfolio) {
+    return result;
+  }
+
+  db.transaction((tx) => {
+    let txResult: void = undefined;
+
+    const existing = tx
+      .select()
+      .from(portfolioSnapshots)
+      .where(
+        and(
+          eq(portfolioSnapshots.portfolioId, portfolio.id),
+          eq(portfolioSnapshots.asOfDate, params.asOfDate),
+        ),
+      )
+      .all()[0];
+
+    let snapshotId = existing?.id ?? newId();
+
+    if (!existing) {
+      tx.insert(portfolioSnapshots)
+        .values({
+          id: snapshotId,
+          portfolioId: portfolio.id,
+          asOfDate: params.asOfDate,
+          isCurrent: 0,
+          createdAt: nowIso(),
+        })
+        .run();
+    }
+
+    for (const metric of params.metrics) {
+      tx.delete(portfolioSnapshotMetrics)
+        .where(
+          and(
+            eq(portfolioSnapshotMetrics.snapshotId, snapshotId),
+            eq(portfolioSnapshotMetrics.code, metric.code),
+          ),
+        )
+        .run();
+
+      tx.insert(portfolioSnapshotMetrics)
+        .values({
+          id: newId(),
+          snapshotId,
+          code: metric.code,
+          integerValue: metric.integerValue ?? null,
+          realValue: metric.realValue ?? null,
+          textValue: metric.textValue ?? null,
+        })
+        .run();
+    }
+
+    return txResult;
+  });
+
+  result = await getSnapshotByDate(db, params.portfolioCode, params.asOfDate);
   return result;
 }

@@ -1,6 +1,7 @@
 import { IDECO_PORTFOLIO_METRIC_CODES } from "./ideco-portfolio-metrics";
 import { MONEX_INSTRUMENT_ATTRIBUTE_CODES } from "./monex-holding-metrics";
 import { RAKUTEN_INSTRUMENT_ATTRIBUTE_CODES } from "./rakuten-holding-metrics";
+import { listSbiWrapProductCostMetricCodes } from "./sbi-wrap-product-costs";
 
 export type HoldingLineColumnId =
   | "portfolioName"
@@ -111,7 +112,7 @@ const KIND_FEATURES: Record<string, PortfolioKindFeatures> = {
       "gainRate",
     ],
     instrumentAttributes: [],
-    portfolioMetrics: [],
+    portfolioMetrics: listSbiWrapProductCostMetricCodes(),
   },
 };
 

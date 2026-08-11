@@ -56,6 +56,7 @@ import {
   replaceCurrentSnapshot,
   setCurrentSnapshot,
   upsertSnapshotByDate,
+  upsertSnapshotMetricsByDate,
 } from "../src/repositories/snapshots";
 import {
   listAllTargetAllocationsForPortfolio,
@@ -1603,5 +1604,187 @@ describe("portfolio repositories", () => {
         }),
       ]),
     );
+  });
+
+  it("resolves portfolio metrics as effective until the next update", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+    const instrument = await createInstrument(db, { name: "Alpha Fund" });
+
+    await upsertSnapshotByDate(db, {
+      portfolioCode: "ideco",
+      asOfDate: "2026-07-01",
+      lines: [
+        {
+          instrumentId: instrument.id,
+          quantity: 1,
+          marketValueMinor: 1000,
+        },
+      ],
+      metrics: [{ code: "ideco_total_contributions", integerValue: 10_000 }],
+      setAsCurrent: false,
+    });
+    await upsertSnapshotByDate(db, {
+      portfolioCode: "ideco",
+      asOfDate: "2026-07-10",
+      lines: [
+        {
+          instrumentId: instrument.id,
+          quantity: 1,
+          marketValueMinor: 1100,
+        },
+      ],
+      metrics: [],
+      setAsCurrent: false,
+    });
+    await upsertSnapshotByDate(db, {
+      portfolioCode: "ideco",
+      asOfDate: "2026-07-15",
+      lines: [
+        {
+          instrumentId: instrument.id,
+          quantity: 1,
+          marketValueMinor: 1200,
+        },
+      ],
+      metrics: [{ code: "ideco_total_contributions", integerValue: 11_000 }],
+      setAsCurrent: true,
+    });
+
+    const mid = await getSnapshotByDate(db, "ideco", "2026-07-10");
+    expect(mid?.metrics).toEqual([
+      {
+        code: "ideco_total_contributions",
+        integerValue: 10_000,
+        realValue: null,
+        textValue: null,
+      },
+    ]);
+
+    const later = await getSnapshotByDate(db, "ideco", "2026-07-15");
+    expect(later?.metrics).toEqual([
+      {
+        code: "ideco_total_contributions",
+        integerValue: 11_000,
+        realValue: null,
+        textValue: null,
+      },
+    ]);
+  });
+
+  it("upserts metrics by date without copying holding lines or changing current", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+    const instrument = await createInstrument(db, { name: "Alpha Fund" });
+
+    await upsertSnapshotByDate(db, {
+      portfolioCode: "ideco",
+      asOfDate: "2026-08-02",
+      lines: [
+        {
+          instrumentId: instrument.id,
+          quantity: 1,
+          marketValueMinor: 2000,
+        },
+      ],
+      setAsCurrent: true,
+    });
+
+    const metricOnly = await upsertSnapshotMetricsByDate(db, {
+      portfolioCode: "ideco",
+      asOfDate: "2026-07-22",
+      metrics: [{ code: "ideco_total_contributions", integerValue: 10_000 }],
+    });
+    expect(metricOnly?.asOfDate).toBe("2026-07-22");
+    expect(metricOnly?.lines).toEqual([]);
+    expect(metricOnly?.metrics).toEqual([
+      {
+        code: "ideco_total_contributions",
+        integerValue: 10_000,
+        realValue: null,
+        textValue: null,
+      },
+    ]);
+
+    const current = await getCurrentSnapshot(db, "ideco");
+    expect(current?.asOfDate).toBe("2026-08-02");
+    expect(current?.lines).toHaveLength(1);
+    expect(current?.metrics).toEqual([
+      {
+        code: "ideco_total_contributions",
+        integerValue: 10_000,
+        realValue: null,
+        textValue: null,
+      },
+    ]);
+  });
+
+  it("applies effective sbi-wrap product costs to holding lines on read", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "sbi-wrap",
+      name: "SBIラップ",
+      kind: "sbi-wrap",
+    });
+    const fundA = await createInstrument(db, {
+      portfolioCode: "sbi-wrap",
+      accountId: "sbi-wrap:AI投資",
+      name: "ファンドA",
+    });
+    const fundB = await createInstrument(db, {
+      portfolioCode: "sbi-wrap",
+      accountId: "sbi-wrap:AI投資",
+      name: "ファンドB",
+    });
+
+    await upsertSnapshotMetricsByDate(db, {
+      portfolioCode: "sbi-wrap",
+      asOfDate: "2026-07-22",
+      metrics: [{ code: "sbi_wrap_product_cost_ai_investment", integerValue: 10_000 }],
+    });
+
+    await upsertSnapshotByDate(db, {
+      portfolioCode: "sbi-wrap",
+      asOfDate: "2026-08-02",
+      lines: [
+        {
+          instrumentId: fundA.id,
+          accountId: "sbi-wrap:AI投資",
+          accountName: "AI投資",
+          quantity: 1,
+          marketValueMinor: 4_000,
+          bookValueMinor: null,
+        },
+        {
+          instrumentId: fundB.id,
+          accountId: "sbi-wrap:AI投資",
+          accountName: "AI投資",
+          quantity: 1,
+          marketValueMinor: 6_000,
+          bookValueMinor: null,
+        },
+      ],
+      metrics: [],
+      setAsCurrent: true,
+    });
+
+    const snapshot = await getCurrentSnapshot(db, "sbi-wrap");
+    expect(snapshot?.metrics).toEqual([
+      {
+        code: "sbi_wrap_product_cost_ai_investment",
+        integerValue: 10_000,
+        realValue: null,
+        textValue: null,
+      },
+    ]);
+    expect(snapshot?.lines.map((line) => line.bookValueMinor)).toEqual([4000, 6000]);
   });
 });

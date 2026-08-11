@@ -6,8 +6,10 @@ import type {
   PortfolioSnapshotMetricInput,
 } from "@repo/shared";
 import {
+  applySbiWrapProductCostsToHoldingInputs,
   buildSbiWrapExternalId,
   parseSbiWrapPaste,
+  readSbiWrapProductCostsFromMetrics,
   SbiWrapPasteError,
 } from "@repo/shared";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -252,9 +254,16 @@ export function SbiWrapBulkImportTab({
       return result;
     }
 
+    const metrics = snapshot ? snapshotToMetricInputs(snapshot) : [];
+    const productCosts = readSbiWrapProductCostsFromMetrics(metrics);
+    const linesWithCosts =
+      Object.keys(productCosts).length > 0
+        ? applySbiWrapProductCostsToHoldingInputs(lines, productCosts)
+        : lines;
+
     const saved = await saveSnapshot(
-      lines,
-      snapshot ? snapshotToMetricInputs(snapshot) : [],
+      linesWithCosts,
+      metrics,
       "保有明細を登録しました。",
     );
     if (saved) {

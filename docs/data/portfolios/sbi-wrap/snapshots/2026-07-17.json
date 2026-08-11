@@ -30,18 +30,49 @@
       "schemeName": "匠の運用"
     }
   ],
-  "metrics": [],
+  "metrics": [
+    {
+      "code": "sbi_wrap_product_cost_ai_investment",
+      "integerValue": 10000,
+      "realValue": null,
+      "textValue": null
+    },
+    {
+      "code": "sbi_wrap_product_cost_all_equity",
+      "integerValue": 10000,
+      "realValue": null,
+      "textValue": null
+    },
+    {
+      "code": "sbi_wrap_product_cost_reba_choice",
+      "integerValue": 10000,
+      "realValue": null,
+      "textValue": null
+    },
+    {
+      "code": "sbi_wrap_product_cost_rebanavi",
+      "integerValue": 10000,
+      "realValue": null,
+      "textValue": null
+    },
+    {
+      "code": "sbi_wrap_product_cost_takumi",
+      "integerValue": 10000,
+      "realValue": null,
+      "textValue": null
+    }
+  ],
   "lines": [
     {
-      "id": "df3db7c8-49ae-4ef5-9f74-c9cf8638c22d",
+      "id": "ab56d91f-9fbf-42cf-b14c-ddd4e21a0eae",
       "instrumentId": "be130054-4a39-4f7d-a592-7caced43660e",
       "instrumentName": "（ラップ専用）ＳＢＩ・米国株式",
       "accountId": "sbi-wrap:AI投資",
       "accountName": "AI投資",
       "sortOrder": 1,
       "quantity": 1,
-      "marketValueMinor": 1617,
-      "bookValueMinor": 1601,
+      "marketValueMinor": 1576,
+      "bookValueMinor": 1574,
       "metrics": [
         {
           "code": "account_type",
@@ -51,14 +82,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 16,
+          "integerValue": 2,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.009993753903810118,
+          "realValue": 0.0012706480304955528,
           "textValue": null
         }
       ],
@@ -83,15 +114,15 @@
       ]
     },
     {
-      "id": "98108931-7e56-4d91-b45b-6576a3a8275a",
+      "id": "cbd9a4f8-7e9c-405c-9f1c-c954d3001909",
       "instrumentId": "1973a843-04e8-4e5a-b1cc-db53be314619",
       "instrumentName": "（ラップ専用）ＳＢＩ・先進国株式",
       "accountId": "sbi-wrap:AI投資",
       "accountName": "AI投資",
       "sortOrder": 2,
       "quantity": 1,
-      "marketValueMinor": 2527,
-      "bookValueMinor": 2502,
+      "marketValueMinor": 2513,
+      "bookValueMinor": 2510,
       "metrics": [
         {
           "code": "account_type",
@@ -101,14 +132,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 25,
+          "integerValue": 3,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.009992006394884092,
+          "realValue": 0.001195219123505976,
           "textValue": null
         }
       ],
@@ -133,15 +164,15 @@
       ]
     },
     {
-      "id": "3b61e6ad-25d6-45e2-aa91-0b08a3ea7db2",
+      "id": "127a8c57-9638-4a7d-b59c-a9bd2910918e",
       "instrumentId": "c5e07a2d-bbdb-43f0-8902-d69d48ef5e79",
       "instrumentName": "（ラップ専用）ＳＢＩ・新興国株式",
       "accountId": "sbi-wrap:AI投資",
       "accountName": "AI投資",
       "sortOrder": 3,
       "quantity": 1,
-      "marketValueMinor": 298,
-      "bookValueMinor": 295,
+      "marketValueMinor": 289,
+      "bookValueMinor": 289,
       "metrics": [
         {
           "code": "account_type",
@@ -151,14 +182,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 3,
+          "integerValue": 0,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.010169491525423728,
+          "realValue": 0,
           "textValue": null
         }
       ],
@@ -183,15 +214,15 @@
       ]
     },
     {
-      "id": "89419087-6c5d-47f3-b2cc-cab14d11645e",
+      "id": "d027fc1e-95e8-4eee-87e9-013c984153ed",
       "instrumentId": "53b66a8c-98c9-4867-afe5-16ee4ec8af97",
       "instrumentName": "（ラップ専用）ＳＢＩ・米国債券",
       "accountId": "sbi-wrap:AI投資",
       "accountName": "AI投資",
       "sortOrder": 4,
       "quantity": 1,
-      "marketValueMinor": 1416,
-      "bookValueMinor": 1402,
+      "marketValueMinor": 1395,
+      "bookValueMinor": 1393,
       "metrics": [
         {
           "code": "account_type",
@@ -201,14 +232,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 14,
+          "integerValue": 2,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.009985734664764621,
+          "realValue": 0.0014357501794687725,
           "textValue": null
         }
       ],
@@ -233,15 +264,15 @@
       ]
     },
     {
-      "id": "aa2827f9-1b5e-4b44-96f4-eb01c60d09e1",
+      "id": "07f27c76-8e6c-4b6d-9fb5-b65da0e4d1e9",
       "instrumentId": "6ba16261-ad73-44e9-9d9a-f98b599cd314",
       "instrumentName": "（ラップ専用）ＳＢＩ・米国ハイイールド債券",
       "accountId": "sbi-wrap:AI投資",
       "accountName": "AI投資",
       "sortOrder": 5,
       "quantity": 1,
-      "marketValueMinor": 286,
-      "bookValueMinor": 283,
+      "marketValueMinor": 282,
+      "bookValueMinor": 282,
       "metrics": [
         {
           "code": "account_type",
@@ -251,14 +282,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 3,
+          "integerValue": 0,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.01060070671378092,
+          "realValue": 0,
           "textValue": null
         }
       ],
@@ -283,15 +314,15 @@
       ]
     },
     {
-      "id": "ad1740e9-f014-429f-bb7f-e441068a9c59",
+      "id": "971d3781-496a-44f4-8a99-705469e4e4c9",
       "instrumentId": "30404871-5f1a-4420-a3e5-08899b895c37",
       "instrumentName": "（ラップ専用）ＳＢＩ・新興国債券",
       "accountId": "sbi-wrap:AI投資",
       "accountName": "AI投資",
       "sortOrder": 6,
       "quantity": 1,
-      "marketValueMinor": 679,
-      "bookValueMinor": 672,
+      "marketValueMinor": 666,
+      "bookValueMinor": 665,
       "metrics": [
         {
           "code": "account_type",
@@ -301,14 +332,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 7,
+          "integerValue": 1,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.010416666666666666,
+          "realValue": 0.0015037593984962407,
           "textValue": null
         }
       ],
@@ -333,15 +364,15 @@
       ]
     },
     {
-      "id": "986c5bea-358c-43e2-8318-ceeabe2b2539",
+      "id": "f2a4b5ea-fccf-4548-be45-6ca51d092c83",
       "instrumentId": "4bf617e7-8528-428e-b354-b3dd7969d4ef",
       "instrumentName": "（ラップ専用）ＳＢＩ・米国不動産",
       "accountId": "sbi-wrap:AI投資",
       "accountName": "AI投資",
       "sortOrder": 7,
       "quantity": 1,
-      "marketValueMinor": 1601,
-      "bookValueMinor": 1585,
+      "marketValueMinor": 1613,
+      "bookValueMinor": 1611,
       "metrics": [
         {
           "code": "account_type",
@@ -351,14 +382,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 16,
+          "integerValue": 2,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.010094637223974764,
+          "realValue": 0.0012414649286157666,
           "textValue": null
         }
       ],
@@ -383,15 +414,15 @@
       ]
     },
     {
-      "id": "68d0a975-a50b-465a-9d18-06325d8ee13f",
+      "id": "0db93211-accd-4b19-844c-e457a7868d0a",
       "instrumentId": "eec2ca58-abcd-438e-9ab8-d9e328093ace",
       "instrumentName": "（ラップ専用）ＳＢＩ・ゴールド",
       "accountId": "sbi-wrap:AI投資",
       "accountName": "AI投資",
       "sortOrder": 8,
       "quantity": 1,
-      "marketValueMinor": 1468,
-      "bookValueMinor": 1453,
+      "marketValueMinor": 1474,
+      "bookValueMinor": 1472,
       "metrics": [
         {
           "code": "account_type",
@@ -401,14 +432,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 15,
+          "integerValue": 2,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.01032346868547832,
+          "realValue": 0.001358695652173913,
           "textValue": null
         }
       ],
@@ -433,15 +464,15 @@
       ]
     },
     {
-      "id": "537cb043-88f6-4bb7-86ab-edc783d80565",
+      "id": "3890345f-19b7-49ef-abb7-6e00482c1ed6",
       "instrumentId": "b8cae33b-1ee5-40ef-be9e-b6232829e0fa",
       "instrumentName": "現金",
       "accountId": "sbi-wrap:AI投資",
       "accountName": "AI投資",
       "sortOrder": 9,
       "quantity": 1,
-      "marketValueMinor": 208,
-      "bookValueMinor": 207,
+      "marketValueMinor": 203,
+      "bookValueMinor": 204,
       "metrics": [
         {
           "code": "account_type",
@@ -451,14 +482,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 1,
+          "integerValue": -1,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.004830917874396135,
+          "realValue": -0.004901960784313725,
           "textValue": null
         }
       ],
@@ -483,15 +514,15 @@
       ]
     },
     {
-      "id": "75ef8e99-9a75-4d19-8596-a3a0417d04c3",
+      "id": "fcb82f88-b97c-4d08-a9bf-c5cf84a70566",
       "instrumentId": "52ca9074-a9e1-479c-a193-fd63a43c3ee0",
       "instrumentName": "ラップ専用・世界株式アクティブ（グローバル・マルチテーマ）",
       "accountId": "sbi-wrap:匠の運用",
       "accountName": "匠の運用",
       "sortOrder": 10,
       "quantity": 1,
-      "marketValueMinor": 2979,
-      "bookValueMinor": 2951,
+      "marketValueMinor": 2856,
+      "bookValueMinor": 2873,
       "metrics": [
         {
           "code": "account_type",
@@ -501,14 +532,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 28,
+          "integerValue": -17,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.009488309047780414,
+          "realValue": -0.005917159763313609,
           "textValue": null
         }
       ],
@@ -533,15 +564,15 @@
       ]
     },
     {
-      "id": "466c917b-c0fa-4152-ba07-46f112b088f6",
+      "id": "accd7c7a-e218-460f-b1ad-c01863861238",
       "instrumentId": "a140700b-49db-4c7f-a31f-f5be82af58f9",
       "instrumentName": "ラップ専用・世界株式アクティブ（グローバル・バリュー）",
       "accountId": "sbi-wrap:匠の運用",
       "accountName": "匠の運用",
       "sortOrder": 11,
       "quantity": 1,
-      "marketValueMinor": 2768,
-      "bookValueMinor": 2742,
+      "marketValueMinor": 2766,
+      "bookValueMinor": 2782,
       "metrics": [
         {
           "code": "account_type",
@@ -551,14 +582,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 26,
+          "integerValue": -16,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.009482129832239242,
+          "realValue": -0.005751258087706686,
           "textValue": null
         }
       ],
@@ -583,15 +614,15 @@
       ]
     },
     {
-      "id": "bbd9085e-a83c-4a3b-8ee0-e406497da28c",
+      "id": "60b68b36-44bd-4e61-aa9c-03a48c7567e2",
       "instrumentId": "d12440f6-c903-49ce-8e81-27e0e286ecd8",
       "instrumentName": "ラップ専用・日本株式アクティブ（セレクト・オポチュニティ）",
       "accountId": "sbi-wrap:匠の運用",
       "accountName": "匠の運用",
       "sortOrder": 12,
       "quantity": 1,
-      "marketValueMinor": 783,
-      "bookValueMinor": 776,
+      "marketValueMinor": 770,
+      "bookValueMinor": 774,
       "metrics": [
         {
           "code": "account_type",
@@ -601,14 +632,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 7,
+          "integerValue": -4,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.00902061855670103,
+          "realValue": -0.00516795865633075,
           "textValue": null
         }
       ],
@@ -633,15 +664,15 @@
       ]
     },
     {
-      "id": "12aaec20-8384-4c2f-9587-5296f7d605b9",
+      "id": "4c472278-aa64-492f-9d98-ebe949f2a8db",
       "instrumentId": "00e9627e-bc24-4ecf-a462-95ea62f5eeb4",
       "instrumentName": "ラップ専用・外国債券アクティブ",
       "accountId": "sbi-wrap:匠の運用",
       "accountName": "匠の運用",
       "sortOrder": 13,
       "quantity": 1,
-      "marketValueMinor": 501,
-      "bookValueMinor": 496,
+      "marketValueMinor": 495,
+      "bookValueMinor": 498,
       "metrics": [
         {
           "code": "account_type",
@@ -651,14 +682,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 5,
+          "integerValue": -3,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.010080645161290322,
+          "realValue": -0.006024096385542169,
           "textValue": null
         }
       ],
@@ -683,15 +714,15 @@
       ]
     },
     {
-      "id": "3272f808-af47-4bcb-90d8-12868b90388d",
+      "id": "3d49a5c6-e580-4064-bc29-266e6cdf271d",
       "instrumentId": "298cc58f-dc4a-43dc-82d8-94cc92da5ca5",
       "instrumentName": "ラップ専用・外国国債アクティブ（為替ヘッジあり）",
       "accountId": "sbi-wrap:匠の運用",
       "accountName": "匠の運用",
       "sortOrder": 14,
       "quantity": 1,
-      "marketValueMinor": 798,
-      "bookValueMinor": 790,
+      "marketValueMinor": 796,
+      "bookValueMinor": 801,
       "metrics": [
         {
           "code": "account_type",
@@ -701,14 +732,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 8,
+          "integerValue": -5,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.010126582278481013,
+          "realValue": -0.006242197253433208,
           "textValue": null
         }
       ],
@@ -733,15 +764,15 @@
       ]
     },
     {
-      "id": "1c9c9e4f-582c-47e9-9340-d0000086ebe5",
+      "id": "0320f43f-4b1b-457d-9fd0-ddc096bd4207",
       "instrumentId": "4f9a5ae4-27cc-4d1e-9703-6efad2ed747c",
       "instrumentName": "ラップ専用・米国ハイ・イールド債券アクティブ",
       "accountId": "sbi-wrap:匠の運用",
       "accountName": "匠の運用",
       "sortOrder": 15,
       "quantity": 1,
-      "marketValueMinor": 501,
-      "bookValueMinor": 496,
+      "marketValueMinor": 494,
+      "bookValueMinor": 497,
       "metrics": [
         {
           "code": "account_type",
@@ -751,14 +782,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 5,
+          "integerValue": -3,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.010080645161290322,
+          "realValue": -0.006036217303822937,
           "textValue": null
         }
       ],
@@ -783,15 +814,15 @@
       ]
     },
     {
-      "id": "176fed72-1ceb-4d8e-9d24-1173522a2481",
+      "id": "e52efc03-df02-4ca1-9ea7-ba7e2369157b",
       "instrumentId": "69f53616-5ebe-4e40-94d9-2aa5488404bf",
       "instrumentName": "ラップ専用・日本債券アクティブ（クレジット戦略型）",
       "accountId": "sbi-wrap:匠の運用",
       "accountName": "匠の運用",
       "sortOrder": 16,
       "quantity": 1,
-      "marketValueMinor": 501,
-      "bookValueMinor": 496,
+      "marketValueMinor": 499,
+      "bookValueMinor": 502,
       "metrics": [
         {
           "code": "account_type",
@@ -801,14 +832,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 5,
+          "integerValue": -3,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.010080645161290322,
+          "realValue": -0.00597609561752988,
           "textValue": null
         }
       ],
@@ -833,15 +864,15 @@
       ]
     },
     {
-      "id": "eff58e13-1a2d-4db5-aa11-bbbdf72ef9f5",
+      "id": "972265a1-363d-461d-b587-a7d1f649f60d",
       "instrumentId": "bada9d28-5773-4cff-9b5b-72216bfba22e",
       "instrumentName": "ラップ専用・グローバルＲＥＩＴアクティブ",
       "accountId": "sbi-wrap:匠の運用",
       "accountName": "匠の運用",
       "sortOrder": 17,
       "quantity": 1,
-      "marketValueMinor": 655,
-      "bookValueMinor": 649,
+      "marketValueMinor": 656,
+      "bookValueMinor": 660,
       "metrics": [
         {
           "code": "account_type",
@@ -851,14 +882,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 6,
+          "integerValue": -4,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.009244992295839754,
+          "realValue": -0.006060606060606061,
           "textValue": null
         }
       ],
@@ -883,15 +914,15 @@
       ]
     },
     {
-      "id": "574764ba-8da4-4725-8fef-c9951e1ca022",
+      "id": "54008672-fe69-4611-9f59-1c2de04eaff4",
       "instrumentId": "5a433ccb-6e44-4a9d-bf09-cd2f60c20173",
       "instrumentName": "ラップ専用・Ｊ−ＲＥＩＴアクティブ",
       "accountId": "sbi-wrap:匠の運用",
       "accountName": "匠の運用",
       "sortOrder": 18,
       "quantity": 1,
-      "marketValueMinor": 502,
-      "bookValueMinor": 497,
+      "marketValueMinor": 509,
+      "bookValueMinor": 512,
       "metrics": [
         {
           "code": "account_type",
@@ -901,14 +932,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 5,
+          "integerValue": -3,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.01006036217303823,
+          "realValue": -0.005859375,
           "textValue": null
         }
       ],
@@ -933,15 +964,15 @@
       ]
     },
     {
-      "id": "491dc8d5-6172-4340-8ef4-b435b64cbbb0",
+      "id": "acc9f074-121f-4d27-babb-37ea3c5ffe0b",
       "instrumentId": "314d78fe-b09c-462b-8b2a-33c6ac5b3ed5",
       "instrumentName": "現金",
       "accountId": "sbi-wrap:匠の運用",
       "accountName": "匠の運用",
       "sortOrder": 19,
       "quantity": 1,
-      "marketValueMinor": 107,
-      "bookValueMinor": 107,
+      "marketValueMinor": 101,
+      "bookValueMinor": 101,
       "metrics": [
         {
           "code": "account_type",
@@ -983,15 +1014,15 @@
       ]
     },
     {
-      "id": "3b96f371-c5d1-411c-8a64-91f944a1a8dd",
+      "id": "77d32333-53e2-4dc9-a1f0-f05ad2de3631",
       "instrumentId": "50602be0-20aa-4d9a-91b7-7240a6ceccb3",
       "instrumentName": "マルチアセット戦略ファンド・トリプル（ラップ専用）",
       "accountId": "sbi-wrap:レバナビ",
       "accountName": "レバナビ",
       "sortOrder": 20,
       "quantity": 1,
-      "marketValueMinor": 1914,
-      "bookValueMinor": 1879,
+      "marketValueMinor": 1834,
+      "bookValueMinor": 1837,
       "metrics": [
         {
           "code": "account_type",
@@ -1001,14 +1032,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 35,
+          "integerValue": -3,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.018626929217668974,
+          "realValue": -0.001633097441480675,
           "textValue": null
         }
       ],
@@ -1033,15 +1064,15 @@
       ]
     },
     {
-      "id": "d1ed6c2a-b15d-4737-8657-b91e45f1766d",
+      "id": "11d5fa95-cd91-4b9b-8be5-ac365502d544",
       "instrumentId": "5ccedcdf-2879-4898-97cf-c9c77ef840e9",
       "instrumentName": "マルチアセット戦略ファンド・シングル（ラップ専用）",
       "accountId": "sbi-wrap:レバナビ",
       "accountName": "レバナビ",
       "sortOrder": 21,
       "quantity": 1,
-      "marketValueMinor": 8171,
-      "bookValueMinor": 8020,
+      "marketValueMinor": 8051,
+      "bookValueMinor": 8066,
       "metrics": [
         {
           "code": "account_type",
@@ -1051,14 +1082,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 151,
+          "integerValue": -15,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.018827930174563592,
+          "realValue": -0.0018596578229605754,
           "textValue": null
         }
       ],
@@ -1083,15 +1114,15 @@
       ]
     },
     {
-      "id": "817414bf-f631-4fa4-a514-9784525920f8",
+      "id": "1b94d90f-e2e6-4ba8-8d12-e14efe9d7541",
       "instrumentId": "9d7796fc-d9b0-4e67-95fc-4e7deccf2123",
       "instrumentName": "現金",
       "accountId": "sbi-wrap:レバナビ",
       "accountName": "レバナビ",
       "sortOrder": 22,
       "quantity": 1,
-      "marketValueMinor": 103,
-      "bookValueMinor": 101,
+      "marketValueMinor": 97,
+      "bookValueMinor": 97,
       "metrics": [
         {
           "code": "account_type",
@@ -1101,14 +1132,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 2,
+          "integerValue": 0,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.019801980198019802,
+          "realValue": 0,
           "textValue": null
         }
       ],
@@ -1133,15 +1164,15 @@
       ]
     },
     {
-      "id": "19847603-f17c-41cf-bb89-bbc194727c2a",
+      "id": "b4a82e40-2486-4f3a-b114-722dbbd7fc9f",
       "instrumentId": "b9ccb308-8676-4e6f-a41c-6d26b0513a8b",
       "instrumentName": "マルチアセット戦略ファンド・トリプル（ラップ専用）",
       "accountId": "sbi-wrap:レバチョイス",
       "accountName": "レバチョイス",
       "sortOrder": 23,
       "quantity": 1,
-      "marketValueMinor": 9440,
-      "bookValueMinor": 9064,
+      "marketValueMinor": 9044,
+      "bookValueMinor": 9044,
       "metrics": [
         {
           "code": "account_type",
@@ -1151,14 +1182,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 376,
+          "integerValue": 0,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.04148278905560459,
+          "realValue": 0,
           "textValue": null
         }
       ],
@@ -1183,15 +1214,15 @@
       ]
     },
     {
-      "id": "f2dfe02a-7e81-4fac-ae16-f06f42b2df1c",
+      "id": "5e543f8d-86a0-48c0-8924-3a221a3add39",
       "instrumentId": "c586196d-6679-40a2-9636-1ef710ce6815",
       "instrumentName": "マルチアセット戦略ファンド・シングル（ラップ専用）",
       "accountId": "sbi-wrap:レバチョイス",
       "accountName": "レバチョイス",
       "sortOrder": 24,
       "quantity": 1,
-      "marketValueMinor": 869,
-      "bookValueMinor": 834,
+      "marketValueMinor": 856,
+      "bookValueMinor": 856,
       "metrics": [
         {
           "code": "account_type",
@@ -1201,14 +1232,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 35,
+          "integerValue": 0,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.04196642685851319,
+          "realValue": 0,
           "textValue": null
         }
       ],
@@ -1233,15 +1264,15 @@
       ]
     },
     {
-      "id": "d70abdb1-dc9b-47de-9b24-a2dbad903ef9",
+      "id": "4e167cb9-0379-49b5-a36d-96329df6de12",
       "instrumentId": "96e1cc99-ae4a-4a97-91d4-f31648c675ee",
       "instrumentName": "現金",
       "accountId": "sbi-wrap:レバチョイス",
       "accountName": "レバチョイス",
       "sortOrder": 25,
       "quantity": 1,
-      "marketValueMinor": 106,
-      "bookValueMinor": 102,
+      "marketValueMinor": 100,
+      "bookValueMinor": 100,
       "metrics": [
         {
           "code": "account_type",
@@ -1251,14 +1282,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 4,
+          "integerValue": 0,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.0392156862745098,
+          "realValue": 0,
           "textValue": null
         }
       ],
@@ -1283,15 +1314,15 @@
       ]
     },
     {
-      "id": "d15c7fca-14ac-4a28-bb0c-abe61fce4a5c",
+      "id": "cee6ed21-e276-4ce9-bdde-de5967b1735c",
       "instrumentId": "d77cad81-0b4d-40dc-bc7c-4c145dcd865d",
       "instrumentName": "ラップ専用・三井住友ＤＳ・米国株式セクター戦略ファンド",
       "accountId": "sbi-wrap:ALL株式",
       "accountName": "ALL株式",
       "sortOrder": 26,
       "quantity": 1,
-      "marketValueMinor": 2806,
-      "bookValueMinor": 2790,
+      "marketValueMinor": 2741,
+      "bookValueMinor": 2802,
       "metrics": [
         {
           "code": "account_type",
@@ -1301,14 +1332,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 16,
+          "integerValue": -61,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.005734767025089606,
+          "realValue": -0.021770164168451105,
           "textValue": null
         }
       ],
@@ -1333,15 +1364,15 @@
       ]
     },
     {
-      "id": "a3ced5de-8914-40c3-a809-d9bdf45e2dff",
+      "id": "ad63e078-7205-4b26-971f-13f66db8c1cc",
       "instrumentId": "3715f0c2-3fa7-4dbe-9cc4-f626d698b512",
       "instrumentName": "ラップ専用・三井住友ＤＳ・米国株式ファクター戦略ファンド",
       "accountId": "sbi-wrap:ALL株式",
       "accountName": "ALL株式",
       "sortOrder": 27,
       "quantity": 1,
-      "marketValueMinor": 4160,
-      "bookValueMinor": 4136,
+      "marketValueMinor": 3988,
+      "bookValueMinor": 4076,
       "metrics": [
         {
           "code": "account_type",
@@ -1351,14 +1382,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 24,
+          "integerValue": -88,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.005802707930367505,
+          "realValue": -0.021589793915603533,
           "textValue": null
         }
       ],
@@ -1383,15 +1414,15 @@
       ]
     },
     {
-      "id": "69716fbe-9dbf-4bb7-8ece-3afd502b468e",
+      "id": "48b006be-60ae-4982-be57-975a3a076e7c",
       "instrumentId": "9701c1b8-29b3-4f5e-99b4-b7eb05f6e23a",
       "instrumentName": "ラップ専用・三井住友ＤＳ・グローバル株式（除く米国）戦略ファンド",
       "accountId": "sbi-wrap:ALL株式",
       "accountName": "ALL株式",
       "sortOrder": 28,
       "quantity": 1,
-      "marketValueMinor": 2988,
-      "bookValueMinor": 2970,
+      "marketValueMinor": 2956,
+      "bookValueMinor": 3021,
       "metrics": [
         {
           "code": "account_type",
@@ -1401,14 +1432,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 18,
+          "integerValue": -65,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.006060606060606061,
+          "realValue": -0.021516054286660046,
           "textValue": null
         }
       ],
@@ -1433,15 +1464,15 @@
       ]
     },
     {
-      "id": "f2bfba6e-9702-4b6e-88cf-a748178987a9",
+      "id": "02de80a7-76ff-4638-bb86-b0c65bd1c8a3",
       "instrumentId": "0c02eed3-d4cb-4f1e-96b9-4e08313e7c3b",
       "instrumentName": "現金",
       "accountId": "sbi-wrap:ALL株式",
       "accountName": "ALL株式",
       "sortOrder": 29,
       "quantity": 1,
-      "marketValueMinor": 105,
-      "bookValueMinor": 104,
+      "marketValueMinor": 99,
+      "bookValueMinor": 101,
       "metrics": [
         {
           "code": "account_type",
@@ -1451,14 +1482,14 @@
         },
         {
           "code": "unrealized_gain_minor",
-          "integerValue": 1,
+          "integerValue": -2,
           "realValue": null,
           "textValue": null
         },
         {
           "code": "unrealized_gain_rate",
           "integerValue": null,
-          "realValue": 0.009615384615384616,
+          "realValue": -0.019801980198019802,
           "textValue": null
         }
       ],

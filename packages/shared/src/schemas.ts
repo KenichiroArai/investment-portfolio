@@ -78,6 +78,11 @@ export const portfolioSnapshotMetricInputSchema = z.object({
   textValue: z.string().max(512).nullable().optional(),
 });
 
+export const upsertSnapshotMetricsSchema = z.object({
+  asOfDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  metrics: z.array(portfolioSnapshotMetricInputSchema).min(1),
+});
+
 export const holdingLineInputSchema = z.object({
   instrumentId: z.string().uuid(),
   accountId: z.string().min(1).max(128),
@@ -134,6 +139,7 @@ export type HoldingLineInput = z.infer<typeof holdingLineInputSchema>;
 export type ReplaceCurrentSnapshotInput = z.infer<
   typeof replaceCurrentSnapshotSchema
 >;
+export type UpsertSnapshotMetricsInput = z.infer<typeof upsertSnapshotMetricsSchema>;
 
 export const snapshotTrendsQuerySchema = z.object({
   from: z

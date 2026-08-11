@@ -20,7 +20,7 @@ type ManageAsOfDateFieldProps =
     };
 
 const HELP_TEXT =
-  "登録・更新・削除の対象となるスナップショットの日付です。閲覧画面の基準日切り替えとは別です。";
+  "登録・更新・削除の対象となるスナップショットの日付です。閲覧画面の基準日切り替えとは別です。汎用指標はこの基準日から次の更新まで有効で、保有明細は変更しません。";
 
 export function ManageAsOfDateField(props: ManageAsOfDateFieldProps) {
   let result = (

@@ -21,6 +21,7 @@ import type {
   UpdateClassificationValueInput,
   UpdateInstrumentInput,
   UpdatePortfolioInput,
+  UpsertSnapshotMetricsInput,
 } from "@repo/shared";
 import { buildBackupZipFilename } from "@repo/shared";
 
@@ -515,6 +516,20 @@ export async function setInstrumentClassifications(
 export async function fetchCurrentSnapshot(portfolioCode: string) {
   let result = await requestJson<CurrentSnapshotDto>(
     `/portfolios/${encodePortfolioCodeForPath(portfolioCode)}/snapshot/current`,
+  );
+  return result;
+}
+
+export async function upsertSnapshotMetrics(
+  portfolioCode: string,
+  input: UpsertSnapshotMetricsInput,
+) {
+  let result = await requestWritableJson<CurrentSnapshotDto>(
+    `/portfolios/${encodePortfolioCodeForPath(portfolioCode)}/snapshots/${encodeURIComponent(input.asOfDate)}/metrics`,
+    {
+      method: "PUT",
+      body: JSON.stringify({ metrics: input.metrics }),
+    },
   );
   return result;
 }

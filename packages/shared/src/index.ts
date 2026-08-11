@@ -50,6 +50,7 @@ export * from "./sbi-wrap-analysis";
 export * from "./sbi-wrap-instrument-match";
 export * from "./sbi-wrap-paste";
 export * from "./sbi-wrap-paste-utils";
+export * from "./sbi-wrap-product-costs";
 export * from "./portfolio-kind-features";
 export * from "./snapshot-line-validation";
 export * from "./backup-manifest";

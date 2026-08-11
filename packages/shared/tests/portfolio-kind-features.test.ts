@@ -29,6 +29,16 @@ describe("portfolio-kind-features", () => {
     expect(shouldShowHoldingColumn("sbi-wrap", "unitPrice")).toBe(false);
   });
 
+  it("lists sbi-wrap product cost portfolio metrics", () => {
+    expect(getPortfolioKindFeatures("sbi-wrap").portfolioMetrics).toEqual([
+      "sbi_wrap_product_cost_ai_investment",
+      "sbi_wrap_product_cost_takumi",
+      "sbi_wrap_product_cost_rebanavi",
+      "sbi_wrap_product_cost_reba_choice",
+      "sbi_wrap_product_cost_all_equity",
+    ]);
+  });
+
   it("returns default features and unit price metric code for unknown kind", () => {
     expect(getPortfolioKindFeatures("unknown").holdingLineColumns).toContain("instrumentName");
     expect(getHoldingUnitPriceMetricCode("ideco")).toBe("unit_price_per_10k_lots");

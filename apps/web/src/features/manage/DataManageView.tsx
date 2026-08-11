@@ -1,6 +1,10 @@
 "use client";
 
-import type { CurrentSnapshotDto, InstrumentListItemDto } from "@repo/shared";
+import type {
+  CurrentSnapshotDto,
+  InstrumentListItemDto,
+} from "@repo/shared";
+import { buildClearedPortfolioMetricInput } from "@repo/shared";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -46,10 +50,8 @@ import {
 import { HoldingsDataTab } from "@/features/manage/HoldingsDataTab";
 import {
   buildReplaceSnapshotInput,
-  removeMetricByCode,
   snapshotToHoldingInputs,
   snapshotToMetricInputs,
-  upsertMetric,
 } from "@/features/manage/snapshot-input";
 import { WritableGuard } from "@/features/manage/WritableGuard";
 import { BackupPanel } from "@/features/backup/BackupPanel";
@@ -64,6 +66,7 @@ import {
   replaceCurrentSnapshot,
   setInstrumentClassifications,
   updateInstrument,
+  upsertSnapshotMetrics,
 } from "@/lib/api-client";
 import { formatYen } from "@/lib/format-yen";
 import {
@@ -269,14 +272,27 @@ export function DataManageView({
       return result;
     }
 
-    const existingLines = snapshot ? snapshotToHoldingInputs(snapshot) : [];
-    const existingMetrics = snapshot ? snapshotToMetricInputs(snapshot) : [];
-    const metrics = upsertMetric(existingMetrics, { code: metricCode, integerValue });
-
-    const saved = await saveSnapshot(existingLines, metrics, "汎用指標を登録しました。");
-    if (saved) {
-      setMetricValue("");
+    const date = asOfDate.trim() || snapshot?.asOfDate || "";
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      toast.error("操作対象の基準日を YYYY-MM-DD 形式で入力してください。");
+      return result;
     }
+
+    setSubmitting(true);
+    const response = await upsertSnapshotMetrics(portfolioCode, {
+      asOfDate: date,
+      metrics: [{ code: metricCode, integerValue }],
+    });
+    setSubmitting(false);
+
+    if (!response.ok) {
+      toast.error(response.message);
+      return result;
+    }
+
+    toast.success("汎用指標を登録しました。");
+    setMetricValue("");
+    await load();
     return result;
   }
 
@@ -320,18 +336,31 @@ export function DataManageView({
 
   async function handleDeleteMetric() {
     let result: void = undefined;
-    if (!snapshot || !deleteMetricCode) {
+    if (!deleteMetricCode) {
       return result;
     }
 
-    const metrics = removeMetricByCode(
-      snapshotToMetricInputs(snapshot),
-      deleteMetricCode,
-    );
-    const saved = await saveSnapshot(snapshotToHoldingInputs(snapshot), metrics, "汎用指標を削除しました。");
-    if (saved) {
-      setDeleteMetricCode(null);
+    const date = asOfDate.trim() || snapshot?.asOfDate || "";
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      toast.error("操作対象の基準日を YYYY-MM-DD 形式で入力してください。");
+      return result;
     }
+
+    setSubmitting(true);
+    const response = await upsertSnapshotMetrics(portfolioCode, {
+      asOfDate: date,
+      metrics: [buildClearedPortfolioMetricInput(deleteMetricCode)],
+    });
+    setSubmitting(false);
+
+    if (!response.ok) {
+      toast.error(response.message);
+      return result;
+    }
+
+    setDeleteMetricCode(null);
+    toast.success("汎用指標を削除しました。");
+    await load();
     return result;
   }
 
@@ -498,6 +527,10 @@ export function DataManageView({
               <Card>
                 <CardHeader>
                   <CardTitle>汎用指標を登録</CardTitle>
+                  <CardDescription>
+                    登録した値は、同じ指標が次に更新されるまで有効です（例: 7/22
+                    に登録すれば、その後の保有日にも自動で適用されます）。明細の複製は行いません。
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <form className="grid max-w-lg gap-4" onSubmit={handleAddMetric}>
@@ -565,15 +598,28 @@ export function DataManageView({
                               initialValue={metric.integerValue ?? 0}
                               disabled={submitting}
                               onSave={async (integerValue) => {
-                                const metrics = upsertMetric(
-                                  snapshotToMetricInputs(snapshot),
-                                  { code: metric.code, integerValue },
-                                );
-                                await saveSnapshot(
-                                  snapshotToHoldingInputs(snapshot),
-                                  metrics,
-                                  "汎用指標を更新しました。",
-                                );
+                                const date = asOfDate.trim() || snapshot.asOfDate;
+                                if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+                                  toast.error(
+                                    "操作対象の基準日を YYYY-MM-DD 形式で入力してください。",
+                                  );
+                                  return;
+                                }
+
+                                setSubmitting(true);
+                                const response = await upsertSnapshotMetrics(portfolioCode, {
+                                  asOfDate: date,
+                                  metrics: [{ code: metric.code, integerValue }],
+                                });
+                                setSubmitting(false);
+
+                                if (!response.ok) {
+                                  toast.error(response.message);
+                                  return;
+                                }
+
+                                toast.success("汎用指標を更新しました。");
+                                await load();
                               }}
                               onDelete={() => {
                                 setDeleteMetricCode(metric.code);
