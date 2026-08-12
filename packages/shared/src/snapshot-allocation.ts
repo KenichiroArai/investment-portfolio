@@ -263,6 +263,13 @@ function attributeLineAmountsByTagAllocations(
   }
   /* v8 ignore stop */
 
+  if (amountMinor === 0) {
+    for (const allocation of tagAllocations) {
+      result.set(allocation.tag.valueCode, 0);
+    }
+    return result;
+  }
+
   result = distributeAmountProportionally(weights, amountMinor);
   return result;
 }

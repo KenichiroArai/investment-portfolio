@@ -180,6 +180,58 @@ describe("snapshot-allocation", () => {
     expect(metrics.unrealizedGainRate).toBeNull();
   });
 
+  it("groups zero gain lines without losing gain data", () => {
+    const lines = [
+      makeLine(9_000, [
+        {
+          schemeCode: "sbi_wrap_product",
+          schemeName: "商品",
+          valueCode: "reba_choice",
+          valueName: "レバチョイス",
+          sortOrder: 4,
+          allocationWeight: 1,
+        },
+      ], {
+        bookValueMinor: 9_000,
+        metrics: [
+          {
+            code: IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor,
+            integerValue: 0,
+            realValue: null,
+            textValue: null,
+          },
+        ],
+      }),
+      makeLine(1_000, [
+        {
+          schemeCode: "sbi_wrap_product",
+          schemeName: "商品",
+          valueCode: "reba_choice",
+          valueName: "レバチョイス",
+          sortOrder: 4,
+          allocationWeight: 1,
+        },
+      ], {
+        bookValueMinor: 1_000,
+        metrics: [
+          {
+            code: IDECO_KAKEIBO_METRIC_CODES.unrealizedGainMinor,
+            integerValue: 0,
+            realValue: null,
+            textValue: null,
+          },
+        ],
+      }),
+    ];
+
+    const slices = groupSnapshotLinesByTag(lines, "sbi_wrap_product");
+
+    expect(slices).toHaveLength(1);
+    expect(slices[0]?.valueCode).toBe("reba_choice");
+    expect(slices[0]?.unrealizedGainMinor).toBe(0);
+    expect(slices[0]?.unrealizedGainRate).toBe(0);
+  });
+
   it("computes portfolio gain from asset balance and contributions", () => {
     expect(computeSnapshotPortfolioGainMinor(300_000, 2716679)).toBe(
       300_000 - 2_716_679,
