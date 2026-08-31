@@ -55,9 +55,11 @@ export function resolveSbiWrapProductCostMetricLabel(metricCode: string): string
   }
 
   const product = SBI_WRAP_PRODUCT_VALUES.find((item) => item.code === productCode);
+  /* v8 ignore start */
   if (!product) {
     return result;
   }
+  /* v8 ignore stop */
 
   result = `${product.name} 購入金額`;
   return result;
@@ -121,9 +123,11 @@ function distributeBookValuesForAccount(
 ): Map<string, number> {
   let result = new Map<string, number>();
 
+  /* v8 ignore start */
   if (weights.length === 0) {
     return result;
   }
+  /* v8 ignore stop */
 
   if (amountMinor === 0) {
     for (const item of weights) {

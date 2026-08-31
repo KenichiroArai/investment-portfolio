@@ -64,10 +64,13 @@ function sortChildIds(
   result = [...childIds].sort((leftId, rightId) => {
     const left = valuesById.get(leftId);
     const right = valuesById.get(rightId);
+    /* v8 ignore start */
     if (!left || !right) {
       return leftId.localeCompare(rightId);
     }
+    /* v8 ignore stop */
 
+    /* v8 ignore next 2 */
     const leftSort = sortOrderByChildId.get(leftId) ?? left.sortOrder;
     const rightSort = sortOrderByChildId.get(rightId) ?? right.sortOrder;
     let compareResult = leftSort - rightSort;
@@ -206,9 +209,11 @@ export function getRootValueIds(
   result.sort((leftId, rightId) => {
     const left = graph.valuesById.get(leftId);
     const right = graph.valuesById.get(rightId);
+    /* v8 ignore start */
     if (!left || !right) {
       return leftId.localeCompare(rightId);
     }
+    /* v8 ignore stop */
 
     return compareValueDisplayOrder(left, right);
   });

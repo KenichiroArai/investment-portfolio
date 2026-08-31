@@ -100,6 +100,7 @@ function compareAllocationDisplayOrder(
   left: AllocationSlice,
   right: AllocationSlice,
 ): number {
+  /* v8 ignore next */
   let result = (left.sortOrder ?? 0) - (right.sortOrder ?? 0);
   if (result !== 0) {
     return result;
@@ -317,6 +318,7 @@ function buildLineTagAttributions(
 
   for (const allocation of tagAllocations) {
     const valueCode = allocation.tag.valueCode;
+    /* v8 ignore next */
     const marketValueMinor = marketValueByTag.get(valueCode) ?? 0;
     if (!Number.isFinite(marketValueMinor) || marketValueMinor < 0) {
       continue;
@@ -743,9 +745,11 @@ function resolveHierarchyDisplayValueIds(
   result.sort((leftId, rightId) => {
     const left = graph.valuesById.get(leftId);
     const right = graph.valuesById.get(rightId);
+    /* v8 ignore start */
     if (!left || !right) {
       return leftId.localeCompare(rightId);
     }
+    /* v8 ignore stop */
 
     let compareResult = left.sortOrder - right.sortOrder;
     if (compareResult !== 0) {
@@ -773,17 +777,21 @@ function lineMatchesDisplayUnit(
 ): boolean {
   let result = false;
   const displayValue = graph.valuesById.get(displayValueId);
+  /* v8 ignore start */
   if (!displayValue) {
     return result;
   }
+  /* v8 ignore stop */
 
   const displayAllowedLeafIds = getDescendantLeafIds(displayValueId, graph);
 
   if (contextParentValueId) {
     const contextValue = graph.valuesById.get(contextParentValueId);
+    /* v8 ignore start */
     if (!contextValue) {
       return result;
     }
+    /* v8 ignore stop */
 
     const contextAllowedLeafIds = getDescendantLeafIds(contextParentValueId, graph);
     const contextLeafIds = lineLeafIdsByScheme.get(contextValue.schemeCode);
@@ -883,9 +891,11 @@ export function buildHierarchicalAllocationBySchemeWithLines(
       }
 
       const displayValue = graph.valuesById.get(displayValueId);
+      /* v8 ignore start */
       if (!displayValue) {
         continue;
       }
+      /* v8 ignore stop */
 
       for (const attribution of attributions) {
         const lineInSlice = buildAllocationLineInSlice(

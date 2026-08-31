@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { HoldingLineInput } from "../src/schemas";
 import {
   applySbiWrapProductCostsToHoldingInputs,
+  applySbiWrapProductCostsToLines,
   buildSbiWrapProductCostMetricCode,
   buildSbiWrapProductCostMetricInputs,
   listSbiWrapProductCostMetricCodes,
@@ -146,5 +147,62 @@ describe("sbi-wrap-product-costs", () => {
 
     const books = lines.map((item) => item.bookValueMinor);
     expect(books.reduce((sum, value) => (sum ?? 0) + (value ?? 0), 0)).toBe(10_000);
+  });
+
+  it("returns metric code unchanged for unknown product suffix", () => {
+    expect(
+      resolveSbiWrapProductCostMetricLabel("sbi_wrap_product_cost_unknown_suffix"),
+    ).toBe("sbi_wrap_product_cost_unknown_suffix");
+  });
+
+  it("ignores non-sbi-wrap accounts and zero-weight groups", () => {
+    const lines = applySbiWrapProductCostsToHoldingInputs(
+      [
+        line({
+          instrumentId: "11111111-1111-1111-1111-111111111111",
+          accountId: "monex:一般:普通預り",
+          marketValueMinor: 50_000,
+        }),
+        line({
+          instrumentId: "22222222-2222-2222-2222-222222222222",
+          accountId: "sbi-wrap:AI投資",
+          marketValueMinor: 0,
+        }),
+      ],
+      { ai_investment: 10_000 },
+    );
+
+    expect(lines[0]?.bookValueMinor).toBeNull();
+    expect(lines[1]?.bookValueMinor).toBeNull();
+  });
+
+  it("handles lines without metrics when applying costs", () => {
+    const withoutMetrics = applySbiWrapProductCostsToHoldingInputs(
+      [
+        {
+          instrumentId: "11111111-1111-1111-1111-111111111111",
+          accountId: "sbi-wrap:AI投資",
+          accountName: "AI投資",
+          quantity: 1,
+          marketValueMinor: 10_000,
+          bookValueMinor: null,
+          sortOrder: 1,
+        },
+      ],
+      { ai_investment: 8_000 },
+    );
+    expect(withoutMetrics[0]?.bookValueMinor).toBe(8_000);
+
+    const withNullMetrics = applySbiWrapProductCostsToLines(
+      [
+        {
+          accountId: "sbi-wrap:匠の運用",
+          marketValueMinor: 5_000,
+          metrics: null,
+        },
+      ],
+      { takumi: 4_000 },
+    );
+    expect(withNullMetrics[0]?.bookValueMinor).toBe(4_000);
   });
 });

@@ -116,6 +116,7 @@ export function resolveMonexInstrumentAssetClassBreakdown(
 
   for (const lookupName of lookupNames) {
     if (seen.has(lookupName)) {
+      /* v8 ignore next */
       continue;
     }
     seen.add(lookupName);

@@ -3,6 +3,8 @@ import { afterEach, describe, expect, it } from "vitest";
 import { IDECO_SCHEME_CODES, MONEX_SCHEME_CODES, SnapshotValidationError } from "@repo/shared";
 
 import {
+  addClassificationLink,
+  copyClassificationValue,
   createClassificationScheme,
   createClassificationValue,
   deleteClassificationSchemeById,
@@ -15,8 +17,10 @@ import {
   getTagsForInstruments,
   listAnalysisSchemesForPortfolio,
   listClassificationSchemesByPortfolioCode,
+  listClassificationValuesBySchemeId,
   listInstrumentClassificationValueIds,
   listSchemesWithValuesForPortfolio,
+  removeClassificationLink,
   setInstrumentClassifications,
   setInstrumentClassificationsWithWeights,
   updateClassificationSchemeName,
@@ -904,6 +908,169 @@ describe("portfolio repositories", () => {
     expect(replacement.id).toBeTruthy();
   });
 
+  it("manages classification links and copies subtrees", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+    const scheme = await createClassificationScheme(db, {
+      portfolioCode: "ideco",
+      code: "asset_class",
+      name: "資産クラス",
+    });
+    const parent = await createClassificationValue(db, {
+      schemeId: scheme!.id,
+      code: "stock",
+      name: "株式",
+      sortOrder: 0,
+    });
+    const child = await createClassificationValue(db, {
+      schemeId: scheme!.id,
+      code: "domestic",
+      name: "国内株式",
+      sortOrder: 1,
+    });
+
+    const linkResult = await addClassificationLink(db, {
+      parentValueId: parent.id,
+      childValueId: child.id,
+      sortOrder: 1,
+    });
+    expect(linkResult.ok).toBe(true);
+
+    const duplicateLink = await addClassificationLink(db, {
+      parentValueId: parent.id,
+      childValueId: child.id,
+    });
+    expect(duplicateLink.ok).toBe(false);
+
+    const copyResult = await copyClassificationValue(db, parent.id, {
+      mode: "with_subtree",
+      code: "stock_copy",
+      name: "株式（コピー）",
+    });
+    expect(copyResult.ok).toBe(true);
+    if (copyResult.ok) {
+      expect(copyResult.copiedValueIds.length).toBe(2);
+      expect(copyResult.value.code).toBe("stock_copy");
+    }
+
+    const copiedChild = copyResult.ok
+      ? await findClassificationValueById(db, copyResult.copiedValueIds[1]!)
+      : null;
+    expect(copiedChild?.code).toBe("domestic_copy");
+
+    const schemeValues = await listClassificationValuesBySchemeId(db, scheme!.id);
+    expect(schemeValues.some((value) => value.code === "stock_copy")).toBe(true);
+
+    const withLinks = await listSchemesWithValuesForPortfolio(db, "ideco");
+    expect(withLinks[0]?.links.length).toBeGreaterThanOrEqual(1);
+    expect(await listSchemesWithValuesForPortfolio(db, "missing")).toEqual([]);
+
+    const duplicateCode = await copyClassificationValue(db, parent.id, {
+      mode: "value_only",
+      code: "stock",
+    });
+    expect(duplicateCode.ok).toBe(false);
+
+    await removeClassificationLink(db, {
+      parentValueId: parent.id,
+      childValueId: child.id,
+    });
+    const missingCopy = await copyClassificationValue(db, "missing-value", {
+      mode: "value_only",
+    });
+    expect(missingCopy.ok).toBe(false);
+  });
+
+  it("rejects non-leaf classification tags on instruments", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+    const scheme = await createClassificationScheme(db, {
+      portfolioCode: "ideco",
+      code: "asset_class",
+      name: "資産クラス",
+    });
+    const parent = await createClassificationValue(db, {
+      schemeId: scheme!.id,
+      code: "stock",
+      name: "株式",
+      sortOrder: 0,
+    });
+    const child = await createClassificationValue(db, {
+      schemeId: scheme!.id,
+      code: "domestic",
+      name: "国内株式",
+      sortOrder: 1,
+    });
+    await addClassificationLink(db, {
+      parentValueId: parent.id,
+      childValueId: child.id,
+    });
+    const instrument = await createInstrument(db, { name: "Tagged fund" });
+
+    await expect(
+      setInstrumentClassificationsWithWeights(db, instrument.id, [
+        { classificationValueId: parent.id, allocationWeight: 1 },
+      ]),
+    ).rejects.toThrow("NON_LEAF_CLASSIFICATION_TAG");
+  });
+
+  it("rejects cross-portfolio classification links", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+    await createPortfolio(db, {
+      code: "monex",
+      name: "Monex",
+      kind: "monex",
+    });
+    const idecoScheme = await createClassificationScheme(db, {
+      portfolioCode: "ideco",
+      code: "region",
+      name: "地域",
+    });
+    const monexScheme = await createClassificationScheme(db, {
+      portfolioCode: "monex",
+      code: "asset_class",
+      name: "資産クラス",
+    });
+    const idecoValue = await createClassificationValue(db, {
+      schemeId: idecoScheme!.id,
+      code: "japan",
+      name: "日本",
+    });
+    const monexValue = await createClassificationValue(db, {
+      schemeId: monexScheme!.id,
+      code: "domestic",
+      name: "国内",
+    });
+
+    const crossPortfolioLink = await addClassificationLink(db, {
+      parentValueId: idecoValue.id,
+      childValueId: monexValue.id,
+    });
+    expect(crossPortfolioLink.ok).toBe(false);
+    if (!crossPortfolioLink.ok) {
+      expect(crossPortfolioLink.reason).toBe("異なる口座の分類値はリンクできません。");
+    }
+
+    const missingLink = await addClassificationLink(db, {
+      parentValueId: "missing-parent",
+      childValueId: monexValue.id,
+    });
+    expect(missingLink.ok).toBe(false);
+  });
+
   it("filters ideco analysis schemes and returns empty for missing portfolio", async () => {
     const db = setup();
     await createPortfolio(db, {
@@ -1725,6 +1892,70 @@ describe("portfolio repositories", () => {
         textValue: null,
       },
     ]);
+  });
+
+  it("returns null when upserting metrics for a missing portfolio", async () => {
+    const db = setup();
+    const snapshot = await upsertSnapshotMetricsByDate(db, {
+      portfolioCode: "missing",
+      asOfDate: "2026-01-01",
+      metrics: [{ code: "ideco_total_contributions", integerValue: 1 }],
+    });
+    expect(snapshot).toBeNull();
+  });
+
+  it("updates metrics on an existing snapshot date", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+    const instrument = await createInstrument(db, { name: "Alpha Fund" });
+
+    await upsertSnapshotByDate(db, {
+      portfolioCode: "ideco",
+      asOfDate: "2026-08-02",
+      lines: [
+        {
+          instrumentId: instrument.id,
+          quantity: 1,
+          marketValueMinor: 2000,
+        },
+      ],
+      metrics: [{ code: "ideco_total_contributions", integerValue: 5_000 }],
+      setAsCurrent: true,
+    });
+
+    const updated = await upsertSnapshotMetricsByDate(db, {
+      portfolioCode: "ideco",
+      asOfDate: "2026-08-02",
+      metrics: [{ code: "ideco_total_contributions", integerValue: 8_000 }],
+    });
+
+    expect(updated?.lines).toHaveLength(1);
+    expect(updated?.metrics).toEqual([
+      {
+        code: "ideco_total_contributions",
+        integerValue: 8_000,
+        realValue: null,
+        textValue: null,
+      },
+    ]);
+
+    const withRealMetric = await upsertSnapshotMetricsByDate(db, {
+      portfolioCode: "ideco",
+      asOfDate: "2026-08-02",
+      metrics: [{ code: "custom_real_metric", realValue: 0.25 }],
+    });
+    expect(
+      withRealMetric?.metrics.find((metric) => metric.code === "custom_real_metric"),
+    ).toEqual({
+      code: "custom_real_metric",
+      integerValue: null,
+      realValue: 0.25,
+      textValue: null,
+    });
   });
 
   it("applies effective sbi-wrap product costs to holding lines on read", async () => {

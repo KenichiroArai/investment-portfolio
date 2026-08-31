@@ -109,4 +109,13 @@ describe("monex-asset-class-breakdown", () => {
       resolveMonexInstrumentAssetClassBreakdown(breakdown, "missing", ["未登録"]),
     ).toEqual([]);
   });
+
+  it("skips duplicate lookup names", () => {
+    const breakdown = new Map([
+      ["正規名", [{ valueCode: "eq", allocationWeight: 1 }]],
+    ]);
+    expect(
+      resolveMonexInstrumentAssetClassBreakdown(breakdown, "未登録", ["dup", "dup", "正規名"]),
+    ).toHaveLength(1);
+  });
 });
