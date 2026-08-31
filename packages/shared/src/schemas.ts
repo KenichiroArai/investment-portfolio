@@ -43,6 +43,23 @@ export const updateClassificationValueSchema = z.object({
   sortOrder: z.number().int(),
 });
 
+export const createClassificationValueLinkSchema = z.object({
+  parentValueId: z.string().uuid(),
+  childValueId: z.string().uuid(),
+  sortOrder: z.number().int().optional(),
+});
+
+export const deleteClassificationValueLinkSchema = z.object({
+  parentValueId: z.string().uuid(),
+  childValueId: z.string().uuid(),
+});
+
+export const copyClassificationValueSchema = z.object({
+  mode: z.enum(["value_only", "with_children", "with_subtree"]),
+  code: z.string().min(1).max(64).optional(),
+  name: z.string().min(1).max(256).optional(),
+});
+
 export const createInstrumentSchema = z.object({
   portfolioCode: z.string().min(1).max(64),
   accountId: z.string().min(1).max(128),

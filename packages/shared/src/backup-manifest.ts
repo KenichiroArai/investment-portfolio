@@ -1,12 +1,13 @@
 import { z } from "zod";
 
 export const BACKUP_FORMAT_VERSION = 1;
-export const BACKUP_SCHEMA_VERSION = "0010";
+export const BACKUP_SCHEMA_VERSION = "0012";
 
 export const BACKUP_TABLE_NAMES = [
   "portfolios",
   "classification_schemes",
   "classification_values",
+  "classification_value_links",
   "instruments",
   "instrument_classifications",
   "instrument_attributes",

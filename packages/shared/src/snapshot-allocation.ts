@@ -1,7 +1,19 @@
+import {
+  buildClassificationGraph,
+  getDescendantLeafIds,
+  getDirectChildIds,
+  getRootValueIds,
+  type ClassificationGraphValue,
+} from "./classification-hierarchy";
 import { IDECO_KAKEIBO_METRIC_CODES } from "./holding-line-metrics";
 import type { HoldingLineMetricDto } from "./holding-line-metrics";
 import { distributeAmountProportionally } from "./rebalance";
-import type { ClassificationTagDto, CurrentSnapshotDto, HoldingLineDto } from "./types";
+import type {
+  ClassificationTagDto,
+  ClassificationValueLinkDto,
+  CurrentSnapshotDto,
+  HoldingLineDto,
+} from "./types";
 
 function getLineMetricIntegerValue(
   metrics: HoldingLineMetricDto[],
@@ -629,6 +641,317 @@ export function buildAllocationBySchemeWithLinesFromSnapshots(
     result.totalMarketValueMinor += slice.marketValueMinor;
   }
 
+  return result;
+}
+
+export type HierarchyAllocationOptions = {
+  parentValueId?: string | null;
+  aggregationLevel: "parent" | "leaf";
+  includeOrphans: boolean;
+  links: ClassificationValueLinkDto[];
+  schemeValues: ClassificationGraphValue[];
+  schemeId: string;
+};
+
+function buildValueCodeBySchemeCodeMap(
+  schemeValues: ClassificationGraphValue[],
+): Map<string, Map<string, string>> {
+  let result = new Map<string, Map<string, string>>();
+
+  for (const value of schemeValues) {
+    const codeMap = result.get(value.schemeCode) ?? new Map<string, string>();
+    codeMap.set(value.code, value.id);
+    result.set(value.schemeCode, codeMap);
+  }
+
+  return result;
+}
+
+function getLineLeafValueIdsBySchemeFromTags(
+  tags: ClassificationTagDto[],
+  valueCodeBySchemeCode: Map<string, Map<string, string>>,
+): Map<string, Set<string>> {
+  let result = new Map<string, Set<string>>();
+
+  for (const tag of tags) {
+    const codeMap = valueCodeBySchemeCode.get(tag.schemeCode);
+    if (!codeMap) {
+      continue;
+    }
+
+    const valueId = codeMap.get(tag.valueCode);
+    if (!valueId) {
+      continue;
+    }
+
+    const existing = result.get(tag.schemeCode) ?? new Set<string>();
+    existing.add(valueId);
+    result.set(tag.schemeCode, existing);
+  }
+
+  return result;
+}
+
+function shouldIncludeOrphanValue(
+  valueId: string,
+  schemeId: string,
+  graph: ReturnType<typeof buildClassificationGraph>,
+  includeOrphans: boolean,
+): boolean {
+  let result = true;
+
+  if (includeOrphans) {
+    return result;
+  }
+
+  const parentIds = graph.parentIdsByChildId.get(valueId) ?? [];
+  if (parentIds.length === 0) {
+    const value = graph.valuesById.get(valueId);
+    if (value?.schemeId === schemeId) {
+      result = false;
+    }
+  }
+
+  return result;
+}
+
+function resolveHierarchyDisplayValueIds(
+  graph: ReturnType<typeof buildClassificationGraph>,
+  schemeId: string,
+  options: HierarchyAllocationOptions,
+): string[] {
+  let result: string[] = [];
+
+  if (options.parentValueId) {
+    result = getDirectChildIds(options.parentValueId, graph);
+    return result;
+  }
+
+  if (options.aggregationLevel === "parent") {
+    result = getRootValueIds(schemeId, graph);
+    return result;
+  }
+
+  for (const valueId of graph.leafValueIds) {
+    const value = graph.valuesById.get(valueId);
+    if (!value || value.schemeId !== schemeId) {
+      continue;
+    }
+    result.push(valueId);
+  }
+
+  result.sort((leftId, rightId) => {
+    const left = graph.valuesById.get(leftId);
+    const right = graph.valuesById.get(rightId);
+    if (!left || !right) {
+      return leftId.localeCompare(rightId);
+    }
+
+    let compareResult = left.sortOrder - right.sortOrder;
+    if (compareResult !== 0) {
+      return compareResult;
+    }
+
+    compareResult = left.name.localeCompare(right.name);
+    if (compareResult !== 0) {
+      return compareResult;
+    }
+
+    compareResult = left.code.localeCompare(right.code);
+    return compareResult;
+  });
+
+  return result;
+}
+
+function lineMatchesDisplayUnit(
+  lineLeafIdsByScheme: Map<string, Set<string>>,
+  displayValueId: string,
+  activeSchemeCode: string,
+  contextParentValueId: string | null | undefined,
+  graph: ReturnType<typeof buildClassificationGraph>,
+): boolean {
+  let result = false;
+  const displayValue = graph.valuesById.get(displayValueId);
+  if (!displayValue) {
+    return result;
+  }
+
+  const displayAllowedLeafIds = getDescendantLeafIds(displayValueId, graph);
+
+  if (contextParentValueId) {
+    const contextValue = graph.valuesById.get(contextParentValueId);
+    if (!contextValue) {
+      return result;
+    }
+
+    const contextAllowedLeafIds = getDescendantLeafIds(contextParentValueId, graph);
+    const contextLeafIds = lineLeafIdsByScheme.get(contextValue.schemeCode);
+    if (!contextLeafIds) {
+      return result;
+    }
+
+    let matchesContext = false;
+    for (const leafId of contextLeafIds) {
+      if (contextAllowedLeafIds.has(leafId)) {
+        matchesContext = true;
+        break;
+      }
+    }
+
+    if (!matchesContext) {
+      return result;
+    }
+  }
+
+  const displayLeafIds = lineLeafIdsByScheme.get(displayValue.schemeCode);
+  if (!displayLeafIds) {
+    return result;
+  }
+
+  for (const leafId of displayLeafIds) {
+    if (displayAllowedLeafIds.has(leafId)) {
+      result = true;
+      return result;
+    }
+  }
+
+  return result;
+}
+
+export function buildHierarchicalAllocationBySchemeWithLines(
+  lines: HoldingLineDto[],
+  schemeCode: string,
+  schemeName: string,
+  options: HierarchyAllocationOptions,
+): AllocationBySchemeWithLines {
+  let result: AllocationBySchemeWithLines = {
+    schemeCode,
+    schemeName,
+    totalMarketValueMinor: 0,
+    slices: [],
+  };
+
+  if (options.links.length === 0) {
+    result = buildAllocationBySchemeWithLines(lines, schemeCode, schemeName);
+    return result;
+  }
+
+  const graph = buildClassificationGraph(options.schemeValues, options.links);
+  const valueCodeBySchemeCode = buildValueCodeBySchemeCodeMap(options.schemeValues);
+  const displayValueIds = resolveHierarchyDisplayValueIds(
+    graph,
+    options.schemeId,
+    options,
+  ).filter((valueId) =>
+    shouldIncludeOrphanValue(valueId, options.schemeId, graph, options.includeOrphans),
+  );
+
+  const totals = new Map<
+    string,
+    {
+      valueName: string;
+      sortOrder: number;
+      marketValueMinor: number;
+      lines: AllocationLineInSlice[];
+    }
+  >();
+
+  for (const line of lines) {
+    const tagAllocations = listSchemeTagAllocations(line.tags, schemeCode);
+    if (tagAllocations.length === 0) {
+      continue;
+    }
+
+    const attributions = buildLineTagAttributions(line, tagAllocations);
+    const lineLeafIdsByScheme = getLineLeafValueIdsBySchemeFromTags(
+      line.tags,
+      valueCodeBySchemeCode,
+    );
+
+    for (const displayValueId of displayValueIds) {
+      if (
+        !lineMatchesDisplayUnit(
+          lineLeafIdsByScheme,
+          displayValueId,
+          schemeCode,
+          options.parentValueId,
+          graph,
+        )
+      ) {
+        continue;
+      }
+
+      const displayValue = graph.valuesById.get(displayValueId);
+      if (!displayValue) {
+        continue;
+      }
+
+      for (const attribution of attributions) {
+        const lineInSlice = buildAllocationLineInSlice(
+          line,
+          attribution,
+          { line },
+          0,
+        );
+        const existing = totals.get(displayValue.code);
+        if (existing) {
+          existing.marketValueMinor += attribution.marketValueMinor;
+          existing.lines.push(lineInSlice);
+          continue;
+        }
+
+        totals.set(displayValue.code, {
+          valueName: displayValue.name,
+          sortOrder: displayValue.sortOrder,
+          marketValueMinor: attribution.marketValueMinor,
+          lines: [lineInSlice],
+        });
+      }
+    }
+  }
+
+  let taggedTotal = 0;
+  for (const item of totals.values()) {
+    taggedTotal += item.marketValueMinor;
+  }
+
+  for (const [valueCode, item] of totals) {
+    const sliceMarketValueMinor = item.marketValueMinor;
+    for (const lineInSlice of item.lines) {
+      lineInSlice.weightInSlice =
+        sliceMarketValueMinor > 0
+          ? lineInSlice.attributedMarketValueMinor / sliceMarketValueMinor
+          : 0;
+    }
+
+    item.lines.sort(
+      (left, right) =>
+        right.attributedMarketValueMinor - left.attributedMarketValueMinor,
+    );
+
+    const gainMetrics = computeAttributedSliceGainMetrics(
+      item.lines.map((lineInSlice) => ({
+        attributedGainMinor: lineInSlice.attributedUnrealizedGainMinor,
+        attributedBookValueMinor: lineInSlice.attributedBookValueMinor,
+      })),
+    );
+
+    let slice: AllocationSliceWithLines = {
+      valueCode,
+      valueName: item.valueName,
+      sortOrder: item.sortOrder,
+      marketValueMinor: sliceMarketValueMinor,
+      weight: taggedTotal > 0 ? sliceMarketValueMinor / taggedTotal : 0,
+      unrealizedGainMinor: gainMetrics.unrealizedGainMinor,
+      unrealizedGainRate: gainMetrics.unrealizedGainRate,
+      lines: item.lines,
+    };
+    result.slices.push(slice);
+    result.totalMarketValueMinor += sliceMarketValueMinor;
+  }
+
+  result.slices.sort(compareAllocationDisplayOrder);
   return result;
 }
 

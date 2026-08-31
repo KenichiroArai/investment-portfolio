@@ -14,6 +14,7 @@ SQLite（`data/portfolio.db`）の Drizzle スキーマ定義です。スキー�
 | 銘柄 | `instruments` | 運用商品マスタ |
 | 分類体系 | `classification_schemes` | 口座ごとの分類軸 |
 | 分類値 | `classification_values` | 分類体系の選択肢 |
+| 分類値リンク | `classification_value_links` | 分類値間の親子関係 |
 | 銘柄分類 | `instrument_classifications` | 銘柄と分類値の紐付け |
 | 銘柄属性 | `instrument_attributes` | 銘柄ごとの可変属性（EAV） |
 | ポートフォリオスナップショット | `portfolio_snapshots` | 基準日時点の保有状態 |
@@ -66,6 +67,14 @@ SQLite（`data/portfolio.db`）の Drizzle スキーマ定義です。スキー�
 | 分類値名 | `name` | text | NOT NULL |
 | 表示順 | `sort_order` | integer | NOT NULL |
 | 作成日時 | `created_at` | text | NOT NULL |
+
+### `classification_value_links`（分類値リンク）
+
+| 論理名 | 物理名 | 型 | NULL |
+| --- | --- | --- | --- |
+| 親分類値ID | `parent_value_id` | text | NOT NULL |
+| 子分類値ID | `child_value_id` | text | NOT NULL |
+| 表示順 | `sort_order` | integer | NOT NULL |
 
 ### `instrument_classifications`（銘柄分類）
 

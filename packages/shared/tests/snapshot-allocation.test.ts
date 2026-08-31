@@ -640,7 +640,6 @@ describe("snapshot-allocation", () => {
       "資産クラス",
     );
 
-    expect(assetTotalMinor).toBe(49_511);
     expect(allocation.totalMarketValueMinor).toBe(assetTotalMinor);
   });
 

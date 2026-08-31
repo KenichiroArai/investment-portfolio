@@ -2,7 +2,6 @@
 
 import type { ClassificationSchemeWithValuesDto } from "@repo/shared";
 import {
-  buildAllocationBySchemeWithLines,
   buildAllocationGapRows,
   buildAllocationPeriodChangeRows,
   findLargestAllocationShareChange,
@@ -11,7 +10,7 @@ import {
   sumSnapshotMarketValue,
   type AnalysisSchemeConfig,
 } from "@repo/shared";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { AnalysisTabPanel } from "@/features/analysis/AnalysisTabPanel";
 import { AnalysisViewControls } from "@/features/analysis/AnalysisViewControls";
@@ -19,10 +18,16 @@ import { AnalysisPanelSummary } from "@/features/analysis/AnalysisPanelSummary";
 import { AllocationDetailPanel } from "@/features/allocation/AllocationDetailPanel";
 import { AllocationPeriodShareSummary } from "@/features/allocation/AllocationPeriodShareSummary";
 import { AllocationSnapshotPanel } from "@/features/allocation/AllocationSnapshotPanel";
+import {
+  AllocationHierarchyControls,
+  mergeClassificationLinks,
+} from "@/features/allocation/AllocationHierarchyControls";
 import { buildAllocationRebalanceDisplayRows } from "@/features/allocation/build-allocation-rebalance-display-rows";
+import { buildSchemeAllocationWithHierarchy } from "@/features/allocation/build-scheme-allocation-with-hierarchy";
 import { RebalanceSettingsCard } from "@/features/allocation/RebalanceSettingsCard";
 import { RebalanceTradesSummary } from "@/features/allocation/RebalanceTradesSummary";
 import { TargetAllocationEditCard } from "@/features/allocation/TargetAllocationEditCard";
+import { useAllocationHierarchyParam } from "@/features/allocation/useAllocationHierarchyParam";
 import { useAllocationSchemeParam } from "@/features/allocation/useAllocationSchemeParam";
 import { useRebalanceDeposit } from "@/features/allocation/useRebalanceDeposit";
 import { useTargetAllocations } from "@/features/allocation/useTargetAllocations";
@@ -41,7 +46,6 @@ import { WritableOnly } from "@/components/WritableOnly";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { fetchClassificationSchemes } from "@/lib/api-client";
-import { isWritableDataSource } from "@/lib/data-source";
 import { formatAsOfDateJa, formatYen } from "@/lib/format-yen";
 
 type AnalysisViewProps = {
@@ -136,15 +140,11 @@ export function AnalysisView({
   const [classificationSchemes, setClassificationSchemes] = useState<
     ClassificationSchemeWithValuesDto[]
   >([]);
-  const [loadingSchemes, setLoadingSchemes] = useState(isWritableDataSource());
+  const [loadingSchemes, setLoadingSchemes] = useState(true);
 
   useEffect(() => {
     let result: () => void = () => {};
     let cancelled = false;
-
-    if (!isWritableDataSource()) {
-      return result;
-    }
 
     async function loadSchemes() {
       let loadResult: void = undefined;
@@ -181,6 +181,34 @@ export function AnalysisView({
   const { activeSchemeCode, setActiveSchemeCode } = useAllocationSchemeParam({
     schemeCodes,
   });
+  const {
+    parentValueId,
+    aggregationLevel,
+    includeOrphans,
+    setParentValueId,
+    setAggregationLevel,
+    setIncludeOrphans,
+  } = useAllocationHierarchyParam();
+
+  const activeClassificationScheme =
+    classificationSchemes.find((scheme) => scheme.code === activeSchemeCode) ?? null;
+  const hasHierarchy = mergeClassificationLinks(classificationSchemes).length > 0;
+  const valueIdByCode = useMemo(() => {
+    let result = new Map<string, string>();
+    for (const value of activeClassificationScheme?.values ?? []) {
+      result.set(value.code, value.id);
+    }
+    return result;
+  }, [activeClassificationScheme]);
+  const drillDownValueIds = useMemo(() => {
+    let result = new Set<string>();
+    for (const value of activeClassificationScheme?.values ?? []) {
+      if ((value.childIds?.length ?? 0) > 0) {
+        result.add(value.id);
+      }
+    }
+    return result;
+  }, [activeClassificationScheme]);
 
   const trendPeriodSummaryData = useTrendPeriodSummaryData({
     mode: "allocation",
@@ -295,12 +323,21 @@ export function AnalysisView({
     return overview;
   };
 
+  const buildActiveSchemeAllocation = (scheme: AnalysisSchemeConfig) => {
+    let result = buildSchemeAllocationWithHierarchy({
+      lines: snapshot.lines,
+      schemeCode: scheme.schemeCode,
+      schemeName: scheme.schemeName,
+      classificationSchemes,
+      parentValueId,
+      aggregationLevel,
+      includeOrphans,
+    });
+    return result;
+  };
+
   const renderAllocationContent = (scheme: AnalysisSchemeConfig): ReactNode => {
-    const schemeAllocation = buildAllocationBySchemeWithLines(
-      snapshot.lines,
-      scheme.schemeCode,
-      scheme.schemeName,
-    );
+    const schemeAllocation = buildActiveSchemeAllocation(scheme);
     const targets = allocationsByScheme[scheme.schemeCode] ?? [];
     const rebalanceResult = buildAllocationRebalanceDisplayRows({
       schemeAllocation,
@@ -314,7 +351,8 @@ export function AnalysisView({
       ? "未分類の銘柄は売買対象外です。目標はタグ付き銘柄内で100%に正規化して試算しています。構成単位の売買を、各構成内の現状比率で銘柄に按分して表示します。"
       : "構成単位の売買を、各構成内の現状比率で銘柄に按分して表示します。";
     const classificationValues =
-      classificationSchemes.find((item) => item.code === scheme.schemeCode)?.values ?? [];
+      classificationSchemes.find((item) => item.code === scheme.schemeCode)?.values
+        .filter((value) => value.isLeaf !== false) ?? [];
 
     let content = (
       <div className="space-y-6">
@@ -352,11 +390,7 @@ export function AnalysisView({
   };
 
   const renderSnapshotOverview = (scheme: AnalysisSchemeConfig): ReactNode => {
-    const schemeAllocation = buildAllocationBySchemeWithLines(
-      snapshot.lines,
-      scheme.schemeCode,
-      scheme.schemeName,
-    );
+    const schemeAllocation = buildActiveSchemeAllocation(scheme);
     const targets = allocationsByScheme[scheme.schemeCode] ?? [];
     const targetTotalRatio =
       targets.length > 0
@@ -374,16 +408,8 @@ export function AnalysisView({
   };
 
   const renderSnapshotContent = (scheme: AnalysisSchemeConfig): ReactNode => {
-    const schemeAllocation = buildAllocationBySchemeWithLines(
-      snapshot.lines,
-      scheme.schemeCode,
-      scheme.schemeName,
-    );
+    const schemeAllocation = buildActiveSchemeAllocation(scheme);
     const targets = allocationsByScheme[scheme.schemeCode] ?? [];
-    const targetTotalRatio =
-      targets.length > 0
-        ? targets.reduce((sum, target) => sum + target.targetRatio, 0)
-        : null;
     const gapRows = buildAllocationGapRows(schemeAllocation.slices, targets);
     const slicesWithGap = mergeAllocationGapIntoSlices(
       schemeAllocation.slices,
@@ -396,6 +422,24 @@ export function AnalysisView({
         portfolioCode={portfolioCode}
         schemeCode={scheme.schemeCode}
         asOfDate={asOfDate}
+        valueIdByCode={valueIdByCode}
+        drillDownValueIds={drillDownValueIds}
+        allowLineExpand={!hasHierarchy || aggregationLevel === "leaf"}
+        onDrillDown={setParentValueId}
+        hierarchyControls={
+          hasHierarchy ? (
+            <AllocationHierarchyControls
+              hasHierarchy={hasHierarchy}
+              activeScheme={activeClassificationScheme}
+              parentValueId={parentValueId}
+              aggregationLevel={aggregationLevel}
+              includeOrphans={includeOrphans}
+              onParentChange={setParentValueId}
+              onAggregationLevelChange={setAggregationLevel}
+              onIncludeOrphansChange={setIncludeOrphans}
+            />
+          ) : null
+        }
       />
     );
     return content;

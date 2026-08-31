@@ -1,3 +1,4 @@
+export * from "./classification-hierarchy";
 export * from "./analysis-schemes";
 export * from "./holding-line-metrics";
 export * from "./holding-account-groups";

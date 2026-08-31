@@ -1,10 +1,21 @@
 import { and, asc, eq, inArray, notInArray } from "drizzle-orm";
-import { isIdecoAnalysisSchemeCode, isMonexAnalysisSchemeCode } from "@repo/shared";
+import {
+  buildClassificationGraph,
+  collectSubtreeLinks,
+  collectSubtreeValueIds,
+  enrichClassificationValues,
+  isIdecoAnalysisSchemeCode,
+  isLeafValue,
+  isMonexAnalysisSchemeCode,
+  validateLinkAddition,
+  type CopyClassificationMode,
+} from "@repo/shared";
 
 import type { AppDatabase } from "../client";
 import { newId, nowIso } from "../id";
 import {
   classificationSchemes,
+  classificationValueLinks,
   classificationValues,
   instrumentClassifications,
 } from "../schema/index";
@@ -116,6 +127,250 @@ export async function deleteClassificationValueById(
   return result;
 }
 
+export async function listLinksForPortfolio(db: AppDatabase, portfolioId: string) {
+  let result: (typeof classificationValueLinks.$inferSelect)[] = [];
+
+  const rows = await db
+    .select({
+      parentValueId: classificationValueLinks.parentValueId,
+      childValueId: classificationValueLinks.childValueId,
+      sortOrder: classificationValueLinks.sortOrder,
+    })
+    .from(classificationValueLinks)
+    .innerJoin(
+      classificationValues,
+      eq(classificationValueLinks.parentValueId, classificationValues.id),
+    )
+    .innerJoin(
+      classificationSchemes,
+      eq(classificationValues.schemeId, classificationSchemes.id),
+    )
+    .where(eq(classificationSchemes.portfolioId, portfolioId))
+    .orderBy(
+      asc(classificationValueLinks.parentValueId),
+      asc(classificationValueLinks.sortOrder),
+    );
+
+  result = rows;
+  return result;
+}
+
+async function listPortfolioGraphValues(db: AppDatabase, portfolioId: string) {
+  let result: Array<{
+    id: string;
+    code: string;
+    name: string;
+    sortOrder: number;
+    schemeId: string;
+    schemeCode: string;
+  }> = [];
+
+  const rows = await db
+    .select({
+      id: classificationValues.id,
+      code: classificationValues.code,
+      name: classificationValues.name,
+      sortOrder: classificationValues.sortOrder,
+      schemeId: classificationValues.schemeId,
+      schemeCode: classificationSchemes.code,
+    })
+    .from(classificationValues)
+    .innerJoin(
+      classificationSchemes,
+      eq(classificationValues.schemeId, classificationSchemes.id),
+    )
+    .where(eq(classificationSchemes.portfolioId, portfolioId));
+
+  result = rows;
+  return result;
+}
+
+async function findPortfolioIdForValue(db: AppDatabase, valueId: string) {
+  let result: string | null = null;
+
+  const rows = await db
+    .select({ portfolioId: classificationSchemes.portfolioId })
+    .from(classificationValues)
+    .innerJoin(
+      classificationSchemes,
+      eq(classificationValues.schemeId, classificationSchemes.id),
+    )
+    .where(eq(classificationValues.id, valueId))
+    .limit(1);
+
+  result = rows[0]?.portfolioId ?? null;
+  return result;
+}
+
+export async function addClassificationLink(
+  db: AppDatabase,
+  params: { parentValueId: string; childValueId: string; sortOrder?: number },
+) {
+  let result:
+    | { ok: true; link: typeof classificationValueLinks.$inferSelect }
+    | { ok: false; reason: string } = { ok: false, reason: "Unknown error" };
+
+  const parentPortfolioId = await findPortfolioIdForValue(db, params.parentValueId);
+  const childPortfolioId = await findPortfolioIdForValue(db, params.childValueId);
+
+  if (!parentPortfolioId || !childPortfolioId) {
+    result = { ok: false, reason: "分類値が見つかりません。" };
+    return result;
+  }
+
+  if (parentPortfolioId !== childPortfolioId) {
+    result = { ok: false, reason: "異なる口座の分類値はリンクできません。" };
+    return result;
+  }
+
+  const graphValues = await listPortfolioGraphValues(db, parentPortfolioId);
+  const links = await listLinksForPortfolio(db, parentPortfolioId);
+  const graph = buildClassificationGraph(graphValues, links);
+  const validation = validateLinkAddition(
+    graph,
+    params.parentValueId,
+    params.childValueId,
+  );
+
+  if (!validation.ok) {
+    result = { ok: false, reason: validation.reason };
+    return result;
+  }
+
+  const link = {
+    parentValueId: params.parentValueId,
+    childValueId: params.childValueId,
+    sortOrder: params.sortOrder ?? 0,
+  };
+  await db.insert(classificationValueLinks).values(link);
+  result = { ok: true, link };
+  return result;
+}
+
+export async function removeClassificationLink(
+  db: AppDatabase,
+  params: { parentValueId: string; childValueId: string },
+) {
+  let result = false;
+
+  await db
+    .delete(classificationValueLinks)
+    .where(
+      and(
+        eq(classificationValueLinks.parentValueId, params.parentValueId),
+        eq(classificationValueLinks.childValueId, params.childValueId),
+      ),
+    );
+
+  result = true;
+  return result;
+}
+
+export async function copyClassificationValue(
+  db: AppDatabase,
+  valueId: string,
+  params: {
+    mode: CopyClassificationMode;
+    code?: string;
+    name?: string;
+  },
+) {
+  let result:
+    | {
+        ok: true;
+        value: typeof classificationValues.$inferSelect;
+        copiedValueIds: string[];
+      }
+    | { ok: false; reason: string } = { ok: false, reason: "Unknown error" };
+
+  const sourceValue = await findClassificationValueById(db, valueId);
+  if (!sourceValue) {
+    result = { ok: false, reason: "分類値が見つかりません。" };
+    return result;
+  }
+
+  const portfolioId = await findPortfolioIdForValue(db, valueId);
+  if (!portfolioId) {
+    result = { ok: false, reason: "分類値が見つかりません。" };
+    return result;
+  }
+
+  const graphValues = await listPortfolioGraphValues(db, portfolioId);
+  const links = await listLinksForPortfolio(db, portfolioId);
+  const graph = buildClassificationGraph(graphValues, links);
+  const sourceIds = collectSubtreeValueIds(valueId, graph, params.mode);
+  const sourceIdSet = new Set(sourceIds);
+  const subtreeLinks = collectSubtreeLinks(sourceIdSet, links);
+  const idMap = new Map<string, string>();
+  const copiedValueIds: string[] = [];
+
+  for (const sourceId of sourceIds) {
+    const source = graphValues.find((value) => value.id === sourceId);
+    if (!source) {
+      continue;
+    }
+
+    const isRoot = sourceId === valueId;
+    let nextCode = `${source.code}_copy`;
+    let nextName = `${source.name}（コピー）`;
+
+    if (isRoot && params.code) {
+      nextCode = params.code;
+    }
+    if (isRoot && params.name) {
+      nextName = params.name;
+    }
+
+    const existing = await findClassificationValueBySchemeAndCode(
+      db,
+      source.schemeId,
+      nextCode,
+    );
+    if (existing) {
+      result = { ok: false, reason: `コード ${nextCode} は既に存在します。` };
+      return result;
+    }
+
+    const copied = await createClassificationValue(db, {
+      schemeId: source.schemeId,
+      code: nextCode,
+      name: nextName,
+      sortOrder: source.sortOrder,
+    });
+    idMap.set(sourceId, copied.id);
+    copiedValueIds.push(copied.id);
+  }
+
+  for (const link of subtreeLinks) {
+    const parentValueId = idMap.get(link.parentValueId);
+    const childValueId = idMap.get(link.childValueId);
+    if (!parentValueId || !childValueId) {
+      continue;
+    }
+
+    await db.insert(classificationValueLinks).values({
+      parentValueId,
+      childValueId,
+      sortOrder: link.sortOrder,
+    });
+  }
+
+  const rootCopiedId = idMap.get(valueId);
+  if (!rootCopiedId) {
+    result = { ok: false, reason: "コピーに失敗しました。" };
+    return result;
+  }
+
+  const copiedRoot = await findClassificationValueById(db, rootCopiedId);
+  if (!copiedRoot) {
+    result = { ok: false, reason: "コピーに失敗しました。" };
+    return result;
+  }
+
+  result = { ok: true, value: copiedRoot, copiedValueIds };
+  return result;
+}
+
 export async function listSchemesWithValuesForPortfolio(
   db: AppDatabase,
   portfolioCode: string,
@@ -124,42 +379,38 @@ export async function listSchemesWithValuesForPortfolio(
     id: string;
     code: string;
     name: string;
-    values: Array<{
-      id: string;
-      code: string;
-      name: string;
+    values: ReturnType<typeof enrichClassificationValues>;
+    links: Array<{
+      parentValueId: string;
+      childValueId: string;
       sortOrder: number;
     }>;
   };
 
   let result: SchemeWithValues[] = [];
 
+  const portfolio = await findPortfolioByCode(db, portfolioCode);
+  if (!portfolio) {
+    return result;
+  }
+
   const schemes = await listClassificationSchemesByPortfolioCode(db, portfolioCode);
+  const graphValues = await listPortfolioGraphValues(db, portfolio.id);
+  const links = await listLinksForPortfolio(db, portfolio.id);
+  const linkDtos = links.map((link) => ({
+    parentValueId: link.parentValueId,
+    childValueId: link.childValueId,
+    sortOrder: link.sortOrder,
+  }));
+
   for (const scheme of schemes) {
-    const values = await listClassificationValuesBySchemeId(db, scheme.id);
+    const schemeValues = graphValues.filter((value) => value.schemeId === scheme.id);
     result.push({
       id: scheme.id,
       code: scheme.code,
       name: scheme.name,
-      values: values
-        .map((value) => ({
-          id: value.id,
-          code: value.code,
-          name: value.name,
-          sortOrder: value.sortOrder,
-        }))
-        .sort((left, right) => {
-          let result = left.sortOrder - right.sortOrder;
-          if (result !== 0) {
-            return result;
-          }
-          result = left.name.localeCompare(right.name);
-          if (result !== 0) {
-            return result;
-          }
-          result = left.code.localeCompare(right.code);
-          return result;
-        }),
+      values: enrichClassificationValues(schemeValues, linkDtos),
+      links: linkDtos,
     });
   }
 
@@ -353,6 +604,22 @@ export async function setInstrumentClassificationsWithWeights(
   weights: InstrumentClassificationWeightInput[],
 ) {
   let result: void = undefined;
+
+  if (weights.length > 0) {
+    const valueIds = weights.map((weight) => weight.classificationValueId);
+    const portfolioId = await findPortfolioIdForValue(db, valueIds[0]!);
+    if (portfolioId) {
+      const links = await listLinksForPortfolio(db, portfolioId);
+      const graphValues = await listPortfolioGraphValues(db, portfolioId);
+      const graph = buildClassificationGraph(graphValues, links);
+
+      for (const valueId of valueIds) {
+        if (!isLeafValue(valueId, graph)) {
+          throw new Error("NON_LEAF_CLASSIFICATION_TAG");
+        }
+      }
+    }
+  }
 
   await db
     .delete(instrumentClassifications)

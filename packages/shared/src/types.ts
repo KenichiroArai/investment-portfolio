@@ -26,11 +26,21 @@ export type PortfolioDto = {
   kind: string;
 };
 
+export type ClassificationValueLinkDto = {
+  parentValueId: string;
+  childValueId: string;
+  sortOrder: number;
+};
+
 export type ClassificationValueDto = {
   id: string;
   code: string;
   name: string;
   sortOrder: number;
+  schemeId?: string;
+  parentIds?: string[];
+  childIds?: string[];
+  isLeaf?: boolean;
 };
 
 export type ClassificationSchemeWithValuesDto = {
@@ -38,6 +48,7 @@ export type ClassificationSchemeWithValuesDto = {
   code: string;
   name: string;
   values: ClassificationValueDto[];
+  links?: ClassificationValueLinkDto[];
 };
 
 export type InstrumentListItemDto = {

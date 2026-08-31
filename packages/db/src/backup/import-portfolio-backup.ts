@@ -231,6 +231,20 @@ function validateForeignKeys(
     );
   }
 
+  if (tableName === "classification_value_links") {
+    const valueIds = new Set(importedData.classification_values.map((row) => row.id));
+    requireReference(
+      "parent_value_id",
+      new Set(importRows.map((row) => row.parent_value_id)),
+      valueIds,
+    );
+    requireReference(
+      "child_value_id",
+      new Set(importRows.map((row) => row.child_value_id)),
+      valueIds,
+    );
+  }
+
   if (tableName === "instruments") {
     const portfolioIds = new Set(importedData.portfolios.map((row) => row.id));
     requireReference(

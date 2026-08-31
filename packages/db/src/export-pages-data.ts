@@ -14,6 +14,7 @@ import {
 } from "./repositories/snapshots";
 import { listAllTargetAllocationsForPortfolio } from "./repositories/target-allocations";
 import { listTargetPortfolioWeights } from "./repositories/target-portfolio-weights";
+import { listSchemesWithValuesForPortfolio } from "./repositories/classifications";
 
 const packageDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(packageDir, "../../..");
@@ -177,6 +178,17 @@ export function findPortfolioByCode(code: string): PortfolioDto | null {
       "utf8",
     );
     console.log(`Exported: ${resolve(outDir, "target-portfolio-weights.json")}`);
+
+    const classificationSchemes = await listSchemesWithValuesForPortfolio(
+      db,
+      portfolio.code,
+    );
+    writeFileSync(
+      resolve(outDir, "classification-schemes.json"),
+      `${JSON.stringify(classificationSchemes, null, 2)}\n`,
+      "utf8",
+    );
+    console.log(`Exported: ${resolve(outDir, "classification-schemes.json")}`);
   }
 
   sqlite.close();

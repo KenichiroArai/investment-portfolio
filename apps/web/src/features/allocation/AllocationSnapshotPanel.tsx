@@ -11,6 +11,11 @@ type AllocationSnapshotPanelProps = {
   portfolioCode?: string;
   schemeCode?: string;
   asOfDate?: string | null;
+  valueIdByCode?: Map<string, string>;
+  drillDownValueIds?: Set<string>;
+  allowLineExpand?: boolean;
+  onDrillDown?: (valueId: string) => void;
+  hierarchyControls?: ReactNode;
 };
 
 export function AllocationSnapshotPanel({
@@ -19,15 +24,25 @@ export function AllocationSnapshotPanel({
   portfolioCode,
   schemeCode,
   asOfDate,
+  valueIdByCode,
+  drillDownValueIds,
+  allowLineExpand = true,
+  onDrillDown,
+  hierarchyControls,
 }: AllocationSnapshotPanelProps) {
   let result: ReactNode = (
     <div className="allocation-snapshot-panel min-w-0 max-w-full space-y-4">
+      {hierarchyControls}
       <AllocationPanel
         slices={slices}
         showPortfolioColumn={showPortfolioColumn}
         portfolioCode={portfolioCode}
         schemeCode={schemeCode}
         asOfDate={asOfDate}
+        valueIdByCode={valueIdByCode}
+        drillDownValueIds={drillDownValueIds}
+        allowLineExpand={allowLineExpand}
+        onDrillDown={onDrillDown}
       />
     </div>
   );

@@ -37,9 +37,13 @@ type AllocationTableProps = {
   portfolioCode?: string;
   schemeCode?: string;
   asOfDate?: string | null;
+  valueIdByCode?: Map<string, string>;
+  drillDownValueIds?: Set<string>;
+  allowLineExpand?: boolean;
   onSliceHover: (valueCode: string) => void;
   onSliceLeave: () => void;
   onToggleExpand: (valueCode: string) => void;
+  onDrillDown?: (valueId: string) => void;
 };
 
 function formatNullableYen(value: number | null): string {
@@ -81,9 +85,13 @@ export function AllocationTable({
   portfolioCode,
   schemeCode,
   asOfDate,
+  valueIdByCode,
+  drillDownValueIds,
+  allowLineExpand = true,
   onSliceHover,
   onSliceLeave,
   onToggleExpand,
+  onDrillDown,
 }: AllocationTableProps) {
   const { sortColumn, sortDirection, toggleSort } =
     useTableSort<AllocationSortColumn>("displayOrder", "asc");
@@ -173,6 +181,11 @@ export function AllocationTable({
         ) : (
           sortedSlices.map((slice) => {
             const isExpanded = expandedValueCodes.includes(slice.valueCode);
+            const valueId = valueIdByCode?.get(slice.valueCode);
+            const canDrillDown =
+              valueId !== undefined &&
+              drillDownValueIds?.has(valueId) === true &&
+              onDrillDown !== undefined;
             const isHighlighted = highlightedValueCode === slice.valueCode;
             const rowClassName = cn(
               "data-table__row--parent",
@@ -197,8 +210,16 @@ export function AllocationTable({
                       type="button"
                       className="allocation-table__expand data-table__expand"
                       aria-expanded={isExpanded}
-                      aria-label={`${slice.valueName} の内訳を${isExpanded ? "閉じる" : "開く"}`}
+                      aria-label={
+                        canDrillDown
+                          ? `${slice.valueName} の子分類へドリルダウン`
+                          : `${slice.valueName} の内訳を${isExpanded ? "閉じる" : "開く"}`
+                      }
                       onClick={() => {
+                        if (canDrillDown && valueId) {
+                          onDrillDown(valueId);
+                          return;
+                        }
                         onToggleExpand(slice.valueCode);
                       }}
                     >
@@ -274,7 +295,7 @@ export function AllocationTable({
                     </>
                   ) : null}
                 </tr>
-                {isExpanded ? (
+                {isExpanded && allowLineExpand ? (
                   <tr>
                     <td colSpan={columnCount} className="allocation-table__detail data-table__detail">
                       <AllocationLineBreakdown

@@ -21,6 +21,10 @@ type AllocationPanelProps = {
   portfolioCode?: string;
   schemeCode?: string;
   asOfDate?: string | null;
+  valueIdByCode?: Map<string, string>;
+  drillDownValueIds?: Set<string>;
+  allowLineExpand?: boolean;
+  onDrillDown?: (valueId: string) => void;
 };
 
 function formatNullableYen(value: number | null): string {
@@ -49,6 +53,10 @@ export function AllocationPanel({
   portfolioCode,
   schemeCode,
   asOfDate,
+  valueIdByCode,
+  drillDownValueIds,
+  allowLineExpand = true,
+  onDrillDown,
 }: AllocationPanelProps) {
   const [highlightedValueCode, setHighlightedValueCode] = useState<string | null>(
     null,
@@ -154,11 +162,15 @@ export function AllocationPanel({
           portfolioCode={portfolioCode}
           schemeCode={schemeCode}
           asOfDate={asOfDate}
+          valueIdByCode={valueIdByCode}
+          drillDownValueIds={drillDownValueIds}
+          allowLineExpand={allowLineExpand}
           onSliceHover={(valueCode) => {
             handleHighlight(valueCode);
           }}
           onSliceLeave={handleSliceLeave}
           onToggleExpand={handleToggleExpand}
+          onDrillDown={onDrillDown}
         />
       </div>
     </div>

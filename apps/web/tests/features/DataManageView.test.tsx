@@ -505,7 +505,7 @@ describe("DataManageView", () => {
       "fetch",
       createManageFetchMock({
         mutate: {
-          replaceSnapshot: { ok: false, message: "保存失敗" },
+          upsertSnapshotMetrics: { ok: false, message: "保存失敗" },
         },
       }),
     );

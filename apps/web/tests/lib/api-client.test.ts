@@ -410,15 +410,18 @@ describe("api-client fetch functions", () => {
     delete process.env.NEXT_PUBLIC_DATA_SOURCE;
   });
 
-  it("returns empty classification schemes without calling fetch in static mode", async () => {
+  it("loads classification schemes from static JSON", async () => {
     process.env.NEXT_PUBLIC_DATA_SOURCE = "static";
-    const fetchMock = vi.fn();
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => [],
+    });
     vi.stubGlobal("fetch", fetchMock);
 
     const result = await fetchClassificationSchemes("ideco");
 
     expect(result).toEqual({ ok: true, data: [] });
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(fetchMock).toHaveBeenCalled();
 
     delete process.env.NEXT_PUBLIC_DATA_SOURCE;
   });

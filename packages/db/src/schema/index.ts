@@ -103,6 +103,35 @@ export const classificationValues = sqliteTable(
   },
 );
 
+/** 分類値リンク — 分類値間の親子関係（分析軸横断可）。詳細は packages/db/README.md */
+export const classificationValueLinks = sqliteTable(
+  "classification_value_links",
+  {
+    parentValueId: text("parent_value_id")
+      .notNull()
+      .references(() => {
+        let result = classificationValues.id;
+        return result;
+      }, { onDelete: "cascade" }), // 親分類値ID
+    childValueId: text("child_value_id")
+      .notNull()
+      .references(() => {
+        let result = classificationValues.id;
+        return result;
+      }, { onDelete: "cascade" }), // 子分類値ID
+    sortOrder: integer("sort_order").notNull().default(0), // 表示順
+  },
+  (table) => {
+    let result = [
+      unique("classification_value_links_unique").on(
+        table.parentValueId,
+        table.childValueId,
+      ),
+    ];
+    return result;
+  },
+);
+
 /** 銘柄分類 — 銘柄と分類値の紐付け。詳細は packages/db/README.md */
 export const instrumentClassifications = sqliteTable(
   "instrument_classifications",
@@ -375,6 +404,32 @@ export const classificationValuesRelations = relations(
         references: [classificationSchemes.id],
       }),
       instrumentClassifications: many(instrumentClassifications),
+      parentLinks: many(classificationValueLinks, {
+        relationName: "childValue",
+      }),
+      childLinks: many(classificationValueLinks, {
+        relationName: "parentValue",
+      }),
+    };
+    return result;
+  },
+);
+
+/** 分類値リンクリレーション */
+export const classificationValueLinksRelations = relations(
+  classificationValueLinks,
+  ({ one }) => {
+    let result = {
+      parentValue: one(classificationValues, {
+        fields: [classificationValueLinks.parentValueId],
+        references: [classificationValues.id],
+        relationName: "parentValue",
+      }),
+      childValue: one(classificationValues, {
+        fields: [classificationValueLinks.childValueId],
+        references: [classificationValues.id],
+        relationName: "childValue",
+      }),
     };
     return result;
   },

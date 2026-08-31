@@ -116,6 +116,20 @@ export function getSnapshotTrendsFetchUrl(
   return result;
 }
 
+export function getClassificationSchemesFetchUrl(portfolioCode: string): string {
+  let result = "";
+  const encodedCode = encodePortfolioCodeForPath(portfolioCode);
+
+  const source = getDataSource();
+  if (source === "static") {
+    result = `${getStaticDataPrefix()}/data/portfolios/${encodedCode}/classification-schemes.json`;
+    return result;
+  }
+
+  result = `${getApiBaseUrl()}/portfolios/${encodedCode}/classification-schemes`;
+  return result;
+}
+
 export function getTargetAllocationsFetchUrl(portfolioCode: string): string {
   let result = "";
   const encodedCode = encodePortfolioCodeForPath(portfolioCode);

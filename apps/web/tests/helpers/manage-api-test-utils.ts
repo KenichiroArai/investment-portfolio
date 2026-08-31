@@ -46,7 +46,18 @@ export const MANAGE_SCHEME = {
   id: "sch1",
   code: "region",
   name: "地域",
-  values: [{ id: "v1", code: "japan", name: "日本", sortOrder: 0 }],
+  values: [
+    {
+      id: "v1",
+      code: "japan",
+      name: "日本",
+      sortOrder: 0,
+      parentIds: [],
+      childIds: [],
+      isLeaf: true,
+    },
+  ],
+  links: [],
 };
 
 type ManageFetchMockOptions = {
@@ -60,6 +71,7 @@ type ManageFetchMockOptions = {
     createInstrument?: { ok: boolean; status?: number; message?: string };
     setClassifications?: { ok: boolean; status?: number; message?: string };
     replaceSnapshot?: { ok: boolean; status?: number; message?: string };
+    upsertSnapshotMetrics?: { ok: boolean; status?: number; message?: string };
     updateInstrument?: { ok: boolean; status?: number; message?: string };
     deleteInstrument?: { ok: boolean; status?: number; message?: string };
     createScheme?: { ok: boolean; status?: number; message?: string };
@@ -117,6 +129,14 @@ export function createManageFetchMock(options: ManageFetchMockOptions = {}) {
       }
       if (status !== 200) {
         return errorResponse(status, "snapshot error");
+      }
+      return okResponse(state.snapshot);
+    }
+
+    if (url.includes("/snapshots/") && url.includes("/metrics") && method === "PUT") {
+      const mutate = options.mutate?.upsertSnapshotMetrics;
+      if (mutate && !mutate.ok) {
+        return errorResponse(mutate.status ?? 400, mutate.message ?? "save failed");
       }
       return okResponse(state.snapshot);
     }

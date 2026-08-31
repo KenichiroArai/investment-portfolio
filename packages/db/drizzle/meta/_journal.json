@@ -85,6 +85,13 @@
       "when": 1783867200000,
       "tag": "0011_holding_lines_snapshot_instrument_account_unique",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1783953600000,
+      "tag": "0012_classification_value_links",
+      "breakpoints": true
     }
   ]
 }

@@ -1,5 +1,7 @@
 import {
   applyMonexAssetClassWeights,
+  addClassificationLink,
+  copyClassificationValue,
   createClassificationScheme,
   createClassificationValue,
   createPortfolio,
@@ -30,6 +32,7 @@ import {
   listAllTargetAllocationsForPortfolio,
   listTargetAllocationWeights,
   listTargetPortfolioWeights,
+  removeClassificationLink,
   replaceCurrentSnapshot,
   replaceTargetAllocationWeights,
   replaceTargetPortfolioWeights,
@@ -46,10 +49,13 @@ import {
   applyMonexAssetClassWeightsSchema,
   backupImportModeSchema,
   buildSnapshotTrends,
+  copyClassificationValueSchema,
   createClassificationSchemeSchema,
+  createClassificationValueLinkSchema,
   createClassificationValueSchema,
   createInstrumentSchema,
   createPortfolioSchema,
+  deleteClassificationValueLinkSchema,
   replaceCurrentSnapshotSchema,
   replaceTargetAllocationWeightsSchema,
   replaceTargetPortfolioWeightsSchema,
@@ -354,6 +360,71 @@ export function createApp(options?: CreateAppOptions) {
     return result;
   });
 
+  app.post("/classification-value-links", async (c) => {
+    let result!: Response;
+
+    const body = await c.req.json();
+    const parsed = createClassificationValueLinkSchema.safeParse(body);
+    if (!parsed.success) {
+      result = c.json({ error: parsed.error.flatten() }, 400);
+      return result;
+    }
+
+    const db = resolveDb();
+    const linkResult = await addClassificationLink(db, parsed.data);
+    if (!linkResult.ok) {
+      result = c.json({ error: linkResult.reason }, 400);
+      return result;
+    }
+
+    result = c.json(linkResult.link, 201);
+    return result;
+  });
+
+  app.delete("/classification-value-links", async (c) => {
+    let result!: Response;
+
+    const body = await c.req.json();
+    const parsed = deleteClassificationValueLinkSchema.safeParse(body);
+    if (!parsed.success) {
+      result = c.json({ error: parsed.error.flatten() }, 400);
+      return result;
+    }
+
+    const db = resolveDb();
+    await removeClassificationLink(db, parsed.data);
+    result = c.json({ ok: true });
+    return result;
+  });
+
+  app.post("/classification-values/:id/copy", async (c) => {
+    let result!: Response;
+
+    const body = await c.req.json();
+    const parsed = copyClassificationValueSchema.safeParse(body);
+    if (!parsed.success) {
+      result = c.json({ error: parsed.error.flatten() }, 400);
+      return result;
+    }
+
+    const valueId = c.req.param("id");
+    const db = resolveDb();
+    const copyResult = await copyClassificationValue(db, valueId, parsed.data);
+    if (!copyResult.ok) {
+      result = c.json({ error: copyResult.reason }, 400);
+      return result;
+    }
+
+    result = c.json(
+      {
+        value: copyResult.value,
+        copiedValueIds: copyResult.copiedValueIds,
+      },
+      201,
+    );
+    return result;
+  });
+
   app.get("/instruments", async (c) => {
     let result!: Response;
 
@@ -489,11 +560,22 @@ export function createApp(options?: CreateAppOptions) {
       return result;
     }
 
-    await setInstrumentClassifications(
-      db,
-      instrumentId,
-      parsed.data.classificationValueIds,
-    );
+    try {
+      await setInstrumentClassifications(
+        db,
+        instrumentId,
+        parsed.data.classificationValueIds,
+      );
+    } catch (error) {
+      if (error instanceof Error && error.message === "NON_LEAF_CLASSIFICATION_TAG") {
+        result = c.json(
+          { error: "銘柄タグは葉（末端）の分類値のみ指定できます。" },
+          400,
+        );
+        return result;
+      }
+      throw error;
+    }
     result = c.json({ ok: true });
     return result;
   });

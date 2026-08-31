@@ -159,17 +159,16 @@ describe("AnalysisSettingsView", () => {
 
   it("updates and deletes category value", async () => {
     const user = userEvent.setup();
+    const promptSpy = vi.spyOn(window, "prompt").mockReturnValue("日本株");
     renderView("value");
     await waitFor(() => {
-      expect(screen.getByDisplayValue("日本")).toBeInTheDocument();
+      expect(screen.getByText("日本")).toBeInTheDocument();
     });
-    const valueName = screen.getByDisplayValue("日本");
-    await user.clear(valueName);
-    await user.type(valueName, "日本株");
-    await user.click(screen.getAllByRole("button", { name: "更新" })[0]!);
+    await user.click(screen.getByRole("button", { name: "名称編集" }));
     await waitFor(() => {
       expect(toastSuccess).toHaveBeenCalledWith("カテゴリ値を更新しました。");
     });
+    promptSpy.mockRestore();
 
     await user.click(screen.getAllByRole("button", { name: "削除" })[0]!);
     const alert = await screen.findByRole("alertdialog", { name: "カテゴリ値を削除" });
@@ -282,10 +281,12 @@ describe("AnalysisSettingsView", () => {
       expect(toastError).toHaveBeenCalledWith("値追加失敗");
     });
 
-    await user.click(screen.getAllByRole("button", { name: "更新" })[0]!);
+    const promptSpy = vi.spyOn(window, "prompt").mockReturnValue("更新失敗テスト");
+    await user.click(screen.getByRole("button", { name: "名称編集" }));
     await waitFor(() => {
       expect(toastError).toHaveBeenCalledWith("値更新失敗");
     });
+    promptSpy.mockRestore();
 
     await user.click(screen.getAllByRole("button", { name: "削除" })[0]!);
     alert = await screen.findByRole("alertdialog");

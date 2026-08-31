@@ -2,6 +2,7 @@
 
 import type {
   ClassificationSchemeWithValuesDto,
+  CopyClassificationMode,
   InstrumentListItemDto,
 } from "@repo/shared";
 import Link from "next/link";
@@ -43,9 +44,12 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WritableGuard } from "@/features/manage/WritableGuard";
+import { ClassificationValueTree } from "@/features/manage/ClassificationValueTree";
 import {
+  copyClassificationValue,
   createClassificationScheme,
   createClassificationValue,
+  createClassificationValueLink,
   deleteClassificationScheme,
   deleteClassificationValue,
   fetchClassificationSchemes,
@@ -346,6 +350,38 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
     return result;
   }
 
+  async function handleAddLink(parentValueId: string, childValueId: string) {
+    let result: void = undefined;
+    setSubmitting(true);
+    const response = await createClassificationValueLink({ parentValueId, childValueId });
+    setSubmitting(false);
+
+    if (!response.ok) {
+      toast.error(response.message);
+      return result;
+    }
+
+    toast.success("親子リンクを追加しました。");
+    await load();
+    return result;
+  }
+
+  async function handleCopyValue(valueId: string, mode: CopyClassificationMode) {
+    let result: void = undefined;
+    setSubmitting(true);
+    const response = await copyClassificationValue(valueId, { mode });
+    setSubmitting(false);
+
+    if (!response.ok) {
+      toast.error(response.message);
+      return result;
+    }
+
+    toast.success("分類値をコピーしました。");
+    await load();
+    return result;
+  }
+
   async function handleSetTags(event: React.FormEvent) {
     let result: void = undefined;
     event.preventDefault();
@@ -519,48 +555,39 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
                   </Button>
                 </form>
 
-                {schemes.map((scheme) => {
-                  let block = (
-                    <div key={scheme.id} className="space-y-3">
-                      <h3 className="text-sm font-semibold">{scheme.name}</h3>
-                      {scheme.values.length === 0 ? (
-                        <EmptyState title="値がありません" className="py-6" />
-                      ) : (
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>コード</TableHead>
-                              <TableHead>名称</TableHead>
-                              <TableHead>表示順</TableHead>
-                              <TableHead className="text-right">操作</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {scheme.values.map((value) => {
-                              let row = (
-                                <ValueTableRow
-                                  key={value.id}
-                                  valueCode={value.code}
-                                  initialName={value.name}
-                                  initialSortOrder={value.sortOrder}
-                                  disabled={submitting}
-                                  onSave={(name, sortOrder) => {
-                                    void handleUpdateValue(value.id, name, sortOrder);
-                                  }}
-                                  onDelete={() => {
-                                    setDeleteValueId(value.id);
-                                  }}
-                                />
-                              );
-                              return row;
-                            })}
-                          </TableBody>
-                        </Table>
-                      )}
-                    </div>
-                  );
-                  return block;
-                })}
+                {schemes.length === 0 ? (
+                  <EmptyState title="分析軸が未登録です" />
+                ) : (
+                  schemes.map((scheme) => {
+                    let block = (
+                      <div key={scheme.id} className="space-y-3">
+                        <h3 className="text-sm font-semibold">{scheme.name}</h3>
+                        {scheme.values.length === 0 ? (
+                          <EmptyState title="値がありません" className="py-6" />
+                        ) : (
+                          <ClassificationValueTree
+                            scheme={scheme}
+                            allSchemes={schemes}
+                            disabled={submitting}
+                            onUpdateValue={(valueId, name, sortOrder) => {
+                              void handleUpdateValue(valueId, name, sortOrder);
+                            }}
+                            onDeleteValue={(valueId) => {
+                              setDeleteValueId(valueId);
+                            }}
+                            onCopyValue={(valueId, mode) => {
+                              void handleCopyValue(valueId, mode);
+                            }}
+                            onAddLink={(parentValueId, childValueId) => {
+                              void handleAddLink(parentValueId, childValueId);
+                            }}
+                          />
+                        )}
+                      </div>
+                    );
+                    return block;
+                  })
+                )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -569,7 +596,9 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
                 <Card>
                   <CardHeader>
                     <CardTitle>銘柄タグ</CardTitle>
-                    <CardDescription>銘柄に分類値を複数付与できます。</CardDescription>
+                    <CardDescription>
+                      銘柄には葉（末端）の分類値のみ付与できます。
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                 <form className="grid max-w-lg gap-4" onSubmit={handleSetTags}>
@@ -597,7 +626,9 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
                         <div key={scheme.id} className="rounded-lg border p-3">
                           <p className="mb-2 text-sm font-medium">{scheme.name}</p>
                           <div className="flex flex-wrap gap-3">
-                            {scheme.values.map((value) => {
+                            {scheme.values
+                              .filter((value) => value.isLeaf !== false)
+                              .map((value) => {
                               let checkbox = (
                                 <label
                                   key={value.id}
@@ -730,70 +761,6 @@ function SchemeTableRow({ scheme, disabled, onSave, onDelete }: SchemeTableRowPr
             disabled={disabled}
             onClick={() => {
               onSave(name);
-            }}
-          >
-            更新
-          </Button>
-          <Button type="button" size="sm" variant="destructive" disabled={disabled} onClick={onDelete}>
-            削除
-          </Button>
-        </div>
-      </TableCell>
-    </TableRow>
-  );
-  return result;
-}
-
-type ValueTableRowProps = {
-  valueCode: string;
-  initialName: string;
-  initialSortOrder: number;
-  disabled: boolean;
-  onSave: (name: string, sortOrder: number) => void;
-  onDelete: () => void;
-};
-
-function ValueTableRow({
-  valueCode,
-  initialName,
-  initialSortOrder,
-  disabled,
-  onSave,
-  onDelete,
-}: ValueTableRowProps) {
-  const [name, setName] = useState(initialName);
-  const [sortOrder, setSortOrder] = useState(String(initialSortOrder));
-
-  let result = (
-    <TableRow>
-      <TableCell className="font-mono text-xs">{valueCode}</TableCell>
-      <TableCell>
-        <Input
-          value={name}
-          onChange={(event) => {
-            setName(event.target.value);
-          }}
-          required
-        />
-      </TableCell>
-      <TableCell>
-        <Input
-          type="number"
-          value={sortOrder}
-          onChange={(event) => {
-            setSortOrder(event.target.value);
-          }}
-        />
-      </TableCell>
-      <TableCell className="text-right">
-        <div className="flex justify-end gap-2">
-          <Button
-            type="button"
-            size="sm"
-            variant="secondary"
-            disabled={disabled}
-            onClick={() => {
-              onSave(name, Number.parseInt(sortOrder, 10) || 0);
             }}
           >
             更新

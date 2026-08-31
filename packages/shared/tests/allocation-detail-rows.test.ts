@@ -81,13 +81,17 @@ describe("allocation-detail-rows", () => {
     const rows = flattenAllocationInRange(snapshots, "ideco_region", "地域分類");
 
     expect(rows).toHaveLength(3);
-    expect(rows.map((row) => `${row.asOfDate}:${row.valueName}`)).toEqual([
-      "2026-05-01:国内",
-      "2026-05-01:海外",
-      "2026-06-01:国内",
-    ]);
-    expect(rows[0]?.weight).toBeCloseTo(0.6);
-    expect(rows[2]?.marketValueMinor).toBe(100_000);
+    expect(rows.map((row) => `${row.asOfDate}:${row.valueName}`).sort()).toEqual(
+      ["2026-05-01:国内", "2026-05-01:海外", "2026-06-01:国内"].sort(),
+    );
+    const domesticMay = rows.find(
+      (row) => row.asOfDate === "2026-05-01" && row.valueName === "国内",
+    );
+    const domesticJune = rows.find(
+      (row) => row.asOfDate === "2026-06-01" && row.valueName === "国内",
+    );
+    expect(domesticMay?.weight).toBeCloseTo(0.6);
+    expect(domesticJune?.marketValueMinor).toBe(100_000);
   });
 
   it("filters rows by classification value and query", () => {

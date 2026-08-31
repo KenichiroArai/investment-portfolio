@@ -65,15 +65,43 @@ const classificationSchemesFixture = [
     code: "ideco_region",
     name: "地域分類",
     values: [
-      { id: "v-domestic", code: "domestic", name: "国内", sortOrder: 0 },
-      { id: "v-foreign", code: "foreign", name: "海外", sortOrder: 1 },
+      {
+        id: "v-domestic",
+        code: "domestic",
+        name: "国内",
+        sortOrder: 0,
+        parentIds: [],
+        childIds: [],
+        isLeaf: true,
+      },
+      {
+        id: "v-foreign",
+        code: "foreign",
+        name: "海外",
+        sortOrder: 1,
+        parentIds: [],
+        childIds: [],
+        isLeaf: true,
+      },
     ],
+    links: [],
   },
   {
     id: "sch-asset",
     code: "ideco_asset_class",
     name: "資産分類",
-    values: [{ id: "v-equity", code: "equity", name: "株式", sortOrder: 0 }],
+    values: [
+      {
+        id: "v-equity",
+        code: "equity",
+        name: "株式",
+        sortOrder: 0,
+        parentIds: [],
+        childIds: [],
+        isLeaf: true,
+      },
+    ],
+    links: [],
   },
 ];
 
@@ -446,6 +474,7 @@ describe("AnalysisView", () => {
       "fetch",
       createPortfolioFetchMock({
         snapshot: snapshotFixture,
+        classificationSchemes: classificationSchemesFixture,
       }),
     );
 

@@ -27,6 +27,7 @@ import { buildBackupZipFilename } from "@repo/shared";
 
 import { getApiBaseUrl } from "@/lib/api-base";
 import {
+  getClassificationSchemesFetchUrl,
   isWritableDataSource,
   WRITABLE_BLOCKED_MESSAGE,
 } from "@/lib/data-source";
@@ -353,14 +354,35 @@ export async function fetchClassificationSchemes(portfolioCode: string) {
     data: [],
   };
 
-  if (!isWritableDataSource()) {
+  if (isWritableDataSource()) {
+    result = await requestJson<ClassificationSchemeWithValuesDto[]>(
+      `/portfolios/${encodePortfolioCodeForPath(portfolioCode)}/classification-schemes`,
+    );
     return result;
   }
 
-  result = await requestJson<ClassificationSchemeWithValuesDto[]>(
-    `/portfolios/${encodePortfolioCodeForPath(portfolioCode)}/classification-schemes`,
-  );
-  return result;
+  try {
+    const response = await fetch(getClassificationSchemesFetchUrl(portfolioCode));
+    if (!response.ok) {
+      result = {
+        ok: false,
+        status: response.status,
+        message: "分類設定を読み込めませんでした。",
+      };
+      return result;
+    }
+
+    const data = (await response.json()) as ClassificationSchemeWithValuesDto[];
+    result = { ok: true, data };
+    return result;
+  } catch {
+    result = {
+      ok: false,
+      status: 0,
+      message: "分類設定を読み込めませんでした。",
+    };
+    return result;
+  }
 }
 
 export async function createClassificationScheme(
@@ -436,6 +458,47 @@ export async function deleteClassificationValue(valueId: string) {
     `/classification-values/${valueId}`,
     { method: "DELETE" },
   );
+  return result;
+}
+
+export async function createClassificationValueLink(input: {
+  parentValueId: string;
+  childValueId: string;
+  sortOrder?: number;
+}) {
+  let result = await requestWritableJson<{
+    parentValueId: string;
+    childValueId: string;
+    sortOrder: number;
+  }>("/classification-value-links", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+  return result;
+}
+
+export async function deleteClassificationValueLink(input: {
+  parentValueId: string;
+  childValueId: string;
+}) {
+  let result = await requestWritableJson<{ ok: boolean }>("/classification-value-links", {
+    method: "DELETE",
+    body: JSON.stringify(input),
+  });
+  return result;
+}
+
+export async function copyClassificationValue(
+  valueId: string,
+  input: { mode: "value_only" | "with_children" | "with_subtree"; code?: string; name?: string },
+) {
+  let result = await requestWritableJson<{
+    value: { id: string; code: string; name: string; sortOrder: number };
+    copiedValueIds: string[];
+  }>(`/classification-values/${valueId}/copy`, {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
   return result;
 }
 

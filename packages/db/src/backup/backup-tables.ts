@@ -14,6 +14,7 @@ export const BACKUP_IMPORT_ORDER: BackupTableName[] = [
   "portfolios",
   "classification_schemes",
   "classification_values",
+  "classification_value_links",
   "instruments",
   "instrument_classifications",
   "instrument_attributes",
@@ -35,6 +36,7 @@ export const BACKUP_DELETE_ORDER: BackupTableName[] = [
  * （同一業務キーで id だけ違う行が既存にあると ON CONFLICT(id) では UNIQUE 違反になる）
  */
 export const BACKUP_MERGE_CONFLICT_COLUMNS: Partial<Record<BackupTableName, string[]>> = {
+  classification_value_links: ["parent_value_id", "child_value_id"],
   instrument_classifications: ["instrument_id", "classification_value_id"],
   instrument_attributes: ["instrument_id", "code"],
   /** preview / 業務キー照合用。実 insert 前に id を既存行へ remap する（子の holding_line_metrics のため） */
@@ -77,6 +79,15 @@ export const BACKUP_TABLE_CONFIGS: Record<BackupTableName, BackupTableConfig> = 
     integerColumns: new Set(["sort_order"]),
     realColumns: new Set(),
     hasId: true,
+  }),
+  classification_value_links: defineTable({
+    name: "classification_value_links",
+    columns: ["parent_value_id", "child_value_id", "sort_order"],
+    exportColumns: ["parent_value_id", "child_value_id", "sort_order"],
+    nullableColumns: new Set(),
+    integerColumns: new Set(["sort_order"]),
+    realColumns: new Set(),
+    hasId: false,
   }),
   instruments: defineTable({
     name: "instruments",
@@ -248,6 +259,20 @@ export function buildBackupExportQuery(
         INNER JOIN portfolios p ON p.id = cs.portfolio_id
         ${portfolioFilter}
         ORDER BY cv.scheme_id, cv.sort_order, cv.code`,
+      params: portfolioParams,
+    };
+    return result;
+  }
+
+  if (tableName === "classification_value_links") {
+    result = {
+      sql: `SELECT cvl.parent_value_id, cvl.child_value_id, cvl.sort_order
+        FROM classification_value_links cvl
+        INNER JOIN classification_values cv ON cv.id = cvl.parent_value_id
+        INNER JOIN classification_schemes cs ON cs.id = cv.scheme_id
+        INNER JOIN portfolios p ON p.id = cs.portfolio_id
+        ${portfolioFilter}
+        ORDER BY cvl.parent_value_id, cvl.sort_order, cvl.child_value_id`,
       params: portfolioParams,
     };
     return result;
