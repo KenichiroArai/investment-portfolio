@@ -163,7 +163,7 @@ export function RakutenBulkImportTab({
       }
     } catch (error) {
       if (error instanceof RakutenPasteError) {
-        toast.error(error.message);
+        toast.error(error.displayMessage);
         return result;
       }
       toast.error("貼り付けデータの解析に失敗しました。");

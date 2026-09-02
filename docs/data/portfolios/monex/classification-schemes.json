@@ -1,0 +1,130 @@
+[
+  {
+    "id": "b2e1b711-1f79-44ac-b27f-4d13591a0d9a",
+    "code": "monex_asset_class",
+    "name": "資産クラス",
+    "values": [
+      {
+        "id": "2ba43cbc-745f-4359-a523-d7cf45c43c3f",
+        "code": "domestic_equity",
+        "name": "国内株式",
+        "sortOrder": 0,
+        "schemeId": "b2e1b711-1f79-44ac-b27f-4d13591a0d9a",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "74f34c67-e348-402f-a3fd-cc109ecb1ad4",
+        "code": "developed_equity",
+        "name": "先進国株式",
+        "sortOrder": 1,
+        "schemeId": "b2e1b711-1f79-44ac-b27f-4d13591a0d9a",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "b926af7e-42e0-4f7d-a7dc-e5a55dea75d1",
+        "code": "emerging_equity",
+        "name": "新興国株式",
+        "sortOrder": 2,
+        "schemeId": "b2e1b711-1f79-44ac-b27f-4d13591a0d9a",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "6b9279f2-1a8f-42b0-a045-02cc335fab48",
+        "code": "domestic_bond",
+        "name": "国内債券",
+        "sortOrder": 3,
+        "schemeId": "b2e1b711-1f79-44ac-b27f-4d13591a0d9a",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "af18fcd1-f766-453f-8c56-8d62534c4751",
+        "code": "developed_bond",
+        "name": "先進国債券",
+        "sortOrder": 4,
+        "schemeId": "b2e1b711-1f79-44ac-b27f-4d13591a0d9a",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "f0c3976d-ff3c-43e1-8772-533f26b9612a",
+        "code": "high_yield_bond",
+        "name": "ハイ・イールド債券",
+        "sortOrder": 5,
+        "schemeId": "b2e1b711-1f79-44ac-b27f-4d13591a0d9a",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "c36ed4e4-26a3-4e40-85fc-ea1b2ffbf870",
+        "code": "emerging_bond",
+        "name": "新興国債券",
+        "sortOrder": 6,
+        "schemeId": "b2e1b711-1f79-44ac-b27f-4d13591a0d9a",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "a5be4734-bbed-458a-b433-dc555664e4e8",
+        "code": "domestic_reit",
+        "name": "国内REIT",
+        "sortOrder": 7,
+        "schemeId": "b2e1b711-1f79-44ac-b27f-4d13591a0d9a",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "3af7631d-11bb-4511-ad31-08ce76cca94f",
+        "code": "foreign_reit",
+        "name": "海外REIT",
+        "sortOrder": 8,
+        "schemeId": "b2e1b711-1f79-44ac-b27f-4d13591a0d9a",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "e50d4768-2239-460f-ba1c-3199389b98fd",
+        "code": "commodity",
+        "name": "コモディティ",
+        "sortOrder": 9,
+        "schemeId": "b2e1b711-1f79-44ac-b27f-4d13591a0d9a",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "b53d789c-7922-4b3e-9f46-03c190a9c70e",
+        "code": "short_term",
+        "name": "短期金融資産",
+        "sortOrder": 10,
+        "schemeId": "b2e1b711-1f79-44ac-b27f-4d13591a0d9a",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "9f726f67-ad18-4f37-a095-8ecd7bbd7130",
+        "code": "other",
+        "name": "その他資産",
+        "sortOrder": 11,
+        "schemeId": "b2e1b711-1f79-44ac-b27f-4d13591a0d9a",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      }
+    ],
+    "links": []
+  }
+]

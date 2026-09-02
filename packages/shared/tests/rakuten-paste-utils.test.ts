@@ -4,6 +4,7 @@ import {
   detectRakutenBlockKind,
   isRakutenAccountTypeLabel,
   isRakutenHeaderLine,
+  isRakutenPageNoiseLine,
   isRakutenStockCode,
   parseRakutenPasteNumber,
   parseRakutenPastePercentRate,
@@ -41,6 +42,8 @@ describe("rakuten-paste-utils", () => {
   it("detects stock codes", () => {
     expect(isRakutenStockCode("1489")).toBe(true);
     expect(isRakutenStockCode("ABCD")).toBe(false);
+    expect(isRakutenPageNoiseLine("315")).toBe(false);
+    expect(isRakutenPageNoiseLine("現金等［円］")).toBe(true);
   });
 
   it("returns null for standalone MMF rows without foreign section", () => {

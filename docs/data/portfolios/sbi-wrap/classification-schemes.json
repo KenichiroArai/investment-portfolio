@@ -1,0 +1,390 @@
+[
+  {
+    "id": "58fd68a3-337a-4331-9ce6-64132c95a457",
+    "code": "sbi_wrap_ai_investment",
+    "name": "AI投資",
+    "values": [
+      {
+        "id": "ef98ee67-722d-4f1b-8d08-22a2caa02353",
+        "code": "be130054-4a39-4f7d-a592-7caced43660e",
+        "name": "（ラップ専用）ＳＢＩ・米国株式",
+        "sortOrder": 1,
+        "schemeId": "58fd68a3-337a-4331-9ce6-64132c95a457",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "ddb6f2e6-82c7-44c1-a871-0dfaef25c01e",
+        "code": "1973a843-04e8-4e5a-b1cc-db53be314619",
+        "name": "（ラップ専用）ＳＢＩ・先進国株式",
+        "sortOrder": 2,
+        "schemeId": "58fd68a3-337a-4331-9ce6-64132c95a457",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "fd8ffc6a-a242-4303-9f6f-94777fddfe63",
+        "code": "c5e07a2d-bbdb-43f0-8902-d69d48ef5e79",
+        "name": "（ラップ専用）ＳＢＩ・新興国株式",
+        "sortOrder": 3,
+        "schemeId": "58fd68a3-337a-4331-9ce6-64132c95a457",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "7e4a1829-fb24-4247-8514-e7ccbf37b601",
+        "code": "53b66a8c-98c9-4867-afe5-16ee4ec8af97",
+        "name": "（ラップ専用）ＳＢＩ・米国債券",
+        "sortOrder": 4,
+        "schemeId": "58fd68a3-337a-4331-9ce6-64132c95a457",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "29570955-62d8-4067-8a66-9c9f56ec86bd",
+        "code": "6ba16261-ad73-44e9-9d9a-f98b599cd314",
+        "name": "（ラップ専用）ＳＢＩ・米国ハイイールド債券",
+        "sortOrder": 5,
+        "schemeId": "58fd68a3-337a-4331-9ce6-64132c95a457",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "031f2c33-4b8d-4f6a-bc63-b33d7d65a9a5",
+        "code": "30404871-5f1a-4420-a3e5-08899b895c37",
+        "name": "（ラップ専用）ＳＢＩ・新興国債券",
+        "sortOrder": 6,
+        "schemeId": "58fd68a3-337a-4331-9ce6-64132c95a457",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "8e0897a0-86c4-4a5a-898b-429e6d66d6d5",
+        "code": "4bf617e7-8528-428e-b354-b3dd7969d4ef",
+        "name": "（ラップ専用）ＳＢＩ・米国不動産",
+        "sortOrder": 7,
+        "schemeId": "58fd68a3-337a-4331-9ce6-64132c95a457",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "4ed2d105-22c9-4270-bbfa-c04e42dbf2ca",
+        "code": "eec2ca58-abcd-438e-9ab8-d9e328093ace",
+        "name": "（ラップ専用）ＳＢＩ・ゴールド",
+        "sortOrder": 8,
+        "schemeId": "58fd68a3-337a-4331-9ce6-64132c95a457",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "63389ee7-b26b-490b-bddc-1bde2269549b",
+        "code": "b8cae33b-1ee5-40ef-be9e-b6232829e0fa",
+        "name": "現金",
+        "sortOrder": 9,
+        "schemeId": "58fd68a3-337a-4331-9ce6-64132c95a457",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      }
+    ],
+    "links": []
+  },
+  {
+    "id": "daa60ff0-a925-4ae3-97fb-80d8f2cab7f5",
+    "code": "sbi_wrap_all_equity",
+    "name": "ALL株式",
+    "values": [
+      {
+        "id": "6eff0508-07ed-45a3-8d85-1b325787ccc2",
+        "code": "d77cad81-0b4d-40dc-bc7c-4c145dcd865d",
+        "name": "ラップ専用・三井住友ＤＳ・米国株式セクター戦略ファンド",
+        "sortOrder": 26,
+        "schemeId": "daa60ff0-a925-4ae3-97fb-80d8f2cab7f5",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "b2e74f8b-1658-41aa-b18c-cf079da13a33",
+        "code": "3715f0c2-3fa7-4dbe-9cc4-f626d698b512",
+        "name": "ラップ専用・三井住友ＤＳ・米国株式ファクター戦略ファンド",
+        "sortOrder": 27,
+        "schemeId": "daa60ff0-a925-4ae3-97fb-80d8f2cab7f5",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "4c7493ab-6cce-4720-a7fb-6a12f600d432",
+        "code": "9701c1b8-29b3-4f5e-99b4-b7eb05f6e23a",
+        "name": "ラップ専用・三井住友ＤＳ・グローバル株式（除く米国）戦略ファンド",
+        "sortOrder": 28,
+        "schemeId": "daa60ff0-a925-4ae3-97fb-80d8f2cab7f5",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "458f1118-ca9e-4cc7-83c1-563d630d6ed7",
+        "code": "0c02eed3-d4cb-4f1e-96b9-4e08313e7c3b",
+        "name": "現金",
+        "sortOrder": 29,
+        "schemeId": "daa60ff0-a925-4ae3-97fb-80d8f2cab7f5",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      }
+    ],
+    "links": []
+  },
+  {
+    "id": "36c19696-d0f9-4c46-96c2-9f8a99347972",
+    "code": "sbi_wrap_product",
+    "name": "商品",
+    "values": [
+      {
+        "id": "b1ffc85e-ccdb-49e8-b7f3-a0a88c785ba7",
+        "code": "ai_investment",
+        "name": "AI投資",
+        "sortOrder": 1,
+        "schemeId": "36c19696-d0f9-4c46-96c2-9f8a99347972",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "0f643d1b-2079-4492-8dfb-914805a6cfc5",
+        "code": "takumi",
+        "name": "匠の運用",
+        "sortOrder": 2,
+        "schemeId": "36c19696-d0f9-4c46-96c2-9f8a99347972",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "7a6acaff-8f77-409e-bcd3-9d8b243b256c",
+        "code": "rebanavi",
+        "name": "レバナビ",
+        "sortOrder": 3,
+        "schemeId": "36c19696-d0f9-4c46-96c2-9f8a99347972",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "6499564d-f31e-4b49-a6cb-9dcc0b271f76",
+        "code": "reba_choice",
+        "name": "レバチョイス",
+        "sortOrder": 4,
+        "schemeId": "36c19696-d0f9-4c46-96c2-9f8a99347972",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "8672bfac-c339-4968-9ec6-5d3da4cfc010",
+        "code": "all_equity",
+        "name": "ALL株式",
+        "sortOrder": 5,
+        "schemeId": "36c19696-d0f9-4c46-96c2-9f8a99347972",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      }
+    ],
+    "links": []
+  },
+  {
+    "id": "10be492b-f7fa-4f4f-8725-b6eda4229976",
+    "code": "sbi_wrap_reba_choice",
+    "name": "レバチョイス",
+    "values": [
+      {
+        "id": "c42b41aa-903a-49ce-9475-38ca4ee2d855",
+        "code": "b9ccb308-8676-4e6f-a41c-6d26b0513a8b",
+        "name": "マルチアセット戦略ファンド・トリプル（ラップ専用）",
+        "sortOrder": 23,
+        "schemeId": "10be492b-f7fa-4f4f-8725-b6eda4229976",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "132abe1f-5466-4a3b-a9a8-30f9c1cf57b2",
+        "code": "c586196d-6679-40a2-9636-1ef710ce6815",
+        "name": "マルチアセット戦略ファンド・シングル（ラップ専用）",
+        "sortOrder": 24,
+        "schemeId": "10be492b-f7fa-4f4f-8725-b6eda4229976",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "50f2c7f1-847b-4e24-b11c-db2f73a3edcd",
+        "code": "96e1cc99-ae4a-4a97-91d4-f31648c675ee",
+        "name": "現金",
+        "sortOrder": 25,
+        "schemeId": "10be492b-f7fa-4f4f-8725-b6eda4229976",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      }
+    ],
+    "links": []
+  },
+  {
+    "id": "dced4e63-2687-42b6-9514-cbde5dbe960b",
+    "code": "sbi_wrap_rebanavi",
+    "name": "レバナビ",
+    "values": [
+      {
+        "id": "d48aae0f-664a-4226-9607-456afefaa58b",
+        "code": "50602be0-20aa-4d9a-91b7-7240a6ceccb3",
+        "name": "マルチアセット戦略ファンド・トリプル（ラップ専用）",
+        "sortOrder": 20,
+        "schemeId": "dced4e63-2687-42b6-9514-cbde5dbe960b",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "1107bb30-61a2-4dad-8607-987aa41c5f3a",
+        "code": "5ccedcdf-2879-4898-97cf-c9c77ef840e9",
+        "name": "マルチアセット戦略ファンド・シングル（ラップ専用）",
+        "sortOrder": 21,
+        "schemeId": "dced4e63-2687-42b6-9514-cbde5dbe960b",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "d9faaf5a-99bd-45dc-9fdb-6ff8ce608848",
+        "code": "9d7796fc-d9b0-4e67-95fc-4e7deccf2123",
+        "name": "現金",
+        "sortOrder": 22,
+        "schemeId": "dced4e63-2687-42b6-9514-cbde5dbe960b",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      }
+    ],
+    "links": []
+  },
+  {
+    "id": "e1ad3104-6a88-4834-bbc4-fd55e4931b3b",
+    "code": "sbi_wrap_takumi",
+    "name": "匠の運用",
+    "values": [
+      {
+        "id": "cd7a1c2b-a6b0-4395-8d28-14c55a6dfeff",
+        "code": "52ca9074-a9e1-479c-a193-fd63a43c3ee0",
+        "name": "ラップ専用・世界株式アクティブ（グローバル・マルチテーマ）",
+        "sortOrder": 10,
+        "schemeId": "e1ad3104-6a88-4834-bbc4-fd55e4931b3b",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "29f18a63-7857-4e12-8bc1-f15e159592fb",
+        "code": "a140700b-49db-4c7f-a31f-f5be82af58f9",
+        "name": "ラップ専用・世界株式アクティブ（グローバル・バリュー）",
+        "sortOrder": 11,
+        "schemeId": "e1ad3104-6a88-4834-bbc4-fd55e4931b3b",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "1e7309e2-4bde-4ba5-aa05-9041b96b6300",
+        "code": "d12440f6-c903-49ce-8e81-27e0e286ecd8",
+        "name": "ラップ専用・日本株式アクティブ（セレクト・オポチュニティ）",
+        "sortOrder": 12,
+        "schemeId": "e1ad3104-6a88-4834-bbc4-fd55e4931b3b",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "bd2ecd62-abac-4634-9670-e86eae706734",
+        "code": "00e9627e-bc24-4ecf-a462-95ea62f5eeb4",
+        "name": "ラップ専用・外国債券アクティブ",
+        "sortOrder": 13,
+        "schemeId": "e1ad3104-6a88-4834-bbc4-fd55e4931b3b",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "04db8731-73c2-494e-9934-52ab8062283e",
+        "code": "298cc58f-dc4a-43dc-82d8-94cc92da5ca5",
+        "name": "ラップ専用・外国国債アクティブ（為替ヘッジあり）",
+        "sortOrder": 14,
+        "schemeId": "e1ad3104-6a88-4834-bbc4-fd55e4931b3b",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "52bf2569-6790-4cf5-a4cb-b7293a542a0e",
+        "code": "4f9a5ae4-27cc-4d1e-9703-6efad2ed747c",
+        "name": "ラップ専用・米国ハイ・イールド債券アクティブ",
+        "sortOrder": 15,
+        "schemeId": "e1ad3104-6a88-4834-bbc4-fd55e4931b3b",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "bccc28e7-1793-44a5-90f3-23b964af8831",
+        "code": "69f53616-5ebe-4e40-94d9-2aa5488404bf",
+        "name": "ラップ専用・日本債券アクティブ（クレジット戦略型）",
+        "sortOrder": 16,
+        "schemeId": "e1ad3104-6a88-4834-bbc4-fd55e4931b3b",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "8b9f71ef-7c81-4609-8e8f-5ed14ee55aa5",
+        "code": "bada9d28-5773-4cff-9b5b-72216bfba22e",
+        "name": "ラップ専用・グローバルＲＥＩＴアクティブ",
+        "sortOrder": 17,
+        "schemeId": "e1ad3104-6a88-4834-bbc4-fd55e4931b3b",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "385d169e-da4e-4284-bb6e-6868aec0bb92",
+        "code": "5a433ccb-6e44-4a9d-bf09-cd2f60c20173",
+        "name": "ラップ専用・Ｊ−ＲＥＩＴアクティブ",
+        "sortOrder": 18,
+        "schemeId": "e1ad3104-6a88-4834-bbc4-fd55e4931b3b",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "6ae3564b-2d36-49bc-b638-e4d630462be5",
+        "code": "314d78fe-b09c-462b-8b2a-33c6ac5b3ed5",
+        "name": "現金",
+        "sortOrder": 19,
+        "schemeId": "e1ad3104-6a88-4834-bbc4-fd55e4931b3b",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      }
+    ],
+    "links": []
+  }
+]

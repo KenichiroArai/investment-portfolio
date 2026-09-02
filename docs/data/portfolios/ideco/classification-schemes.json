@@ -1,0 +1,568 @@
+[
+  {
+    "id": "ede50215-0f4f-4fe5-b6ae-436377738c1d",
+    "code": "ideco_asset_class",
+    "name": "資産分類",
+    "values": [
+      {
+        "id": "e5f4f9d5-9779-48f0-8ac1-0c24c50769bf",
+        "code": "equity",
+        "name": "株式",
+        "sortOrder": 0,
+        "schemeId": "ede50215-0f4f-4fe5-b6ae-436377738c1d",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "fc8e7238-9082-4a4c-b835-a3710f5e8412",
+        "code": "bond",
+        "name": "債券",
+        "sortOrder": 1,
+        "schemeId": "ede50215-0f4f-4fe5-b6ae-436377738c1d",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "24817f79-97b8-4132-a687-4b57ba565b68",
+        "code": "real_estate",
+        "name": "不動産",
+        "sortOrder": 2,
+        "schemeId": "ede50215-0f4f-4fe5-b6ae-436377738c1d",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "7ff3b8c3-0ae3-424c-adb4-69fa6b90b5f3",
+        "code": "balanced",
+        "name": "複合",
+        "sortOrder": 3,
+        "schemeId": "ede50215-0f4f-4fe5-b6ae-436377738c1d",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "a2af0111-075e-44ed-90a8-5bba8cadbaa2",
+        "code": "other",
+        "name": "その他",
+        "sortOrder": 4,
+        "schemeId": "ede50215-0f4f-4fe5-b6ae-436377738c1d",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      }
+    ],
+    "links": []
+  },
+  {
+    "id": "3476abb3-78bc-4dd0-9260-73b56fc77230",
+    "code": "ideco_axis_40470d15",
+    "name": "主要資産：資産分類",
+    "values": [
+      {
+        "id": "c1426544-46e3-4c06-bfdb-a78c37e4f72a",
+        "code": "equity",
+        "name": "株式",
+        "sortOrder": 0,
+        "schemeId": "3476abb3-78bc-4dd0-9260-73b56fc77230",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "9db568f7-c8f6-45d2-8b75-cfe73f8eabf6",
+        "code": "bond",
+        "name": "債券",
+        "sortOrder": 1,
+        "schemeId": "3476abb3-78bc-4dd0-9260-73b56fc77230",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "a565fe29-a447-47ac-b6f3-6481ad1e8069",
+        "code": "real_estate",
+        "name": "不動産",
+        "sortOrder": 2,
+        "schemeId": "3476abb3-78bc-4dd0-9260-73b56fc77230",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      }
+    ],
+    "links": []
+  },
+  {
+    "id": "49d0d673-eba1-4272-88d3-3e2c938a0522",
+    "code": "ideco_axis_4381cf4c",
+    "name": "その他",
+    "values": [
+      {
+        "id": "98ab345c-938c-4109-962d-5854f12ab3be",
+        "code": "balanced",
+        "name": "内外資産複合",
+        "sortOrder": 0,
+        "schemeId": "49d0d673-eba1-4272-88d3-3e2c938a0522",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "e1db3f17-e345-497c-aa6a-273ed26911a2",
+        "code": "domestic_other",
+        "name": "国内その他資産",
+        "sortOrder": 1,
+        "schemeId": "49d0d673-eba1-4272-88d3-3e2c938a0522",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      }
+    ],
+    "links": []
+  },
+  {
+    "id": "2e9f4103-a4c0-4803-8749-0d6ce4315093",
+    "code": "ideco_axis_7452352e",
+    "name": "主要資産：地域分類",
+    "values": [
+      {
+        "id": "fe1d1dc5-4635-4b00-9d3f-528f8fb3972a",
+        "code": "domestic",
+        "name": "国内",
+        "sortOrder": 0,
+        "schemeId": "2e9f4103-a4c0-4803-8749-0d6ce4315093",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "e41fd2df-d882-4ac4-9aaa-28c77a89f7d3",
+        "code": "foreign",
+        "name": "海外",
+        "sortOrder": 1,
+        "schemeId": "2e9f4103-a4c0-4803-8749-0d6ce4315093",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      }
+    ],
+    "links": []
+  },
+  {
+    "id": "d3feac1c-7d1e-461a-9501-07dbca349459",
+    "code": "ideco_axis_9b6ea403",
+    "name": "主要資産",
+    "values": [
+      {
+        "id": "29adc281-dc34-4077-b967-7268870ed503",
+        "code": "domestic_equity",
+        "name": "国内株式",
+        "sortOrder": 0,
+        "schemeId": "d3feac1c-7d1e-461a-9501-07dbca349459",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "58565e2f-ef89-47e7-b524-75ae8f2a4742",
+        "code": "domestic_foreign_equity",
+        "name": "内外株式",
+        "sortOrder": 1,
+        "schemeId": "d3feac1c-7d1e-461a-9501-07dbca349459",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "e5fcf2fc-44d0-4520-8fa3-77754276d7be",
+        "code": "foreign_equity",
+        "name": "海外株式",
+        "sortOrder": 2,
+        "schemeId": "d3feac1c-7d1e-461a-9501-07dbca349459",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "44f053d9-820c-4d42-a622-fa438b6845d3",
+        "code": "domestic_bond",
+        "name": "国内債券",
+        "sortOrder": 3,
+        "schemeId": "d3feac1c-7d1e-461a-9501-07dbca349459",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "59ad94e0-9c8b-4912-9337-9dc94d23041c",
+        "code": "foreign_bond",
+        "name": "海外債券",
+        "sortOrder": 4,
+        "schemeId": "d3feac1c-7d1e-461a-9501-07dbca349459",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "630f88f4-0a6f-48c4-a1e7-3e2faa47f5e1",
+        "code": "domestic_reit",
+        "name": "国内不動産投信",
+        "sortOrder": 5,
+        "schemeId": "d3feac1c-7d1e-461a-9501-07dbca349459",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "7f17753f-2688-48cf-b693-9bd4120c6c92",
+        "code": "foreign_reit",
+        "name": "海外不動産投信",
+        "sortOrder": 6,
+        "schemeId": "d3feac1c-7d1e-461a-9501-07dbca349459",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      }
+    ],
+    "links": []
+  },
+  {
+    "id": "b3bf24f3-581c-4005-b541-e890754ce5b3",
+    "code": "ideco_axis_distributed-combination-1",
+    "name": "分散組み合わせ（先進国統一、ゴールド除く）",
+    "values": [
+      {
+        "id": "54924a33-dc13-4ae7-8dc3-429443f6d161",
+        "code": "domestic_equity",
+        "name": "国内株式",
+        "sortOrder": 0,
+        "schemeId": "b3bf24f3-581c-4005-b541-e890754ce5b3",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "07d1b4ee-b3fc-4aad-b412-d95a1747c0a1",
+        "code": "developed_equity",
+        "name": "先進国株式",
+        "sortOrder": 1,
+        "schemeId": "b3bf24f3-581c-4005-b541-e890754ce5b3",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "653487a4-29c8-49d3-a13c-bff2f56bb6dd",
+        "code": "emerging_equity",
+        "name": "新興国株式",
+        "sortOrder": 2,
+        "schemeId": "b3bf24f3-581c-4005-b541-e890754ce5b3",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "0750b854-a94f-4f02-97b0-9fca45b32a68",
+        "code": "domestic_bond",
+        "name": "国内債券",
+        "sortOrder": 3,
+        "schemeId": "b3bf24f3-581c-4005-b541-e890754ce5b3",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "a9c2ef5d-252f-497e-8fa3-43093f164b8d",
+        "code": "developed_bond",
+        "name": "先進国債券",
+        "sortOrder": 4,
+        "schemeId": "b3bf24f3-581c-4005-b541-e890754ce5b3",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "51746ab4-994f-4a66-b5b0-519ee53a85ac",
+        "code": "emerging_bond",
+        "name": "新興国債券",
+        "sortOrder": 5,
+        "schemeId": "b3bf24f3-581c-4005-b541-e890754ce5b3",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "b35c37e8-0522-4437-8887-18ea0e217f86",
+        "code": "domestic_reit",
+        "name": "国内不動産,",
+        "sortOrder": 6,
+        "schemeId": "b3bf24f3-581c-4005-b541-e890754ce5b3",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "dd4d1f1a-e299-4f44-a31b-cce37afb6f61",
+        "code": "foreign_reit",
+        "name": "海外不動産",
+        "sortOrder": 7,
+        "schemeId": "b3bf24f3-581c-4005-b541-e890754ce5b3",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      }
+    ],
+    "links": []
+  },
+  {
+    "id": "c26698f0-6813-401b-865f-82bfb436bb7f",
+    "code": "ideco_instrument_status",
+    "name": "ステータス",
+    "values": [
+      {
+        "id": "cb6e9002-cc5b-4185-a0ce-1c783e468203",
+        "code": "exclusion_pending",
+        "name": "除外手続中",
+        "sortOrder": 0,
+        "schemeId": "c26698f0-6813-401b-865f-82bfb436bb7f",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      }
+    ],
+    "links": []
+  },
+  {
+    "id": "af0be7d3-e78f-4dfb-98b6-6f188db6ed8f",
+    "code": "ideco_major_category",
+    "name": "大分類",
+    "values": [
+      {
+        "id": "1e44fb60-ded6-47e5-96f2-54d9927ed148",
+        "code": "time_deposit",
+        "name": "定期預金",
+        "sortOrder": 0,
+        "schemeId": "af0be7d3-e78f-4dfb-98b6-6f188db6ed8f",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "05ac63f0-dda2-411d-a1b5-61dba99c2770",
+        "code": "mutual_fund",
+        "name": "投資信託",
+        "sortOrder": 1,
+        "schemeId": "af0be7d3-e78f-4dfb-98b6-6f188db6ed8f",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "bcadd8c0-28c1-4c2e-8752-0187908e21a7",
+        "code": "standby_cash",
+        "name": "待機資金",
+        "sortOrder": 2,
+        "schemeId": "af0be7d3-e78f-4dfb-98b6-6f188db6ed8f",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      }
+    ],
+    "links": []
+  },
+  {
+    "id": "e06c16b1-dd8e-4749-a14d-337aba4a8c7a",
+    "code": "ideco_product_group",
+    "name": "商品グループ",
+    "values": [
+      {
+        "id": "1ebdb253-a00c-4a39-84da-3d036226a49b",
+        "code": "major_assets",
+        "name": "主要資産",
+        "sortOrder": 0,
+        "schemeId": "e06c16b1-dd8e-4749-a14d-337aba4a8c7a",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "c3b98bf7-23a3-4c36-ab2c-431a14dd4ac5",
+        "code": "other",
+        "name": "その他",
+        "sortOrder": 1,
+        "schemeId": "e06c16b1-dd8e-4749-a14d-337aba4a8c7a",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      }
+    ],
+    "links": []
+  },
+  {
+    "id": "83cd72af-fcc4-47ee-befe-9d3a2113abdc",
+    "code": "ideco_product_style",
+    "name": "商品タイプ(スタイル)",
+    "values": [
+      {
+        "id": "b0069093-680b-4715-836b-ae99787a919a",
+        "code": "passive",
+        "name": "パッシブ",
+        "sortOrder": 0,
+        "schemeId": "83cd72af-fcc4-47ee-befe-9d3a2113abdc",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "0cf93297-94e4-4855-9060-c13462a8983d",
+        "code": "active",
+        "name": "アクティブ",
+        "sortOrder": 1,
+        "schemeId": "83cd72af-fcc4-47ee-befe-9d3a2113abdc",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      }
+    ],
+    "links": []
+  },
+  {
+    "id": "47875d42-fadd-43a5-947e-2db59d494776",
+    "code": "ideco_product_type",
+    "name": "すべて",
+    "values": [
+      {
+        "id": "cf55eead-f585-4a05-b83e-a3887b4d7edd",
+        "code": "domestic_equity",
+        "name": "国内株式",
+        "sortOrder": 0,
+        "schemeId": "47875d42-fadd-43a5-947e-2db59d494776",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "453bcffc-745c-4b18-af82-851b3366b521",
+        "code": "domestic_foreign_equity",
+        "name": "内外株式",
+        "sortOrder": 1,
+        "schemeId": "47875d42-fadd-43a5-947e-2db59d494776",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "044f264f-383c-485e-8a95-a79f79eaa701",
+        "code": "foreign_equity",
+        "name": "海外株式",
+        "sortOrder": 2,
+        "schemeId": "47875d42-fadd-43a5-947e-2db59d494776",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "bbc58a2a-82cf-43de-a9f3-d4a2a2e1bc6d",
+        "code": "domestic_bond",
+        "name": "国内債券",
+        "sortOrder": 3,
+        "schemeId": "47875d42-fadd-43a5-947e-2db59d494776",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "1ec6aa1a-bf35-440b-a1ae-9a06b47761e5",
+        "code": "foreign_bond",
+        "name": "海外債券",
+        "sortOrder": 4,
+        "schemeId": "47875d42-fadd-43a5-947e-2db59d494776",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "3ce57a8f-5489-440e-9042-23586d1d851c",
+        "code": "domestic_reit",
+        "name": "国内不動産投信",
+        "sortOrder": 5,
+        "schemeId": "47875d42-fadd-43a5-947e-2db59d494776",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "c3d17bd7-6db9-4eae-a197-2390e0a61b1b",
+        "code": "foreign_reit",
+        "name": "海外不動産投信",
+        "sortOrder": 6,
+        "schemeId": "47875d42-fadd-43a5-947e-2db59d494776",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "550df883-4bf1-44ff-b7aa-68a7f63e9552",
+        "code": "balanced",
+        "name": "内外資産複合",
+        "sortOrder": 7,
+        "schemeId": "47875d42-fadd-43a5-947e-2db59d494776",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "af0511b1-2434-40a8-9839-fb4993d93326",
+        "code": "domestic_other",
+        "name": "国内その他資産",
+        "sortOrder": 8,
+        "schemeId": "47875d42-fadd-43a5-947e-2db59d494776",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "746a1512-a83d-4dd0-806e-eb4d118c1239",
+        "code": "principal_protected",
+        "name": "元本確保",
+        "sortOrder": 9,
+        "schemeId": "47875d42-fadd-43a5-947e-2db59d494776",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      }
+    ],
+    "links": []
+  },
+  {
+    "id": "28c74745-0128-4d5c-b53f-e4de72b49db7",
+    "code": "ideco_region",
+    "name": "地域分類",
+    "values": [
+      {
+        "id": "50c48152-0af7-4fd7-adce-821f203bf164",
+        "code": "domestic",
+        "name": "国内",
+        "sortOrder": 0,
+        "schemeId": "28c74745-0128-4d5c-b53f-e4de72b49db7",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      },
+      {
+        "id": "e3436617-31d5-4e3e-8d25-9e515c4cea14",
+        "code": "foreign",
+        "name": "海外",
+        "sortOrder": 1,
+        "schemeId": "28c74745-0128-4d5c-b53f-e4de72b49db7",
+        "parentIds": [],
+        "childIds": [],
+        "isLeaf": true
+      }
+    ],
+    "links": []
+  }
+]

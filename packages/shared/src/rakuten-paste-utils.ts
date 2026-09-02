@@ -136,6 +136,295 @@ export function isRakutenStockCode(value: string): boolean {
   return result;
 }
 
+export function extractRakutenLeadingStockCode(line: string): string | null {
+  let result: string | null = null;
+  const cells = splitRakutenPasteCells(line);
+  const first = cells[0].trim().normalize("NFKC");
+
+  if (!isRakutenStockCode(first)) {
+    return result;
+  }
+
+  result = first;
+  return result;
+}
+
+export type RakutenPasteFormat = "legacy" | "page";
+
+export function detectRakutenPasteFormat(lines: string[]): RakutenPasteFormat {
+  let hasLegacy = false;
+  let hasPage = false;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed.startsWith("種別\t") || trimmed.startsWith("種別 ")) {
+      hasLegacy = true;
+      continue;
+    }
+
+    const cells = splitRakutenPasteCells(line);
+    const first = cells[0].trim().normalize("NFKC");
+
+    if (first === "国内株式" && isRakutenStockCode(cells[1] ?? "")) {
+      hasLegacy = true;
+      continue;
+    }
+
+    if (
+      first === "投資信託" &&
+      (cells[1] ?? "").trim() !== "" &&
+      isRakutenAccountTypeLabel(cells[2] ?? "")
+    ) {
+      hasLegacy = true;
+      continue;
+    }
+
+    if (first === "国内債券" && (cells[1] ?? "").trim() !== "") {
+      hasLegacy = true;
+      continue;
+    }
+
+    if (
+      (first === "楽天・マネーファンド" || first.startsWith("楽天・マネーファンド")) &&
+      (cells[1] ?? "").trim() !== "" &&
+      isRakutenAccountTypeLabel(cells[2] ?? "")
+    ) {
+      hasLegacy = true;
+      continue;
+    }
+
+    if (first === "外貨建" || first === "楽ラップ") {
+      hasLegacy = true;
+      continue;
+    }
+
+    if (first === "MMF" && (cells[1] ?? "").trim() !== "") {
+      hasLegacy = true;
+      continue;
+    }
+
+    if (parseRakutenPageAccountSection(line) !== null) {
+      hasPage = true;
+      continue;
+    }
+
+    if (extractRakutenLeadingStockCode(line) !== null) {
+      hasPage = true;
+      continue;
+    }
+
+    if (isRakutenWrapFundLine(line)) {
+      hasPage = true;
+      continue;
+    }
+  }
+
+  let result: RakutenPasteFormat = "legacy";
+  if (hasPage && !hasLegacy) {
+    result = "page";
+  }
+  return result;
+}
+
+export function parseRakutenPageAccountSection(line: string): string | null {
+  let result: string | null = null;
+  const normalized = line.trim().normalize("NFKC").replace(/\s+/g, "");
+
+  if (normalized === "特定口座") {
+    result = "特定";
+    return result;
+  }
+
+  if (normalized === "一般口座") {
+    result = "一般";
+    return result;
+  }
+
+  return result;
+}
+
+export function isRakutenPageNoiseLine(line: string): boolean {
+  let result = false;
+  const trimmed = line.trim();
+  const normalized = trimmed.normalize("NFKC");
+
+  if (trimmed === "") {
+    result = true;
+    return result;
+  }
+
+  const exactNoise = new Set([
+    "詳細",
+    "買い",
+    "売り",
+    "積立",
+    "買い 売却",
+    "買い 解約",
+    "追加 引き出し",
+    "注文",
+    "銘柄",
+    "ファンド",
+    "デフォルト",
+    "取引",
+    "登録",
+    "制限",
+    "あし",
+    "あと",
+    "すべて",
+    "国内株式",
+    "投信",
+    "米国株式",
+    "中国株式",
+    "アセアン株式",
+    "債券",
+    "外貨預り金",
+    "金・プラチナ",
+    "楽ラップ",
+    "投資信託",
+    "国内債券",
+    "外貨建MMF",
+    "特定口座合計",
+    "決算発表日",
+    "再投資型",
+    "分配金",
+    "コース",
+    "(変更)",
+    "(執行中)",
+    "円%",
+    "FR",
+    "合計",
+    "現金等［円］",
+    "↓特定口座",
+    "↓一般口座",
+    "口座合計を表示",
+    "口座合計をすべて非表示",
+    "貸株金利を表示",
+    "銘柄の登録・比較ボタンを表示",
+    "ファンドの登録・比較ボタンを表示",
+    "ファンドの登録ボタンを表示",
+  ]);
+
+  if (exactNoise.has(normalized)) {
+    result = true;
+    return result;
+  }
+
+  if (
+    normalized.startsWith("平均取得") ||
+    normalized.startsWith("取得総額") ||
+    normalized.startsWith("保有数量") ||
+    normalized.startsWith("現在値") ||
+    normalized.startsWith("前日比") ||
+    normalized.startsWith("時価評価額") ||
+    normalized.startsWith("評価損益") ||
+    normalized.startsWith("基準価額") ||
+    normalized.startsWith("未収分配金") ||
+    normalized.startsWith("参考為替レート") ||
+    normalized.startsWith("償還日") ||
+    normalized.startsWith("年利率") ||
+    normalized.startsWith("評価額") ||
+    normalized.startsWith("参考単価") ||
+    normalized.startsWith("損益率") ||
+    normalized.startsWith("ファンド名") ||
+    normalized.startsWith("トータル") ||
+    normalized.startsWith("リターン") ||
+    normalized.includes("円 / USD") ||
+    /^\(\d{2}\/\d{2}/.test(normalized) ||
+    /^\d{4}\/\d{2}\/\d{2}$/.test(normalized)
+  ) {
+    result = true;
+    return result;
+  }
+
+  if (/^[\d,.+\-]+\s*USD$/i.test(normalized)) {
+    result = true;
+    return result;
+  }
+
+  if (normalized === "米ドル") {
+    result = true;
+    return result;
+  }
+
+  if (normalized.startsWith("現金等［") || normalized.startsWith("現金等[")) {
+    result = true;
+    return result;
+  }
+
+  return result;
+}
+
+export function isRakutenWrapFundLine(line: string): boolean {
+  let result = false;
+  const trimmed = line.trim();
+
+  if (trimmed.startsWith("【楽ラップ専用】")) {
+    result = true;
+  }
+
+  return result;
+}
+
+export function isRakutenDomesticBondLine(line: string): boolean {
+  let result = false;
+  const trimmed = line.trim();
+
+  if (trimmed.startsWith("個人国債")) {
+    result = true;
+  }
+
+  return result;
+}
+
+export function isRakutenPageMutualFundNameLine(line: string): boolean {
+  let result = false;
+  const trimmed = line.trim();
+
+  if (trimmed === "" || isRakutenPageNoiseLine(line)) {
+    return result;
+  }
+
+  if (extractRakutenLeadingStockCode(line) !== null) {
+    return result;
+  }
+
+  if (isRakutenWrapFundLine(line) || isRakutenDomesticBondLine(line)) {
+    return result;
+  }
+
+  if (trimmed === "楽天・マネーファンド" || trimmed.startsWith("楽天・マネーファンド")) {
+    return result;
+  }
+
+  if (trimmed === "現金等" || trimmed.startsWith("現金等")) {
+    return result;
+  }
+
+  if (
+    trimmed.includes("ファンド") ||
+    trimmed.includes("オープン") ||
+    trimmed.includes("ウェルスナビ") ||
+    trimmed.includes("Tracers") ||
+    trimmed.includes("インベスコ") ||
+    trimmed.includes("SMT ")
+  ) {
+    result = true;
+  }
+
+  return result;
+}
+
+export function isRakutenFxMmfFundLine(line: string): boolean {
+  let result = false;
+  const trimmed = line.trim();
+
+  if (trimmed.includes("MMF") && trimmed.includes("ファンド")) {
+    result = true;
+  }
+
+  return result;
+}
+
 export function detectRakutenBlockKind(
   lines: string[],
   index: number,
@@ -146,17 +435,27 @@ export function detectRakutenBlockKind(
   const first = cells[0].trim().normalize("NFKC");
 
   if (first === "国内株式") {
-    result = "domestic_equity";
+    if (isRakutenStockCode(cells[1] ?? "")) {
+      result = "domestic_equity";
+    }
     return result;
   }
 
   if (first === "投資信託") {
-    result = "mutual_fund";
+    const instrumentName = (cells[1] ?? "").trim();
+    const accountTypeRaw = cells[2] ?? "";
+    if (instrumentName !== "" && isRakutenAccountTypeLabel(accountTypeRaw)) {
+      result = "mutual_fund";
+    }
     return result;
   }
 
   if (first === "楽天・マネーファンド" || first.startsWith("楽天・マネーファンド")) {
-    result = "money_fund";
+    const instrumentName = (cells[1] ?? "").trim();
+    const accountTypeRaw = cells[2] ?? "";
+    if (instrumentName !== "" && isRakutenAccountTypeLabel(accountTypeRaw)) {
+      result = "money_fund";
+    }
     return result;
   }
 
@@ -174,7 +473,10 @@ export function detectRakutenBlockKind(
   }
 
   if (first === "国内債券") {
-    result = "domestic_bond";
+    const instrumentName = (cells[1] ?? "").trim();
+    if (instrumentName !== "") {
+      result = "domestic_bond";
+    }
     return result;
   }
 

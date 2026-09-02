@@ -22,7 +22,7 @@ export function RakutenBulkImportPasteCard({
       <CardHeader>
         <CardTitle>楽天証券から一括取り込み</CardTitle>
         <CardDescription>
-          楽天証券の保有残高画面をコピーして貼り付け、「取り込み」で下書きに反映します。一括登録時は保有明細をすべて置き換えます。
+          楽天証券の保有商品一覧画面（国内株式・投信・楽ラップ・マネーファンド等）をすべて含めてコピーし、貼り付けて「取り込み」を押してください。一括登録時は保有明細をすべて置き換えます。
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

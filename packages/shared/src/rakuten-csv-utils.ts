@@ -1,9 +1,33 @@
 import { normalizeIdecoInstrumentMatchKey } from "./ideco-instrument-match";
 
+export type RakutenPasteErrorOptions = {
+  lineNumber?: number;
+  hint?: string;
+};
+
 export class RakutenPasteError extends Error {
-  constructor(message: string) {
+  readonly lineNumber?: number;
+  readonly hint?: string;
+
+  constructor(message: string, options?: RakutenPasteErrorOptions) {
     super(message);
     this.name = "RakutenPasteError";
+    this.lineNumber = options?.lineNumber;
+    this.hint = options?.hint;
+  }
+
+  get displayMessage(): string {
+    let result = this.message;
+
+    if (this.lineNumber !== undefined) {
+      result = `行 ${this.lineNumber}: ${result}`;
+    }
+
+    if (this.hint !== undefined && this.hint !== "") {
+      result = `${result}（${this.hint}）`;
+    }
+
+    return result;
   }
 }
 
