@@ -279,13 +279,7 @@ export function validateLinkAddition(
 }
 
 export function enrichClassificationValues(
-  values: Array<{
-    id: string;
-    code: string;
-    name: string;
-    sortOrder: number;
-    schemeId: string;
-  }>,
+  values: ClassificationGraphValue[],
   links: ClassificationValueLinkDto[],
 ): ClassificationValueDto[] {
   let result: ClassificationValueDto[] = [];

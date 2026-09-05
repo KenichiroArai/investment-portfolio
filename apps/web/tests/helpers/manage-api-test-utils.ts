@@ -261,7 +261,12 @@ export function createManageFetchMock(options: ManageFetchMockOptions = {}) {
         return errorResponse(mutate.status ?? 400, mutate.message ?? "scheme create failed");
       }
       const body = JSON.parse(String(init?.body)) as { code: string; name: string };
-      const created = { id: "sch-new", ...body, values: [] as typeof MANAGE_SCHEME.values };
+      const created = {
+        id: "sch-new",
+        ...body,
+        values: [] as typeof MANAGE_SCHEME.values,
+        links: [] as typeof MANAGE_SCHEME.links,
+      };
       state.schemes = [...state.schemes, created];
       return okResponse(created);
     }

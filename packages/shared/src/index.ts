@@ -47,7 +47,6 @@ export * from "./rakuten-holding-metrics";
 export * from "./rakuten-instrument-match";
 export * from "./rakuten-paste";
 export * from "./rakuten-page-paste";
-export * from "./rakuten-paste-row";
 export * from "./rakuten-paste-utils";
 export * from "./sbi-wrap-analysis";
 export * from "./sbi-wrap-instrument-match";
