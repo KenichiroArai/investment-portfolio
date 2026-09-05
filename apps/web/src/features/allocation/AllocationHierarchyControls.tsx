@@ -28,6 +28,7 @@ export function buildClassificationGraphValues(
         id: value.id,
         code: value.code,
         name: value.name,
+        description: value.description ?? null,
         sortOrder: value.sortOrder,
         schemeId: value.schemeId ?? scheme.id,
         schemeCode: scheme.code,

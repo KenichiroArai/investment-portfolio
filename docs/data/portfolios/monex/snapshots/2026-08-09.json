@@ -3766,10 +3766,18 @@
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
+          "valueCode": "domestic_equity",
+          "valueName": "国内株式",
+          "sortOrder": 0,
+          "allocationWeight": 0.3333333333333333
+        },
+        {
+          "schemeCode": "monex_asset_class",
+          "schemeName": "資産クラス",
           "valueCode": "short_term",
           "valueName": "短期金融資産",
           "sortOrder": 10,
-          "allocationWeight": 1
+          "allocationWeight": 0.3333333333333333
         }
       ]
     }

@@ -89,6 +89,7 @@ export const classificationValues = sqliteTable(
       }, { onDelete: "cascade" }), // 分類体系ID
     code: text("code").notNull(), // 分類値コード
     name: text("name").notNull(), // 分類値名
+    description: text("description"), // 説明
     sortOrder: integer("sort_order").notNull().default(0), // 表示順
     createdAt: text("created_at").notNull(), // 作成日時
   },

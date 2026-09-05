@@ -34,6 +34,7 @@ import {
   useAllocationHierarchyParam,
   type AllocationAggregationLevel,
 } from "@/features/allocation/useAllocationHierarchyParam";
+import { buildClassificationDescriptionByCode } from "@/components/classification-value-label";
 import { useAllocationSchemeParam } from "@/features/allocation/useAllocationSchemeParam";
 import { useRebalanceDeposit } from "@/features/allocation/useRebalanceDeposit";
 import { useTargetAllocations } from "@/features/allocation/useTargetAllocations";
@@ -204,6 +205,12 @@ export function AnalysisView({
     for (const value of activeClassificationScheme?.values ?? []) {
       result.set(value.code, value.id);
     }
+    return result;
+  }, [activeClassificationScheme]);
+  const descriptionByValueCode = useMemo(() => {
+    let result = buildClassificationDescriptionByCode(
+      activeClassificationScheme?.values ?? [],
+    );
     return result;
   }, [activeClassificationScheme]);
   const drillDownValueIds = useMemo(() => {
@@ -433,6 +440,7 @@ export function AnalysisView({
         schemeCode={scheme.schemeCode}
         asOfDate={asOfDate}
         valueIdByCode={valueIdByCode}
+        descriptionByValueCode={descriptionByValueCode}
         drillDownValueIds={drillDownValueIds}
         allowLineExpand={!hasHierarchy || aggregationLevel === "leaf"}
         onDrillDown={setParentValueId}

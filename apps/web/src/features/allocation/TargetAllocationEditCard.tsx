@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { ClassificationValueLabel } from "@/components/classification-value-label";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -170,7 +171,14 @@ export function TargetAllocationEditCard({
                 {values.map((value) => {
                   let row = (
                     <TableRow key={value.id}>
-                      <TableCell>{value.name}</TableCell>
+                      <TableCell>
+                        <ClassificationValueLabel
+                          name={value.name}
+                          description={value.description}
+                          code={value.code}
+                          nameClassName="max-w-[14rem]"
+                        />
+                      </TableCell>
                       <TableCell>
                         <Input
                           type="number"

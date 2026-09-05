@@ -35,11 +35,13 @@ export const updateClassificationSchemeSchema = z.object({
 export const createClassificationValueSchema = z.object({
   code: z.string().min(1).max(64),
   name: z.string().min(1).max(256),
+  description: z.string().max(2000).nullable().optional(),
   sortOrder: z.number().int().optional(),
 });
 
 export const updateClassificationValueSchema = z.object({
   name: z.string().min(1).max(256),
+  description: z.string().max(2000).nullable().optional(),
   sortOrder: z.number().int(),
 });
 

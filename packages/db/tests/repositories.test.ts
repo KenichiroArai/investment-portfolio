@@ -840,17 +840,29 @@ describe("portfolio repositories", () => {
       schemeId: scheme!.id,
       code: "japan",
       name: "日本",
+      description: "国内株式など",
       sortOrder: 0,
     });
     const foundValue = await findClassificationValueById(db, value.id);
     expect(foundValue?.name).toBe("日本");
+    expect(foundValue?.description).toBe("国内株式など");
 
     await updateClassificationValue(db, value.id, {
       name: "日本（更新）",
+      description: "更新後の説明",
       sortOrder: 1,
     });
     const updatedValue = await findClassificationValueById(db, value.id);
     expect(updatedValue?.name).toBe("日本（更新）");
+    expect(updatedValue?.description).toBe("更新後の説明");
+
+    await updateClassificationValue(db, value.id, {
+      name: "日本（更新）",
+      description: "",
+      sortOrder: 1,
+    });
+    const clearedDescription = await findClassificationValueById(db, value.id);
+    expect(clearedDescription?.description).toBeNull();
 
     await updateClassificationSchemeName(db, scheme!.id, "地域分類");
     const renamedScheme = await findSchemeById(db, scheme!.id);

@@ -11,6 +11,7 @@ import { toast } from "sonner";
 
 import { EmptyState } from "@/components/empty-state";
 import { FormField } from "@/components/form-field";
+import { ClassificationValueLabel } from "@/components/classification-value-label";
 import { LoadingSkeleton } from "@/components/loading-skeleton";
 import { PageHeader } from "@/components/layout/page-header";
 import {
@@ -422,25 +423,30 @@ export function DataManageView({
                               <div className="flex flex-wrap gap-3">
                                 {scheme.values.map((value) => {
                                   let checkbox = (
-                                    <label
-                                      key={value.id}
-                                      className="flex items-center gap-2 text-sm"
-                                    >
-                                      <input
-                                        type="checkbox"
-                                        checked={tagValueIds.includes(value.id)}
-                                        onChange={(event) => {
-                                          if (event.target.checked) {
-                                            setTagValueIds((current) => [...current, value.id]);
-                                            return;
-                                          }
-                                          setTagValueIds((current) =>
-                                            current.filter((id) => id !== value.id),
-                                          );
-                                        }}
-                                      />
-                                      {value.name}
-                                    </label>
+                                      <div
+                                        key={value.id}
+                                        className="flex min-w-0 items-center gap-2 text-sm"
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          checked={tagValueIds.includes(value.id)}
+                                          aria-label={value.name}
+                                          onChange={(event) => {
+                                            if (event.target.checked) {
+                                              setTagValueIds((current) => [...current, value.id]);
+                                              return;
+                                            }
+                                            setTagValueIds((current) =>
+                                              current.filter((id) => id !== value.id),
+                                            );
+                                          }}
+                                        />
+                                        <ClassificationValueLabel
+                                          name={value.name}
+                                          description={value.description}
+                                          nameClassName="max-w-[12rem]"
+                                        />
+                                      </div>
                                   );
                                   return checkbox;
                                 })}

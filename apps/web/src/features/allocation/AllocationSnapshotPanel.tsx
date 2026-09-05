@@ -12,6 +12,7 @@ type AllocationSnapshotPanelProps = {
   schemeCode?: string;
   asOfDate?: string | null;
   valueIdByCode?: Map<string, string>;
+  descriptionByValueCode?: Map<string, string | null>;
   drillDownValueIds?: Set<string>;
   allowLineExpand?: boolean;
   onDrillDown?: (valueId: string) => void;
@@ -25,6 +26,7 @@ export function AllocationSnapshotPanel({
   schemeCode,
   asOfDate,
   valueIdByCode,
+  descriptionByValueCode,
   drillDownValueIds,
   allowLineExpand = true,
   onDrillDown,
@@ -40,6 +42,7 @@ export function AllocationSnapshotPanel({
         schemeCode={schemeCode}
         asOfDate={asOfDate}
         valueIdByCode={valueIdByCode}
+        descriptionByValueCode={descriptionByValueCode}
         drillDownValueIds={drillDownValueIds}
         allowLineExpand={allowLineExpand}
         onDrillDown={onDrillDown}

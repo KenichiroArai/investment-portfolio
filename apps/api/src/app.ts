@@ -340,6 +340,12 @@ export function createApp(options?: CreateAppOptions) {
       id: value.id,
       code: value.code,
       name: parsed.data.name,
+      description:
+        parsed.data.description === undefined
+          ? (value.description ?? null)
+          : parsed.data.description === null || parsed.data.description.trim() === ""
+            ? null
+            : parsed.data.description.trim(),
       sortOrder: parsed.data.sortOrder,
     });
     return result;

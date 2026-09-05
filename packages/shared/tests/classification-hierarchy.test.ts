@@ -94,11 +94,15 @@ describe("classification-hierarchy", () => {
   });
 
   it("enriches values with parent and child ids", () => {
-    const enriched = enrichClassificationValues(values, links);
+    const enriched = enrichClassificationValues(
+      [{ ...values[0]!, description: "株式全体" }, ...values.slice(1)],
+      links,
+    );
     const stock = enriched.find((value) => value.id === "stock");
 
     expect(stock?.childIds).toEqual(["domestic", "developed", "region-developed"]);
     expect(stock?.isLeaf).toBe(false);
+    expect(stock?.description).toBe("株式全体");
   });
 
   it("collects subtree ids for copy modes", () => {

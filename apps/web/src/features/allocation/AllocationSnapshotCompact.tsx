@@ -3,11 +3,13 @@
 import type { AllocationSlice } from "@repo/shared";
 import type { ReactNode } from "react";
 
+import { ClassificationValueLabel } from "@/components/classification-value-label";
 import { formatAllocationPercent } from "@/lib/format-yen";
 import { cn } from "@/lib/utils";
 
 type AllocationSnapshotCompactProps = {
   slices: AllocationSlice[];
+  descriptionByValueCode?: Map<string, string | null>;
   topCount?: number;
   asOfDateLabel?: string | null;
   uncoveredMinor?: number | null;
@@ -22,6 +24,7 @@ function sortByWeight(slices: AllocationSlice[]): AllocationSlice[] {
 
 export function AllocationSnapshotCompact({
   slices,
+  descriptionByValueCode,
   topCount = 3,
   asOfDateLabel = null,
   uncoveredMinor = null,
@@ -45,7 +48,11 @@ export function AllocationSnapshotCompact({
             let item = (
               <li key={slice.valueCode} className="space-y-1">
                 <div className="flex items-center justify-between gap-2 text-sm">
-                  <span className="truncate">{slice.valueName}</span>
+                  <ClassificationValueLabel
+                    name={slice.valueName}
+                    description={descriptionByValueCode?.get(slice.valueCode)}
+                    nameClassName="max-w-[10rem]"
+                  />
                   <span className="shrink-0 font-medium tabular-nums">
                     {formatAllocationPercent(slice.weight)}
                   </span>
@@ -64,10 +71,11 @@ export function AllocationSnapshotCompact({
       )}
       {uncoveredMinor !== null && uncoveredMinor > 0 ? (
         <p className="mt-3 text-xs text-muted-foreground">
-          未分類あり（詳細は資産配分で確認）
+          未分類あり（表示対象外の評価額があります）
         </p>
       ) : null}
     </div>
   );
+
   return result;
 }

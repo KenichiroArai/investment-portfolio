@@ -3,6 +3,7 @@
 import type { PortfolioCompositionGapRow, TargetAllocationWeightDto } from "@repo/shared";
 import { useMemo } from "react";
 
+import { ClassificationValueLabel } from "@/components/classification-value-label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -19,12 +20,14 @@ type ImpliedAllocationTargetsCardProps = {
   gapRows: PortfolioCompositionGapRow[];
   allocationTargets: TargetAllocationWeightDto[];
   schemeName: string;
+  descriptionByValueCode?: Map<string, string | null>;
 };
 
 export function ImpliedAllocationTargetsCard({
   gapRows,
   allocationTargets,
   schemeName,
+  descriptionByValueCode,
 }: ImpliedAllocationTargetsCardProps) {
   const rows = useMemo(() => {
     let result: Array<
@@ -77,7 +80,13 @@ export function ImpliedAllocationTargetsCard({
               {rows.map((row) => {
                 let tableRow = (
                   <TableRow key={row.valueCode}>
-                    <TableCell>{row.valueName}</TableCell>
+                    <TableCell>
+                      <ClassificationValueLabel
+                        name={row.valueName}
+                        description={descriptionByValueCode?.get(row.valueCode)}
+                        nameClassName="max-w-[12rem]"
+                      />
+                    </TableCell>
                     <TableCell className="text-right">
                       {formatAllocationPercent(row.currentRatio)}
                     </TableCell>

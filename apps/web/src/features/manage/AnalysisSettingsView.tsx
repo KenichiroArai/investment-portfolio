@@ -92,6 +92,7 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
   const [valueSchemeId, setValueSchemeId] = useState("");
   const [valueCode, setValueCode] = useState("");
   const [valueName, setValueName] = useState("");
+  const [valueDescription, setValueDescription] = useState("");
   const [valueSortOrder, setValueSortOrder] = useState("0");
   const [tagInstrumentId, setTagInstrumentId] = useState("");
   const [tagValueIds, setTagValueIds] = useState<string[]>([]);
@@ -296,6 +297,7 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
     const response = await createClassificationValue(valueSchemeId, {
       code: valueCode.trim(),
       name: valueName.trim(),
+      description: valueDescription.trim() === "" ? null : valueDescription.trim(),
       sortOrder: Number.parseInt(valueSortOrder, 10) || 0,
     });
     setSubmitting(false);
@@ -307,17 +309,21 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
 
     setValueCode("");
     setValueName("");
+    setValueDescription("");
     setValueSortOrder("0");
     toast.success("カテゴリ値を追加しました。");
     await load();
     return result;
   }
 
-  async function handleUpdateValue(valueId: string, name: string, sortOrder: number) {
+  async function handleUpdateValue(
+    valueId: string,
+    payload: { name: string; description: string | null; sortOrder: number },
+  ) {
     let result: void = undefined;
     setSubmitting(true);
 
-    const response = await updateClassificationValue(valueId, { name, sortOrder });
+    const response = await updateClassificationValue(valueId, payload);
     setSubmitting(false);
 
     if (!response.ok) {
@@ -544,6 +550,17 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
                       required
                     />
                   </FormField>
+                  <FormField label="説明" htmlFor="value-description">
+                    <textarea
+                      id="value-description"
+                      className="flex min-h-[72px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                      value={valueDescription}
+                      onChange={(event) => {
+                        setValueDescription(event.target.value);
+                      }}
+                      placeholder="任意。一覧では先頭だけ表示されます。"
+                    />
+                  </FormField>
                   <FormField label="表示順" htmlFor="value-sort">
                     <Input
                       id="value-sort"
@@ -566,8 +583,8 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
                     schemes={schemes}
                     schemeId={valueSchemeId}
                     disabled={submitting}
-                    onUpdateValue={(valueId, name, sortOrder) => {
-                      void handleUpdateValue(valueId, name, sortOrder);
+                    onUpdateValue={(valueId, payload) => {
+                      void handleUpdateValue(valueId, payload);
                     }}
                     onDeleteValue={(valueId) => {
                       setDeleteValueId(valueId);
@@ -738,7 +755,10 @@ type SelectedSchemeValuePanelProps = {
   schemes: ClassificationSchemeWithValuesDto[];
   schemeId: string;
   disabled: boolean;
-  onUpdateValue: (valueId: string, name: string, sortOrder: number) => void;
+  onUpdateValue: (
+    valueId: string,
+    payload: { name: string; description: string | null; sortOrder: number },
+  ) => void;
   onDeleteValue: (valueId: string) => void;
   onCopyValue: (valueId: string, mode: CopyClassificationMode) => void;
   onAddLink: (parentValueId: string, childValueId: string) => void;

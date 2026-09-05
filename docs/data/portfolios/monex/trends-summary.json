@@ -1129,8 +1129,8 @@
           {
             "valueCode": "domestic_equity",
             "valueName": "国内株式",
-            "marketValueMinor": 6993,
-            "ratio": 0.13818519543137178
+            "marketValueMinor": 7039,
+            "ratio": 0.13909417855590248
           },
           {
             "valueCode": "developed_equity",
@@ -1189,8 +1189,8 @@
           {
             "valueCode": "short_term",
             "valueName": "短期金融資産",
-            "marketValueMinor": 92,
-            "ratio": 0.0018179662490613762
+            "marketValueMinor": 46,
+            "ratio": 0.0009089831245306881
           }
         ],
         "__portfolio_instruments__": [

@@ -7,6 +7,7 @@ export type ClassificationGraphValue = {
   id: string;
   code: string;
   name: string;
+  description?: string | null;
   sortOrder: number;
   schemeId: string;
   schemeCode: string;
@@ -290,6 +291,7 @@ export function enrichClassificationValues(
       id: value.id,
       code: value.code,
       name: value.name,
+      description: value.description ?? null,
       sortOrder: value.sortOrder,
       schemeId: value.schemeId,
       parentIds: graph.parentIdsByChildId.get(value.id) ?? [],

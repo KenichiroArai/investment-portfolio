@@ -9,6 +9,7 @@ import { buildClassificationGraph, getRootValueIds } from "@repo/shared";
 import { ChevronDown, ChevronRight, Copy } from "lucide-react";
 import { useMemo, useState } from "react";
 
+import { ClassificationValueLabel } from "@/components/classification-value-label";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -19,11 +20,17 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
+type ClassificationValueUpdatePayload = {
+  name: string;
+  description: string | null;
+  sortOrder: number;
+};
+
 type ClassificationValueTreeProps = {
   scheme: ClassificationSchemeWithValuesDto;
   allSchemes: ClassificationSchemeWithValuesDto[];
   disabled?: boolean;
-  onUpdateValue: (valueId: string, name: string, sortOrder: number) => void;
+  onUpdateValue: (valueId: string, payload: ClassificationValueUpdatePayload) => void;
   onDeleteValue: (valueId: string) => void;
   onCopyValue: (valueId: string, mode: CopyClassificationMode) => void;
   onAddLink: (parentValueId: string, childValueId: string) => void;
@@ -37,7 +44,7 @@ type TreeNodeProps = {
   expandedIds: Set<string>;
   disabled?: boolean;
   onToggleExpand: (valueId: string) => void;
-  onUpdateValue: (valueId: string, name: string, sortOrder: number) => void;
+  onUpdateValue: (valueId: string, payload: ClassificationValueUpdatePayload) => void;
   onDeleteValue: (valueId: string) => void;
   onCopyValue: (valueId: string, mode: CopyClassificationMode) => void;
 };
@@ -60,6 +67,7 @@ function TreeNode({
   const childValues = childIds
     .map((childId) => allValues.find((item) => item.id === childId))
     .filter((item): item is ClassificationValueDto => item !== undefined);
+  const descriptionPreview = value.description?.trim() ?? "";
 
   let result = (
     <div className="space-y-1">
@@ -87,18 +95,29 @@ function TreeNode({
         ) : (
           <span className="inline-block size-6" />
         )}
-        <span className="min-w-0 flex-1 text-sm">
-          <span className="font-medium">{value.name}</span>
-          <span className="ml-2 font-mono text-xs text-muted-foreground">{value.code}</span>
-          {value.isLeaf === false ? (
-            <span className="ml-2 rounded bg-muted px-1.5 py-0.5 text-xs">親</span>
+        <div className="min-w-0 flex-1 space-y-0.5 text-sm">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            <ClassificationValueLabel
+              name={value.name}
+              description={value.description}
+              code={value.code}
+              nameClassName="max-w-[14rem]"
+            />
+            {value.isLeaf === false ? (
+              <span className="rounded bg-muted px-1.5 py-0.5 text-xs">親</span>
+            ) : null}
+            {(value.parentIds?.length ?? 0) > 1 ? (
+              <span className="text-xs text-muted-foreground">
+                親 {value.parentIds?.length} 件
+              </span>
+            ) : null}
+          </div>
+          {descriptionPreview !== "" ? (
+            <p className="truncate text-xs text-muted-foreground" title={descriptionPreview}>
+              {descriptionPreview}
+            </p>
           ) : null}
-          {(value.parentIds?.length ?? 0) > 1 ? (
-            <span className="ml-2 text-xs text-muted-foreground">
-              親 {value.parentIds?.length} 件
-            </span>
-          ) : null}
-        </span>
+        </div>
         <Button
           type="button"
           variant="ghost"
@@ -121,10 +140,36 @@ function TreeNode({
             if (nextName === null || nextName.trim() === "") {
               return;
             }
-            onUpdateValue(value.id, nextName.trim(), value.sortOrder);
+            onUpdateValue(value.id, {
+              name: nextName.trim(),
+              description: value.description ?? null,
+              sortOrder: value.sortOrder,
+            });
           }}
         >
           名称編集
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          disabled={disabled}
+          onClick={() => {
+            const nextDescription = window.prompt(
+              "説明（空でクリア）",
+              value.description ?? "",
+            );
+            if (nextDescription === null) {
+              return;
+            }
+            onUpdateValue(value.id, {
+              name: value.name,
+              description: nextDescription.trim() === "" ? null : nextDescription.trim(),
+              sortOrder: value.sortOrder,
+            });
+          }}
+        >
+          説明編集
         </Button>
         <Button
           type="button"
@@ -195,6 +240,7 @@ export function ClassificationValueTree({
       id: value.id,
       code: value.code,
       name: value.name,
+      description: value.description ?? null,
       sortOrder: value.sortOrder,
       schemeId: value.schemeId ?? scheme.id,
       schemeCode:

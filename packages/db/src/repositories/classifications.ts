@@ -30,6 +30,7 @@ export type CreateValueParams = {
   schemeId: string;
   code: string;
   name: string;
+  description?: string | null;
   sortOrder?: number;
 };
 
@@ -159,6 +160,7 @@ async function listPortfolioGraphValues(db: AppDatabase, portfolioId: string) {
     id: string;
     code: string;
     name: string;
+    description: string | null;
     sortOrder: number;
     schemeId: string;
     schemeCode: string;
@@ -169,6 +171,7 @@ async function listPortfolioGraphValues(db: AppDatabase, portfolioId: string) {
       id: classificationValues.id,
       code: classificationValues.code,
       name: classificationValues.name,
+      description: classificationValues.description,
       sortOrder: classificationValues.sortOrder,
       schemeId: classificationValues.schemeId,
       schemeCode: classificationSchemes.code,
@@ -338,6 +341,7 @@ export async function copyClassificationValue(
       schemeId: source.schemeId,
       code: nextCode,
       name: nextName,
+      description: source.description ?? null,
       sortOrder: source.sortOrder,
     });
     idMap.set(sourceId, copied.id);
@@ -449,11 +453,19 @@ export async function createClassificationValue(
   db: AppDatabase,
   params: CreateValueParams,
 ) {
+  const description =
+    params.description === undefined
+      ? null
+      : params.description === null || params.description.trim() === ""
+        ? null
+        : params.description.trim();
+
   let result = {
     id: newId(),
     schemeId: params.schemeId,
     code: params.code,
     name: params.name,
+    description,
     sortOrder: params.sortOrder ?? 0,
     createdAt: nowIso(),
   };
@@ -478,16 +490,29 @@ export async function listClassificationValuesBySchemeId(
 export async function updateClassificationValue(
   db: AppDatabase,
   valueId: string,
-  params: { name: string; sortOrder: number },
+  params: { name: string; sortOrder: number; description?: string | null },
 ) {
   let result: void = undefined;
 
+  const patch: {
+    name: string;
+    sortOrder: number;
+    description?: string | null;
+  } = {
+    name: params.name,
+    sortOrder: params.sortOrder,
+  };
+
+  if (params.description !== undefined) {
+    patch.description =
+      params.description === null || params.description.trim() === ""
+        ? null
+        : params.description.trim();
+  }
+
   await db
     .update(classificationValues)
-    .set({
-      name: params.name,
-      sortOrder: params.sortOrder,
-    })
+    .set(patch)
     .where(eq(classificationValues.id, valueId));
 
   return result;

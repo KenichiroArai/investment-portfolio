@@ -3,10 +3,10 @@
 import type { AllocationSliceWithLines } from "@repo/shared";
 import { sortAllocationSlices } from "@repo/shared";
 import { ChevronRight } from "lucide-react";
-import Link from "next/link";
 import { Fragment, useMemo } from "react";
 
 import { SortableTableHeader } from "@/components/SortableTableHeader";
+import { ClassificationValueLabel } from "@/components/classification-value-label";
 import { AllocationLineBreakdown } from "@/features/analysis/AllocationLineBreakdown";
 import { useTableSort } from "@/hooks/useTableSort";
 import { formatAllocationPercent, formatAllocationPercentPoint, formatPercent, formatYen } from "@/lib/format-yen";
@@ -38,6 +38,7 @@ type AllocationTableProps = {
   schemeCode?: string;
   asOfDate?: string | null;
   valueIdByCode?: Map<string, string>;
+  descriptionByValueCode?: Map<string, string | null>;
   drillDownValueIds?: Set<string>;
   allowLineExpand?: boolean;
   onSliceHover: (valueCode: string) => void;
@@ -86,6 +87,7 @@ export function AllocationTable({
   schemeCode,
   asOfDate,
   valueIdByCode,
+  descriptionByValueCode,
   drillDownValueIds,
   allowLineExpand = true,
   onSliceHover,
@@ -233,16 +235,12 @@ export function AllocationTable({
                     </button>
                   </td>
                   <td>
-                    {holdingsHref ? (
-                      <Link
-                        href={holdingsHref}
-                        className="font-medium text-primary hover:underline"
-                      >
-                        {slice.valueName}
-                      </Link>
-                    ) : (
-                      slice.valueName
-                    )}
+                    <ClassificationValueLabel
+                      name={slice.valueName}
+                      description={descriptionByValueCode?.get(slice.valueCode)}
+                      href={holdingsHref}
+                      nameClassName="max-w-[12rem]"
+                    />
                   </td>
                   <td className="data-table__cell-numeric">
                     {formatYen(slice.marketValueMinor)}

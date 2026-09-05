@@ -26,6 +26,7 @@ import {
   buildClassificationGraphValues,
   mergeClassificationLinks,
 } from "@/features/allocation/AllocationHierarchyControls";
+import { ClassificationValueLabel } from "@/components/classification-value-label";
 import { cn } from "@/lib/utils";
 
 type InstrumentTagHierarchyPickerProps = {
@@ -298,40 +299,36 @@ export function InstrumentTagHierarchyPicker({
                     disabled ? "opacity-60" : undefined,
                   )}
                 >
-                  <label
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    disabled={disabled}
+                    aria-label={value.name}
+                    onChange={(event) => {
+                      handleToggleValue(value.id, event.target.checked);
+                    }}
+                  />
+                  <span className="min-w-0 flex-1">
+                    <ClassificationValueLabel
+                      name={value.name}
+                      description={value.description}
+                      code={value.code}
+                      nameClassName="max-w-[16rem]"
+                    />
+                    {!leaf && selectedSubtreeCount > 0 ? (
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        配下選択 {selectedSubtreeCount} 件
+                      </span>
+                    ) : null}
+                  </span>
+                  <span
                     className={cn(
-                      "flex min-w-0 flex-1 items-center gap-3",
-                      disabled ? "pointer-events-none" : "cursor-pointer",
+                      "rounded px-1.5 py-0.5 text-xs",
+                      leaf ? "bg-muted text-muted-foreground" : "bg-muted",
                     )}
                   >
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      disabled={disabled}
-                      onChange={(event) => {
-                        handleToggleValue(value.id, event.target.checked);
-                      }}
-                    />
-                    <span className="min-w-0 flex-1">
-                      <span className="font-medium">{value.name}</span>
-                      <span className="ml-2 font-mono text-xs text-muted-foreground">
-                        {value.code}
-                      </span>
-                      {!leaf && selectedSubtreeCount > 0 ? (
-                        <span className="ml-2 text-xs text-muted-foreground">
-                          配下選択 {selectedSubtreeCount} 件
-                        </span>
-                      ) : null}
-                    </span>
-                    <span
-                      className={cn(
-                        "rounded px-1.5 py-0.5 text-xs",
-                        leaf ? "bg-muted text-muted-foreground" : "bg-muted",
-                      )}
-                    >
-                      {leaf ? "葉" : "親"}
-                    </span>
-                  </label>
+                    {leaf ? "葉" : "親"}
+                  </span>
                   {!leaf ? (
                     <Button
                       type="button"

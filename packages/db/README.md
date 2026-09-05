@@ -65,6 +65,7 @@ SQLite（`data/portfolio.db`）の Drizzle スキーマ定義です。スキー�
 | 分類体系ID | `scheme_id` | text | NOT NULL |
 | 分類値コード | `code` | text | NOT NULL |
 | 分類値名 | `name` | text | NOT NULL |
+| 説明 | `description` | text | NULL |
 | 表示順 | `sort_order` | integer | NOT NULL |
 | 作成日時 | `created_at` | text | NOT NULL |
 

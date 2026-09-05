@@ -22,6 +22,7 @@ type AllocationPanelProps = {
   schemeCode?: string;
   asOfDate?: string | null;
   valueIdByCode?: Map<string, string>;
+  descriptionByValueCode?: Map<string, string | null>;
   drillDownValueIds?: Set<string>;
   allowLineExpand?: boolean;
   onDrillDown?: (valueId: string) => void;
@@ -54,6 +55,7 @@ export function AllocationPanel({
   schemeCode,
   asOfDate,
   valueIdByCode,
+  descriptionByValueCode,
   drillDownValueIds,
   allowLineExpand = true,
   onDrillDown,
@@ -121,6 +123,7 @@ export function AllocationPanel({
         <AllocationChart
           slices={slices}
           highlightedValueCode={highlightedValueCode}
+          descriptionByValueCode={descriptionByValueCode}
           onSliceHover={handleSliceHover}
           onSliceLeave={handleSliceLeave}
         />
@@ -134,6 +137,11 @@ export function AllocationPanel({
             role="tooltip"
           >
             <strong>{tooltip.slice.valueName}</strong>
+            {descriptionByValueCode?.get(tooltip.slice.valueCode)?.trim() ? (
+              <span className="whitespace-pre-wrap text-xs opacity-90">
+                {descriptionByValueCode.get(tooltip.slice.valueCode)}
+              </span>
+            ) : null}
             <span>評価額: {formatYen(tooltip.slice.marketValueMinor)}</span>
             <span>構成比: {formatAllocationPercent(tooltip.slice.weight)}</span>
             {tooltip.slice.unrealizedGainMinor !== null ? (
@@ -163,6 +171,7 @@ export function AllocationPanel({
           schemeCode={schemeCode}
           asOfDate={asOfDate}
           valueIdByCode={valueIdByCode}
+          descriptionByValueCode={descriptionByValueCode}
           drillDownValueIds={drillDownValueIds}
           allowLineExpand={allowLineExpand}
           onSliceHover={(valueCode) => {

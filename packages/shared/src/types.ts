@@ -36,6 +36,7 @@ export type ClassificationValueDto = {
   id: string;
   code: string;
   name: string;
+  description?: string | null;
   sortOrder: number;
   schemeId?: string;
   parentIds?: string[];

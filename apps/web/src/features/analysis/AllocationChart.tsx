@@ -1,5 +1,6 @@
 import type { AllocationSliceWithLines } from "@repo/shared";
 
+import { ClassificationValueLabel } from "@/components/classification-value-label";
 import { getAllocationChartColor } from "@/features/analysis/chart-colors";
 import {
   formatAllocationPercent,
@@ -14,6 +15,7 @@ const INNER_RADIUS = OUTER_RADIUS * 0.56;
 type AllocationChartProps = {
   slices: AllocationSliceWithLines[];
   highlightedValueCode: string | null;
+  descriptionByValueCode?: Map<string, string | null>;
   onSliceHover: (valueCode: string, clientX: number, clientY: number) => void;
   onSliceLeave: () => void;
   /** 凡例の右側に評価額・構成比を表示する */
@@ -119,6 +121,7 @@ function buildDonutSegments(slices: AllocationSliceWithLines[]): DonutSegment[] 
 export function AllocationChart({
   slices,
   highlightedValueCode,
+  descriptionByValueCode,
   onSliceHover,
   onSliceLeave,
   showLegendValues = false,
@@ -214,7 +217,11 @@ export function AllocationChart({
                 }}
               />
               <span className="allocation-chart__legend-label">
-                {slice.valueName}
+                <ClassificationValueLabel
+                  name={slice.valueName}
+                  description={descriptionByValueCode?.get(slice.valueCode)}
+                  nameClassName="max-w-[9rem]"
+                />
               </span>
               {showLegendValues ? (
                 <span className="allocation-chart__legend-metrics">
