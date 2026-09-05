@@ -1,1 +1,52 @@
-{}
+{
+  "monex_asset_class": [
+    {
+      "valueCode": "commodity",
+      "targetRatio": 0.02
+    },
+    {
+      "valueCode": "developed_bond",
+      "targetRatio": 0.1
+    },
+    {
+      "valueCode": "developed_equity",
+      "targetRatio": 0.48
+    },
+    {
+      "valueCode": "domestic_bond",
+      "targetRatio": 0.04
+    },
+    {
+      "valueCode": "domestic_equity",
+      "targetRatio": 0.15
+    },
+    {
+      "valueCode": "domestic_reit",
+      "targetRatio": 0.02
+    },
+    {
+      "valueCode": "emerging_bond",
+      "targetRatio": 0.015
+    },
+    {
+      "valueCode": "emerging_equity",
+      "targetRatio": 0.13
+    },
+    {
+      "valueCode": "foreign_reit",
+      "targetRatio": 0.03
+    },
+    {
+      "valueCode": "high_yield_bond",
+      "targetRatio": 0.015
+    },
+    {
+      "valueCode": "other",
+      "targetRatio": 0
+    },
+    {
+      "valueCode": "short_term",
+      "targetRatio": 0
+    }
+  ]
+}
