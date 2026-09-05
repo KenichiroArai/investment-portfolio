@@ -45,6 +45,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WritableGuard } from "@/features/manage/WritableGuard";
 import { ClassificationValueTree } from "@/features/manage/ClassificationValueTree";
+import { InstrumentTagHierarchyPicker } from "@/features/manage/InstrumentTagHierarchyPicker";
 import {
   copyClassificationValue,
   createClassificationScheme,
@@ -500,6 +501,9 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
                 <Card>
                   <CardHeader>
                     <CardTitle>カテゴリ値</CardTitle>
+                    <CardDescription>
+                      分析軸を選んでからカテゴリ値を追加し、親子リンクで階層を組み立てます。
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
                 <form className="grid max-w-lg gap-4" onSubmit={handleCreateValue}>
@@ -558,35 +562,23 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
                 {schemes.length === 0 ? (
                   <EmptyState title="分析軸が未登録です" />
                 ) : (
-                  schemes.map((scheme) => {
-                    let block = (
-                      <div key={scheme.id} className="space-y-3">
-                        <h3 className="text-sm font-semibold">{scheme.name}</h3>
-                        {scheme.values.length === 0 ? (
-                          <EmptyState title="値がありません" className="py-6" />
-                        ) : (
-                          <ClassificationValueTree
-                            scheme={scheme}
-                            allSchemes={schemes}
-                            disabled={submitting}
-                            onUpdateValue={(valueId, name, sortOrder) => {
-                              void handleUpdateValue(valueId, name, sortOrder);
-                            }}
-                            onDeleteValue={(valueId) => {
-                              setDeleteValueId(valueId);
-                            }}
-                            onCopyValue={(valueId, mode) => {
-                              void handleCopyValue(valueId, mode);
-                            }}
-                            onAddLink={(parentValueId, childValueId) => {
-                              void handleAddLink(parentValueId, childValueId);
-                            }}
-                          />
-                        )}
-                      </div>
-                    );
-                    return block;
-                  })
+                  <SelectedSchemeValuePanel
+                    schemes={schemes}
+                    schemeId={valueSchemeId}
+                    disabled={submitting}
+                    onUpdateValue={(valueId, name, sortOrder) => {
+                      void handleUpdateValue(valueId, name, sortOrder);
+                    }}
+                    onDeleteValue={(valueId) => {
+                      setDeleteValueId(valueId);
+                    }}
+                    onCopyValue={(valueId, mode) => {
+                      void handleCopyValue(valueId, mode);
+                    }}
+                    onAddLink={(parentValueId, childValueId) => {
+                      void handleAddLink(parentValueId, childValueId);
+                    }}
+                  />
                 )}
                   </CardContent>
                 </Card>
@@ -597,11 +589,11 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
                   <CardHeader>
                     <CardTitle>銘柄タグ</CardTitle>
                     <CardDescription>
-                      銘柄には葉（末端）の分類値のみ付与できます。
+                      分析軸 → カテゴリ値（親）→ カテゴリ値（子）の順に辿り、親・葉どちらもタグ付けできます。
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                <form className="grid max-w-lg gap-4" onSubmit={handleSetTags}>
+                <form className="grid max-w-2xl gap-4" onSubmit={handleSetTags}>
                   <FormField label="銘柄" htmlFor="tag-instrument">
                     <Select value={tagInstrumentId} onValueChange={setTagInstrumentId}>
                       <SelectTrigger id="tag-instrument">
@@ -619,45 +611,12 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
                       </SelectContent>
                     </Select>
                   </FormField>
-                  <div className="grid gap-3">
-                    <p className="text-sm font-medium">分類値（複数選択可）</p>
-                    {schemes.map((scheme) => {
-                      let group = (
-                        <div key={scheme.id} className="rounded-lg border p-3">
-                          <p className="mb-2 text-sm font-medium">{scheme.name}</p>
-                          <div className="flex flex-wrap gap-3">
-                            {scheme.values
-                              .filter((value) => value.isLeaf !== false)
-                              .map((value) => {
-                              let checkbox = (
-                                <label
-                                  key={value.id}
-                                  className="flex items-center gap-2 text-sm"
-                                >
-                                  <input
-                                    type="checkbox"
-                                    checked={tagValueIds.includes(value.id)}
-                                    onChange={(event) => {
-                                      if (event.target.checked) {
-                                        setTagValueIds((current) => [...current, value.id]);
-                                        return;
-                                      }
-                                      setTagValueIds((current) =>
-                                        current.filter((id) => id !== value.id),
-                                      );
-                                    }}
-                                  />
-                                  {value.name}
-                                </label>
-                              );
-                              return checkbox;
-                            })}
-                          </div>
-                        </div>
-                      );
-                      return group;
-                    })}
-                  </div>
+                  <InstrumentTagHierarchyPicker
+                    schemes={schemes}
+                    selectedValueIds={tagValueIds}
+                    onSelectedValueIdsChange={setTagValueIds}
+                    disabled={submitting || !tagInstrumentId}
+                  />
                   <Button type="submit" disabled={submitting || !tagInstrumentId}>
                     タグを保存
                   </Button>
@@ -771,6 +730,53 @@ function SchemeTableRow({ scheme, disabled, onSave, onDelete }: SchemeTableRowPr
         </div>
       </TableCell>
     </TableRow>
+  );
+  return result;
+}
+
+type SelectedSchemeValuePanelProps = {
+  schemes: ClassificationSchemeWithValuesDto[];
+  schemeId: string;
+  disabled: boolean;
+  onUpdateValue: (valueId: string, name: string, sortOrder: number) => void;
+  onDeleteValue: (valueId: string) => void;
+  onCopyValue: (valueId: string, mode: CopyClassificationMode) => void;
+  onAddLink: (parentValueId: string, childValueId: string) => void;
+};
+
+function SelectedSchemeValuePanel({
+  schemes,
+  schemeId,
+  disabled,
+  onUpdateValue,
+  onDeleteValue,
+  onCopyValue,
+  onAddLink,
+}: SelectedSchemeValuePanelProps) {
+  const selectedScheme = schemes.find((scheme) => scheme.id === schemeId) ?? schemes[0];
+
+  if (!selectedScheme) {
+    let emptyResult = <EmptyState title="分析軸が未登録です" />;
+    return emptyResult;
+  }
+
+  let result = (
+    <div className="space-y-3">
+      <h3 className="text-sm font-semibold">{selectedScheme.name}</h3>
+      {selectedScheme.values.length === 0 ? (
+        <EmptyState title="値がありません" className="py-6" />
+      ) : (
+        <ClassificationValueTree
+          scheme={selectedScheme}
+          allSchemes={schemes}
+          disabled={disabled}
+          onUpdateValue={onUpdateValue}
+          onDeleteValue={onDeleteValue}
+          onCopyValue={onCopyValue}
+          onAddLink={onAddLink}
+        />
+      )}
+    </div>
   );
   return result;
 }

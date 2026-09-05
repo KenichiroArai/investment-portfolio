@@ -560,22 +560,11 @@ export function createApp(options?: CreateAppOptions) {
       return result;
     }
 
-    try {
-      await setInstrumentClassifications(
-        db,
-        instrumentId,
-        parsed.data.classificationValueIds,
-      );
-    } catch (error) {
-      if (error instanceof Error && error.message === "NON_LEAF_CLASSIFICATION_TAG") {
-        result = c.json(
-          { error: "銘柄タグは葉（末端）の分類値のみ指定できます。" },
-          400,
-        );
-        return result;
-      }
-      throw error;
-    }
+    await setInstrumentClassifications(
+      db,
+      instrumentId,
+      parsed.data.classificationValueIds,
+    );
     result = c.json({ ok: true });
     return result;
   });

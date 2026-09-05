@@ -1,6 +1,9 @@
 "use client";
 
-import type { ClassificationSchemeWithValuesDto } from "@repo/shared";
+import type {
+  ClassificationSchemeWithValuesDto,
+  ClassificationValueDto,
+} from "@repo/shared";
 import {
   buildAllocationGapRows,
   buildAllocationPeriodChangeRows,
@@ -27,7 +30,10 @@ import { buildSchemeAllocationWithHierarchy } from "@/features/allocation/build-
 import { RebalanceSettingsCard } from "@/features/allocation/RebalanceSettingsCard";
 import { RebalanceTradesSummary } from "@/features/allocation/RebalanceTradesSummary";
 import { TargetAllocationEditCard } from "@/features/allocation/TargetAllocationEditCard";
-import { useAllocationHierarchyParam } from "@/features/allocation/useAllocationHierarchyParam";
+import {
+  useAllocationHierarchyParam,
+  type AllocationAggregationLevel,
+} from "@/features/allocation/useAllocationHierarchyParam";
 import { useAllocationSchemeParam } from "@/features/allocation/useAllocationSchemeParam";
 import { useRebalanceDeposit } from "@/features/allocation/useRebalanceDeposit";
 import { useTargetAllocations } from "@/features/allocation/useTargetAllocations";
@@ -350,9 +356,13 @@ export function AnalysisView({
     const rebalanceDescription = hasUncovered
       ? "未分類の銘柄は売買対象外です。目標はタグ付き銘柄内で100%に正規化して試算しています。構成単位の売買を、各構成内の現状比率で銘柄に按分して表示します。"
       : "構成単位の売買を、各構成内の現状比率で銘柄に按分して表示します。";
-    const classificationValues =
-      classificationSchemes.find((item) => item.code === scheme.schemeCode)?.values
-        .filter((value) => value.isLeaf !== false) ?? [];
+    const schemeValues =
+      classificationSchemes.find((item) => item.code === scheme.schemeCode)?.values ?? [];
+    const classificationValues = resolveTargetAllocationValues(
+      schemeValues,
+      aggregationLevel,
+      parentValueId,
+    );
 
     let content = (
       <div className="space-y-6">
@@ -524,5 +534,30 @@ export function AnalysisView({
       </Tabs>
     </PageContainer>
   );
+  return result;
+}
+
+function resolveTargetAllocationValues(
+  values: ClassificationValueDto[],
+  aggregationLevel: AllocationAggregationLevel,
+  parentValueId: string | null,
+): ClassificationValueDto[] {
+  let result: ClassificationValueDto[] = [];
+
+  if (parentValueId) {
+    result = values.filter(
+      (value) =>
+        value.id === parentValueId || (value.parentIds ?? []).includes(parentValueId),
+    );
+    return result;
+  }
+
+  if (aggregationLevel === "parent") {
+    result = values.filter((value) => (value.parentIds?.length ?? 0) === 0);
+    return result;
+  }
+
+  // 葉単位: 親タグ直付けも目標設定できるよう全値を出す
+  result = values;
   return result;
 }

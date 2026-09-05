@@ -11,6 +11,20 @@
         "sortOrder": 0,
         "schemeId": "b2e1b711-1f79-44ac-b27f-4d13591a0d9a",
         "parentIds": [],
+        "childIds": [
+          "8f73005a-e069-41a5-b383-0746f68e87b8"
+        ],
+        "isLeaf": false
+      },
+      {
+        "id": "8f73005a-e069-41a5-b383-0746f68e87b8",
+        "code": "domestic_equity_growth",
+        "name": "国内株式・成長",
+        "sortOrder": 0,
+        "schemeId": "b2e1b711-1f79-44ac-b27f-4d13591a0d9a",
+        "parentIds": [
+          "2ba43cbc-745f-4359-a523-d7cf45c43c3f"
+        ],
         "childIds": [],
         "isLeaf": true
       },
@@ -125,6 +139,12 @@
         "isLeaf": true
       }
     ],
-    "links": []
+    "links": [
+      {
+        "parentValueId": "2ba43cbc-745f-4359-a523-d7cf45c43c3f",
+        "childValueId": "8f73005a-e069-41a5-b383-0746f68e87b8",
+        "sortOrder": 0
+      }
+    ]
   }
 ]

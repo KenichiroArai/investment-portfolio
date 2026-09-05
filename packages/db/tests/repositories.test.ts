@@ -985,7 +985,7 @@ describe("portfolio repositories", () => {
     expect(missingCopy.ok).toBe(false);
   });
 
-  it("rejects non-leaf classification tags on instruments", async () => {
+  it("allows non-leaf classification tags on instruments", async () => {
     const db = setup();
     await createPortfolio(db, {
       code: "ideco",
@@ -1015,11 +1015,12 @@ describe("portfolio repositories", () => {
     });
     const instrument = await createInstrument(db, { name: "Tagged fund" });
 
-    await expect(
-      setInstrumentClassificationsWithWeights(db, instrument.id, [
-        { classificationValueId: parent.id, allocationWeight: 1 },
-      ]),
-    ).rejects.toThrow("NON_LEAF_CLASSIFICATION_TAG");
+    await setInstrumentClassificationsWithWeights(db, instrument.id, [
+      { classificationValueId: parent.id, allocationWeight: 1 },
+    ]);
+
+    const tags = await listInstrumentClassificationValueIds(db, instrument.id);
+    expect(tags).toEqual([parent.id]);
   });
 
   it("rejects cross-portfolio classification links", async () => {

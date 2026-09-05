@@ -468,14 +468,14 @@ export function lineMatchesCrossSchemeChildFilter(
     return result;
   }
 
-  const childAllowedLeafIds = getDescendantLeafIds(childValueId, graph);
+  const childAllowedIds = getDescendantValueIds(childValueId, graph);
   const childLeafIds = lineLeafIdsByScheme.get(childSchemeCode);
   if (!childLeafIds || childLeafIds.size === 0) {
     return result;
   }
 
   for (const leafId of childLeafIds) {
-    if (childAllowedLeafIds.has(leafId)) {
+    if (childAllowedIds.has(leafId)) {
       result = true;
       return result;
     }

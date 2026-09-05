@@ -1,8 +1,9 @@
 import {
   buildClassificationGraph,
-  getDescendantLeafIds,
+  getDescendantValueIds,
   getDirectChildIds,
   getRootValueIds,
+  type ClassificationGraph,
   type ClassificationGraphValue,
 } from "./classification-hierarchy";
 import { IDECO_KAKEIBO_METRIC_CODES } from "./holding-line-metrics";
@@ -697,7 +698,7 @@ function getLineLeafValueIdsBySchemeFromTags(
 function shouldIncludeOrphanValue(
   valueId: string,
   schemeId: string,
-  graph: ReturnType<typeof buildClassificationGraph>,
+  graph: ClassificationGraph,
   includeOrphans: boolean,
 ): boolean {
   let result = true;
@@ -707,25 +708,62 @@ function shouldIncludeOrphanValue(
   }
 
   const parentIds = graph.parentIdsByChildId.get(valueId) ?? [];
-  if (parentIds.length === 0) {
-    const value = graph.valuesById.get(valueId);
-    if (value?.schemeId === schemeId) {
-      result = false;
-    }
+  if (parentIds.length > 0) {
+    return result;
+  }
+
+  const value = graph.valuesById.get(valueId);
+  if (!value || value.schemeId !== schemeId) {
+    return result;
+  }
+
+  // 階層の頂点（非葉ルート）は残し、親も子もない孤立葉だけ除外する
+  if (graph.leafValueIds.has(valueId)) {
+    result = false;
   }
 
   return result;
 }
 
+function compareGraphValueDisplayOrder(
+  leftId: string,
+  rightId: string,
+  graph: ClassificationGraph,
+): number {
+  let result = 0;
+  const left = graph.valuesById.get(leftId);
+  const right = graph.valuesById.get(rightId);
+  /* v8 ignore start */
+  if (!left || !right) {
+    result = leftId.localeCompare(rightId);
+    return result;
+  }
+  /* v8 ignore stop */
+
+  result = left.sortOrder - right.sortOrder;
+  if (result !== 0) {
+    return result;
+  }
+
+  result = left.name.localeCompare(right.name);
+  if (result !== 0) {
+    return result;
+  }
+
+  result = left.code.localeCompare(right.code);
+  return result;
+}
+
 function resolveHierarchyDisplayValueIds(
-  graph: ReturnType<typeof buildClassificationGraph>,
+  graph: ClassificationGraph,
   schemeId: string,
   options: HierarchyAllocationOptions,
 ): string[] {
   let result: string[] = [];
 
   if (options.parentValueId) {
-    result = getDirectChildIds(options.parentValueId, graph);
+    // 親直付けタグの残差用に、ドリルダウン中は親自身も含める
+    result = [options.parentValueId, ...getDirectChildIds(options.parentValueId, graph)];
     return result;
   }
 
@@ -734,46 +772,86 @@ function resolveHierarchyDisplayValueIds(
     return result;
   }
 
-  for (const valueId of graph.leafValueIds) {
-    const value = graph.valuesById.get(valueId);
-    if (!value || value.schemeId !== schemeId) {
+  // 葉単位: 葉に加え、親タグ直付けを残すため同一軸の非葉も含める
+  for (const value of graph.valuesById.values()) {
+    if (value.schemeId !== schemeId) {
       continue;
     }
-    result.push(valueId);
+    result.push(value.id);
   }
 
-  result.sort((leftId, rightId) => {
-    const left = graph.valuesById.get(leftId);
-    const right = graph.valuesById.get(rightId);
-    /* v8 ignore start */
-    if (!left || !right) {
-      return leftId.localeCompare(rightId);
-    }
-    /* v8 ignore stop */
+  result.sort((leftId, rightId) => compareGraphValueDisplayOrder(leftId, rightId, graph));
+  return result;
+}
 
-    let compareResult = left.sortOrder - right.sortOrder;
-    if (compareResult !== 0) {
-      return compareResult;
-    }
+function isProperDescendantValue(
+  ancestorValueId: string,
+  descendantValueId: string,
+  graph: ClassificationGraph,
+): boolean {
+  let result = false;
 
-    compareResult = left.name.localeCompare(right.name);
-    if (compareResult !== 0) {
-      return compareResult;
-    }
+  if (ancestorValueId === descendantValueId) {
+    return result;
+  }
 
-    compareResult = left.code.localeCompare(right.code);
-    return compareResult;
-  });
+  result = getDescendantValueIds(ancestorValueId, graph).has(descendantValueId);
+  return result;
+}
+
+function pickMostSpecificDisplayValueIds(
+  taggedValueId: string,
+  displayValueIds: string[],
+  graph: ClassificationGraph,
+): string[] {
+  let result: string[] = [];
+  const coveringIds = displayValueIds.filter((displayValueId) =>
+    getDescendantValueIds(displayValueId, graph).has(taggedValueId),
+  );
+
+  for (const candidateId of coveringIds) {
+    const hasMoreSpecific = coveringIds.some(
+      (otherId) =>
+        otherId !== candidateId && isProperDescendantValue(candidateId, otherId, graph),
+    );
+    if (hasMoreSpecific) {
+      continue;
+    }
+    result.push(candidateId);
+  }
+
+  return result;
+}
+
+function lineTaggedValueMatchesDisplayUnit(
+  taggedValueIds: Set<string>,
+  displayValueId: string,
+  displayValueIds: string[],
+  graph: ClassificationGraph,
+): boolean {
+  let result = false;
+
+  for (const taggedValueId of taggedValueIds) {
+    const mostSpecificIds = pickMostSpecificDisplayValueIds(
+      taggedValueId,
+      displayValueIds,
+      graph,
+    );
+    if (mostSpecificIds.includes(displayValueId)) {
+      result = true;
+      return result;
+    }
+  }
 
   return result;
 }
 
 function lineMatchesDisplayUnit(
-  lineLeafIdsByScheme: Map<string, Set<string>>,
+  lineTaggedIdsByScheme: Map<string, Set<string>>,
   displayValueId: string,
-  activeSchemeCode: string,
+  displayValueIds: string[],
   contextParentValueId: string | null | undefined,
-  graph: ReturnType<typeof buildClassificationGraph>,
+  graph: ClassificationGraph,
 ): boolean {
   let result = false;
   const displayValue = graph.valuesById.get(displayValueId);
@@ -783,8 +861,6 @@ function lineMatchesDisplayUnit(
   }
   /* v8 ignore stop */
 
-  const displayAllowedLeafIds = getDescendantLeafIds(displayValueId, graph);
-
   if (contextParentValueId) {
     const contextValue = graph.valuesById.get(contextParentValueId);
     /* v8 ignore start */
@@ -793,15 +869,15 @@ function lineMatchesDisplayUnit(
     }
     /* v8 ignore stop */
 
-    const contextAllowedLeafIds = getDescendantLeafIds(contextParentValueId, graph);
-    const contextLeafIds = lineLeafIdsByScheme.get(contextValue.schemeCode);
-    if (!contextLeafIds) {
+    const contextAllowedIds = getDescendantValueIds(contextParentValueId, graph);
+    const contextTaggedIds = lineTaggedIdsByScheme.get(contextValue.schemeCode);
+    if (!contextTaggedIds) {
       return result;
     }
 
     let matchesContext = false;
-    for (const leafId of contextLeafIds) {
-      if (contextAllowedLeafIds.has(leafId)) {
+    for (const taggedId of contextTaggedIds) {
+      if (contextAllowedIds.has(taggedId)) {
         matchesContext = true;
         break;
       }
@@ -812,18 +888,44 @@ function lineMatchesDisplayUnit(
     }
   }
 
-  const displayLeafIds = lineLeafIdsByScheme.get(displayValue.schemeCode);
-  if (!displayLeafIds) {
+  const displayTaggedIds = lineTaggedIdsByScheme.get(displayValue.schemeCode);
+  if (!displayTaggedIds) {
     return result;
   }
 
-  for (const leafId of displayLeafIds) {
-    if (displayAllowedLeafIds.has(leafId)) {
-      result = true;
-      return result;
-    }
+  result = lineTaggedValueMatchesDisplayUnit(
+    displayTaggedIds,
+    displayValueId,
+    displayValueIds,
+    graph,
+  );
+  return result;
+}
+
+function attributionMatchesDisplayUnit(
+  attribution: LineTagAttribution,
+  displayValueId: string,
+  displayValueIds: string[],
+  valueCodeBySchemeCode: Map<string, Map<string, string>>,
+  graph: ClassificationGraph,
+): boolean {
+  let result = false;
+  const codeMap = valueCodeBySchemeCode.get(attribution.tag.schemeCode);
+  if (!codeMap) {
+    return result;
   }
 
+  const taggedValueId = codeMap.get(attribution.tag.valueCode);
+  if (!taggedValueId) {
+    return result;
+  }
+
+  const mostSpecificIds = pickMostSpecificDisplayValueIds(
+    taggedValueId,
+    displayValueIds,
+    graph,
+  );
+  result = mostSpecificIds.includes(displayValueId);
   return result;
 }
 
@@ -872,7 +974,7 @@ export function buildHierarchicalAllocationBySchemeWithLines(
     }
 
     const attributions = buildLineTagAttributions(line, tagAllocations);
-    const lineLeafIdsByScheme = getLineLeafValueIdsBySchemeFromTags(
+    const lineTaggedIdsByScheme = getLineLeafValueIdsBySchemeFromTags(
       line.tags,
       valueCodeBySchemeCode,
     );
@@ -880,9 +982,9 @@ export function buildHierarchicalAllocationBySchemeWithLines(
     for (const displayValueId of displayValueIds) {
       if (
         !lineMatchesDisplayUnit(
-          lineLeafIdsByScheme,
+          lineTaggedIdsByScheme,
           displayValueId,
-          schemeCode,
+          displayValueIds,
           options.parentValueId,
           graph,
         )
@@ -898,6 +1000,18 @@ export function buildHierarchicalAllocationBySchemeWithLines(
       /* v8 ignore stop */
 
       for (const attribution of attributions) {
+        if (
+          !attributionMatchesDisplayUnit(
+            attribution,
+            displayValueId,
+            displayValueIds,
+            valueCodeBySchemeCode,
+            graph,
+          )
+        ) {
+          continue;
+        }
+
         const lineInSlice = buildAllocationLineInSlice(
           line,
           attribution,

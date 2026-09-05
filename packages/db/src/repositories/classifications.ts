@@ -5,7 +5,6 @@ import {
   collectSubtreeValueIds,
   enrichClassificationValues,
   isIdecoAnalysisSchemeCode,
-  isLeafValue,
   isMonexAnalysisSchemeCode,
   validateLinkAddition,
   type CopyClassificationMode,
@@ -612,22 +611,6 @@ export async function setInstrumentClassificationsWithWeights(
   weights: InstrumentClassificationWeightInput[],
 ) {
   let result: void = undefined;
-
-  if (weights.length > 0) {
-    const valueIds = weights.map((weight) => weight.classificationValueId);
-    const portfolioId = await findPortfolioIdForValue(db, valueIds[0]!);
-    if (portfolioId) {
-      const links = await listLinksForPortfolio(db, portfolioId);
-      const graphValues = await listPortfolioGraphValues(db, portfolioId);
-      const graph = buildClassificationGraph(graphValues, links);
-
-      for (const valueId of valueIds) {
-        if (!isLeafValue(valueId, graph)) {
-          throw new Error("NON_LEAF_CLASSIFICATION_TAG");
-        }
-      }
-    }
-  }
 
   await db
     .delete(instrumentClassifications)
