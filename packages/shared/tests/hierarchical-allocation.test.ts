@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  PARENT_RESIDUAL_SLICE_NAME,
   buildAllocationBySchemeWithLines,
   buildHierarchicalAllocationBySchemeWithLines,
 } from "../src/snapshot-allocation";
@@ -530,9 +531,38 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
     expect(allocation.slices.map((slice) => slice.valueCode).sort()).toEqual(
       ["domestic", "stock"].sort(),
     );
-    expect(allocation.slices.find((slice) => slice.valueCode === "stock")?.marketValueMinor).toBe(
-      400_000,
+
+    const residual = allocation.slices.find((slice) => slice.valueCode === "stock");
+    expect(residual?.marketValueMinor).toBe(400_000);
+    expect(residual?.valueName).toBe(PARENT_RESIDUAL_SLICE_NAME);
+    expect(residual?.isParentResidual).toBe(true);
+
+    const child = allocation.slices.find((slice) => slice.valueCode === "domestic");
+    expect(child?.valueName).toBe("国内株式");
+    expect(child?.isParentResidual).toBe(false);
+  });
+
+  it("keeps the original parent name for residual slices at leaf aggregation", () => {
+    const lines = [
+      makeHierarchyLine(700_000, "stock"),
+      makeHierarchyLine(300_000, "domestic"),
+    ];
+    const allocation = buildHierarchicalAllocationBySchemeWithLines(
+      lines,
+      "asset_class",
+      "資産クラス",
+      {
+        aggregationLevel: "leaf",
+        includeOrphans: true,
+        links,
+        schemeValues,
+        schemeId: "scheme-a",
+      },
     );
+
+    const parentSlice = allocation.slices.find((slice) => slice.valueCode === "stock");
+    expect(parentSlice?.valueName).toBe("株式");
+    expect(parentSlice?.isParentResidual).toBe(false);
   });
 
   it("does not double-count leaf tags into ancestor slices at leaf aggregation", () => {

@@ -58,7 +58,10 @@ export function buildAllocationGapRows(
 
   for (const slice of slices) {
     const currentRatio = slice.weight;
-    const targetRatio = targetByCode.get(slice.valueCode) ?? null;
+    // 親直付けの残差は目標設定の単位ではないため、親の目標を流用しない
+    const targetRatio = slice.isParentResidual === true
+      ? null
+      : targetByCode.get(slice.valueCode) ?? null;
     let gapRatio: number | null = null;
     let gapMarketValueMinor: number | null = null;
 

@@ -216,12 +216,17 @@ export function AnalysisView({
   const drillDownValueIds = useMemo(() => {
     let result = new Set<string>();
     for (const value of activeClassificationScheme?.values ?? []) {
-      if ((value.childIds?.length ?? 0) > 0) {
-        result.add(value.id);
+      if ((value.childIds?.length ?? 0) === 0) {
+        continue;
       }
+      // ドリルダウン中の親は残差行として並ぶため、自分自身への再ドリルダウンは無効にする
+      if (value.id === parentValueId) {
+        continue;
+      }
+      result.add(value.id);
     }
     return result;
-  }, [activeClassificationScheme]);
+  }, [activeClassificationScheme, parentValueId]);
 
   const trendPeriodSummaryData = useTrendPeriodSummaryData({
     mode: "allocation",
@@ -553,9 +558,9 @@ function resolveTargetAllocationValues(
   let result: ClassificationValueDto[] = [];
 
   if (parentValueId) {
-    result = values.filter(
-      (value) =>
-        value.id === parentValueId || (value.parentIds ?? []).includes(parentValueId),
+    // 親自身は残差行として表示されるだけなので、目標設定の対象は直下の子に限る
+    result = values.filter((value) =>
+      (value.parentIds ?? []).includes(parentValueId),
     );
     return result;
   }

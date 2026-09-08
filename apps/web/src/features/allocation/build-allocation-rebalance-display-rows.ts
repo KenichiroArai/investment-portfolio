@@ -37,10 +37,6 @@ export function buildAllocationRebalanceDisplayRows(
 
   const valueNameByCode = new Map<string, string>();
 
-  for (const slice of input.schemeAllocation.slices) {
-    valueNameByCode.set(slice.valueCode, slice.valueName);
-  }
-
   const selectedClassificationScheme = input.classificationSchemes.find(
     (item) => item.code === input.schemeAllocation.schemeCode,
   );
@@ -50,11 +46,38 @@ export function buildAllocationRebalanceDisplayRows(
     }
   }
 
-  const normalizedTargets = normalizeTargetAllocationWeights(input.targets);
-  const classifiedTotalMinor = input.schemeAllocation.totalMarketValueMinor;
+  for (const slice of input.schemeAllocation.slices) {
+    valueNameByCode.set(slice.valueCode, slice.valueName);
+  }
+
+  // 親直付けの残差は目標を持てない単位なので売買対象から外す
+  const residualValueCodes = new Set<string>();
+  for (const slice of input.schemeAllocation.slices) {
+    if (slice.isParentResidual !== true) {
+      continue;
+    }
+    residualValueCodes.add(slice.valueCode);
+  }
+
+  const rebalanceSlices = input.schemeAllocation.slices.filter(
+    (slice) => !residualValueCodes.has(slice.valueCode),
+  );
+  const rebalanceAllocation: AllocationBySchemeWithLines = {
+    ...input.schemeAllocation,
+    slices: rebalanceSlices,
+    totalMarketValueMinor: rebalanceSlices.reduce(
+      (total, slice) => total + slice.marketValueMinor,
+      0,
+    ),
+  };
+
+  const normalizedTargets = normalizeTargetAllocationWeights(
+    input.targets.filter((target) => !residualValueCodes.has(target.valueCode)),
+  );
+  const classifiedTotalMinor = rebalanceAllocation.totalMarketValueMinor;
 
   const allocationRebalance = computeAllocationRebalanceByInstrument({
-    schemeAllocation: input.schemeAllocation,
+    schemeAllocation: rebalanceAllocation,
     targets: normalizedTargets,
     portfolioTotalMinor: classifiedTotalMinor,
     depositMinor: input.depositMinor,
@@ -64,9 +87,7 @@ export function buildAllocationRebalanceDisplayRows(
   const displayRows: RebalanceDisplayRow[] = [];
 
   for (const sliceTrade of allocationRebalance.sliceTrades) {
-    const slice = input.schemeAllocation.slices.find(
-      (item) => item.valueCode === sliceTrade.key,
-    );
+    const slice = rebalanceSlices.find((item) => item.valueCode === sliceTrade.key);
     const valueName = valueNameByCode.get(sliceTrade.key) ?? slice?.valueName ?? sliceTrade.key;
     const instrumentRows = allocationRebalance.instrumentRows.filter(
       (row) => row.valueCode === sliceTrade.key,

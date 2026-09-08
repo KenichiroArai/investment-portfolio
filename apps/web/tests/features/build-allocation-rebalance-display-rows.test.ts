@@ -85,4 +85,35 @@ describe("buildAllocationRebalanceDisplayRows", () => {
     expect(globalHeader?.sellMinor).toBeGreaterThan(0);
     expect(result.totalBuyMinor).toBe(result.totalSellMinor);
   });
+
+  it("excludes parent residual slices from rebalance rows", () => {
+    const residualSlice = {
+      ...schemeAllocation.slices[1]!,
+      valueCode: "domestic_equity",
+      valueName: "その他（未細分）",
+      isParentResidual: true,
+    };
+    let result = buildAllocationRebalanceDisplayRows({
+      schemeAllocation: {
+        ...schemeAllocation,
+        slices: [schemeAllocation.slices[0]!, residualSlice],
+      },
+      targets: [
+        { valueCode: "global_equity", targetRatio: 0.4 },
+        { valueCode: "domestic_equity", targetRatio: 0.6 },
+      ],
+      depositMinor: 0,
+      mode: "full",
+      classificationSchemes: [],
+    });
+
+    expect(
+      result.rows.some((row) => row.groupKey === "domestic_equity"),
+    ).toBe(false);
+
+    const globalHeader = result.rows.find(
+      (row) => row.isGroupHeader && row.groupKey === "global_equity",
+    );
+    expect(globalHeader?.currentRatio).toBeCloseTo(1);
+  });
 });

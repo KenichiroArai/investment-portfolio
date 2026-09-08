@@ -44,6 +44,9 @@ function getLineMetricIntegerValueOrNull(
   return result;
 }
 
+// 親に直接タグ付けされ、どの子分類にも属さない残差の表示名
+export const PARENT_RESIDUAL_SLICE_NAME = "その他（未細分）";
+
 export type AllocationSlice = {
   valueCode: string;
   valueName: string;
@@ -52,6 +55,7 @@ export type AllocationSlice = {
   weight: number;
   unrealizedGainMinor: number | null;
   unrealizedGainRate: number | null;
+  isParentResidual?: boolean;
 };
 
 export type AllocationLineInSlice = {
@@ -929,6 +933,20 @@ function attributionMatchesDisplayUnit(
   return result;
 }
 
+function isParentResidualDisplayUnit(
+  displayValueId: string,
+  parentValueId: string | null | undefined,
+): boolean {
+  let result = false;
+
+  if (!parentValueId) {
+    return result;
+  }
+
+  result = displayValueId === parentValueId;
+  return result;
+}
+
 export function buildHierarchicalAllocationBySchemeWithLines(
   lines: HoldingLineDto[],
   schemeCode: string,
@@ -964,6 +982,7 @@ export function buildHierarchicalAllocationBySchemeWithLines(
       sortOrder: number;
       marketValueMinor: number;
       lines: AllocationLineInSlice[];
+      isParentResidual: boolean;
     }
   >();
 
@@ -999,6 +1018,11 @@ export function buildHierarchicalAllocationBySchemeWithLines(
       }
       /* v8 ignore stop */
 
+      const isParentResidual = isParentResidualDisplayUnit(
+        displayValueId,
+        options.parentValueId,
+      );
+
       for (const attribution of attributions) {
         if (
           !attributionMatchesDisplayUnit(
@@ -1026,10 +1050,13 @@ export function buildHierarchicalAllocationBySchemeWithLines(
         }
 
         totals.set(displayValue.code, {
-          valueName: displayValue.name,
+          valueName: isParentResidual
+            ? PARENT_RESIDUAL_SLICE_NAME
+            : displayValue.name,
           sortOrder: displayValue.sortOrder,
           marketValueMinor: attribution.marketValueMinor,
           lines: [lineInSlice],
+          isParentResidual,
         });
       }
     }
@@ -1070,6 +1097,7 @@ export function buildHierarchicalAllocationBySchemeWithLines(
       unrealizedGainMinor: gainMetrics.unrealizedGainMinor,
       unrealizedGainRate: gainMetrics.unrealizedGainRate,
       lines: item.lines,
+      isParentResidual: item.isParentResidual,
     };
     result.slices.push(slice);
     result.totalMarketValueMinor += sliceMarketValueMinor;

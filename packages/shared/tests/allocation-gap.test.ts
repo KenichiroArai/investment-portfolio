@@ -108,6 +108,34 @@ describe("buildAllocationGapRows", () => {
     expect(result[0]?.gapRatio).toBeCloseTo(698_025 / 1_734_297 - normalizedTarget, 4);
     expect(Math.abs(result[0]?.gapRatio ?? 0)).toBeLessThan(0.01);
   });
+
+  it("does not apply the parent target to a parent residual slice", () => {
+    const residualSlices: AllocationSlice[] = [
+      {
+        valueCode: "domestic",
+        valueName: "その他（未細分）",
+        marketValueMinor: 600_000,
+        weight: 0.6,
+        isParentResidual: true,
+      },
+      {
+        valueCode: "foreign",
+        valueName: "外国株式",
+        marketValueMinor: 400_000,
+        weight: 0.4,
+      },
+    ];
+
+    let result = buildAllocationGapRows(residualSlices, [
+      { valueCode: "domestic", targetRatio: 0.5 },
+      { valueCode: "foreign", targetRatio: 0.5 },
+    ]);
+
+    expect(result[0]?.targetRatio).toBeNull();
+    expect(result[0]?.gapRatio).toBeNull();
+    expect(result[0]?.gapMarketValueMinor).toBeNull();
+    expect(result[1]?.targetRatio).toBeCloseTo(0.5);
+  });
 });
 
 describe("mergeAllocationGapIntoSlices", () => {
