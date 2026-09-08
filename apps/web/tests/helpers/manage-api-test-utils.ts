@@ -60,10 +60,32 @@ export const MANAGE_SCHEME = {
   links: [],
 };
 
+type ManageInstrumentTags = {
+  instrumentId: string;
+  classificationValueIds: string[];
+};
+
+type ManageScheme = {
+  id: string;
+  code: string;
+  name: string;
+  values: Array<{
+    id: string;
+    code: string;
+    name: string;
+    sortOrder: number;
+    parentIds: string[];
+    childIds: string[];
+    isLeaf: boolean;
+  }>;
+  links: Array<{ parentValueId: string; childValueId: string; sortOrder: number }>;
+};
+
 type ManageFetchMockOptions = {
   snapshot?: typeof MANAGE_SNAPSHOT | null;
   instruments?: typeof MANAGE_INSTRUMENT[];
-  schemes?: typeof MANAGE_SCHEME[];
+  schemes?: ManageScheme[];
+  instrumentTags?: ManageInstrumentTags[];
   snapshotGetStatus?: number;
   schemesGetStatus?: number;
   failFetch?: boolean;
@@ -82,6 +104,7 @@ type ManageFetchMockOptions = {
     deleteValue?: { ok: boolean; status?: number; message?: string };
     instrumentClassifications?: { ok: boolean; status?: number; message?: string };
     setInstrumentTags?: { ok: boolean; status?: number; message?: string };
+    addValueInstruments?: { ok: boolean; status?: number; message?: string };
     createPortfolio?: { ok: boolean; status?: number; message?: string };
     updatePortfolio?: { ok: boolean; status?: number; message?: string };
     deletePortfolio?: { ok: boolean; status?: number; message?: string };
@@ -107,11 +130,18 @@ function okResponse(body: unknown, status = 200) {
 }
 
 export function createManageFetchMock(options: ManageFetchMockOptions = {}) {
+  const instruments = options.instruments ?? [MANAGE_INSTRUMENT];
   const state = {
     snapshot:
       options.snapshot === undefined ? MANAGE_SNAPSHOT : options.snapshot,
-    instruments: options.instruments ?? [MANAGE_INSTRUMENT],
-    schemes: options.schemes ?? [MANAGE_SCHEME],
+    instruments,
+    schemes: (options.schemes ?? [MANAGE_SCHEME]) as ManageScheme[],
+    instrumentTags:
+      options.instrumentTags ??
+      instruments.map((item) => ({
+        instrumentId: item.id,
+        classificationValueIds: ["v1"],
+      })),
   };
 
   let result = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -198,6 +228,23 @@ export function createManageFetchMock(options: ManageFetchMockOptions = {}) {
 
     if (url.includes("/monex-asset-class-weights") && method === "PUT") {
       return okResponse({ updatedInstrumentCount: 1 });
+    }
+
+    if (url.includes("/instrument-classifications") && method === "GET") {
+      return okResponse(state.instrumentTags);
+    }
+
+    if (
+      url.includes("/classification-values/") &&
+      url.endsWith("/instruments") &&
+      method === "POST"
+    ) {
+      const mutate = options.mutate?.addValueInstruments;
+      if (mutate && !mutate.ok) {
+        return errorResponse(mutate.status ?? 400, mutate.message ?? "tag assign failed");
+      }
+      const body = JSON.parse(String(init?.body)) as { instrumentIds: string[] };
+      return okResponse({ ok: true, updated: body.instrumentIds.length });
     }
 
     if (url.endsWith("/instruments") && method === "POST") {

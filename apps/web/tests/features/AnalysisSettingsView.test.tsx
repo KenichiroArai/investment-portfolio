@@ -12,6 +12,33 @@ import {
 const toastSuccess = vi.hoisted(() => vi.fn());
 const toastError = vi.hoisted(() => vi.fn());
 
+const HIERARCHY_SCHEME = {
+  id: "sch1",
+  code: "asset_class",
+  name: "資産クラス",
+  values: [
+    {
+      id: "v-parent",
+      code: "stock",
+      name: "株式",
+      sortOrder: 0,
+      parentIds: [],
+      childIds: ["v-child"],
+      isLeaf: false,
+    },
+    {
+      id: "v-child",
+      code: "domestic",
+      name: "国内株式",
+      sortOrder: 1,
+      parentIds: ["v-parent"],
+      childIds: [],
+      isLeaf: true,
+    },
+  ],
+  links: [{ parentValueId: "v-parent", childValueId: "v-child", sortOrder: 0 }],
+};
+
 vi.mock("sonner", () => ({
   toast: {
     success: toastSuccess,
@@ -293,6 +320,66 @@ describe("AnalysisSettingsView", () => {
     await user.click(within(alert).getByRole("button", { name: "削除" }));
     await waitFor(() => {
       expect(toastError).toHaveBeenCalledWith("値削除失敗");
+    });
+  });
+
+  it("assigns a child value to instruments picked from the scheme", async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal(
+      "fetch",
+      createManageFetchMock({
+        schemes: [HIERARCHY_SCHEME],
+        instrumentTags: [
+          { instrumentId: MANAGE_INSTRUMENT.id, classificationValueIds: ["v-parent"] },
+        ],
+      }),
+    );
+    renderView("tag");
+
+    await user.click(await screen.findByRole("tab", { name: "分析軸から選ぶ" }));
+    await user.click(await screen.findByRole("button", { name: "銘柄を表示" }));
+
+    expect(
+      await screen.findByRole("checkbox", { name: MANAGE_INSTRUMENT.name }),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "すべて選択" }));
+    await user.click(screen.getByRole("combobox", { name: "付与する子カテゴリ値" }));
+    await user.click(screen.getByRole("option", { name: "国内株式" }));
+    await user.click(screen.getByRole("button", { name: /銘柄に付与$/ }));
+
+    await waitFor(() => {
+      expect(toastSuccess).toHaveBeenCalledWith("1 件の銘柄にタグを追加しました。");
+    });
+  });
+
+  it("shows error when child value assignment fails", async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal(
+      "fetch",
+      createManageFetchMock({
+        schemes: [HIERARCHY_SCHEME],
+        instrumentTags: [
+          { instrumentId: MANAGE_INSTRUMENT.id, classificationValueIds: ["v-parent"] },
+        ],
+        mutate: {
+          addValueInstruments: { ok: false, message: "タグ付与失敗" },
+        },
+      }),
+    );
+    renderView("tag");
+
+    await user.click(await screen.findByRole("tab", { name: "分析軸から選ぶ" }));
+    await user.click(await screen.findByRole("button", { name: "銘柄を表示" }));
+    await user.click(
+      await screen.findByRole("checkbox", { name: MANAGE_INSTRUMENT.name }),
+    );
+    await user.click(screen.getByRole("combobox", { name: "付与する子カテゴリ値" }));
+    await user.click(screen.getByRole("option", { name: "国内株式" }));
+    await user.click(screen.getByRole("button", { name: /銘柄に付与$/ }));
+
+    await waitFor(() => {
+      expect(toastError).toHaveBeenCalledWith("タグ付与失敗");
     });
   });
 

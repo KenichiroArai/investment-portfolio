@@ -305,6 +305,112 @@ describe("API app", () => {
     sqlite.close();
   });
 
+  it("lists portfolio instrument classifications and bulk-adds a value", async () => {
+    const { db, sqlite } = createTestDb();
+    const app = createApp({ getDb: () => db });
+
+    await app.request("/portfolios", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: "bulk", name: "一括口座", kind: "taxable" }),
+    });
+
+    const schemeRes = await app.request("/portfolios/bulk/classification-schemes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: "asset_class", name: "資産クラス" }),
+    });
+    const scheme = (await schemeRes.json()) as { id: string };
+
+    const parentRes = await app.request(`/classification-schemes/${scheme.id}/values`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: "stock", name: "株式" }),
+    });
+    const parent = (await parentRes.json()) as { id: string };
+
+    const childRes = await app.request(`/classification-schemes/${scheme.id}/values`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: "domestic", name: "国内株式" }),
+    });
+    const child = (await childRes.json()) as { id: string };
+
+    await app.request("/classification-value-links", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ parentValueId: parent.id, childValueId: child.id }),
+    });
+
+    const instrumentRes = await app.request("/instruments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        portfolioCode: "bulk",
+        accountId: "bulk:manual",
+        name: "銘柄A",
+      }),
+    });
+    const instrument = (await instrumentRes.json()) as { id: string };
+
+    await app.request(`/instruments/${instrument.id}/classifications`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ classificationValueIds: [parent.id] }),
+    });
+
+    const missingPortfolio = await app.request(
+      "/portfolios/unknown/instrument-classifications",
+    );
+    expect(missingPortfolio.status).toBe(404);
+
+    const listRes = await app.request("/portfolios/bulk/instrument-classifications");
+    expect(listRes.status).toBe(200);
+    const rows = (await listRes.json()) as Array<{
+      instrumentId: string;
+      classificationValueIds: string[];
+    }>;
+    expect(rows).toEqual([
+      { instrumentId: instrument.id, classificationValueIds: [parent.id] },
+    ]);
+
+    const badBody = await app.request(`/classification-values/${child.id}/instruments`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ instrumentIds: [] }),
+    });
+    expect(badBody.status).toBe(400);
+
+    const missingValue = await app.request(
+      "/classification-values/00000000-0000-4000-8000-000000000099/instruments",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ instrumentIds: [instrument.id] }),
+      },
+    );
+    expect(missingValue.status).toBe(404);
+
+    const assignRes = await app.request(
+      `/classification-values/${child.id}/instruments`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ instrumentIds: [instrument.id] }),
+      },
+    );
+    expect(assignRes.status).toBe(200);
+    expect(await assignRes.json()).toEqual({ ok: true, updated: 1 });
+
+    const afterRes = await app.request(`/instruments/${instrument.id}/classifications`);
+    const after = (await afterRes.json()) as { classificationValueIds: string[] };
+    expect([...after.classificationValueIds].sort()).toEqual(
+      [parent.id, child.id].sort(),
+    );
+
+    sqlite.close();
+  });
+
   it("supports portfolio, classification, and instrument CRUD", async () => {
     const { db, sqlite } = createTestDb();
     const app = createApp({ getDb: () => db });

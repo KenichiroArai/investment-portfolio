@@ -83,6 +83,10 @@ export const setInstrumentClassificationsSchema = z.object({
   classificationValueIds: z.array(z.string().uuid()),
 });
 
+export const addClassificationValueInstrumentsSchema = z.object({
+  instrumentIds: z.array(z.string().uuid()).min(1),
+});
+
 export const holdingLineMetricInputSchema = z.object({
   code: z.string().min(1).max(64),
   integerValue: z.number().int().nullable().optional(),
@@ -153,6 +157,9 @@ export type CreateInstrumentInput = z.infer<typeof createInstrumentSchema>;
 export type UpdateInstrumentInput = z.infer<typeof updateInstrumentSchema>;
 export type SetInstrumentClassificationsInput = z.infer<
   typeof setInstrumentClassificationsSchema
+>;
+export type AddClassificationValueInstrumentsInput = z.infer<
+  typeof addClassificationValueInstrumentsSchema
 >;
 export type HoldingLineInput = z.infer<typeof holdingLineInputSchema>;
 export type ReplaceCurrentSnapshotInput = z.infer<

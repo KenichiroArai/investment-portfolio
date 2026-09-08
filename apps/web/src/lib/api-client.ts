@@ -1,4 +1,5 @@
 import type {
+  AddClassificationValueInstrumentsInput,
   BackupImportMode,
   BackupImportPreview,
   BackupImportResult,
@@ -9,6 +10,7 @@ import type {
   CreatePortfolioInput,
   CurrentSnapshotDto,
   InstrumentClassificationsDto,
+  InstrumentClassificationSummaryDto,
   InstrumentListItemDto,
   PortfolioDto,
   ReplaceCurrentSnapshotInput,
@@ -570,6 +572,27 @@ export async function setInstrumentClassifications(
     `/instruments/${instrumentId}/classifications`,
     {
       method: "PUT",
+      body: JSON.stringify(input),
+    },
+  );
+  return result;
+}
+
+export async function fetchPortfolioInstrumentClassifications(portfolioCode: string) {
+  let result = await requestJson<InstrumentClassificationSummaryDto[]>(
+    `/portfolios/${encodePortfolioCodeForPath(portfolioCode)}/instrument-classifications`,
+  );
+  return result;
+}
+
+export async function addInstrumentsToClassificationValue(
+  classificationValueId: string,
+  input: AddClassificationValueInstrumentsInput,
+) {
+  let result = await requestWritableJson<{ ok: boolean; updated: number }>(
+    `/classification-values/${classificationValueId}/instruments`,
+    {
+      method: "POST",
       body: JSON.stringify(input),
     },
   );

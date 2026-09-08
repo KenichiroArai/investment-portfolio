@@ -1,9 +1,11 @@
+import { eq } from "drizzle-orm";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { IDECO_SCHEME_CODES, MONEX_SCHEME_CODES, SnapshotValidationError } from "@repo/shared";
 
 import {
   addClassificationLink,
+  addClassificationValueToInstruments,
   copyClassificationValue,
   createClassificationScheme,
   createClassificationValue,
@@ -18,6 +20,7 @@ import {
   listAnalysisSchemesForPortfolio,
   listClassificationSchemesByPortfolioCode,
   listClassificationValuesBySchemeId,
+  listInstrumentClassificationsForPortfolio,
   listInstrumentClassificationValueIds,
   listSchemesWithValuesForPortfolio,
   removeClassificationLink,
@@ -71,6 +74,7 @@ import {
   listTargetPortfolioWeights,
   replaceTargetPortfolioWeights,
 } from "../src/repositories/target-portfolio-weights";
+import { instrumentClassifications } from "../src/schema/index";
 import { createTestDb } from "../src/test-utils";
 
 describe("portfolio repositories", () => {
@@ -1181,6 +1185,147 @@ describe("portfolio repositories", () => {
       { classificationValueId: valueJapan.id, allocationWeight: 0 },
     ]);
     expect(await listInstrumentClassificationValueIds(db, instrument.id)).toEqual([]);
+  });
+
+  it("lists instrument classifications for a portfolio", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+    await createPortfolio(db, {
+      code: "monex",
+      name: "Monex",
+      kind: "monex",
+    });
+    const scheme = await createClassificationScheme(db, {
+      portfolioCode: "ideco",
+      code: "region",
+      name: "地域",
+    });
+    const japan = await createClassificationValue(db, {
+      schemeId: scheme!.id,
+      code: "japan",
+      name: "日本",
+      sortOrder: 0,
+    });
+    const world = await createClassificationValue(db, {
+      schemeId: scheme!.id,
+      code: "world",
+      name: "全世界",
+      sortOrder: 1,
+    });
+    const alpha = await createInstrument(db, { name: "Alpha Fund" });
+    const beta = await createInstrument(db, { name: "Beta Fund" });
+    const outside = await createInstrument(db, {
+      portfolioCode: "monex",
+      name: "Monex Fund",
+    });
+
+    await setInstrumentClassifications(db, alpha.id, [japan.id, world.id]);
+    await setInstrumentClassifications(db, beta.id, [japan.id]);
+    await setInstrumentClassifications(db, outside.id, [japan.id]);
+
+    expect(await listInstrumentClassificationsForPortfolio(db, "missing")).toEqual([]);
+
+    const rows = await listInstrumentClassificationsForPortfolio(db, "ideco");
+    expect(rows).toHaveLength(2);
+    expect(rows.some((row) => row.instrumentId === outside.id)).toBe(false);
+
+    const alphaRow = rows.find((row) => row.instrumentId === alpha.id);
+    expect([...(alphaRow?.classificationValueIds ?? [])].sort()).toEqual(
+      [japan.id, world.id].sort(),
+    );
+    const betaRow = rows.find((row) => row.instrumentId === beta.id);
+    expect(betaRow?.classificationValueIds).toEqual([japan.id]);
+  });
+
+  it("adds a classification value to instruments while keeping existing weights", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+    const scheme = await createClassificationScheme(db, {
+      portfolioCode: "ideco",
+      code: "asset_class",
+      name: "資産クラス",
+    });
+    const parent = await createClassificationValue(db, {
+      schemeId: scheme!.id,
+      code: "stock",
+      name: "株式",
+      sortOrder: 0,
+    });
+    const domestic = await createClassificationValue(db, {
+      schemeId: scheme!.id,
+      code: "domestic",
+      name: "国内株式",
+      sortOrder: 1,
+    });
+    const foreign = await createClassificationValue(db, {
+      schemeId: scheme!.id,
+      code: "foreign",
+      name: "外国株式",
+      sortOrder: 2,
+    });
+    await addClassificationLink(db, {
+      parentValueId: parent.id,
+      childValueId: domestic.id,
+    });
+    await addClassificationLink(db, {
+      parentValueId: parent.id,
+      childValueId: foreign.id,
+    });
+
+    const alpha = await createInstrument(db, { name: "Alpha Fund" });
+    const beta = await createInstrument(db, { name: "Beta Fund" });
+    const gamma = await createInstrument(db, { name: "Gamma Fund" });
+
+    expect(await addClassificationValueToInstruments(db, domestic.id, [])).toBe(0);
+
+    await setInstrumentClassificationsWithWeights(db, alpha.id, [
+      { classificationValueId: parent.id, allocationWeight: 3 },
+      { classificationValueId: foreign.id, allocationWeight: 1 },
+    ]);
+    await setInstrumentClassifications(db, gamma.id, [domestic.id]);
+
+    const updated = await addClassificationValueToInstruments(db, domestic.id, [
+      alpha.id,
+      beta.id,
+      gamma.id,
+      "00000000-0000-4000-8000-000000000099",
+    ]);
+    expect(updated).toBe(2);
+
+    const tags = await getTagsForInstruments(db, [alpha.id, beta.id]);
+    const alphaTags = tags.get(alpha.id) ?? [];
+    const parentWeight =
+      alphaTags.find((tag) => tag.valueCode === "stock")?.allocationWeight ?? 0;
+    const foreignWeight =
+      alphaTags.find((tag) => tag.valueCode === "foreign")?.allocationWeight ?? 0;
+    const domesticWeight =
+      alphaTags.find((tag) => tag.valueCode === "domestic")?.allocationWeight ?? 0;
+    expect(parentWeight / foreignWeight).toBeCloseTo(3);
+    expect(domesticWeight).toBeCloseTo(1 / 3);
+
+    const betaTags = tags.get(beta.id) ?? [];
+    expect(betaTags.map((tag) => tag.valueCode)).toEqual(["domestic"]);
+    expect(betaTags[0]?.allocationWeight).toBe(1);
+
+    await db
+      .update(instrumentClassifications)
+      .set({ allocationWeight: null })
+      .where(eq(instrumentClassifications.instrumentId, beta.id));
+
+    expect(await addClassificationValueToInstruments(db, parent.id, [beta.id])).toBe(1);
+    const betaTagsAfter = (await getTagsForInstruments(db, [beta.id])).get(beta.id) ?? [];
+    expect(betaTagsAfter).toHaveLength(2);
+    for (const tag of betaTagsAfter) {
+      expect(tag.allocationWeight).toBeCloseTo(0.5);
+    }
   });
 
   it("lists instruments with portfolio, account, and search filters", async () => {

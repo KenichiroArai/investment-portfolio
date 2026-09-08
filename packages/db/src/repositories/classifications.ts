@@ -17,6 +17,7 @@ import {
   classificationValueLinks,
   classificationValues,
   instrumentClassifications,
+  instruments,
 } from "../schema/index";
 import { findPortfolioByCode } from "./portfolios";
 
@@ -607,6 +608,47 @@ export async function listInstrumentClassificationValueIds(
   return result;
 }
 
+export async function listInstrumentClassificationsForPortfolio(
+  db: AppDatabase,
+  portfolioCode: string,
+) {
+  let result: Array<{
+    instrumentId: string;
+    classificationValueIds: string[];
+  }> = [];
+
+  const portfolio = await findPortfolioByCode(db, portfolioCode);
+  if (!portfolio) {
+    return result;
+  }
+
+  const rows = await db
+    .select({
+      instrumentId: instrumentClassifications.instrumentId,
+      classificationValueId: instrumentClassifications.classificationValueId,
+    })
+    .from(instrumentClassifications)
+    .innerJoin(
+      instruments,
+      eq(instrumentClassifications.instrumentId, instruments.id),
+    )
+    .where(eq(instruments.portfolioId, portfolio.id))
+    .orderBy(asc(instruments.name));
+
+  const valueIdsByInstrument = new Map<string, string[]>();
+  for (const row of rows) {
+    const existing = valueIdsByInstrument.get(row.instrumentId) ?? [];
+    existing.push(row.classificationValueId);
+    valueIdsByInstrument.set(row.instrumentId, existing);
+  }
+
+  for (const [instrumentId, classificationValueIds] of valueIdsByInstrument) {
+    result.push({ instrumentId, classificationValueIds });
+  }
+
+  return result;
+}
+
 export type InstrumentClassificationWeightInput = {
   classificationValueId: string;
   allocationWeight: number;
@@ -678,6 +720,69 @@ export async function setInstrumentClassificationsWithWeights(
   /* v8 ignore stop */
 
   await db.insert(instrumentClassifications).values(rows);
+
+  return result;
+}
+
+export async function addClassificationValueToInstruments(
+  db: AppDatabase,
+  classificationValueId: string,
+  instrumentIds: string[],
+) {
+  let result = 0;
+
+  if (instrumentIds.length === 0) {
+    return result;
+  }
+
+  const instrumentRows = await db
+    .select({ id: instruments.id })
+    .from(instruments)
+    .where(inArray(instruments.id, instrumentIds));
+  const knownInstrumentIds = new Set(instrumentRows.map((row) => row.id));
+
+  const tagRows = await db
+    .select({
+      instrumentId: instrumentClassifications.instrumentId,
+      classificationValueId: instrumentClassifications.classificationValueId,
+      allocationWeight: instrumentClassifications.allocationWeight,
+    })
+    .from(instrumentClassifications)
+    .where(inArray(instrumentClassifications.instrumentId, instrumentIds));
+
+  const weightsByInstrument = new Map<
+    string,
+    InstrumentClassificationWeightInput[]
+  >();
+  for (const row of tagRows) {
+    const existing = weightsByInstrument.get(row.instrumentId) ?? [];
+    existing.push({
+      classificationValueId: row.classificationValueId,
+      allocationWeight: row.allocationWeight ?? 1,
+    });
+    weightsByInstrument.set(row.instrumentId, existing);
+  }
+
+  for (const instrumentId of instrumentIds) {
+    if (!knownInstrumentIds.has(instrumentId)) {
+      continue;
+    }
+
+    const existing = weightsByInstrument.get(instrumentId) ?? [];
+    const alreadyTagged = existing.some(
+      (weight) => weight.classificationValueId === classificationValueId,
+    );
+    if (alreadyTagged) {
+      continue;
+    }
+
+    const addedWeight = existing.length > 0 ? 1 / existing.length : 1;
+    await setInstrumentClassificationsWithWeights(db, instrumentId, [
+      ...existing,
+      { classificationValueId, allocationWeight: addedWeight },
+    ]);
+    result += 1;
+  }
 
   return result;
 }

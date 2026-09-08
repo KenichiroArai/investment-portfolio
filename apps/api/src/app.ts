@@ -1,6 +1,7 @@
 import {
   applyMonexAssetClassWeights,
   addClassificationLink,
+  addClassificationValueToInstruments,
   copyClassificationValue,
   createClassificationScheme,
   createClassificationValue,
@@ -20,6 +21,7 @@ import {
   getSnapshotsInDateRange,
   importPortfolioBackup,
   BackupImportError,
+  listInstrumentClassificationsForPortfolio,
   listInstrumentClassificationValueIds,
   listInstruments,
   listIdecoInstrumentsForPaste,
@@ -46,6 +48,7 @@ import {
   type AppDatabase,
 } from "@repo/db";
 import {
+  addClassificationValueInstrumentsSchema,
   applyMonexAssetClassWeightsSchema,
   backupImportModeSchema,
   buildSnapshotTrends,
@@ -431,6 +434,33 @@ export function createApp(options?: CreateAppOptions) {
     return result;
   });
 
+  app.post("/classification-values/:id/instruments", async (c) => {
+    let result!: Response;
+
+    const body = await c.req.json();
+    const parsed = addClassificationValueInstrumentsSchema.safeParse(body);
+    if (!parsed.success) {
+      result = c.json({ error: parsed.error.flatten() }, 400);
+      return result;
+    }
+
+    const valueId = c.req.param("id");
+    const db = resolveDb();
+    const value = await findClassificationValueById(db, valueId);
+    if (!value) {
+      result = c.json({ error: "Classification value not found" }, 404);
+      return result;
+    }
+
+    const updated = await addClassificationValueToInstruments(
+      db,
+      valueId,
+      parsed.data.instrumentIds,
+    );
+    result = c.json({ ok: true, updated });
+    return result;
+  });
+
   app.get("/instruments", async (c) => {
     let result!: Response;
 
@@ -545,6 +575,25 @@ export function createApp(options?: CreateAppOptions) {
       instrumentId,
     );
     result = c.json({ classificationValueIds });
+    return result;
+  });
+
+  app.get("/portfolios/:code/instrument-classifications", async (c) => {
+    let result!: Response;
+
+    const db = resolveDb();
+    const portfolioCode = c.req.param("code");
+    const portfolio = await findPortfolioByCode(db, portfolioCode);
+    if (!portfolio) {
+      result = c.json({ error: "Portfolio not found" }, 404);
+      return result;
+    }
+
+    const rows = await listInstrumentClassificationsForPortfolio(
+      db,
+      portfolioCode,
+    );
+    result = c.json(rows);
     return result;
   });
 

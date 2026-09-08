@@ -26,6 +26,10 @@ import {
   buildClassificationGraphValues,
   mergeClassificationLinks,
 } from "@/features/allocation/AllocationHierarchyControls";
+import {
+  buildClassificationBreadcrumb,
+  resolveValuesByIds,
+} from "@/features/manage/classification-picker-utils";
 import { ClassificationValueLabel } from "@/components/classification-value-label";
 import { cn } from "@/lib/utils";
 
@@ -35,27 +39,6 @@ type InstrumentTagHierarchyPickerProps = {
   onSelectedValueIdsChange: (valueIds: string[]) => void;
   disabled?: boolean;
 };
-
-function findValueAcrossSchemes(
-  schemes: ClassificationSchemeWithValuesDto[],
-  valueId: string,
-): ClassificationValueDto | null {
-  let result: ClassificationValueDto | null = null;
-
-  for (const scheme of schemes) {
-    const found = scheme.values.find((value) => value.id === valueId);
-    if (!found) {
-      continue;
-    }
-    result = {
-      ...found,
-      schemeId: found.schemeId ?? scheme.id,
-    };
-    break;
-  }
-
-  return result;
-}
 
 export function InstrumentTagHierarchyPicker({
   schemes,
@@ -112,32 +95,16 @@ export function InstrumentTagHierarchyPicker({
   }, [currentParentId, graph, resolvedSchemeId]);
 
   const currentValues = useMemo(() => {
-    let result: ClassificationValueDto[] = [];
-
-    for (const valueId of currentValueIds) {
-      const value = findValueAcrossSchemes(schemes, valueId);
-      if (!value) {
-        continue;
-      }
-      result.push(value);
-    }
-
+    let result: ClassificationValueDto[] = resolveValuesByIds(schemes, currentValueIds);
     return result;
   }, [currentValueIds, schemes]);
 
   const breadcrumb = useMemo(() => {
-    let result: Array<{ id: string | null; label: string }> = [
-      { id: null, label: activeScheme?.name ?? "分析軸" },
-    ];
-
-    for (const valueId of parentStack) {
-      const value = findValueAcrossSchemes(schemes, valueId);
-      if (!value) {
-        continue;
-      }
-      result.push({ id: valueId, label: value.name });
-    }
-
+    let result = buildClassificationBreadcrumb(
+      schemes,
+      parentStack,
+      activeScheme?.name ?? "分析軸",
+    );
     return result;
   }, [activeScheme?.name, parentStack, schemes]);
 

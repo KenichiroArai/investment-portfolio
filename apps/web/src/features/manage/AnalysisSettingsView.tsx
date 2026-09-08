@@ -46,7 +46,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WritableGuard } from "@/features/manage/WritableGuard";
 import { ClassificationValueTree } from "@/features/manage/ClassificationValueTree";
 import { InstrumentTagHierarchyPicker } from "@/features/manage/InstrumentTagHierarchyPicker";
+import { SchemeInstrumentTagPanel } from "@/features/manage/SchemeInstrumentTagPanel";
 import {
+  addInstrumentsToClassificationValue,
   copyClassificationValue,
   createClassificationScheme,
   createClassificationValue,
@@ -56,6 +58,7 @@ import {
   fetchClassificationSchemes,
   fetchInstrumentClassifications,
   fetchInstruments,
+  fetchPortfolioInstrumentClassifications,
   setInstrumentClassifications,
   updateClassificationScheme,
   updateClassificationValue,
@@ -96,6 +99,8 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
   const [valueSortOrder, setValueSortOrder] = useState("0");
   const [tagInstrumentId, setTagInstrumentId] = useState("");
   const [tagValueIds, setTagValueIds] = useState<string[]>([]);
+  const [tagMode, setTagMode] = useState("instrument");
+  const [instrumentTagMap, setInstrumentTagMap] = useState<Record<string, string[]>>({});
   const [deleteSchemeId, setDeleteSchemeId] = useState<string | null>(null);
   const [deleteValueId, setDeleteValueId] = useState<string | null>(null);
 
@@ -116,9 +121,10 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
     let result: void = undefined;
     setLoading(true);
 
-    const [schemeResponse, instrumentResponse] = await Promise.all([
+    const [schemeResponse, instrumentResponse, instrumentTagResponse] = await Promise.all([
       fetchClassificationSchemes(portfolioCode),
       fetchInstruments(portfolioCode),
+      fetchPortfolioInstrumentClassifications(portfolioCode),
     ]);
 
     if (!schemeResponse.ok) {
@@ -143,6 +149,14 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
         }
         return instrumentResponse.data[0]?.id ?? "";
       });
+    }
+
+    if (instrumentTagResponse.ok) {
+      const tagMap: Record<string, string[]> = {};
+      for (const entry of instrumentTagResponse.data) {
+        tagMap[entry.instrumentId] = entry.classificationValueIds;
+      }
+      setInstrumentTagMap(tagMap);
     }
 
     setLoading(false);
@@ -409,6 +423,33 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
 
     toast.success("銘柄タグを保存しました。");
     await loadInstrumentTags(tagInstrumentId);
+    await load();
+    return result;
+  }
+
+  async function handleAssignChildValue(childValueId: string, instrumentIds: string[]) {
+    let result: void = undefined;
+
+    if (!childValueId || instrumentIds.length === 0) {
+      return result;
+    }
+
+    setSubmitting(true);
+    const response = await addInstrumentsToClassificationValue(childValueId, {
+      instrumentIds,
+    });
+    setSubmitting(false);
+
+    if (!response.ok) {
+      toast.error(response.message);
+      return result;
+    }
+
+    toast.success(`${response.data.updated} 件の銘柄にタグを追加しました。`);
+    await load();
+    if (tagInstrumentId) {
+      await loadInstrumentTags(tagInstrumentId);
+    }
     return result;
   }
 
@@ -606,38 +647,59 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
                   <CardHeader>
                     <CardTitle>銘柄タグ</CardTitle>
                     <CardDescription>
-                      分析軸 → カテゴリ値（親）→ カテゴリ値（子）の順に辿り、親・葉どちらもタグ付けできます。
+                      銘柄を選んでタグ付けするか、分析軸から親カテゴリ値を選んで対象銘柄にまとめて子カテゴリ値を付与できます。
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                <form className="grid max-w-2xl gap-4" onSubmit={handleSetTags}>
-                  <FormField label="銘柄" htmlFor="tag-instrument">
-                    <Select value={tagInstrumentId} onValueChange={setTagInstrumentId}>
-                      <SelectTrigger id="tag-instrument">
-                        <SelectValue placeholder="銘柄を選択" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {instruments.map((instrument) => {
-                          let item = (
-                            <SelectItem key={instrument.id} value={instrument.id}>
-                              {instrument.name}
-                            </SelectItem>
-                          );
-                          return item;
-                        })}
-                      </SelectContent>
-                    </Select>
-                  </FormField>
-                  <InstrumentTagHierarchyPicker
-                    schemes={schemes}
-                    selectedValueIds={tagValueIds}
-                    onSelectedValueIdsChange={setTagValueIds}
-                    disabled={submitting || !tagInstrumentId}
-                  />
-                  <Button type="submit" disabled={submitting || !tagInstrumentId}>
-                    タグを保存
-                  </Button>
-                </form>
+                <Tabs value={tagMode} onValueChange={setTagMode} className="space-y-4">
+                  <TabsList>
+                    <TabsTrigger value="instrument">銘柄から選ぶ</TabsTrigger>
+                    <TabsTrigger value="scheme">分析軸から選ぶ</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="instrument">
+                    <form className="grid max-w-2xl gap-4" onSubmit={handleSetTags}>
+                      <FormField label="銘柄" htmlFor="tag-instrument">
+                        <Select value={tagInstrumentId} onValueChange={setTagInstrumentId}>
+                          <SelectTrigger id="tag-instrument">
+                            <SelectValue placeholder="銘柄を選択" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {instruments.map((instrument) => {
+                              let item = (
+                                <SelectItem key={instrument.id} value={instrument.id}>
+                                  {instrument.name}
+                                </SelectItem>
+                              );
+                              return item;
+                            })}
+                          </SelectContent>
+                        </Select>
+                      </FormField>
+                      <InstrumentTagHierarchyPicker
+                        schemes={schemes}
+                        selectedValueIds={tagValueIds}
+                        onSelectedValueIdsChange={setTagValueIds}
+                        disabled={submitting || !tagInstrumentId}
+                      />
+                      <Button type="submit" disabled={submitting || !tagInstrumentId}>
+                        タグを保存
+                      </Button>
+                    </form>
+                  </TabsContent>
+                  <TabsContent value="scheme">
+                    <div className="max-w-2xl">
+                      <SchemeInstrumentTagPanel
+                        schemes={schemes}
+                        instruments={instruments}
+                        instrumentTagMap={instrumentTagMap}
+                        disabled={submitting}
+                        onAssign={(childValueId, instrumentIds) => {
+                          void handleAssignChildValue(childValueId, instrumentIds);
+                        }}
+                      />
+                    </div>
+                  </TabsContent>
+                </Tabs>
                   </CardContent>
                 </Card>
               </TabsContent>

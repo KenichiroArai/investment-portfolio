@@ -66,6 +66,11 @@ export type InstrumentClassificationsDto = {
   classificationValueIds: string[];
 };
 
+export type InstrumentClassificationSummaryDto = {
+  instrumentId: string;
+  classificationValueIds: string[];
+};
+
 export type TargetAllocationWeightDto = {
   valueCode: string;
   targetRatio: number;
