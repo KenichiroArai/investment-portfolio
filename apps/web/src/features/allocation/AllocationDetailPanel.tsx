@@ -24,6 +24,8 @@ import {
   getSnapshotByDateFetchUrl,
   getSnapshotLoadErrorMessage,
 } from "@/lib/data-source";
+import { useKeyedState } from "@/hooks/useKeyedState";
+import { useStableStringList } from "@/hooks/useStableStringList";
 import { useTableSort } from "@/hooks/useTableSort";
 import { formatAsOfDateJa } from "@/lib/format-yen";
 
@@ -57,13 +59,27 @@ export function AllocationDetailPanel({
 
   const [query, setQuery] = useState("");
   const [asOfDateFilter, setAsOfDateFilter] = useState("__all__");
-  const [classificationValue, setClassificationValue] = useState("__all__");
-  const [page, setPage] = useState(1);
+  const [classificationValue, setClassificationValue] = useKeyedState(
+    schemeCode,
+    "__all__",
+  );
   const [pageSize, setPageSize] = useState(ALLOCATION_DETAIL_DEFAULT_PAGE_SIZE);
   const { sortColumn, sortDirection, toggleSort } =
     useTableSort<AllocationDetailSortColumn>("asOfDate", "desc");
 
+  const fetchDates = useStableStringList(rangeDates);
   const rangeDatesKey = rangeDates.join(",");
+  const pageResetKey = [
+    schemeCode,
+    query,
+    asOfDateFilter,
+    classificationValue,
+    pageSize,
+    rangeDatesKey,
+    sortColumn,
+    sortDirection,
+  ].join("\u0000");
+  const [page, setPage] = useKeyedState(pageResetKey, 1);
 
   useEffect(() => {
     let result: () => void = () => {};
@@ -72,7 +88,7 @@ export function AllocationDetailPanel({
     async function loadRangeSnapshots() {
       let loadResult: void = undefined;
 
-      if (rangeDates.length === 0) {
+      if (fetchDates.length === 0) {
         setRangeSnapshots([]);
         setRangeFetchError(null);
         setPartialFetchWarning(null);
@@ -85,7 +101,7 @@ export function AllocationDetailPanel({
       setPartialFetchWarning(null);
 
       const fetchResults = await Promise.all(
-        rangeDates.map(async (asOfDate) => {
+        fetchDates.map(async (asOfDate) => {
           let snapshotResult: CurrentSnapshotDto | null = null;
 
           try {
@@ -138,33 +154,11 @@ export function AllocationDetailPanel({
       cancelled = true;
     };
     return result;
-  }, [portfolioCode, rangeDatesKey]);
-
-  useEffect(() => {
-    let result: void = undefined;
-    setPage(1);
-    return result;
-  }, [
-    query,
-    asOfDateFilter,
-    classificationValue,
-    pageSize,
-    rangeDatesKey,
-    sortColumn,
-    sortDirection,
-    schemeCode,
-  ]);
-
-  useEffect(() => {
-    let result: void = undefined;
-    setClassificationValue("__all__");
-    return result;
-  }, [schemeCode]);
+  }, [portfolioCode, fetchDates]);
 
   const handleDetailSort = (column: AllocationDetailSortColumn): void => {
     let result: void = undefined;
     toggleSort(column);
-    setPage(1);
     return result;
   };
 

@@ -379,7 +379,6 @@ describe("DataManageView", () => {
   });
 
   it("rejects invalid as-of date on save", async () => {
-    const user = userEvent.setup();
     vi.stubGlobal(
       "fetch",
       createManageFetchMock({ snapshot: null }),
@@ -487,7 +486,6 @@ describe("DataManageView", () => {
   });
 
   it("shows empty generic metrics when snapshot has none", async () => {
-    const user = userEvent.setup();
     vi.stubGlobal(
       "fetch",
       createManageFetchMock({

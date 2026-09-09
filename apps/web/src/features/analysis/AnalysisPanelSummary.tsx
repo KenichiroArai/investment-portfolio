@@ -1,4 +1,4 @@
-import { formatAllocationPercent, formatAllocationPercentPoint, formatYen } from "@/lib/format-yen";
+import { formatAllocationPercent, formatYen } from "@/lib/format-yen";
 
 type AnalysisPanelSummaryProps = {
   axisTotalMinor: number;

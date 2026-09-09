@@ -22,6 +22,7 @@ function makeRow(
     unrealizedGainMinor: overrides.unrealizedGainMinor ?? null,
     unrealizedGainRate: overrides.unrealizedGainRate ?? null,
     tags: overrides.tags ?? [],
+    portfolioWeight: overrides.portfolioWeight ?? null,
   };
   return result;
 }

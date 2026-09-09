@@ -260,7 +260,6 @@ describe("portfolio routes", () => {
     vi.stubGlobal("fetch", createManageFetchMock());
     const page = await SettingsPage({
       params: Promise.resolve({ code: "ideco" }),
-      searchParams: Promise.resolve({}),
     });
     render(page);
     await waitFor(() => {

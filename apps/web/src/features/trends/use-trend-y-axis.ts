@@ -9,7 +9,6 @@ import type { TrendChartSeries } from "@/features/trends/trend-chart-series";
 import {
   formatPercentAxis,
   formatPercentPointAxis,
-  formatPercentDeltaTooltip,
   formatYenAxisLabel,
   formatYenMan,
 } from "@/lib/format-yen";

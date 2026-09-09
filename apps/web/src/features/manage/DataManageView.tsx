@@ -104,7 +104,10 @@ export function DataManageView({
   const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [schemeOptions, setSchemeOptions] = useState<
-    Array<{ schemeName: string; values: Array<{ id: string; name: string }> }>
+    Array<{
+      schemeName: string;
+      values: Array<{ id: string; name: string; description?: string | null }>;
+    }>
   >([]);
 
   const [asOfDate, setAsOfDate] = useState("");
@@ -149,6 +152,7 @@ export function DataManageView({
           values: scheme.values.map((value) => ({
             id: value.id,
             name: value.name,
+            description: value.description ?? null,
           })),
         })),
       );

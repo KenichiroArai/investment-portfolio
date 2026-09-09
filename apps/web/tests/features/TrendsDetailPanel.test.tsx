@@ -25,6 +25,19 @@ describe("TrendsDetailPanel", () => {
     vi.unstubAllGlobals();
   });
 
+  // 期間バケットのラベルは構成比の「推移」表示にだけ現れる。
+  async function showAllocationTrendView(
+    user: ReturnType<typeof userEvent.setup>,
+  ): Promise<void> {
+    let result: void = undefined;
+
+    const views = await waitFor(() =>
+      within(screen.getByRole("tablist", { name: "構成比グラフの表示" })),
+    );
+    await user.click(views.getByRole("tab", { name: "推移" }));
+    return result;
+  }
+
   function stubTrendsFetch(points = trendsPointsFixture) {
     vi.stubGlobal(
       "fetch",
@@ -74,10 +87,13 @@ describe("TrendsDetailPanel", () => {
   });
 
   it("renders daily labels when a calendar month is selected", async () => {
+    const user = userEvent.setup();
     stubTrendsFetch([trendsPointsFixture[1]]);
     renderWithPortfolioTime(<TrendsDetailPanel portfolioCode="ideco" />, {
       initialSearchParams: "month=2026-06&unit=day",
     });
+
+    await showAllocationTrendView(user);
 
     await waitFor(() => {
       expect(screen.getAllByText("1日単位").length).toBeGreaterThan(0);
@@ -219,6 +235,7 @@ describe("TrendsDetailPanel", () => {
   });
 
   it("shows sparse data note when snapshots start after the selected range", async () => {
+    const user = userEvent.setup();
     stubTrendsFetch([
       {
         ...trendsPointsFixture[1],
@@ -229,6 +246,8 @@ describe("TrendsDetailPanel", () => {
     renderWithPortfolioTime(<TrendsDetailPanel portfolioCode="ideco" />, {
       initialSearchParams: "from=2026-03-11&to=2026-06-11&unit=3m",
     });
+
+    await showAllocationTrendView(user);
 
     await waitFor(() => {
       expect(

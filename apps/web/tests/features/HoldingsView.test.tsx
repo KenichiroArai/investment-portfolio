@@ -31,6 +31,7 @@ describe("HoldingsDetailPanel", () => {
     const view = renderWithPortfolioTime(
       <HoldingsDetailPanel
         portfolioCode="ideco"
+        portfolioKind="ideco"
         holdingsMode={holdingsMode}
         onHoldingsModeChange={onHoldingsModeChange}
       />,

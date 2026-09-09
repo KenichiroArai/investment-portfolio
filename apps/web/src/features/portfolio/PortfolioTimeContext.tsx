@@ -42,6 +42,8 @@ import {
   getSnapshotLoadErrorMessage,
   getSnapshotTrendsFetchUrl,
 } from "@/lib/data-source";
+import { useKeyedState } from "@/hooks/useKeyedState";
+import { useStableStringList } from "@/hooks/useStableStringList";
 import { shouldShowSnapshotTimeBar } from "@/lib/portfolio-time-bar";
 
 type PortfolioTimeContextValue = {
@@ -162,7 +164,6 @@ export function PortfolioTimeProvider({
 
   const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [currentAsOfDate, setCurrentAsOfDate] = useState<string | null>(null);
-  const [selectedAsOfDate, setSelectedAsOfDateState] = useState<string | null>(null);
   const [snapshot, setSnapshot] = useState<CurrentSnapshotDto | null>(null);
   const [trends, setTrends] = useState<SnapshotTrendsDto | null>(null);
   const [loadingDates, setLoadingDates] = useState(true);
@@ -173,9 +174,50 @@ export function PortfolioTimeProvider({
   const customFrom = searchParams.get("from") ?? "";
   const customTo = searchParams.get("to") ?? "";
   const calendarMonth = searchParams.get("month") ?? "";
+  const asOfFromUrl = searchParams.get("asOf");
   const unitFromUrl = searchParams.get("unit");
   const trendBucketPick = readTrendBucketPick(searchParams.get("pick"));
   const trendMinMaxField = readTrendMinMaxField(searchParams.get("minMaxBy"));
+
+  // URL 反映までの間だけ利用する暫定選択。asOf が変わったら破棄する。
+  const [pendingAsOfDate, setPendingAsOfDate] = useKeyedState<string | null>(
+    asOfFromUrl ?? "",
+    null,
+  );
+
+  const selectedAsOfDate = useMemo(() => {
+    let result: string | null = null;
+
+    if (!shouldShowSnapshotTimeBar(pathname, portfolioCode)) {
+      return result;
+    }
+
+    if (availableDates.length === 0) {
+      return result;
+    }
+
+    if (pendingAsOfDate !== null && availableDates.includes(pendingAsOfDate)) {
+      result = pendingAsOfDate;
+      return result;
+    }
+
+    if (asOfFromUrl && availableDates.includes(asOfFromUrl)) {
+      result = asOfFromUrl;
+      return result;
+    }
+
+    const latest = resolveLatestSnapshotDate(availableDates);
+    const customEnd = customTo || latest;
+    result = customEnd && availableDates.includes(customEnd) ? customEnd : latest;
+    return result;
+  }, [
+    asOfFromUrl,
+    availableDates,
+    customTo,
+    pathname,
+    pendingAsOfDate,
+    portfolioCode,
+  ]);
 
   const periodPreset = useMemo(() => {
     let result: SnapshotPeriodPreset | null = detectMatchingPreset(
@@ -253,11 +295,11 @@ export function PortfolioTimeProvider({
   const setSelectedAsOfDate = useCallback(
     (asOfDate: string) => {
       let result: void = undefined;
-      setSelectedAsOfDateState(asOfDate);
+      setPendingAsOfDate(asOfDate);
       updateSearchParams({ asOf: asOfDate });
       return result;
     },
-    [updateSearchParams],
+    [setPendingAsOfDate, updateSearchParams],
   );
 
   const jumpToLatest = useCallback(() => {
@@ -434,43 +476,17 @@ export function PortfolioTimeProvider({
   useEffect(() => {
     let result: void = undefined;
 
-    if (!shouldShowSnapshotTimeBar(pathname, portfolioCode)) {
-      setSelectedAsOfDateState(null);
+    if (selectedAsOfDate === null) {
       return result;
     }
 
-    if (availableDates.length === 0) {
-      setSelectedAsOfDateState(null);
+    if (asOfFromUrl === selectedAsOfDate) {
       return result;
     }
 
-    const fromUrl = searchParams.get("asOf");
-    const latest = resolveLatestSnapshotDate(availableDates);
-    const customEnd = customTo || latest;
-    const initial =
-      fromUrl && availableDates.includes(fromUrl)
-        ? fromUrl
-        : customEnd && availableDates.includes(customEnd)
-          ? customEnd
-          : latest;
-
-    if (initial && initial !== selectedAsOfDate) {
-      setSelectedAsOfDateState(initial);
-      if (fromUrl !== initial) {
-        updateSearchParams({ asOf: initial });
-      }
-    }
-
+    updateSearchParams({ asOf: selectedAsOfDate });
     return result;
-  }, [
-    availableDates,
-    customTo,
-    pathname,
-    portfolioCode,
-    searchParams,
-    selectedAsOfDate,
-    updateSearchParams,
-  ]);
+  }, [asOfFromUrl, selectedAsOfDate, updateSearchParams]);
 
   useEffect(() => {
     let result: () => void = () => {};
@@ -571,8 +587,8 @@ export function PortfolioTimeProvider({
     return result;
   }, [availableDates, periodPreset, customFrom, customTo, calendarMonth, periodBounds]);
 
-  const rangeDatesKey = rangeDates.join(",");
-  const availableDatesKey = availableDates.join(",");
+  const stableRangeDates = useStableStringList(rangeDates);
+  const stableAvailableDates = useStableStringList(availableDates);
 
   useEffect(() => {
     let result: () => void = () => {};
@@ -587,7 +603,7 @@ export function PortfolioTimeProvider({
         return loadResult;
       }
 
-      if (rangeDates.length === 0 || !periodBounds) {
+      if (stableRangeDates.length === 0 || !periodBounds) {
         setTrends(null);
         setLoadingTrends(false);
         return loadResult;
@@ -596,7 +612,7 @@ export function PortfolioTimeProvider({
       setLoadingTrends(true);
       const rangeFrom = periodBounds.from;
       const rangeTo = periodBounds.to;
-      const priorDates = availableDates.filter((date) => date < rangeFrom);
+      const priorDates = stableAvailableDates.filter((date) => date < rangeFrom);
       const baselineDate = priorDates.at(-1) ?? null;
       const fetchFrom = baselineDate ?? rangeFrom;
 
@@ -639,7 +655,13 @@ export function PortfolioTimeProvider({
       cancelled = true;
     };
     return result;
-  }, [portfolioCode, pathname, rangeDatesKey, availableDatesKey, periodBounds]);
+  }, [
+    portfolioCode,
+    pathname,
+    stableRangeDates,
+    stableAvailableDates,
+    periodBounds,
+  ]);
 
   const { displayTrendPoints, baselinePoint } = useMemo(() => {
     let result = {

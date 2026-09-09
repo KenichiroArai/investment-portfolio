@@ -12,11 +12,17 @@ import {
 } from "@/features/manage/snapshot-input";
 import { MANAGE_SNAPSHOT } from "../helpers/manage-api-test-utils";
 
+const HOLDING_LINE_ACCOUNT = {
+  accountId: "ideco:unknown",
+  accountName: "不明口座",
+};
+
 describe("snapshot-input", () => {
   it("builds replace snapshot input", () => {
     const lines = [
       {
         instrumentId: "i1",
+        ...HOLDING_LINE_ACCOUNT,
         quantity: 1,
         marketValueMinor: 1000,
       },
@@ -37,6 +43,7 @@ describe("snapshot-input", () => {
   it("merges holding lines and metrics", () => {
     const lines = mergeHoldingLine([], {
       instrumentId: "550e8400-e29b-41d4-a716-446655440000",
+      ...HOLDING_LINE_ACCOUNT,
       quantity: 1,
       marketValueMinor: 1000,
     });
@@ -66,22 +73,26 @@ describe("snapshot-input", () => {
     const lines = [
       {
         instrumentId: "i1",
+        ...HOLDING_LINE_ACCOUNT,
         quantity: 1,
         marketValueMinor: 1000,
       },
       {
         instrumentId: "i2",
+        ...HOLDING_LINE_ACCOUNT,
         quantity: 2,
         marketValueMinor: 2000,
       },
     ];
     const updated = updateHoldingLineAtIndex(lines, 1, {
       instrumentId: "i2",
+      ...HOLDING_LINE_ACCOUNT,
       quantity: 3,
       marketValueMinor: 3000,
     });
     expect(updated[1]).toEqual({
       instrumentId: "i2",
+      ...HOLDING_LINE_ACCOUNT,
       quantity: 3,
       marketValueMinor: 3000,
     });

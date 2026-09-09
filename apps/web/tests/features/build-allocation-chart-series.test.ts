@@ -8,6 +8,8 @@ describe("buildAllocationChartSeries", () => {
     const chartPoints = [
       {
         asOfDate: "2026-06-01",
+        bucketKey: "2026-06",
+        bucketLabel: "2026年6月",
         sourceAsOfDate: "2026-06-01",
         totalMarketValueMinor: 1_000_000,
         totalBookValueMinor: 900_000,

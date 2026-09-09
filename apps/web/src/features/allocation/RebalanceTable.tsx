@@ -3,10 +3,11 @@
 import type { RebalanceTradeRow } from "@repo/shared";
 import { compareNullableNumbers, compareStrings, type SortDirection } from "@repo/shared";
 import { ChevronRight } from "lucide-react";
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useMemo } from "react";
 
 import { SortableTableHeader } from "@/components/SortableTableHeader";
 import { TableHead } from "@/components/ui/table";
+import { useKeyedState } from "@/hooks/useKeyedState";
 import { useTableSort } from "@/hooks/useTableSort";
 import { formatAllocationPercent, formatAllocationPercentPoint, formatYen } from "@/lib/format-yen";
 import { cn } from "@/lib/utils";
@@ -243,7 +244,6 @@ function RebalanceTableRow({
 export function RebalanceTable({ rows, grouped = false }: RebalanceTableProps) {
   const { sortColumn, sortDirection, toggleSort } =
     useTableSort<RebalanceSortColumn>("buyMinor", "desc");
-  const [expandedGroupKeys, setExpandedGroupKeys] = useState<string[]>([]);
 
   const sortedRows = useMemo(() => {
     let result = grouped
@@ -257,29 +257,16 @@ export function RebalanceTable({ rows, grouped = false }: RebalanceTableProps) {
     return result;
   }, [grouped, sortedRows]);
 
-  useEffect(() => {
-    let result: () => void = () => {};
-    if (!grouped) {
-      setExpandedGroupKeys([]);
-      return result;
-    }
-
-    setExpandedGroupKeys((previous) => {
-      let next = groupedRows.map((item) => item.groupKey);
-      if (previous.length === 0) {
-        return next;
-      }
-
-      const preserved = previous.filter((groupKey) => next.includes(groupKey));
-      const added = next.filter((groupKey) => !preserved.includes(groupKey));
-      if (preserved.length === 0) {
-        return next;
-      }
-      return [...preserved, ...added];
-    });
-    result = () => {};
+  const allGroupKeys = useMemo(() => {
+    let result: string[] = groupedRows.map((item) => item.groupKey);
     return result;
-  }, [grouped, groupedRows]);
+  }, [groupedRows]);
+
+  // グループ構成が変わったら全グループを開いた状態に戻す。
+  const [expandedGroupKeys, setExpandedGroupKeys] = useKeyedState(
+    allGroupKeys.join("\u0000"),
+    allGroupKeys,
+  );
 
   function toggleGroup(groupKey: string): void {
     let result: void = undefined;

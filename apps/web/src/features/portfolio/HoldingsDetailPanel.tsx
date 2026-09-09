@@ -33,6 +33,8 @@ import {
   getSnapshotByDateFetchUrl,
   getSnapshotLoadErrorMessage,
 } from "@/lib/data-source";
+import { useKeyedState } from "@/hooks/useKeyedState";
+import { useStableStringList } from "@/hooks/useStableStringList";
 import { useTableSort } from "@/hooks/useTableSort";
 import { formatAsOfDateJa } from "@/lib/format-yen";
 import { buildPortfolioPath } from "@/lib/portfolio-path";
@@ -100,7 +102,7 @@ export function HoldingsDetailPanel({
 
     return result;
   });
-  const [classificationSchemeCode, setClassificationSchemeCode] = useState(() => {
+  const [selectedClassificationSchemeCode, setClassificationSchemeCode] = useState(() => {
     let result = "";
     const scheme = searchParams.get("scheme");
     if (scheme) {
@@ -116,11 +118,11 @@ export function HoldingsDetailPanel({
     }
     return result;
   });
-  const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(HOLDINGS_RANGE_DEFAULT_PAGE_SIZE);
   const { sortColumn, sortDirection, toggleSort } =
     useTableSort<HoldingDetailSortColumn>("accountName", "asc");
 
+  const fetchDates = useStableStringList(rangeDates);
   const rangeDatesKey = rangeDates.join(",");
 
   const comparisonDate = useMemo(() => {
@@ -204,7 +206,7 @@ export function HoldingsDetailPanel({
         return loadResult;
       }
 
-      if (rangeDates.length === 0) {
+      if (fetchDates.length === 0) {
         setRangeSnapshots([]);
         setRangeFetchError(null);
         setPartialFetchWarning(null);
@@ -217,7 +219,7 @@ export function HoldingsDetailPanel({
       setPartialFetchWarning(null);
 
       const fetchResults = await Promise.all(
-        rangeDates.map(async (asOfDate) => {
+        fetchDates.map(async (asOfDate) => {
           let snapshotResult: CurrentSnapshotDto | null = null;
 
           try {
@@ -270,27 +272,11 @@ export function HoldingsDetailPanel({
       cancelled = true;
     };
     return result;
-  }, [portfolioCode, rangeDatesKey, holdingsMode]);
-
-  useEffect(() => {
-    let result: void = undefined;
-    setPage(1);
-    return result;
-  }, [
-    query,
-    asOfDateFilter,
-    classificationSchemeCode,
-    classificationValue,
-    pageSize,
-    rangeDatesKey,
-    sortColumn,
-    sortDirection,
-  ]);
+  }, [portfolioCode, fetchDates, holdingsMode]);
 
   const handleDetailSort = (column: HoldingDetailSortColumn): void => {
     let result: void = undefined;
     toggleSort(column);
-    setPage(1);
     return result;
   };
 
@@ -336,20 +322,23 @@ export function HoldingsDetailPanel({
     return result;
   }, [allDetailRows, rangeSnapshots, snapshot]);
 
-  useEffect(() => {
-    let result: void = undefined;
+  // 未選択のときは期間内に存在する先頭の分析軸を既定値として扱う。
+  const classificationSchemeCode =
+    selectedClassificationSchemeCode !== ""
+      ? selectedClassificationSchemeCode
+      : rangeClassificationSchemes[0]?.schemeCode ?? "";
 
-    if (classificationSchemeCode !== "") {
-      return result;
-    }
-
-    const firstScheme = rangeClassificationSchemes[0]?.schemeCode ?? "";
-    if (firstScheme !== "") {
-      setClassificationSchemeCode(firstScheme);
-    }
-
-    return result;
-  }, [classificationSchemeCode, rangeClassificationSchemes]);
+  const pageResetKey = [
+    query,
+    asOfDateFilter,
+    classificationSchemeCode,
+    classificationValue,
+    pageSize,
+    rangeDatesKey,
+    sortColumn,
+    sortDirection,
+  ].join("\u0000");
+  const [page, setPage] = useKeyedState(pageResetKey, 1);
 
   const classificationValues = useMemo(() => {
     let result: string[] = [];

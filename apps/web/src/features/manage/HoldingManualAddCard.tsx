@@ -1,7 +1,7 @@
 "use client";
 
 import type { InstrumentListItemDto } from "@repo/shared";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { FormField } from "@/components/form-field";
 import { Button } from "@/components/ui/button";
@@ -30,18 +30,13 @@ export function HoldingManualAddCard({
   disabled,
   onAdd,
 }: HoldingManualAddCardProps) {
-  const [instrumentId, setInstrumentId] = useState(instruments[0]?.id ?? "");
+  const [selectedInstrumentId, setInstrumentId] = useState("");
   const [quantity, setQuantity] = useState("");
   const [marketValueMinor, setMarketValueMinor] = useState("");
 
-  useEffect(() => {
-    let result: void = undefined;
-    if (instrumentId !== "" || instruments.length === 0) {
-      return result;
-    }
-    setInstrumentId(instruments[0].id);
-    return result;
-  }, [instrumentId, instruments]);
+  // 未選択のときは先頭の銘柄を既定値として扱う（銘柄一覧の遅延読み込みに追従する）。
+  const instrumentId =
+    selectedInstrumentId !== "" ? selectedInstrumentId : instruments[0]?.id ?? "";
 
   let result = (
     <Card>

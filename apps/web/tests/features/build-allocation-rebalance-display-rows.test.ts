@@ -13,6 +13,8 @@ const schemeAllocation: AllocationBySchemeWithLines = {
       valueName: "内外株式",
       marketValueMinor: 700_000,
       weight: 0.7,
+      unrealizedGainMinor: null,
+      unrealizedGainRate: null,
       lines: [
         {
           line: {
@@ -30,6 +32,10 @@ const schemeAllocation: AllocationBySchemeWithLines = {
             tags: [],
           },
           weightInSlice: 1,
+          attributedMarketValueMinor: 700_000,
+          attributedBookValueMinor: null,
+          attributedUnrealizedGainMinor: null,
+          attributedUnrealizedGainRate: null,
         },
       ],
     },
@@ -38,6 +44,8 @@ const schemeAllocation: AllocationBySchemeWithLines = {
       valueName: "海外株式",
       marketValueMinor: 300_000,
       weight: 0.3,
+      unrealizedGainMinor: null,
+      unrealizedGainRate: null,
       lines: [
         {
           line: {
@@ -55,6 +63,10 @@ const schemeAllocation: AllocationBySchemeWithLines = {
             tags: [],
           },
           weightInSlice: 1,
+          attributedMarketValueMinor: 300_000,
+          attributedBookValueMinor: null,
+          attributedUnrealizedGainMinor: null,
+          attributedUnrealizedGainRate: null,
         },
       ],
     },

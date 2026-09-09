@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { TrendBarChart } from "@/features/trends/TrendBarChart";
-import { formatPercent, formatYen, formatYenManAxis } from "@/lib/format-yen";
+import { formatYen, formatYenManAxis } from "@/lib/format-yen";
 
 describe("TrendBarChart", () => {
   afterEach(() => {

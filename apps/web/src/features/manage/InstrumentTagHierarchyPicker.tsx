@@ -12,7 +12,7 @@ import {
   isLeafValue,
 } from "@repo/shared";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -31,7 +31,10 @@ import {
   resolveValuesByIds,
 } from "@/features/manage/classification-picker-utils";
 import { ClassificationValueLabel } from "@/components/classification-value-label";
+import { useKeyedState } from "@/hooks/useKeyedState";
 import { cn } from "@/lib/utils";
+
+const EMPTY_PARENT_STACK: string[] = [];
 
 type InstrumentTagHierarchyPickerProps = {
   schemes: ClassificationSchemeWithValuesDto[];
@@ -47,26 +50,15 @@ export function InstrumentTagHierarchyPicker({
   disabled,
 }: InstrumentTagHierarchyPickerProps) {
   const [schemeId, setSchemeId] = useState(() => schemes[0]?.id ?? "");
-  const [parentStack, setParentStack] = useState<string[]>([]);
 
   const activeScheme = schemes.find((scheme) => scheme.id === schemeId) ?? schemes[0] ?? null;
   const resolvedSchemeId = activeScheme?.id ?? "";
 
-  useEffect(() => {
-    let result: void = undefined;
-
-    if (!resolvedSchemeId) {
-      return result;
-    }
-
-    if (schemeId === resolvedSchemeId) {
-      return result;
-    }
-
-    setSchemeId(resolvedSchemeId);
-    setParentStack([]);
-    return result;
-  }, [resolvedSchemeId, schemeId]);
+  // 対象の分析軸が変わったら階層の位置を先頭に戻す。
+  const [parentStack, setParentStack] = useKeyedState(
+    resolvedSchemeId,
+    EMPTY_PARENT_STACK,
+  );
 
   const graph = useMemo(() => {
     let result = buildClassificationGraph(

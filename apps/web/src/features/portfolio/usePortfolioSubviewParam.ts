@@ -164,42 +164,33 @@ export function usePortfolioSubviewParam(
     [pathname, router, searchParams],
   );
 
-  if (options.page === "analysis") {
-    const mainView = useMemo(() => {
-      let result: AnalysisMainView = "holdings";
+  const analysisMainView = useMemo(() => {
+    let result: AnalysisMainView = "holdings";
 
-      if (localMainView !== null && ANALYSIS_MAIN_VIEWS.includes(localMainView as AnalysisMainView)) {
-        result = localMainView as AnalysisMainView;
-        return result;
-      }
-
-      result = readAnalysisMainView(viewParam);
+    if (localMainView !== null && ANALYSIS_MAIN_VIEWS.includes(localMainView as AnalysisMainView)) {
+      result = localMainView as AnalysisMainView;
       return result;
-    }, [localMainView, viewParam]);
+    }
 
-    const setMainView = useCallback(
-      (view: AnalysisMainView) => {
-        let result: void = undefined;
-        setLocalMainView(view);
-        replaceParams((params) => {
-          if (view === "holdings") {
-            params.delete("view");
-            return;
-          }
-          params.set("view", view);
-        });
-        return result;
-      },
-      [replaceParams],
-    );
+    result = readAnalysisMainView(viewParam);
+    return result;
+  }, [localMainView, viewParam]);
 
-    let analysisResult: AnalysisSubview = {
-      page: "analysis",
-      mainView,
-      setMainView,
-    };
-    return analysisResult;
-  }
+  const setAnalysisMainView = useCallback(
+    (view: AnalysisMainView) => {
+      let result: void = undefined;
+      setLocalMainView(view);
+      replaceParams((params) => {
+        if (view === "holdings") {
+          params.delete("view");
+          return;
+        }
+        params.set("view", view);
+      });
+      return result;
+    },
+    [replaceParams],
+  );
 
   const mainView = useMemo(() => {
     let result: PortfolioAllocationMainView = "holdings";
@@ -270,14 +261,24 @@ export function usePortfolioSubviewParam(
     [replaceParams],
   );
 
-  let portfolioResult: PortfolioAllocationSubview = {
+  let result: UsePortfolioSubviewParamResult = {
     page: "portfolio-allocation",
     mainView,
     setMainView,
     holdingsMode,
     setHoldingsMode,
   };
-  return portfolioResult;
+
+  if (options.page === "analysis") {
+    result = {
+      page: "analysis",
+      mainView: analysisMainView,
+      setMainView: setAnalysisMainView,
+    };
+    return result;
+  }
+
+  return result;
 }
 
 export function isDetailsOrTrendsSubview(searchParams: URLSearchParams): boolean {
