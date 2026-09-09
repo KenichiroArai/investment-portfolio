@@ -6,7 +6,9 @@ import {
   enrichClassificationValues,
   isIdecoAnalysisSchemeCode,
   isMonexAnalysisSchemeCode,
+  resolveHierarchyTagWeights,
   validateLinkAddition,
+  type ClassificationGraph,
   type CopyClassificationMode,
 } from "@repo/shared";
 
@@ -185,6 +187,18 @@ async function listPortfolioGraphValues(db: AppDatabase, portfolioId: string) {
     .where(eq(classificationSchemes.portfolioId, portfolioId));
 
   result = rows;
+  return result;
+}
+
+export async function buildPortfolioClassificationGraph(
+  db: AppDatabase,
+  portfolioId: string,
+) {
+  let result: ClassificationGraph;
+
+  const graphValues = await listPortfolioGraphValues(db, portfolioId);
+  const links = await listLinksForPortfolio(db, portfolioId);
+  result = buildClassificationGraph(graphValues, links);
   return result;
 }
 
@@ -724,6 +738,50 @@ export async function setInstrumentClassificationsWithWeights(
   return result;
 }
 
+export function resolveAddedClassificationWeights(
+  classificationValueId: string,
+  existing: InstrumentClassificationWeightInput[],
+  graph: ClassificationGraph,
+): InstrumentClassificationWeightInput[] | null {
+  let result: InstrumentClassificationWeightInput[] | null = null;
+  const appended: InstrumentClassificationWeightInput[] = [
+    ...existing,
+    {
+      classificationValueId,
+      allocationWeight: existing.length > 0 ? 1 / existing.length : 1,
+    },
+  ];
+
+  // 親タグ直付けの残差を残さないよう、同一軸の祖先タグの重みは子タグへ移す
+  const resolved = resolveHierarchyTagWeights(
+    appended.map((weight) => {
+      let tagWeight = {
+        valueId: weight.classificationValueId,
+        weight: weight.allocationWeight,
+      };
+      return tagWeight;
+    }),
+    graph,
+  );
+
+  // 付与対象の祖先が既にタグ付けされている場合はロールアップで集計済みのため何もしない
+  const hasAddedValue = resolved.some(
+    (weight) => weight.valueId === classificationValueId,
+  );
+  if (!hasAddedValue) {
+    return result;
+  }
+
+  result = resolved.map((weight) => {
+    let weightInput: InstrumentClassificationWeightInput = {
+      classificationValueId: weight.valueId,
+      allocationWeight: weight.weight,
+    };
+    return weightInput;
+  });
+  return result;
+}
+
 export async function addClassificationValueToInstruments(
   db: AppDatabase,
   classificationValueId: string,
@@ -763,6 +821,11 @@ export async function addClassificationValueToInstruments(
     weightsByInstrument.set(row.instrumentId, existing);
   }
 
+  const portfolioId = await findPortfolioIdForValue(db, classificationValueId);
+  const graph = portfolioId
+    ? await buildPortfolioClassificationGraph(db, portfolioId)
+    : buildClassificationGraph([], []);
+
   for (const instrumentId of instrumentIds) {
     if (!knownInstrumentIds.has(instrumentId)) {
       continue;
@@ -776,11 +839,16 @@ export async function addClassificationValueToInstruments(
       continue;
     }
 
-    const addedWeight = existing.length > 0 ? 1 / existing.length : 1;
-    await setInstrumentClassificationsWithWeights(db, instrumentId, [
-      ...existing,
-      { classificationValueId, allocationWeight: addedWeight },
-    ]);
+    const nextWeights = resolveAddedClassificationWeights(
+      classificationValueId,
+      existing,
+      graph,
+    );
+    if (!nextWeights) {
+      continue;
+    }
+
+    await setInstrumentClassificationsWithWeights(db, instrumentId, nextWeights);
     result += 1;
   }
 

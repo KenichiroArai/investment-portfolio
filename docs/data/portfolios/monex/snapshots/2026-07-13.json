@@ -162,18 +162,10 @@
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
-          "valueCode": "domestic_equity",
-          "valueName": "国内株式",
-          "sortOrder": 0,
-          "allocationWeight": 0.5
-        },
-        {
-          "schemeCode": "monex_asset_class",
-          "schemeName": "資産クラス",
           "valueCode": "growth",
           "valueName": "成長",
           "sortOrder": 0,
-          "allocationWeight": 0.5
+          "allocationWeight": 1
         }
       ]
     },
@@ -393,18 +385,10 @@
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
-          "valueCode": "domestic_equity",
-          "valueName": "国内株式",
-          "sortOrder": 0,
-          "allocationWeight": 0.5
-        },
-        {
-          "schemeCode": "monex_asset_class",
-          "schemeName": "資産クラス",
           "valueCode": "growth",
           "valueName": "成長",
           "sortOrder": 0,
-          "allocationWeight": 0.5
+          "allocationWeight": 1
         }
       ]
     },
@@ -558,18 +542,10 @@
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
-          "valueCode": "domestic_equity",
-          "valueName": "国内株式",
-          "sortOrder": 0,
-          "allocationWeight": 0.1111111111111111
-        },
-        {
-          "schemeCode": "monex_asset_class",
-          "schemeName": "資産クラス",
           "valueCode": "growth",
           "valueName": "成長",
           "sortOrder": 0,
-          "allocationWeight": 0.1111111111111111
+          "allocationWeight": 0.12499999999999997
         },
         {
           "schemeCode": "monex_asset_class",
@@ -577,7 +553,7 @@
           "valueCode": "developed_equity",
           "valueName": "先進国株式",
           "sortOrder": 1,
-          "allocationWeight": 0.1111111111111111
+          "allocationWeight": 0.12499999999999997
         },
         {
           "schemeCode": "monex_asset_class",
@@ -585,7 +561,7 @@
           "valueCode": "emerging_equity",
           "valueName": "新興国株式",
           "sortOrder": 2,
-          "allocationWeight": 0.1111111111111111
+          "allocationWeight": 0.12499999999999997
         },
         {
           "schemeCode": "monex_asset_class",
@@ -593,7 +569,7 @@
           "valueCode": "domestic_bond",
           "valueName": "国内債券",
           "sortOrder": 3,
-          "allocationWeight": 0.1111111111111111
+          "allocationWeight": 0.12499999999999997
         },
         {
           "schemeCode": "monex_asset_class",
@@ -601,7 +577,7 @@
           "valueCode": "developed_bond",
           "valueName": "先進国債券",
           "sortOrder": 4,
-          "allocationWeight": 0.1111111111111111
+          "allocationWeight": 0.12499999999999997
         },
         {
           "schemeCode": "monex_asset_class",
@@ -609,7 +585,7 @@
           "valueCode": "emerging_bond",
           "valueName": "新興国債券",
           "sortOrder": 6,
-          "allocationWeight": 0.1111111111111111
+          "allocationWeight": 0.12499999999999997
         },
         {
           "schemeCode": "monex_asset_class",
@@ -617,7 +593,7 @@
           "valueCode": "domestic_reit",
           "valueName": "国内REIT",
           "sortOrder": 7,
-          "allocationWeight": 0.1111111111111111
+          "allocationWeight": 0.12499999999999997
         },
         {
           "schemeCode": "monex_asset_class",
@@ -625,7 +601,7 @@
           "valueCode": "foreign_reit",
           "valueName": "海外REIT",
           "sortOrder": 8,
-          "allocationWeight": 0.1111111111111111
+          "allocationWeight": 0.12499999999999997
         }
       ]
     },
@@ -894,18 +870,10 @@
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
-          "valueCode": "domestic_equity",
-          "valueName": "国内株式",
-          "sortOrder": 0,
-          "allocationWeight": 0.5
-        },
-        {
-          "schemeCode": "monex_asset_class",
-          "schemeName": "資産クラス",
           "valueCode": "growth",
           "valueName": "成長",
           "sortOrder": 0,
-          "allocationWeight": 0.5
+          "allocationWeight": 1
         }
       ]
     },
@@ -968,18 +936,10 @@
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
-          "valueCode": "domestic_equity",
-          "valueName": "国内株式",
-          "sortOrder": 0,
-          "allocationWeight": 0.5
-        },
-        {
-          "schemeCode": "monex_asset_class",
-          "schemeName": "資産クラス",
           "valueCode": "income",
           "valueName": "インカム",
           "sortOrder": 0,
-          "allocationWeight": 0.5
+          "allocationWeight": 1
         }
       ]
     },
@@ -1174,18 +1134,10 @@
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
-          "valueCode": "domestic_equity",
-          "valueName": "国内株式",
-          "sortOrder": 0,
-          "allocationWeight": 0.5
-        },
-        {
-          "schemeCode": "monex_asset_class",
-          "schemeName": "資産クラス",
           "valueCode": "income",
           "valueName": "インカム",
           "sortOrder": 0,
-          "allocationWeight": 0.5
+          "allocationWeight": 1
         }
       ]
     },
@@ -1446,18 +1398,10 @@
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
-          "valueCode": "domestic_equity",
-          "valueName": "国内株式",
-          "sortOrder": 0,
-          "allocationWeight": 0.06559263521288838
-        },
-        {
-          "schemeCode": "monex_asset_class",
-          "schemeName": "資産クラス",
           "valueCode": "income",
           "valueName": "インカム",
           "sortOrder": 0,
-          "allocationWeight": 0.25
+          "allocationWeight": 0.08745684695051784
         },
         {
           "schemeCode": "monex_asset_class",
@@ -1465,7 +1409,7 @@
           "valueCode": "developed_equity",
           "valueName": "先進国株式",
           "sortOrder": 1,
-          "allocationWeight": 0.5635788262370541
+          "allocationWeight": 0.7514384349827388
         },
         {
           "schemeCode": "monex_asset_class",
@@ -1473,7 +1417,7 @@
           "valueCode": "emerging_equity",
           "valueName": "新興国株式",
           "sortOrder": 2,
-          "allocationWeight": 0.12082853855005755
+          "allocationWeight": 0.16110471806674337
         }
       ]
     },
@@ -1602,18 +1546,10 @@
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
-          "valueCode": "domestic_equity",
-          "valueName": "国内株式",
-          "sortOrder": 0,
-          "allocationWeight": 0.5
-        },
-        {
-          "schemeCode": "monex_asset_class",
-          "schemeName": "資産クラス",
           "valueCode": "income",
           "valueName": "インカム",
           "sortOrder": 0,
-          "allocationWeight": 0.5
+          "allocationWeight": 1
         }
       ]
     },
@@ -1676,18 +1612,10 @@
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
-          "valueCode": "domestic_equity",
-          "valueName": "国内株式",
-          "sortOrder": 0,
-          "allocationWeight": 0.20835380835380835
-        },
-        {
-          "schemeCode": "monex_asset_class",
-          "schemeName": "資産クラス",
           "valueCode": "income",
           "valueName": "インカム",
           "sortOrder": 0,
-          "allocationWeight": 0.2
+          "allocationWeight": 0.26044226044226043
         },
         {
           "schemeCode": "monex_asset_class",
@@ -1695,7 +1623,7 @@
           "valueCode": "developed_bond",
           "valueName": "先進国債券",
           "sortOrder": 4,
-          "allocationWeight": 0.2810810810810811
+          "allocationWeight": 0.35135135135135137
         },
         {
           "schemeCode": "monex_asset_class",
@@ -1703,7 +1631,7 @@
           "valueCode": "emerging_bond",
           "valueName": "新興国債券",
           "sortOrder": 6,
-          "allocationWeight": 0.10417690417690417
+          "allocationWeight": 0.13022113022113022
         },
         {
           "schemeCode": "monex_asset_class",
@@ -1711,7 +1639,7 @@
           "valueCode": "domestic_reit",
           "valueName": "国内REIT",
           "sortOrder": 7,
-          "allocationWeight": 0.2063882063882064
+          "allocationWeight": 0.257985257985258
         }
       ]
     },
@@ -2270,18 +2198,10 @@
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
-          "valueCode": "domestic_equity",
-          "valueName": "国内株式",
-          "sortOrder": 0,
-          "allocationWeight": 0.1111111111111111
-        },
-        {
-          "schemeCode": "monex_asset_class",
-          "schemeName": "資産クラス",
           "valueCode": "growth",
           "valueName": "成長",
           "sortOrder": 0,
-          "allocationWeight": 0.1111111111111111
+          "allocationWeight": 0.12499999999999997
         },
         {
           "schemeCode": "monex_asset_class",
@@ -2289,7 +2209,7 @@
           "valueCode": "developed_equity",
           "valueName": "先進国株式",
           "sortOrder": 1,
-          "allocationWeight": 0.1111111111111111
+          "allocationWeight": 0.12499999999999997
         },
         {
           "schemeCode": "monex_asset_class",
@@ -2297,7 +2217,7 @@
           "valueCode": "emerging_equity",
           "valueName": "新興国株式",
           "sortOrder": 2,
-          "allocationWeight": 0.1111111111111111
+          "allocationWeight": 0.12499999999999997
         },
         {
           "schemeCode": "monex_asset_class",
@@ -2305,7 +2225,7 @@
           "valueCode": "domestic_bond",
           "valueName": "国内債券",
           "sortOrder": 3,
-          "allocationWeight": 0.1111111111111111
+          "allocationWeight": 0.12499999999999997
         },
         {
           "schemeCode": "monex_asset_class",
@@ -2313,7 +2233,7 @@
           "valueCode": "developed_bond",
           "valueName": "先進国債券",
           "sortOrder": 4,
-          "allocationWeight": 0.1111111111111111
+          "allocationWeight": 0.12499999999999997
         },
         {
           "schemeCode": "monex_asset_class",
@@ -2321,7 +2241,7 @@
           "valueCode": "emerging_bond",
           "valueName": "新興国債券",
           "sortOrder": 6,
-          "allocationWeight": 0.1111111111111111
+          "allocationWeight": 0.12499999999999997
         },
         {
           "schemeCode": "monex_asset_class",
@@ -2329,7 +2249,7 @@
           "valueCode": "domestic_reit",
           "valueName": "国内REIT",
           "sortOrder": 7,
-          "allocationWeight": 0.1111111111111111
+          "allocationWeight": 0.12499999999999997
         },
         {
           "schemeCode": "monex_asset_class",
@@ -2337,7 +2257,7 @@
           "valueCode": "foreign_reit",
           "valueName": "海外REIT",
           "sortOrder": 8,
-          "allocationWeight": 0.1111111111111111
+          "allocationWeight": 0.12499999999999997
         }
       ]
     },
@@ -2961,18 +2881,10 @@
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
-          "valueCode": "domestic_equity",
-          "valueName": "国内株式",
-          "sortOrder": 0,
-          "allocationWeight": 0.5
-        },
-        {
-          "schemeCode": "monex_asset_class",
-          "schemeName": "資産クラス",
           "valueCode": "growth",
           "valueName": "成長",
           "sortOrder": 0,
-          "allocationWeight": 0.5
+          "allocationWeight": 1
         }
       ]
     },
@@ -3167,18 +3079,10 @@
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
-          "valueCode": "domestic_equity",
-          "valueName": "国内株式",
-          "sortOrder": 0,
-          "allocationWeight": 0.5
-        },
-        {
-          "schemeCode": "monex_asset_class",
-          "schemeName": "資産クラス",
           "valueCode": "income",
           "valueName": "インカム",
           "sortOrder": 0,
-          "allocationWeight": 0.5
+          "allocationWeight": 1
         }
       ]
     },
@@ -3320,18 +3224,10 @@
         {
           "schemeCode": "monex_asset_class",
           "schemeName": "資産クラス",
-          "valueCode": "domestic_equity",
-          "valueName": "国内株式",
-          "sortOrder": 0,
-          "allocationWeight": 0.08085617608482404
-        },
-        {
-          "schemeCode": "monex_asset_class",
-          "schemeName": "資産クラス",
           "valueCode": "growth",
           "valueName": "成長",
           "sortOrder": 0,
-          "allocationWeight": 0.1111111111111111
+          "allocationWeight": 0.09096319809542702
         },
         {
           "schemeCode": "monex_asset_class",
@@ -3339,7 +3235,7 @@
           "valueCode": "developed_equity",
           "valueName": "先進国株式",
           "sortOrder": 1,
-          "allocationWeight": 0.5601737041078377
+          "allocationWeight": 0.6301954171213173
         },
         {
           "schemeCode": "monex_asset_class",
@@ -3347,7 +3243,7 @@
           "valueCode": "emerging_equity",
           "valueName": "新興国株式",
           "sortOrder": 2,
-          "allocationWeight": 0.0381796338546661
+          "allocationWeight": 0.042952088086499356
         },
         {
           "schemeCode": "monex_asset_class",
@@ -3355,7 +3251,7 @@
           "valueCode": "domestic_bond",
           "valueName": "国内債券",
           "sortOrder": 3,
-          "allocationWeight": 0.053345677787697436
+          "allocationWeight": 0.0600138875111596
         },
         {
           "schemeCode": "monex_asset_class",
@@ -3363,7 +3259,7 @@
           "valueCode": "developed_bond",
           "valueName": "先進国債券",
           "sortOrder": 4,
-          "allocationWeight": 0.12176922483439696
+          "allocationWeight": 0.13699037793869656
         },
         {
           "schemeCode": "monex_asset_class",
@@ -3371,7 +3267,7 @@
           "valueCode": "emerging_bond",
           "valueName": "新興国債券",
           "sortOrder": 6,
-          "allocationWeight": 0.007935720662632676
+          "allocationWeight": 0.00892768574546176
         },
         {
           "schemeCode": "monex_asset_class",
@@ -3379,7 +3275,7 @@
           "valueCode": "domestic_reit",
           "valueName": "国内REIT",
           "sortOrder": 7,
-          "allocationWeight": 0.0017634934805850393
+          "allocationWeight": 0.0019839301656581687
         },
         {
           "schemeCode": "monex_asset_class",
@@ -3387,7 +3283,7 @@
           "valueCode": "foreign_reit",
           "valueName": "海外REIT",
           "sortOrder": 8,
-          "allocationWeight": 0.02486525807624905
+          "allocationWeight": 0.027973415335780176
         }
       ]
     }

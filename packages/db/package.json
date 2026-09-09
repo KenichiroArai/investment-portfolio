@@ -12,6 +12,7 @@
     "lint": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/migrate.ts",
+    "db:repair-tags": "tsx src/repair-tags.ts",
     "pages:export": "tsx src/export-pages-data.ts"
   },
   "dependencies": {

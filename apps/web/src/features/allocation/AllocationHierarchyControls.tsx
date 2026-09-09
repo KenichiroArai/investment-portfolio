@@ -3,18 +3,12 @@
 import type { ClassificationSchemeWithValuesDto } from "@repo/shared";
 import type { ClassificationGraphValue } from "@repo/shared";
 
-import type { AllocationAggregationLevel } from "@/features/allocation/useAllocationHierarchyParam";
 import { Button } from "@/components/ui/button";
 
 type AllocationHierarchyControlsProps = {
-  hasHierarchy: boolean;
   activeScheme: ClassificationSchemeWithValuesDto | null;
   parentValueId: string | null;
-  aggregationLevel: AllocationAggregationLevel;
-  includeOrphans: boolean;
   onParentChange: (valueId: string | null) => void;
-  onAggregationLevelChange: (level: AllocationAggregationLevel) => void;
-  onIncludeOrphansChange: (include: boolean) => void;
 };
 
 export function buildClassificationGraphValues(
@@ -56,14 +50,9 @@ export function mergeClassificationLinks(
 }
 
 export function AllocationHierarchyControls({
-  hasHierarchy,
   activeScheme,
   parentValueId,
-  aggregationLevel,
-  includeOrphans,
   onParentChange,
-  onAggregationLevelChange,
-  onIncludeOrphansChange,
 }: AllocationHierarchyControlsProps) {
   const parentValue =
     parentValueId !== null
@@ -71,42 +60,9 @@ export function AllocationHierarchyControls({
       : null;
 
   let result = (
-    <div className="flex flex-wrap items-center gap-3 rounded-lg border p-3">
-      <Button
-        type="button"
-        variant={aggregationLevel === "parent" ? "default" : "outline"}
-        size="sm"
-        disabled={!hasHierarchy}
-        onClick={() => {
-          onAggregationLevelChange("parent");
-        }}
-      >
-        親単位
-      </Button>
-      <Button
-        type="button"
-        variant={aggregationLevel === "leaf" ? "default" : "outline"}
-        size="sm"
-        disabled={!hasHierarchy}
-        onClick={() => {
-          onAggregationLevelChange("leaf");
-        }}
-      >
-        葉単位
-      </Button>
-      <Button
-        type="button"
-        variant={includeOrphans ? "default" : "outline"}
-        size="sm"
-        disabled={!hasHierarchy}
-        onClick={() => {
-          onIncludeOrphansChange(!includeOrphans);
-        }}
-      >
-        親未所属を{includeOrphans ? "含める" : "除外"}
-      </Button>
+    <div className="flex flex-wrap items-center gap-3 rounded-lg border p-3 text-sm">
       {parentValue ? (
-        <div className="flex items-center gap-2 text-sm">
+        <>
           <span className="text-muted-foreground">ドリルダウン:</span>
           <span className="font-medium">{parentValue.name}</span>
           <Button
@@ -119,8 +75,12 @@ export function AllocationHierarchyControls({
           >
             ルートに戻る
           </Button>
-        </div>
-      ) : null}
+        </>
+      ) : (
+        <span className="text-muted-foreground">
+          親分類ごとの構成比を表示しています。分類名の矢印から子分類にドリルダウンできます。
+        </span>
+      )}
     </div>
   );
 

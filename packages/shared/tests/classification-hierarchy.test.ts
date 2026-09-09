@@ -7,15 +7,18 @@ import {
   collectSubtreeLinks,
   collectSubtreeValueIds,
   enrichClassificationValues,
+  getAncestorValueIds,
   getDescendantLeafIds,
   getDescendantValueIds,
   getDirectChildIds,
   getLineLeafValueIdsByScheme,
-  getOrphanValueIdsInScheme,
+  getNearestTaggedDescendantIds,
   getRootValueIds,
+  getTaggedAncestorValueIds,
   isLeafValue,
   lineMatchesCrossSchemeChildFilter,
   lineMatchesDescendantFilter,
+  resolveHierarchyTagWeights,
   validateLinkAddition,
 } from "../src/classification-hierarchy";
 
@@ -140,7 +143,7 @@ describe("classification-hierarchy", () => {
     ]);
   });
 
-  it("exposes leaf, child, descendant, and orphan helpers", () => {
+  it("exposes leaf, child, descendant, and ancestor helpers", () => {
     const graph = buildClassificationGraph(values, links);
 
     expect(isLeafValue("domestic", graph)).toBe(true);
@@ -153,8 +156,8 @@ describe("classification-hierarchy", () => {
     expect([...getDescendantValueIds("stock", graph)].sort()).toEqual(
       ["developed", "domestic", "region-developed", "stock"].sort(),
     );
-    expect(getOrphanValueIdsInScheme(schemeA, graph)).toEqual(["stock"]);
-    expect(getOrphanValueIdsInScheme(schemeB, graph)).toEqual([]);
+    expect([...getAncestorValueIds("domestic", graph)]).toEqual(["stock"]);
+    expect([...getAncestorValueIds("stock", graph)]).toEqual([]);
   });
 
   it("validates link addition errors", () => {
@@ -442,5 +445,227 @@ describe("classification-hierarchy", () => {
     expect([...getDescendantValueIds("node-a", cyclicGraph)].sort()).toEqual(
       ["node-a", "node-b"].sort(),
     );
+  });
+});
+
+describe("resolveHierarchyTagWeights", () => {
+  const deepValues = [
+    {
+      id: "stock",
+      code: "stock",
+      name: "株式",
+      sortOrder: 1,
+      schemeId: schemeA,
+      schemeCode: "asset_class",
+    },
+    {
+      id: "domestic",
+      code: "domestic",
+      name: "国内株式",
+      sortOrder: 1,
+      schemeId: schemeA,
+      schemeCode: "asset_class",
+    },
+    {
+      id: "income",
+      code: "income",
+      name: "インカム",
+      sortOrder: 1,
+      schemeId: schemeA,
+      schemeCode: "asset_class",
+    },
+    {
+      id: "growth",
+      code: "growth",
+      name: "成長",
+      sortOrder: 2,
+      schemeId: schemeA,
+      schemeCode: "asset_class",
+    },
+    {
+      id: "developed",
+      code: "developed",
+      name: "先進国株式",
+      sortOrder: 2,
+      schemeId: schemeA,
+      schemeCode: "asset_class",
+    },
+    {
+      id: "region-domestic",
+      code: "domestic",
+      name: "日本",
+      sortOrder: 1,
+      schemeId: schemeB,
+      schemeCode: "region",
+    },
+  ];
+
+  const deepLinks = [
+    { parentValueId: "stock", childValueId: "domestic", sortOrder: 1 },
+    { parentValueId: "stock", childValueId: "developed", sortOrder: 2 },
+    { parentValueId: "domestic", childValueId: "income", sortOrder: 1 },
+    { parentValueId: "domestic", childValueId: "growth", sortOrder: 2 },
+    { parentValueId: "domestic", childValueId: "region-domestic", sortOrder: 3 },
+  ];
+
+  const deepGraph = buildClassificationGraph(deepValues, deepLinks);
+
+  it("orders tagged ancestors from the nearest one and skips untagged ones", () => {
+    expect(
+      getTaggedAncestorValueIds("income", new Set(["stock", "domestic"]), deepGraph),
+    ).toEqual(["domestic", "stock"]);
+    expect(getTaggedAncestorValueIds("income", new Set(["stock"]), deepGraph)).toEqual([
+      "stock",
+    ]);
+    expect(getTaggedAncestorValueIds("stock", new Set(["domestic"]), deepGraph)).toEqual(
+      [],
+    );
+  });
+
+  it("walks a shared grandparent only once and orders equally deep ancestors", () => {
+    const diamondValues = [
+      ...deepValues,
+      {
+        id: "hybrid",
+        code: "hybrid",
+        name: "ハイブリッド",
+        sortOrder: 3,
+        schemeId: schemeA,
+        schemeCode: "asset_class",
+      },
+    ];
+    const diamondGraph = buildClassificationGraph(diamondValues, [
+      ...deepLinks,
+      { parentValueId: "domestic", childValueId: "hybrid", sortOrder: 4 },
+      { parentValueId: "developed", childValueId: "hybrid", sortOrder: 1 },
+    ]);
+
+    expect([...getAncestorValueIds("hybrid", diamondGraph)].sort()).toEqual(
+      ["developed", "domestic", "stock"].sort(),
+    );
+    expect(
+      getTaggedAncestorValueIds(
+        "hybrid",
+        new Set(["domestic", "developed"]),
+        diamondGraph,
+      ),
+    ).toEqual(["domestic", "developed"]);
+  });
+
+  it("keeps only the nearest tagged descendants", () => {
+    expect(
+      getNearestTaggedDescendantIds(
+        "stock",
+        new Set(["domestic", "income", "developed"]),
+        deepGraph,
+      ),
+    ).toEqual(["domestic", "developed"]);
+    expect(getNearestTaggedDescendantIds("income", new Set(["stock"]), deepGraph)).toEqual(
+      [],
+    );
+  });
+
+  it("moves a parent tag weight onto its child tag", () => {
+    const resolved = resolveHierarchyTagWeights(
+      [
+        { valueId: "domestic", weight: 0.5 },
+        { valueId: "income", weight: 0.5 },
+      ],
+      deepGraph,
+    );
+
+    expect(resolved).toEqual([{ valueId: "income", weight: 0.5 }]);
+  });
+
+  it("keeps sibling weights untouched when repairing one branch", () => {
+    const resolved = resolveHierarchyTagWeights(
+      [
+        { valueId: "domestic", weight: 1 / 9 },
+        { valueId: "growth", weight: 1 / 9 },
+        { valueId: "developed", weight: 1 / 9 },
+      ],
+      deepGraph,
+    );
+
+    expect(resolved).toEqual([
+      { valueId: "growth", weight: 1 / 9 },
+      { valueId: "developed", weight: 1 / 9 },
+    ]);
+  });
+
+  it("splits the parent weight across children by their relative weights", () => {
+    const resolved = resolveHierarchyTagWeights(
+      [
+        { valueId: "domestic", weight: 0.4 },
+        { valueId: "income", weight: 0.3 },
+        { valueId: "growth", weight: 0.1 },
+      ],
+      deepGraph,
+    );
+
+    expect(resolved).toEqual([
+      { valueId: "income", weight: 0.3 },
+      { valueId: "growth", weight: 0.1 },
+    ]);
+  });
+
+  it("splits the parent weight evenly when children have no weight", () => {
+    const resolved = resolveHierarchyTagWeights(
+      [
+        { valueId: "domestic", weight: 0.4 },
+        { valueId: "income", weight: 0 },
+        { valueId: "growth", weight: 0 },
+      ],
+      deepGraph,
+    );
+
+    expect(resolved).toEqual([
+      { valueId: "income", weight: 0.2 },
+      { valueId: "growth", weight: 0.2 },
+    ]);
+  });
+
+  it("collapses multi level ancestor tags into the deepest tag", () => {
+    const resolved = resolveHierarchyTagWeights(
+      [
+        { valueId: "stock", weight: 0.6 },
+        { valueId: "domestic", weight: 0.3 },
+        { valueId: "income", weight: 0.1 },
+      ],
+      deepGraph,
+    );
+
+    expect(resolved).toEqual([{ valueId: "income", weight: 0.6 }]);
+  });
+
+  it("does not move weights across schemes", () => {
+    const resolved = resolveHierarchyTagWeights(
+      [
+        { valueId: "domestic", weight: 0.7 },
+        { valueId: "region-domestic", weight: 0.3 },
+      ],
+      deepGraph,
+    );
+
+    expect(resolved).toEqual([
+      { valueId: "domestic", weight: 0.7 },
+      { valueId: "region-domestic", weight: 0.3 },
+    ]);
+  });
+
+  it("keeps weights for values missing from the graph", () => {
+    const resolved = resolveHierarchyTagWeights(
+      [
+        { valueId: "missing", weight: 0.5 },
+        { valueId: "domestic", weight: 0.25 },
+        { valueId: "income", weight: 0.25 },
+      ],
+      deepGraph,
+    );
+
+    expect(resolved).toEqual([
+      { valueId: "missing", weight: 0.5 },
+      { valueId: "income", weight: 0.25 },
+    ]);
   });
 });

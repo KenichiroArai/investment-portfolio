@@ -31,6 +31,7 @@ export default defineConfig({
         "packages/shared/src/types.ts",
         "packages/db/src/index.ts",
         "packages/db/src/migrate.ts",
+        "packages/db/src/repair-tags.ts",
         "packages/db/src/export-pages-data.ts",
         "packages/db/src/test-utils.ts",
         "packages/db/src/schema/**",

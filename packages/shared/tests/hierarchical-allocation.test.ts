@@ -5,11 +5,11 @@ import {
   buildAllocationBySchemeWithLines,
   buildHierarchicalAllocationBySchemeWithLines,
 } from "../src/snapshot-allocation";
-import type { HoldingLineDto } from "../src/types";
+import type { ClassificationTagDto, HoldingLineDto } from "../src/types";
 
-function makeHierarchyLine(
+function makeTaggedLine(
   marketValueMinor: number,
-  valueCode: string,
+  tags: ClassificationTagDto[],
 ): HoldingLineDto {
   let result: HoldingLineDto = {
     id: "line-1",
@@ -23,16 +23,24 @@ function makeHierarchyLine(
     bookValueMinor: marketValueMinor,
     metrics: [],
     instrumentAttributes: [],
-    tags: [
-      {
-        schemeCode: "asset_class",
-        schemeName: "資産クラス",
-        valueCode,
-        valueName: valueCode,
-        allocationWeight: 1,
-      },
-    ],
+    tags,
   };
+  return result;
+}
+
+function makeHierarchyLine(
+  marketValueMinor: number,
+  valueCode: string,
+): HoldingLineDto {
+  let result = makeTaggedLine(marketValueMinor, [
+    {
+      schemeCode: "asset_class",
+      schemeName: "資産クラス",
+      valueCode,
+      valueName: valueCode,
+      allocationWeight: 1,
+    },
+  ]);
   return result;
 }
 
@@ -79,8 +87,6 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
       "asset_class",
       "資産クラス",
       {
-        aggregationLevel: "parent",
-        includeOrphans: true,
         links,
         schemeValues,
         schemeId: "scheme-a",
@@ -100,8 +106,6 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
       "asset_class",
       "資産クラス",
       {
-        aggregationLevel: "parent",
-        includeOrphans: true,
         links: [],
         schemeValues,
         schemeId: "scheme-a",
@@ -114,19 +118,29 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
 
   it("ignores unknown tag codes while building hierarchical allocation", () => {
     const lines = [
-      {
-        ...makeHierarchyLine(100_000, "domestic"),
-        tags: [
-          ...makeHierarchyLine(100_000, "domestic").tags,
-          {
-            schemeCode: "unknown_scheme",
-            schemeName: "未知",
-            valueCode: "missing",
-            valueName: "missing",
-            allocationWeight: 1,
-          },
-        ],
-      },
+      makeTaggedLine(100_000, [
+        {
+          schemeCode: "asset_class",
+          schemeName: "資産クラス",
+          valueCode: "domestic",
+          valueName: "国内株式",
+          allocationWeight: 0.5,
+        },
+        {
+          schemeCode: "asset_class",
+          schemeName: "資産クラス",
+          valueCode: "missing-code",
+          valueName: "未登録",
+          allocationWeight: 0.5,
+        },
+        {
+          schemeCode: "unknown_scheme",
+          schemeName: "未知",
+          valueCode: "missing",
+          valueName: "missing",
+          allocationWeight: 1,
+        },
+      ]),
       makeHierarchyLine(200_000, "missing-code"),
     ];
     const allocation = buildHierarchicalAllocationBySchemeWithLines(
@@ -134,8 +148,6 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
       "asset_class",
       "資産クラス",
       {
-        aggregationLevel: "leaf",
-        includeOrphans: true,
         links,
         schemeValues,
         schemeId: "scheme-a",
@@ -143,67 +155,71 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
     );
 
     expect(allocation.slices).toHaveLength(1);
-    expect(allocation.slices[0]?.valueCode).toBe("domestic");
+    expect(allocation.slices[0]?.valueCode).toBe("stock");
+    expect(allocation.slices[0]?.marketValueMinor).toBe(50_000);
   });
 
-  it("excludes orphan roots when includeOrphans is false at parent level", () => {
-    const orphanValues = [
-      ...schemeValues,
+  it("ignores attributions whose scheme has no registered values", () => {
+    // 表示単位は「地域」軸の値だが、集計対象タグは値が登録されていない「資産クラス」軸
+    const regionValues = [
       {
-        id: "orphan",
-        code: "orphan",
-        name: "未リンク",
-        sortOrder: 3,
+        id: "region-root",
+        code: "region_root",
+        name: "地域",
+        sortOrder: 1,
         schemeId: "scheme-a",
-        schemeCode: "asset_class",
+        schemeCode: "region",
+      },
+      {
+        id: "region-domestic",
+        code: "region_domestic",
+        name: "日本",
+        sortOrder: 1,
+        schemeId: "scheme-a",
+        schemeCode: "region",
       },
     ];
     const lines = [
-      makeHierarchyLine(600_000, "domestic"),
-      makeHierarchyLine(400_000, "developed"),
-      makeHierarchyLine(100_000, "orphan"),
+      makeTaggedLine(500_000, [
+        {
+          schemeCode: "region",
+          schemeName: "地域",
+          valueCode: "region_domestic",
+          valueName: "日本",
+          allocationWeight: 1,
+        },
+        {
+          schemeCode: "asset_class",
+          schemeName: "資産クラス",
+          valueCode: "domestic",
+          valueName: "国内株式",
+          allocationWeight: 1,
+        },
+      ]),
     ];
-
-    const leafAllocation = buildHierarchicalAllocationBySchemeWithLines(
+    const allocation = buildHierarchicalAllocationBySchemeWithLines(
       lines,
       "asset_class",
       "資産クラス",
       {
-        aggregationLevel: "leaf",
-        includeOrphans: true,
-        links,
-        schemeValues: orphanValues,
+        links: [
+          { parentValueId: "region-root", childValueId: "region-domestic", sortOrder: 1 },
+        ],
+        schemeValues: regionValues,
         schemeId: "scheme-a",
       },
-    );
-    expect(leafAllocation.slices.map((slice) => slice.valueCode).sort()).toEqual(
-      ["developed", "domestic", "orphan"].sort(),
     );
 
-    const withoutOrphans = buildHierarchicalAllocationBySchemeWithLines(
-      lines,
-      "asset_class",
-      "資産クラス",
-      {
-        aggregationLevel: "leaf",
-        includeOrphans: false,
-        links,
-        schemeValues: orphanValues,
-        schemeId: "scheme-a",
-      },
-    );
-    expect(withoutOrphans.slices.map((slice) => slice.valueCode).sort()).toEqual(
-      ["developed", "domestic"].sort(),
-    );
+    expect(allocation.slices).toEqual([]);
   });
 
-  it("ignores leaves from other schemes when aggregating at leaf level", () => {
+  it("ignores roots that belong to another scheme", () => {
     const crossSchemeValues = [
       ...schemeValues,
       {
-        id: "region-developed",
-        code: "developed",
-        name: "先進国",
+        id: "region-root",
+        code: "region_root",
+        name: "地域",
         sortOrder: 1,
         schemeId: "scheme-b",
         schemeCode: "region",
@@ -215,15 +231,13 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
       "asset_class",
       "資産クラス",
       {
-        aggregationLevel: "leaf",
-        includeOrphans: true,
         links,
         schemeValues: crossSchemeValues,
         schemeId: "scheme-a",
       },
     );
 
-    expect(allocation.slices.map((slice) => slice.valueCode)).toEqual(["domestic"]);
+    expect(allocation.slices.map((slice) => slice.valueCode)).toEqual(["stock"]);
   });
 
   it("drills down by parent value id", () => {
@@ -236,8 +250,6 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
       "asset_class",
       "資産クラス",
       {
-        aggregationLevel: "parent",
-        includeOrphans: true,
         parentValueId: "stock",
         links,
         schemeValues,
@@ -250,6 +262,49 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
     );
   });
 
+  it("splits a single line across sibling children on drilldown", () => {
+    const lines = [
+      makeTaggedLine(1_000_000, [
+        {
+          schemeCode: "asset_class",
+          schemeName: "資産クラス",
+          valueCode: "domestic",
+          valueName: "国内株式",
+          allocationWeight: 0.6,
+        },
+        {
+          schemeCode: "asset_class",
+          schemeName: "資産クラス",
+          valueCode: "developed",
+          valueName: "先進国株式",
+          allocationWeight: 0.4,
+        },
+      ]),
+    ];
+    const allocation = buildHierarchicalAllocationBySchemeWithLines(
+      lines,
+      "asset_class",
+      "資産クラス",
+      {
+        parentValueId: "stock",
+        links,
+        schemeValues,
+        schemeId: "scheme-a",
+      },
+    );
+
+    expect(
+      allocation.slices.map((slice) => [slice.valueCode, slice.marketValueMinor]),
+    ).toEqual([
+      ["domestic", 600_000],
+      ["developed", 400_000],
+    ]);
+    // 同一明細がどちらのスライスにも重複して積まれないこと
+    for (const slice of allocation.slices) {
+      expect(slice.lines).toHaveLength(1);
+    }
+  });
+
   it("skips lines that do not match the active display unit", () => {
     const lines = [makeHierarchyLine(500_000, "domestic")];
     const allocation = buildHierarchicalAllocationBySchemeWithLines(
@@ -257,8 +312,6 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
       "asset_class",
       "資産クラス",
       {
-        aggregationLevel: "parent",
-        includeOrphans: true,
         parentValueId: "developed",
         links,
         schemeValues,
@@ -276,8 +329,6 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
       "asset_class",
       "資産クラス",
       {
-        aggregationLevel: "leaf",
-        includeOrphans: true,
         links,
         schemeValues,
         schemeId: "scheme-a",
@@ -298,8 +349,6 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
       "asset_class",
       "資産クラス",
       {
-        aggregationLevel: "parent",
-        includeOrphans: true,
         parentValueId: "stock",
         links,
         schemeValues: partialSchemeValues,
@@ -332,8 +381,6 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
       "asset_class",
       "資産クラス",
       {
-        aggregationLevel: "parent",
-        includeOrphans: true,
         parentValueId: "stock",
         links: crossSchemeLinks,
         schemeValues: crossSchemeValues,
@@ -344,7 +391,7 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
     expect(allocation.slices.map((slice) => slice.valueCode)).toEqual(["domestic"]);
   });
 
-  it("sorts leaf slices by name and code when sort order ties", () => {
+  it("sorts child slices by name and code when sort order ties", () => {
     const tiedLeaves = [
       ...schemeValues,
       {
@@ -377,15 +424,17 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
       "asset_class",
       "資産クラス",
       {
-        aggregationLevel: "leaf",
-        includeOrphans: true,
+        parentValueId: "stock",
         links: tiedLinks,
         schemeValues: tiedLeaves,
         schemeId: "scheme-a",
       },
     );
 
-    expect(allocation.slices.map((slice) => slice.valueCode)).toEqual(["leaf_a", "leaf_b"]);
+    expect(allocation.slices.map((slice) => slice.valueCode)).toEqual([
+      "leaf_a",
+      "leaf_b",
+    ]);
   });
 
   it("skips lines outside the selected context parent", () => {
@@ -406,8 +455,6 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
       "asset_class",
       "資産クラス",
       {
-        aggregationLevel: "parent",
-        includeOrphans: true,
         parentValueId: "stock",
         links,
         schemeValues: orphanValues,
@@ -416,6 +463,38 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
     );
 
     expect(allocation.slices).toEqual([]);
+  });
+
+  it("keeps values without links as their own root slice", () => {
+    const orphanValues = [
+      ...schemeValues,
+      {
+        id: "orphan",
+        code: "orphan",
+        name: "未リンク",
+        sortOrder: 3,
+        schemeId: "scheme-a",
+        schemeCode: "asset_class",
+      },
+    ];
+    const lines = [
+      makeHierarchyLine(600_000, "domestic"),
+      makeHierarchyLine(400_000, "orphan"),
+    ];
+    const allocation = buildHierarchicalAllocationBySchemeWithLines(
+      lines,
+      "asset_class",
+      "資産クラス",
+      {
+        links,
+        schemeValues: orphanValues,
+        schemeId: "scheme-a",
+      },
+    );
+
+    expect(allocation.slices.map((slice) => slice.valueCode).sort()).toEqual(
+      ["orphan", "stock"].sort(),
+    );
   });
 
   it("skips lines when context scheme tags are absent", () => {
@@ -448,8 +527,6 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
       "asset_class",
       "資産クラス",
       {
-        aggregationLevel: "parent",
-        includeOrphans: true,
         parentValueId: "region-root",
         links: crossSchemeLinks,
         schemeValues: crossSchemeValues,
@@ -467,8 +544,6 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
       "asset_class",
       "資産クラス",
       {
-        aggregationLevel: "parent",
-        includeOrphans: true,
         links,
         schemeValues,
         schemeId: "scheme-a",
@@ -478,35 +553,6 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
     expect(allocation.slices).toHaveLength(1);
     expect(allocation.slices[0]?.valueCode).toBe("stock");
     expect(allocation.slices[0]?.marketValueMinor).toBe(700_000);
-  });
-
-  it("keeps parent-tagged holdings as residual slices at leaf aggregation", () => {
-    const lines = [
-      makeHierarchyLine(700_000, "stock"),
-      makeHierarchyLine(300_000, "domestic"),
-    ];
-    const allocation = buildHierarchicalAllocationBySchemeWithLines(
-      lines,
-      "asset_class",
-      "資産クラス",
-      {
-        aggregationLevel: "leaf",
-        includeOrphans: true,
-        links,
-        schemeValues,
-        schemeId: "scheme-a",
-      },
-    );
-
-    expect(allocation.slices.map((slice) => slice.valueCode).sort()).toEqual(
-      ["domestic", "stock"].sort(),
-    );
-    expect(allocation.slices.find((slice) => slice.valueCode === "stock")?.marketValueMinor).toBe(
-      700_000,
-    );
-    expect(
-      allocation.slices.find((slice) => slice.valueCode === "domestic")?.marketValueMinor,
-    ).toBe(300_000);
   });
 
   it("shows parent-tagged residual when drilling into that parent", () => {
@@ -519,8 +565,6 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
       "asset_class",
       "資産クラス",
       {
-        aggregationLevel: "parent",
-        includeOrphans: true,
         parentValueId: "stock",
         links,
         schemeValues,
@@ -542,46 +586,49 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
     expect(child?.isParentResidual).toBe(false);
   });
 
-  it("keeps the original parent name for residual slices at leaf aggregation", () => {
+  it("leaves no residual once the parent weight has been moved to the child", () => {
+    // 修復後のデータ形（親タグは付けず、子タグだけが重みを持つ）
     const lines = [
-      makeHierarchyLine(700_000, "stock"),
-      makeHierarchyLine(300_000, "domestic"),
+      makeTaggedLine(1_000_000, [
+        {
+          schemeCode: "asset_class",
+          schemeName: "資産クラス",
+          valueCode: "domestic",
+          valueName: "国内株式",
+          allocationWeight: 1,
+        },
+      ]),
     ];
-    const allocation = buildHierarchicalAllocationBySchemeWithLines(
+    const rootAllocation = buildHierarchicalAllocationBySchemeWithLines(
       lines,
       "asset_class",
       "資産クラス",
       {
-        aggregationLevel: "leaf",
-        includeOrphans: true,
         links,
         schemeValues,
         schemeId: "scheme-a",
       },
     );
 
-    const parentSlice = allocation.slices.find((slice) => slice.valueCode === "stock");
-    expect(parentSlice?.valueName).toBe("株式");
-    expect(parentSlice?.isParentResidual).toBe(false);
-  });
+    expect(rootAllocation.slices.map((slice) => slice.valueCode)).toEqual(["stock"]);
+    expect(rootAllocation.slices[0]?.marketValueMinor).toBe(1_000_000);
 
-  it("does not double-count leaf tags into ancestor slices at leaf aggregation", () => {
-    const lines = [makeHierarchyLine(500_000, "domestic")];
-    const allocation = buildHierarchicalAllocationBySchemeWithLines(
+    const drilledAllocation = buildHierarchicalAllocationBySchemeWithLines(
       lines,
       "asset_class",
       "資産クラス",
       {
-        aggregationLevel: "leaf",
-        includeOrphans: true,
+        parentValueId: "stock",
         links,
         schemeValues,
         schemeId: "scheme-a",
       },
     );
 
-    expect(allocation.slices).toHaveLength(1);
-    expect(allocation.slices[0]?.valueCode).toBe("domestic");
-    expect(allocation.slices[0]?.marketValueMinor).toBe(500_000);
+    expect(drilledAllocation.slices.map((slice) => slice.valueCode)).toEqual([
+      "domestic",
+    ]);
+    expect(drilledAllocation.slices[0]?.marketValueMinor).toBe(1_000_000);
+    expect(drilledAllocation.slices[0]?.weight).toBeCloseTo(1);
   });
 });

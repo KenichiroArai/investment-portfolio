@@ -653,8 +653,6 @@ export function buildAllocationBySchemeWithLinesFromSnapshots(
 
 export type HierarchyAllocationOptions = {
   parentValueId?: string | null;
-  aggregationLevel: "parent" | "leaf";
-  includeOrphans: boolean;
   links: ClassificationValueLinkDto[];
   schemeValues: ClassificationGraphValue[];
   schemeId: string;
@@ -699,65 +697,6 @@ function getLineLeafValueIdsBySchemeFromTags(
   return result;
 }
 
-function shouldIncludeOrphanValue(
-  valueId: string,
-  schemeId: string,
-  graph: ClassificationGraph,
-  includeOrphans: boolean,
-): boolean {
-  let result = true;
-
-  if (includeOrphans) {
-    return result;
-  }
-
-  const parentIds = graph.parentIdsByChildId.get(valueId) ?? [];
-  if (parentIds.length > 0) {
-    return result;
-  }
-
-  const value = graph.valuesById.get(valueId);
-  if (!value || value.schemeId !== schemeId) {
-    return result;
-  }
-
-  // 階層の頂点（非葉ルート）は残し、親も子もない孤立葉だけ除外する
-  if (graph.leafValueIds.has(valueId)) {
-    result = false;
-  }
-
-  return result;
-}
-
-function compareGraphValueDisplayOrder(
-  leftId: string,
-  rightId: string,
-  graph: ClassificationGraph,
-): number {
-  let result = 0;
-  const left = graph.valuesById.get(leftId);
-  const right = graph.valuesById.get(rightId);
-  /* v8 ignore start */
-  if (!left || !right) {
-    result = leftId.localeCompare(rightId);
-    return result;
-  }
-  /* v8 ignore stop */
-
-  result = left.sortOrder - right.sortOrder;
-  if (result !== 0) {
-    return result;
-  }
-
-  result = left.name.localeCompare(right.name);
-  if (result !== 0) {
-    return result;
-  }
-
-  result = left.code.localeCompare(right.code);
-  return result;
-}
-
 function resolveHierarchyDisplayValueIds(
   graph: ClassificationGraph,
   schemeId: string,
@@ -771,20 +710,7 @@ function resolveHierarchyDisplayValueIds(
     return result;
   }
 
-  if (options.aggregationLevel === "parent") {
-    result = getRootValueIds(schemeId, graph);
-    return result;
-  }
-
-  // 葉単位: 葉に加え、親タグ直付けを残すため同一軸の非葉も含める
-  for (const value of graph.valuesById.values()) {
-    if (value.schemeId !== schemeId) {
-      continue;
-    }
-    result.push(value.id);
-  }
-
-  result.sort((leftId, rightId) => compareGraphValueDisplayOrder(leftId, rightId, graph));
+  result = getRootValueIds(schemeId, graph);
   return result;
 }
 
@@ -795,9 +721,11 @@ function isProperDescendantValue(
 ): boolean {
   let result = false;
 
+  /* v8 ignore start */
   if (ancestorValueId === descendantValueId) {
     return result;
   }
+  /* v8 ignore stop */
 
   result = getDescendantValueIds(ancestorValueId, graph).has(descendantValueId);
   return result;
@@ -971,8 +899,6 @@ export function buildHierarchicalAllocationBySchemeWithLines(
     graph,
     options.schemeId,
     options,
-  ).filter((valueId) =>
-    shouldIncludeOrphanValue(valueId, options.schemeId, graph, options.includeOrphans),
   );
 
   const totals = new Map<

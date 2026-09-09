@@ -222,21 +222,225 @@ export function getRootValueIds(
   return result;
 }
 
-export function getOrphanValueIdsInScheme(
-  schemeId: string,
+export function getAncestorValueIds(
+  valueId: string,
+  graph: ClassificationGraph,
+): Set<string> {
+  let result = new Set<string>();
+  const stack = [...(graph.parentIdsByChildId.get(valueId) ?? [])];
+
+  while (stack.length > 0) {
+    const currentId = stack.pop();
+    if (!currentId || result.has(currentId)) {
+      continue;
+    }
+
+    result.add(currentId);
+    const parentIds = graph.parentIdsByChildId.get(currentId) ?? [];
+    for (const parentId of parentIds) {
+      stack.push(parentId);
+    }
+  }
+
+  result.delete(valueId);
+  return result;
+}
+
+function compareValueIdDisplayOrder(
+  leftId: string,
+  rightId: string,
+  graph: ClassificationGraph,
+): number {
+  let result = 0;
+  const left = graph.valuesById.get(leftId);
+  const right = graph.valuesById.get(rightId);
+
+  /* v8 ignore start */
+  if (!left || !right) {
+    result = leftId.localeCompare(rightId);
+    return result;
+  }
+  /* v8 ignore stop */
+
+  result = compareValueDisplayOrder(left, right);
+  return result;
+}
+
+export function getTaggedAncestorValueIds(
+  valueId: string,
+  taggedValueIds: Set<string>,
   graph: ClassificationGraph,
 ): string[] {
   let result: string[] = [];
 
-  for (const value of graph.valuesById.values()) {
-    if (value.schemeId !== schemeId) {
+  for (const ancestorId of getAncestorValueIds(valueId, graph)) {
+    if (!taggedValueIds.has(ancestorId)) {
+      continue;
+    }
+    result.push(ancestorId);
+  }
+
+  // 近い（深い）祖先を先頭にする
+  result.sort((leftId, rightId) => {
+    let compareResult =
+      getAncestorValueIds(rightId, graph).size - getAncestorValueIds(leftId, graph).size;
+    if (compareResult !== 0) {
+      return compareResult;
+    }
+
+    compareResult = compareValueIdDisplayOrder(leftId, rightId, graph);
+    return compareResult;
+  });
+
+  return result;
+}
+
+export function getNearestTaggedDescendantIds(
+  valueId: string,
+  taggedValueIds: Set<string>,
+  graph: ClassificationGraph,
+): string[] {
+  let result: string[] = [];
+  const candidateIds: string[] = [];
+
+  for (const descendantId of getDescendantValueIds(valueId, graph)) {
+    if (descendantId === valueId) {
+      continue;
+    }
+    if (!taggedValueIds.has(descendantId)) {
+      continue;
+    }
+    candidateIds.push(descendantId);
+  }
+
+  for (const candidateId of candidateIds) {
+    const ancestorIds = getAncestorValueIds(candidateId, graph);
+    const hasNearerCandidate = candidateIds.some(
+      (otherId) => otherId !== candidateId && ancestorIds.has(otherId),
+    );
+    if (hasNearerCandidate) {
+      continue;
+    }
+    result.push(candidateId);
+  }
+
+  result.sort((leftId, rightId) =>
+    compareValueIdDisplayOrder(leftId, rightId, graph),
+  );
+  return result;
+}
+
+export type HierarchyTagWeight = {
+  valueId: string;
+  weight: number;
+};
+
+function readTagWeight(
+  weightByValueId: Map<string, number>,
+  valueId: string,
+): number {
+  let result = 0;
+  const weight = weightByValueId.get(valueId);
+
+  /* v8 ignore start */
+  if (weight === undefined) {
+    return result;
+  }
+  /* v8 ignore stop */
+
+  result = weight;
+  return result;
+}
+
+function transferAncestorWeightsWithinScheme(
+  valueIds: string[],
+  weightByValueId: Map<string, number>,
+  graph: ClassificationGraph,
+): void {
+  let result: void = undefined;
+
+  // 浅い側から処理すると、多段の親タグでも最終的に最深の子タグへ重みが集まる
+  const orderedValueIds = [...valueIds].sort((leftId, rightId) => {
+    let compareResult =
+      getAncestorValueIds(leftId, graph).size - getAncestorValueIds(rightId, graph).size;
+    if (compareResult !== 0) {
+      return compareResult;
+    }
+
+    compareResult = compareValueIdDisplayOrder(leftId, rightId, graph);
+    return compareResult;
+  });
+  const taggedValueIds = new Set(valueIds);
+
+  // 祖先は必ず子孫より前に処理されるため、除去済みの値が再び対象になることはない
+  for (const valueId of orderedValueIds) {
+    const descendantIds = getNearestTaggedDescendantIds(
+      valueId,
+      taggedValueIds,
+      graph,
+    );
+    if (descendantIds.length === 0) {
       continue;
     }
 
-    const parentIds = graph.parentIdsByChildId.get(value.id) ?? [];
-    if (parentIds.length === 0) {
-      result.push(value.id);
+    const ancestorWeight = readTagWeight(weightByValueId, valueId);
+    weightByValueId.delete(valueId);
+    taggedValueIds.delete(valueId);
+
+    let descendantTotal = 0;
+    for (const descendantId of descendantIds) {
+      descendantTotal += readTagWeight(weightByValueId, descendantId);
     }
+
+    for (const descendantId of descendantIds) {
+      const share =
+        descendantTotal > 0
+          ? readTagWeight(weightByValueId, descendantId) / descendantTotal
+          : 1 / descendantIds.length;
+      weightByValueId.set(descendantId, ancestorWeight * share);
+    }
+  }
+
+  return result;
+}
+
+export function resolveHierarchyTagWeights(
+  weights: HierarchyTagWeight[],
+  graph: ClassificationGraph,
+): HierarchyTagWeight[] {
+  let result: HierarchyTagWeight[] = [];
+  const weightByValueId = new Map<string, number>();
+  const valueIdsBySchemeId = new Map<string, string[]>();
+
+  for (const weight of weights) {
+    const value = graph.valuesById.get(weight.valueId);
+    if (!value) {
+      continue;
+    }
+
+    weightByValueId.set(weight.valueId, weight.weight);
+    const schemeValueIds = valueIdsBySchemeId.get(value.schemeId) ?? [];
+    schemeValueIds.push(weight.valueId);
+    valueIdsBySchemeId.set(value.schemeId, schemeValueIds);
+  }
+
+  // 軸をまたいだ重み移動は分類軸ごとの構成比を壊すため、同一軸内だけで処理する
+  for (const schemeValueIds of valueIdsBySchemeId.values()) {
+    transferAncestorWeightsWithinScheme(schemeValueIds, weightByValueId, graph);
+  }
+
+  for (const weight of weights) {
+    if (!graph.valuesById.has(weight.valueId)) {
+      result.push(weight);
+      continue;
+    }
+
+    const resolvedWeight = weightByValueId.get(weight.valueId);
+    if (resolvedWeight === undefined) {
+      continue;
+    }
+
+    result.push({ valueId: weight.valueId, weight: resolvedWeight });
   }
 
   return result;

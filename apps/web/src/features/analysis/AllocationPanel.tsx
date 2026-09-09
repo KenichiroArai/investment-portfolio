@@ -24,7 +24,6 @@ type AllocationPanelProps = {
   valueIdByCode?: Map<string, string>;
   descriptionByValueCode?: Map<string, string | null>;
   drillDownValueIds?: Set<string>;
-  allowLineExpand?: boolean;
   onDrillDown?: (valueId: string) => void;
 };
 
@@ -57,7 +56,6 @@ export function AllocationPanel({
   valueIdByCode,
   descriptionByValueCode,
   drillDownValueIds,
-  allowLineExpand = true,
   onDrillDown,
 }: AllocationPanelProps) {
   const [highlightedValueCode, setHighlightedValueCode] = useState<string | null>(
@@ -173,7 +171,6 @@ export function AllocationPanel({
           valueIdByCode={valueIdByCode}
           descriptionByValueCode={descriptionByValueCode}
           drillDownValueIds={drillDownValueIds}
-          allowLineExpand={allowLineExpand}
           onSliceHover={(valueCode) => {
             handleHighlight(valueCode);
           }}

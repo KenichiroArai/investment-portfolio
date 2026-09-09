@@ -14,7 +14,6 @@ type AllocationSnapshotPanelProps = {
   valueIdByCode?: Map<string, string>;
   descriptionByValueCode?: Map<string, string | null>;
   drillDownValueIds?: Set<string>;
-  allowLineExpand?: boolean;
   onDrillDown?: (valueId: string) => void;
   hierarchyControls?: ReactNode;
 };
@@ -28,7 +27,6 @@ export function AllocationSnapshotPanel({
   valueIdByCode,
   descriptionByValueCode,
   drillDownValueIds,
-  allowLineExpand = true,
   onDrillDown,
   hierarchyControls,
 }: AllocationSnapshotPanelProps) {
@@ -44,7 +42,6 @@ export function AllocationSnapshotPanel({
         valueIdByCode={valueIdByCode}
         descriptionByValueCode={descriptionByValueCode}
         drillDownValueIds={drillDownValueIds}
-        allowLineExpand={allowLineExpand}
         onDrillDown={onDrillDown}
       />
     </div>

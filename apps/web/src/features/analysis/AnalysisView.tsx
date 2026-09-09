@@ -30,10 +30,7 @@ import { buildSchemeAllocationWithHierarchy } from "@/features/allocation/build-
 import { RebalanceSettingsCard } from "@/features/allocation/RebalanceSettingsCard";
 import { RebalanceTradesSummary } from "@/features/allocation/RebalanceTradesSummary";
 import { TargetAllocationEditCard } from "@/features/allocation/TargetAllocationEditCard";
-import {
-  useAllocationHierarchyParam,
-  type AllocationAggregationLevel,
-} from "@/features/allocation/useAllocationHierarchyParam";
+import { useAllocationHierarchyParam } from "@/features/allocation/useAllocationHierarchyParam";
 import { buildClassificationDescriptionByCode } from "@/components/classification-value-label";
 import { useAllocationSchemeParam } from "@/features/allocation/useAllocationSchemeParam";
 import { useRebalanceDeposit } from "@/features/allocation/useRebalanceDeposit";
@@ -188,14 +185,7 @@ export function AnalysisView({
   const { activeSchemeCode, setActiveSchemeCode } = useAllocationSchemeParam({
     schemeCodes,
   });
-  const {
-    parentValueId,
-    aggregationLevel,
-    includeOrphans,
-    setParentValueId,
-    setAggregationLevel,
-    setIncludeOrphans,
-  } = useAllocationHierarchyParam();
+  const { parentValueId, setParentValueId } = useAllocationHierarchyParam();
 
   const activeClassificationScheme =
     classificationSchemes.find((scheme) => scheme.code === activeSchemeCode) ?? null;
@@ -348,8 +338,6 @@ export function AnalysisView({
       schemeName: scheme.schemeName,
       classificationSchemes,
       parentValueId,
-      aggregationLevel,
-      includeOrphans,
     });
     return result;
   };
@@ -372,7 +360,6 @@ export function AnalysisView({
       classificationSchemes.find((item) => item.code === scheme.schemeCode)?.values ?? [];
     const classificationValues = resolveTargetAllocationValues(
       schemeValues,
-      aggregationLevel,
       parentValueId,
     );
 
@@ -447,19 +434,13 @@ export function AnalysisView({
         valueIdByCode={valueIdByCode}
         descriptionByValueCode={descriptionByValueCode}
         drillDownValueIds={drillDownValueIds}
-        allowLineExpand={!hasHierarchy || aggregationLevel === "leaf"}
         onDrillDown={setParentValueId}
         hierarchyControls={
           hasHierarchy ? (
             <AllocationHierarchyControls
-              hasHierarchy={hasHierarchy}
               activeScheme={activeClassificationScheme}
               parentValueId={parentValueId}
-              aggregationLevel={aggregationLevel}
-              includeOrphans={includeOrphans}
               onParentChange={setParentValueId}
-              onAggregationLevelChange={setAggregationLevel}
-              onIncludeOrphansChange={setIncludeOrphans}
             />
           ) : null
         }
@@ -552,7 +533,6 @@ export function AnalysisView({
 
 function resolveTargetAllocationValues(
   values: ClassificationValueDto[],
-  aggregationLevel: AllocationAggregationLevel,
   parentValueId: string | null,
 ): ClassificationValueDto[] {
   let result: ClassificationValueDto[] = [];
@@ -565,12 +545,6 @@ function resolveTargetAllocationValues(
     return result;
   }
 
-  if (aggregationLevel === "parent") {
-    result = values.filter((value) => (value.parentIds?.length ?? 0) === 0);
-    return result;
-  }
-
-  // 葉単位: 親タグ直付けも目標設定できるよう全値を出す
-  result = values;
+  result = values.filter((value) => (value.parentIds?.length ?? 0) === 0);
   return result;
 }

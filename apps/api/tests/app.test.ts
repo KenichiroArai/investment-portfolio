@@ -402,11 +402,21 @@ describe("API app", () => {
     expect(assignRes.status).toBe(200);
     expect(await assignRes.json()).toEqual({ ok: true, updated: 1 });
 
+    // 子を付与すると親直付けタグの重みは子へ移り、親タグ自体は外れる
     const afterRes = await app.request(`/instruments/${instrument.id}/classifications`);
     const after = (await afterRes.json()) as { classificationValueIds: string[] };
-    expect([...after.classificationValueIds].sort()).toEqual(
-      [parent.id, child.id].sort(),
+    expect(after.classificationValueIds).toEqual([child.id]);
+
+    // 既に子が付いている銘柄に親を付与してもロールアップで集計済みなので変わらない
+    const parentAssignRes = await app.request(
+      `/classification-values/${parent.id}/instruments`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ instrumentIds: [instrument.id] }),
+      },
     );
+    expect(await parentAssignRes.json()).toEqual({ ok: true, updated: 0 });
 
     sqlite.close();
   });

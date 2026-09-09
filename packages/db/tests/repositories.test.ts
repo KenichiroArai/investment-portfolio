@@ -1241,7 +1241,7 @@ describe("portfolio repositories", () => {
     expect(betaRow?.classificationValueIds).toEqual([japan.id]);
   });
 
-  it("adds a classification value to instruments while keeping existing weights", async () => {
+  it("moves the parent tag weight onto the child when adding a child value", async () => {
     const db = setup();
     await createPortfolio(db, {
       code: "ideco",
@@ -1285,6 +1285,11 @@ describe("portfolio repositories", () => {
     const gamma = await createInstrument(db, { name: "Gamma Fund" });
 
     expect(await addClassificationValueToInstruments(db, domestic.id, [])).toBe(0);
+    expect(
+      await addClassificationValueToInstruments(db, "missing-value", [
+        "00000000-0000-4000-8000-000000000099",
+      ]),
+    ).toBe(0);
 
     await setInstrumentClassificationsWithWeights(db, alpha.id, [
       { classificationValueId: parent.id, allocationWeight: 3 },
@@ -1302,14 +1307,17 @@ describe("portfolio repositories", () => {
 
     const tags = await getTagsForInstruments(db, [alpha.id, beta.id]);
     const alphaTags = tags.get(alpha.id) ?? [];
-    const parentWeight =
-      alphaTags.find((tag) => tag.valueCode === "stock")?.allocationWeight ?? 0;
+    // 親「株式」の重みは子へ移り、親直付けの残差は残らない
+    expect(alphaTags.map((tag) => tag.valueCode).sort()).toEqual([
+      "domestic",
+      "foreign",
+    ]);
     const foreignWeight =
       alphaTags.find((tag) => tag.valueCode === "foreign")?.allocationWeight ?? 0;
     const domesticWeight =
       alphaTags.find((tag) => tag.valueCode === "domestic")?.allocationWeight ?? 0;
-    expect(parentWeight / foreignWeight).toBeCloseTo(3);
-    expect(domesticWeight).toBeCloseTo(1 / 3);
+    expect(domesticWeight).toBeCloseTo(2 / 3);
+    expect(foreignWeight).toBeCloseTo(1 / 3);
 
     const betaTags = tags.get(beta.id) ?? [];
     expect(betaTags.map((tag) => tag.valueCode)).toEqual(["domestic"]);
@@ -1320,12 +1328,52 @@ describe("portfolio repositories", () => {
       .set({ allocationWeight: null })
       .where(eq(instrumentClassifications.instrumentId, beta.id));
 
-    expect(await addClassificationValueToInstruments(db, parent.id, [beta.id])).toBe(1);
+    // 兄弟同士の付与は従来どおり均等に按分する
+    expect(await addClassificationValueToInstruments(db, foreign.id, [beta.id])).toBe(1);
     const betaTagsAfter = (await getTagsForInstruments(db, [beta.id])).get(beta.id) ?? [];
     expect(betaTagsAfter).toHaveLength(2);
     for (const tag of betaTagsAfter) {
       expect(tag.allocationWeight).toBeCloseTo(0.5);
     }
+  });
+
+  it("skips adding a parent value when a child value is already tagged", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+    const scheme = await createClassificationScheme(db, {
+      portfolioCode: "ideco",
+      code: "asset_class",
+      name: "資産クラス",
+    });
+    const parent = await createClassificationValue(db, {
+      schemeId: scheme!.id,
+      code: "stock",
+      name: "株式",
+      sortOrder: 0,
+    });
+    const domestic = await createClassificationValue(db, {
+      schemeId: scheme!.id,
+      code: "domestic",
+      name: "国内株式",
+      sortOrder: 1,
+    });
+    await addClassificationLink(db, {
+      parentValueId: parent.id,
+      childValueId: domestic.id,
+    });
+
+    const alpha = await createInstrument(db, { name: "Alpha Fund" });
+    await setInstrumentClassifications(db, alpha.id, [domestic.id]);
+
+    expect(await addClassificationValueToInstruments(db, parent.id, [alpha.id])).toBe(0);
+
+    const alphaTags = (await getTagsForInstruments(db, [alpha.id])).get(alpha.id) ?? [];
+    expect(alphaTags.map((tag) => tag.valueCode)).toEqual(["domestic"]);
+    expect(alphaTags[0]?.allocationWeight).toBe(1);
   });
 
   it("lists instruments with portfolio, account, and search filters", async () => {

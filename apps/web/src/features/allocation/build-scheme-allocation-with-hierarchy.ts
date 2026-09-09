@@ -10,7 +10,6 @@ import {
   buildClassificationGraphValues,
   mergeClassificationLinks,
 } from "@/features/allocation/AllocationHierarchyControls";
-import type { AllocationAggregationLevel } from "@/features/allocation/useAllocationHierarchyParam";
 
 type BuildSchemeAllocationInput = {
   lines: HoldingLineDto[];
@@ -18,8 +17,6 @@ type BuildSchemeAllocationInput = {
   schemeName: string;
   classificationSchemes: ClassificationSchemeWithValuesDto[];
   parentValueId: string | null;
-  aggregationLevel: AllocationAggregationLevel;
-  includeOrphans: boolean;
 };
 
 export function buildSchemeAllocationWithHierarchy(
@@ -48,8 +45,6 @@ export function buildSchemeAllocationWithHierarchy(
 
   const hierarchyOptions: HierarchyAllocationOptions = {
     parentValueId: input.parentValueId,
-    aggregationLevel: input.aggregationLevel,
-    includeOrphans: input.includeOrphans,
     links,
     schemeValues: buildClassificationGraphValues(input.classificationSchemes),
     schemeId: activeScheme.id,

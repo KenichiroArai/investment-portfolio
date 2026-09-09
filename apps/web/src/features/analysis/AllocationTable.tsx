@@ -40,7 +40,6 @@ type AllocationTableProps = {
   valueIdByCode?: Map<string, string>;
   descriptionByValueCode?: Map<string, string | null>;
   drillDownValueIds?: Set<string>;
-  allowLineExpand?: boolean;
   onSliceHover: (valueCode: string) => void;
   onSliceLeave: () => void;
   onToggleExpand: (valueCode: string) => void;
@@ -89,7 +88,6 @@ export function AllocationTable({
   valueIdByCode,
   descriptionByValueCode,
   drillDownValueIds,
-  allowLineExpand = true,
   onSliceHover,
   onSliceLeave,
   onToggleExpand,
@@ -293,7 +291,7 @@ export function AllocationTable({
                     </>
                   ) : null}
                 </tr>
-                {isExpanded && allowLineExpand ? (
+                {isExpanded ? (
                   <tr>
                     <td colSpan={columnCount} className="allocation-table__detail data-table__detail">
                       <AllocationLineBreakdown
