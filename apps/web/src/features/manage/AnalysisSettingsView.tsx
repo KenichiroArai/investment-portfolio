@@ -55,6 +55,7 @@ import {
   createClassificationValueLink,
   deleteClassificationScheme,
   deleteClassificationValue,
+  deleteClassificationValueLink,
   fetchClassificationSchemes,
   fetchInstrumentClassifications,
   fetchInstruments,
@@ -371,19 +372,57 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
     return result;
   }
 
-  async function handleAddLink(parentValueId: string, childValueId: string) {
+  async function handleApplyLinkChanges(diff: {
+    toAdd: Array<{ parentValueId: string; childValueId: string }>;
+    toRemove: Array<{ parentValueId: string; childValueId: string }>;
+  }) {
     let result: void = undefined;
-    setSubmitting(true);
-    const response = await createClassificationValueLink({ parentValueId, childValueId });
-    setSubmitting(false);
 
-    if (!response.ok) {
-      toast.error(response.message);
+    if (diff.toAdd.length === 0 && diff.toRemove.length === 0) {
       return result;
     }
 
-    toast.success("親子リンクを追加しました。");
-    await load();
+    setSubmitting(true);
+    let addedCount = 0;
+    let removedCount = 0;
+    const errorMessages: string[] = [];
+
+    for (const link of diff.toAdd) {
+      const response = await createClassificationValueLink(link);
+      if (!response.ok) {
+        errorMessages.push(response.message);
+        continue;
+      }
+      addedCount += 1;
+    }
+
+    for (const link of diff.toRemove) {
+      const response = await deleteClassificationValueLink(link);
+      if (!response.ok) {
+        errorMessages.push(response.message);
+        continue;
+      }
+      removedCount += 1;
+    }
+
+    setSubmitting(false);
+
+    for (const message of errorMessages) {
+      toast.error(message);
+    }
+
+    if (addedCount > 0 || removedCount > 0) {
+      const parts: string[] = [];
+      if (addedCount > 0) {
+        parts.push(`${addedCount}件追加`);
+      }
+      if (removedCount > 0) {
+        parts.push(`${removedCount}件解除`);
+      }
+      toast.success(`${parts.join("、")}しました。`);
+      await load();
+    }
+
     return result;
   }
 
@@ -633,8 +672,8 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
                     onCopyValue={(valueId, mode) => {
                       void handleCopyValue(valueId, mode);
                     }}
-                    onAddLink={(parentValueId, childValueId) => {
-                      void handleAddLink(parentValueId, childValueId);
+                    onApplyLinkChanges={(diff) => {
+                      void handleApplyLinkChanges(diff);
                     }}
                   />
                 )}
@@ -823,7 +862,10 @@ type SelectedSchemeValuePanelProps = {
   ) => void;
   onDeleteValue: (valueId: string) => void;
   onCopyValue: (valueId: string, mode: CopyClassificationMode) => void;
-  onAddLink: (parentValueId: string, childValueId: string) => void;
+  onApplyLinkChanges: (diff: {
+    toAdd: Array<{ parentValueId: string; childValueId: string }>;
+    toRemove: Array<{ parentValueId: string; childValueId: string }>;
+  }) => void;
 };
 
 function SelectedSchemeValuePanel({
@@ -833,7 +875,7 @@ function SelectedSchemeValuePanel({
   onUpdateValue,
   onDeleteValue,
   onCopyValue,
-  onAddLink,
+  onApplyLinkChanges,
 }: SelectedSchemeValuePanelProps) {
   const selectedScheme = schemes.find((scheme) => scheme.id === schemeId) ?? schemes[0];
 
@@ -855,7 +897,7 @@ function SelectedSchemeValuePanel({
           onUpdateValue={onUpdateValue}
           onDeleteValue={onDeleteValue}
           onCopyValue={onCopyValue}
-          onAddLink={onAddLink}
+          onApplyLinkChanges={onApplyLinkChanges}
         />
       )}
     </div>

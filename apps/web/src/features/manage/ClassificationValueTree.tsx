@@ -26,6 +26,18 @@ type ClassificationValueUpdatePayload = {
   sortOrder: number;
 };
 
+type ClassificationLinkPair = {
+  parentValueId: string;
+  childValueId: string;
+};
+
+type ClassificationLinkDiff = {
+  toAdd: ClassificationLinkPair[];
+  toRemove: ClassificationLinkPair[];
+};
+
+type LinkEditMode = "children" | "parents";
+
 type ClassificationValueTreeProps = {
   scheme: ClassificationSchemeWithValuesDto;
   allSchemes: ClassificationSchemeWithValuesDto[];
@@ -33,7 +45,7 @@ type ClassificationValueTreeProps = {
   onUpdateValue: (valueId: string, payload: ClassificationValueUpdatePayload) => void;
   onDeleteValue: (valueId: string) => void;
   onCopyValue: (valueId: string, mode: CopyClassificationMode) => void;
-  onAddLink: (parentValueId: string, childValueId: string) => void;
+  onApplyLinkChanges: (diff: ClassificationLinkDiff) => void;
 };
 
 type TreeNodeProps = {
@@ -209,6 +221,64 @@ function TreeNode({
   return result;
 }
 
+function getLinkedIdsForAnchor(
+  anchor: ClassificationValueDto | undefined,
+  linkMode: LinkEditMode,
+): string[] {
+  let result: string[] = [];
+
+  if (!anchor) {
+    return result;
+  }
+
+  if (linkMode === "children") {
+    result = [...(anchor.childIds ?? [])];
+    return result;
+  }
+
+  result = [...(anchor.parentIds ?? [])];
+  return result;
+}
+
+function buildLinkDiff(
+  anchorValueId: string,
+  linkMode: LinkEditMode,
+  baselineIds: string[],
+  selectedIds: string[],
+): ClassificationLinkDiff {
+  let result: ClassificationLinkDiff = { toAdd: [], toRemove: [] };
+  const baselineSet = new Set(baselineIds);
+  const selectedSet = new Set(selectedIds);
+
+  for (const valueId of selectedIds) {
+    if (baselineSet.has(valueId)) {
+      continue;
+    }
+
+    if (linkMode === "children") {
+      result.toAdd.push({ parentValueId: anchorValueId, childValueId: valueId });
+      continue;
+    }
+
+    result.toAdd.push({ parentValueId: valueId, childValueId: anchorValueId });
+  }
+
+  for (const valueId of baselineIds) {
+    if (selectedSet.has(valueId)) {
+      continue;
+    }
+
+    if (linkMode === "children") {
+      result.toRemove.push({ parentValueId: anchorValueId, childValueId: valueId });
+      continue;
+    }
+
+    result.toRemove.push({ parentValueId: valueId, childValueId: anchorValueId });
+  }
+
+  return result;
+}
+
 export function ClassificationValueTree({
   scheme,
   allSchemes,
@@ -216,11 +286,12 @@ export function ClassificationValueTree({
   onUpdateValue,
   onDeleteValue,
   onCopyValue,
-  onAddLink,
+  onApplyLinkChanges,
 }: ClassificationValueTreeProps) {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
-  const [linkParentId, setLinkParentId] = useState("");
-  const [linkChildId, setLinkChildId] = useState("");
+  const [anchorValueId, setAnchorValueId] = useState("");
+  const [linkMode, setLinkMode] = useState<LinkEditMode>("children");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const allValues = useMemo(() => {
     let result: ClassificationValueDto[] = [];
@@ -272,7 +343,15 @@ export function ClassificationValueTree({
     .map((valueId) => scheme.values.find((value) => value.id === valueId))
     .filter((value): value is ClassificationValueDto => value !== undefined);
 
+  const anchorValue = allValues.find((value) => value.id === anchorValueId);
+  const baselineIds = getLinkedIdsForAnchor(anchorValue, linkMode);
+  const candidateValues = allValues.filter((value) => value.id !== anchorValueId);
+  const linkDiff = buildLinkDiff(anchorValueId, linkMode, baselineIds, selectedIds);
+  const hasLinkDiff = linkDiff.toAdd.length > 0 || linkDiff.toRemove.length > 0;
+  const candidateLabel = linkMode === "children" ? "子分類値" : "親分類値";
+
   const onToggleExpand = (valueId: string) => {
+    let result: void = undefined;
     setExpandedIds((current) => {
       const next = new Set(current);
       if (next.has(valueId)) {
@@ -282,59 +361,203 @@ export function ClassificationValueTree({
       }
       return next;
     });
+    return result;
   };
+
+  function resetSelection(nextAnchorId: string, nextMode: LinkEditMode) {
+    let result: void = undefined;
+    const nextAnchor = allValues.find((value) => value.id === nextAnchorId);
+    setSelectedIds(getLinkedIdsForAnchor(nextAnchor, nextMode));
+    return result;
+  }
+
+  function handleAnchorChange(nextAnchorId: string) {
+    let result: void = undefined;
+    setAnchorValueId(nextAnchorId);
+    resetSelection(nextAnchorId, linkMode);
+    return result;
+  }
+
+  function handleLinkModeChange(nextMode: LinkEditMode) {
+    let result: void = undefined;
+    if (nextMode === linkMode) {
+      return result;
+    }
+    setLinkMode(nextMode);
+    resetSelection(anchorValueId, nextMode);
+    return result;
+  }
+
+  function handleToggleCandidate(valueId: string, checked: boolean) {
+    let result: void = undefined;
+    setSelectedIds((current) => {
+      if (checked) {
+        if (current.includes(valueId)) {
+          return current;
+        }
+        return [...current, valueId];
+      }
+      return current.filter((id) => id !== valueId);
+    });
+    return result;
+  }
+
+  function handleSelectAllCandidates() {
+    let result: void = undefined;
+    setSelectedIds(candidateValues.map((value) => value.id));
+    return result;
+  }
+
+  function handleClearCandidateSelection() {
+    let result: void = undefined;
+    setSelectedIds([]);
+    return result;
+  }
+
+  function handleApplyLinkChanges() {
+    let result: void = undefined;
+    if (!anchorValueId || !hasLinkDiff) {
+      return result;
+    }
+    onApplyLinkChanges(linkDiff);
+    return result;
+  }
+
+  function formatValueOptionLabel(value: ClassificationValueDto): string {
+    let result = "";
+    const ownerScheme =
+      allSchemes.find((item) => item.id === value.schemeId)?.name ?? scheme.name;
+    result = `${ownerScheme} / ${value.name}`;
+    return result;
+  }
 
   let result = (
     <div className="space-y-4">
-      <div className="rounded-lg border p-3">
-        <p className="mb-2 text-sm font-medium">親子リンクを追加</p>
-        <div className="grid gap-3 md:grid-cols-[1fr_1fr_auto]">
-          <Select value={linkParentId} onValueChange={setLinkParentId}>
+      <div className="space-y-3 rounded-lg border p-3">
+        <p className="text-sm font-medium">親子リンクを編集</p>
+        <div className="grid gap-3 md:grid-cols-[1fr_auto]">
+          <Select value={anchorValueId} onValueChange={handleAnchorChange}>
             <SelectTrigger>
-              <SelectValue placeholder="親分類値" />
+              <SelectValue placeholder="分類値を選択" />
             </SelectTrigger>
             <SelectContent>
               {allValues.map((value) => {
-                const ownerScheme =
-                  allSchemes.find((item) => item.id === value.schemeId)?.name ?? scheme.name;
                 let item = (
-                  <SelectItem key={`parent-${value.id}`} value={value.id}>
-                    {ownerScheme} / {value.name}
+                  <SelectItem key={`anchor-${value.id}`} value={value.id}>
+                    {formatValueOptionLabel(value)}
                   </SelectItem>
                 );
                 return item;
               })}
             </SelectContent>
           </Select>
-          <Select value={linkChildId} onValueChange={setLinkChildId}>
-            <SelectTrigger>
-              <SelectValue placeholder="子分類値" />
-            </SelectTrigger>
-            <SelectContent>
-              {allValues.map((value) => {
-                const ownerScheme =
-                  allSchemes.find((item) => item.id === value.schemeId)?.name ?? scheme.name;
-                let item = (
-                  <SelectItem key={`child-${value.id}`} value={value.id}>
-                    {ownerScheme} / {value.name}
-                  </SelectItem>
-                );
-                return item;
-              })}
-            </SelectContent>
-          </Select>
-          <Button
-            type="button"
-            disabled={disabled || !linkParentId || !linkChildId}
-            onClick={() => {
-              onAddLink(linkParentId, linkChildId);
-              setLinkParentId("");
-              setLinkChildId("");
-            }}
-          >
-            リンク追加
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              size="sm"
+              variant={linkMode === "children" ? "default" : "outline"}
+              disabled={disabled}
+              onClick={() => {
+                handleLinkModeChange("children");
+              }}
+            >
+              子を紐づける
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant={linkMode === "parents" ? "default" : "outline"}
+              disabled={disabled}
+              onClick={() => {
+                handleLinkModeChange("parents");
+              }}
+            >
+              親を紐づける
+            </Button>
+          </div>
         </div>
+
+        {anchorValueId === "" ? (
+          <p className="text-sm text-muted-foreground">
+            分類値を選ぶと、紐づけ候補をまとめて選択できます。
+          </p>
+        ) : (
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-sm text-muted-foreground">
+                {candidateLabel}を選択（{selectedIds.length} / {candidateValues.length}）
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={disabled || candidateValues.length === 0}
+                  onClick={handleSelectAllCandidates}
+                >
+                  すべて選択
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  disabled={disabled || selectedIds.length === 0}
+                  onClick={handleClearCandidateSelection}
+                >
+                  選択解除
+                </Button>
+              </div>
+            </div>
+
+            <div className="max-h-80 divide-y overflow-y-auto rounded-md border">
+              {candidateValues.length === 0 ? (
+                <p className="px-3 py-4 text-sm text-muted-foreground">
+                  紐づけ候補がありません。
+                </p>
+              ) : (
+                candidateValues.map((value) => {
+                  const checked = selectedIds.includes(value.id);
+                  const isLinked = baselineIds.includes(value.id);
+                  let row = (
+                    <label
+                      key={`candidate-${value.id}`}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2 text-sm",
+                        disabled ? "opacity-60" : "cursor-pointer",
+                      )}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        disabled={disabled}
+                        onChange={(event) => {
+                          handleToggleCandidate(value.id, event.target.checked);
+                        }}
+                      />
+                      <span className="min-w-0 flex-1 truncate">
+                        {formatValueOptionLabel(value)}
+                      </span>
+                      {isLinked ? (
+                        <span className="shrink-0 text-xs text-muted-foreground">リンク済み</span>
+                      ) : null}
+                    </label>
+                  );
+                  return row;
+                })
+              )}
+            </div>
+
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                disabled={disabled || !hasLinkDiff}
+                onClick={handleApplyLinkChanges}
+              >
+                変更を適用
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="space-y-2">
