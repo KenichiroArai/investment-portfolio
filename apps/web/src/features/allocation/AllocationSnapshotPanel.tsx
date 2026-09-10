@@ -13,9 +13,8 @@ type AllocationSnapshotPanelProps = {
   asOfDate?: string | null;
   valueIdByCode?: Map<string, string>;
   descriptionByValueCode?: Map<string, string | null>;
-  drillDownValueIds?: Set<string>;
-  onDrillDown?: (valueId: string) => void;
-  hierarchyControls?: ReactNode;
+  childSlicesByParentValueId?: Map<string, AllocationSliceWithLines[]>;
+  hierarchyNote?: ReactNode;
 };
 
 export function AllocationSnapshotPanel({
@@ -26,13 +25,12 @@ export function AllocationSnapshotPanel({
   asOfDate,
   valueIdByCode,
   descriptionByValueCode,
-  drillDownValueIds,
-  onDrillDown,
-  hierarchyControls,
+  childSlicesByParentValueId,
+  hierarchyNote,
 }: AllocationSnapshotPanelProps) {
   let result: ReactNode = (
     <div className="allocation-snapshot-panel min-w-0 max-w-full space-y-4">
-      {hierarchyControls}
+      {hierarchyNote}
       <AllocationPanel
         slices={slices}
         showPortfolioColumn={showPortfolioColumn}
@@ -41,8 +39,7 @@ export function AllocationSnapshotPanel({
         asOfDate={asOfDate}
         valueIdByCode={valueIdByCode}
         descriptionByValueCode={descriptionByValueCode}
-        drillDownValueIds={drillDownValueIds}
-        onDrillDown={onDrillDown}
+        childSlicesByParentValueId={childSlicesByParentValueId}
       />
     </div>
   );

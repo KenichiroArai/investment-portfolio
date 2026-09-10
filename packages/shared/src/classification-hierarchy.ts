@@ -352,6 +352,13 @@ function readTagWeight(
   return result;
 }
 
+function isMultiParentValue(valueId: string, graph: ClassificationGraph): boolean {
+  let result = false;
+  const parentIds = graph.parentIdsByChildId.get(valueId) ?? [];
+  result = parentIds.length > 1;
+  return result;
+}
+
 function transferAncestorWeightsWithinScheme(
   valueIds: string[],
   weightByValueId: Map<string, number>,
@@ -380,6 +387,11 @@ function transferAncestorWeightsWithinScheme(
       graph,
     );
     if (descendantIds.length === 0) {
+      continue;
+    }
+
+    // 共有葉（多親）への吸収は資産クラス親の構成比を壊すため移譲しない
+    if (descendantIds.some((descendantId) => isMultiParentValue(descendantId, graph))) {
       continue;
     }
 

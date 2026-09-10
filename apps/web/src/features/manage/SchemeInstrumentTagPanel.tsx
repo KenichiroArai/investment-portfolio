@@ -41,6 +41,8 @@ type SchemeInstrumentTagPanelProps = {
   instrumentTagMap: Record<string, string[]>;
   disabled?: boolean;
   onAssign: (childValueId: string, instrumentIds: string[]) => void;
+  onRemoveParent: (parentValueId: string, instrumentIds: string[]) => void;
+  onRemoveChild: (childValueId: string, instrumentIds: string[]) => void;
 };
 
 export function SchemeInstrumentTagPanel({
@@ -49,6 +51,8 @@ export function SchemeInstrumentTagPanel({
   instrumentTagMap,
   disabled,
   onAssign,
+  onRemoveParent,
+  onRemoveChild,
 }: SchemeInstrumentTagPanelProps) {
   const [schemeId, setSchemeId] = useState(() => schemes[0]?.id ?? "");
   const [parentStack, setParentStack] = useState<string[]>([]);
@@ -130,6 +134,7 @@ export function SchemeInstrumentTagPanel({
       return result;
     }
 
+    // 親タグ直付けのみ。共有スタイル葉（全親の子）だけでは一覧に出さない
     const query = instrumentQuery.trim().toLowerCase();
     for (const instrument of instruments) {
       const valueIds = instrumentTagMap[instrument.id] ?? [];
@@ -236,6 +241,37 @@ export function SchemeInstrumentTagPanel({
     return result;
   }
 
+  function getSelectedVisibleInstrumentIds() {
+    let result: string[] = [];
+    const visibleIds = new Set(taggedInstruments.map((instrument) => instrument.id));
+    result = selectedInstrumentIds.filter((id) => visibleIds.has(id));
+    return result;
+  }
+
+  function handleRemoveParent() {
+    let result: void = undefined;
+
+    if (!targetParentId || selectedCount === 0) {
+      return result;
+    }
+
+    onRemoveParent(targetParentId, getSelectedVisibleInstrumentIds());
+    setSelectedInstrumentIds([]);
+    return result;
+  }
+
+  function handleRemoveChild() {
+    let result: void = undefined;
+
+    if (!childValueId || selectedCount === 0) {
+      return result;
+    }
+
+    onRemoveChild(childValueId, getSelectedVisibleInstrumentIds());
+    setSelectedInstrumentIds([]);
+    return result;
+  }
+
   function renderChildTagLabels(instrumentId: string) {
     let result = "";
 
@@ -281,7 +317,7 @@ export function SchemeInstrumentTagPanel({
           </SelectContent>
         </Select>
         <p className="text-xs text-muted-foreground">
-          親カテゴリ値を選ぶと、その値が付いた銘柄だけを一覧化します。銘柄を選んで子カテゴリ値を付与すると、親タグは残したまま子タグが追加されます。
+          親カテゴリ値を選ぶと、その親タグが付いた銘柄を一覧化します。子（インカム・成長など）は下で手動付与します。付与後も親タグは残ります。
         </p>
       </div>
 
@@ -509,6 +545,25 @@ export function SchemeInstrumentTagPanel({
               onClick={handleAssign}
             >
               選択した {selectedCount} 銘柄に付与
+            </Button>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={disabled || selectedCount === 0 || !targetParentId}
+              onClick={handleRemoveParent}
+            >
+              親タグを外す（{selectedCount}）
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={disabled || selectedCount === 0 || !childValueId}
+              onClick={handleRemoveChild}
+            >
+              子タグを外す（{selectedCount}）
             </Button>
           </div>
         </div>

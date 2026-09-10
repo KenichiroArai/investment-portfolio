@@ -6,6 +6,7 @@ import type {
 } from "@repo/shared";
 import {
   buildClassificationGraph,
+  getAncestorValueIds,
   getDescendantValueIds,
   getDirectChildIds,
   getRootValueIds,
@@ -100,6 +101,11 @@ export function InstrumentTagHierarchyPicker({
     return result;
   }, [activeScheme?.name, parentStack, schemes]);
 
+  const selectedIdSet = useMemo(() => {
+    let result = new Set(selectedValueIds);
+    return result;
+  }, [selectedValueIds]);
+
   const selectedInSchemeCount = useMemo(() => {
     let result = 0;
     if (!activeScheme) {
@@ -143,16 +149,55 @@ export function InstrumentTagHierarchyPicker({
 
   function handleToggleValue(valueId: string, checked: boolean) {
     let result: void = undefined;
+    const leaf = isLeafValue(valueId, graph);
 
-    if (checked) {
-      if (selectedValueIds.includes(valueId)) {
+    if (leaf) {
+      if (checked) {
+        const ancestorIds = getAncestorValueIds(valueId, graph);
+        // 共有葉でもドリルダウン中の親は資産クラス帰属のため残す
+        const keepParentId =
+          currentParentId && ancestorIds.has(currentParentId) ? currentParentId : null;
+        const nextIds = selectedValueIds.filter((id) => {
+          if (id === valueId) {
+            return false;
+          }
+          if (keepParentId && id === keepParentId) {
+            return true;
+          }
+          // 単親ツリーの祖先は葉へ寄せる。多親の共有葉ではドリル親以外の祖先を外す
+          if (ancestorIds.has(id)) {
+            return false;
+          }
+          return true;
+        });
+        if (keepParentId && !nextIds.includes(keepParentId)) {
+          nextIds.push(keepParentId);
+        }
+        if (!nextIds.includes(valueId)) {
+          nextIds.push(valueId);
+        }
+        onSelectedValueIdsChange(nextIds);
         return result;
       }
-      onSelectedValueIdsChange([...selectedValueIds, valueId]);
+
+      onSelectedValueIdsChange(selectedValueIds.filter((id) => id !== valueId));
       return result;
     }
 
-    onSelectedValueIdsChange(selectedValueIds.filter((id) => id !== valueId));
+    const descendantIds = getDescendantValueIds(valueId, graph);
+
+    if (checked) {
+      // 親直付けは未細分化。配下の選択は外し、親IDだけ残す
+      const nextIds = selectedValueIds.filter((id) => !descendantIds.has(id));
+      nextIds.push(valueId);
+      onSelectedValueIdsChange(nextIds);
+      return result;
+    }
+
+    // 親解除: 親自身と配下の選択をまとめて除去
+    onSelectedValueIdsChange(
+      selectedValueIds.filter((id) => id !== valueId && !descendantIds.has(id)),
+    );
     return result;
   }
 
@@ -187,7 +232,7 @@ export function InstrumentTagHierarchyPicker({
           </SelectContent>
         </Select>
         <p className="text-xs text-muted-foreground">
-          分析軸 → カテゴリ値（親）→ カテゴリ値（子）の順に辿り、親・葉どちらもタグ付けできます。この軸の選択中:{" "}
+          葉にタグ付けすると親は構成比で自動集計されます。親直付けは未細分化分です。この軸の選択中:{" "}
           {selectedInSchemeCount} 件
         </p>
       </div>
@@ -245,10 +290,16 @@ export function InstrumentTagHierarchyPicker({
           ) : (
             currentValues.map((value) => {
               const leaf = isLeafValue(value.id, graph);
-              const selectedSubtreeCount = [...getDescendantValueIds(value.id, graph)].filter(
-                (subtreeId) => selectedValueIds.includes(subtreeId),
-              ).length;
-              const checked = selectedValueIds.includes(value.id);
+              const descendantIds = getDescendantValueIds(value.id, graph);
+              const selectedSubtreeIds = [...descendantIds].filter(
+                (subtreeId) =>
+                  subtreeId !== value.id && selectedIdSet.has(subtreeId),
+              );
+              const selfSelected = selectedIdSet.has(value.id);
+              const hasSubtreeSelection = selectedSubtreeIds.length > 0;
+              // 葉選択は親含意。親直付けまたは配下選択があれば checked
+              const checked = selfSelected || hasSubtreeSelection;
+              const indeterminate = !selfSelected && hasSubtreeSelection;
 
               let row = (
                 <div
@@ -263,7 +314,17 @@ export function InstrumentTagHierarchyPicker({
                     checked={checked}
                     disabled={disabled}
                     aria-label={value.name}
+                    ref={(element) => {
+                      if (element) {
+                        element.indeterminate = indeterminate;
+                      }
+                    }}
                     onChange={(event) => {
+                      if (indeterminate) {
+                        // 配下含意（indeterminate）からのクリックは解除として扱う
+                        handleToggleValue(value.id, false);
+                        return;
+                      }
                       handleToggleValue(value.id, event.target.checked);
                     }}
                   />
@@ -274,9 +335,9 @@ export function InstrumentTagHierarchyPicker({
                       code={value.code}
                       nameClassName="max-w-[16rem]"
                     />
-                    {!leaf && selectedSubtreeCount > 0 ? (
+                    {!leaf && hasSubtreeSelection ? (
                       <span className="ml-2 text-xs text-muted-foreground">
-                        配下選択 {selectedSubtreeCount} 件
+                        配下選択 {selectedSubtreeIds.length} 件（親含意）
                       </span>
                     ) : null}
                   </span>

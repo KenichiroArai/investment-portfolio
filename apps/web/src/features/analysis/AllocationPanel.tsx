@@ -23,8 +23,7 @@ type AllocationPanelProps = {
   asOfDate?: string | null;
   valueIdByCode?: Map<string, string>;
   descriptionByValueCode?: Map<string, string | null>;
-  drillDownValueIds?: Set<string>;
-  onDrillDown?: (valueId: string) => void;
+  childSlicesByParentValueId?: Map<string, AllocationSliceTableRow[]>;
 };
 
 function formatNullableYen(value: number | null): string {
@@ -55,8 +54,7 @@ export function AllocationPanel({
   asOfDate,
   valueIdByCode,
   descriptionByValueCode,
-  drillDownValueIds,
-  onDrillDown,
+  childSlicesByParentValueId,
 }: AllocationPanelProps) {
   const [highlightedValueCode, setHighlightedValueCode] = useState<string | null>(
     null,
@@ -99,15 +97,15 @@ export function AllocationPanel({
     return result;
   }
 
-  function handleToggleExpand(valueCode: string): void {
+  function handleToggleExpand(expandKey: string): void {
     let result: void = undefined;
     setExpandedValueCodes((current) => {
       let next: string[] = [];
 
-      if (current.includes(valueCode)) {
-        next = current.filter((code) => code !== valueCode);
+      if (current.includes(expandKey)) {
+        next = current.filter((code) => code !== expandKey);
       } else {
-        next = [...current, valueCode];
+        next = [...current, expandKey];
       }
 
       return next;
@@ -170,13 +168,12 @@ export function AllocationPanel({
           asOfDate={asOfDate}
           valueIdByCode={valueIdByCode}
           descriptionByValueCode={descriptionByValueCode}
-          drillDownValueIds={drillDownValueIds}
+          childSlicesByParentValueId={childSlicesByParentValueId}
           onSliceHover={(valueCode) => {
             handleHighlight(valueCode);
           }}
           onSliceLeave={handleSliceLeave}
           onToggleExpand={handleToggleExpand}
-          onDrillDown={onDrillDown}
         />
       </div>
     </div>

@@ -599,6 +599,20 @@ export async function addInstrumentsToClassificationValue(
   return result;
 }
 
+export async function removeInstrumentsFromClassificationValue(
+  classificationValueId: string,
+  input: AddClassificationValueInstrumentsInput,
+) {
+  let result = await requestWritableJson<{ ok: boolean; updated: number }>(
+    `/classification-values/${classificationValueId}/remove-instruments`,
+    {
+      method: "POST",
+      body: JSON.stringify(input),
+    },
+  );
+  return result;
+}
+
 export async function fetchCurrentSnapshot(portfolioCode: string) {
   let result = await requestJson<CurrentSnapshotDto>(
     `/portfolios/${encodePortfolioCodeForPath(portfolioCode)}/snapshot/current`,

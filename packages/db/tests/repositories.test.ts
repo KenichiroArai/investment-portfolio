@@ -6,6 +6,7 @@ import { IDECO_SCHEME_CODES, MONEX_SCHEME_CODES, SnapshotValidationError } from 
 import {
   addClassificationLink,
   addClassificationValueToInstruments,
+  removeClassificationValueFromInstruments,
   copyClassificationValue,
   createClassificationScheme,
   createClassificationValue,
@@ -1374,6 +1375,46 @@ describe("portfolio repositories", () => {
     const alphaTags = (await getTagsForInstruments(db, [alpha.id])).get(alpha.id) ?? [];
     expect(alphaTags.map((tag) => tag.valueCode)).toEqual(["domestic"]);
     expect(alphaTags[0]?.allocationWeight).toBe(1);
+  });
+
+  it("removes a classification value from instruments and renormalizes weights", async () => {
+    const db = setup();
+    await createPortfolio(db, { code: "taxable", name: "Taxable", kind: "taxable" });
+    const scheme = await createClassificationScheme(db, {
+      portfolioCode: "taxable",
+      code: "asset_class",
+      name: "資産クラス",
+    });
+    const domestic = await createClassificationValue(db, {
+      schemeId: scheme!.id,
+      code: "domestic",
+      name: "国内株式",
+      sortOrder: 1,
+    });
+    const foreign = await createClassificationValue(db, {
+      schemeId: scheme!.id,
+      code: "foreign",
+      name: "海外株式",
+      sortOrder: 2,
+    });
+    const fund = await createInstrument(db, { name: "Remove Tag Fund" });
+    await setInstrumentClassificationsWithWeights(db, fund.id, [
+      { classificationValueId: domestic.id, allocationWeight: 0.4 },
+      { classificationValueId: foreign.id, allocationWeight: 0.6 },
+    ]);
+
+    expect(
+      await removeClassificationValueFromInstruments(db, domestic.id, [
+        fund.id,
+        "00000000-0000-4000-8000-000000000099",
+      ]),
+    ).toBe(1);
+    expect(await removeClassificationValueFromInstruments(db, domestic.id, [fund.id])).toBe(0);
+    expect(await removeClassificationValueFromInstruments(db, domestic.id, [])).toBe(0);
+
+    const tags = (await getTagsForInstruments(db, [fund.id])).get(fund.id) ?? [];
+    expect(tags.map((tag) => tag.valueCode)).toEqual(["foreign"]);
+    expect(tags[0]?.allocationWeight).toBe(1);
   });
 
   it("lists instruments with portfolio, account, and search filters", async () => {

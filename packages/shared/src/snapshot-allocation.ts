@@ -755,109 +755,178 @@ function pickMostSpecificDisplayValueIds(
   return result;
 }
 
-function lineTaggedValueMatchesDisplayUnit(
-  taggedValueIds: Set<string>,
-  displayValueId: string,
+/**
+ * 多親葉の covering を、同一明細上のタグ付き親と交差して曖昧性を解消する。
+ * 親タグが無い共有葉はルートへ等分せず除外し、偽の均等構成比を出さない。
+ */
+function resolveAttributionCoveringDisplayValueIds(
+  taggedValueId: string,
   displayValueIds: string[],
+  lineTaggedIds: Set<string> | undefined,
   graph: ClassificationGraph,
-): boolean {
-  let result = false;
-
-  for (const taggedValueId of taggedValueIds) {
-    const mostSpecificIds = pickMostSpecificDisplayValueIds(
-      taggedValueId,
-      displayValueIds,
-      graph,
-    );
-    if (mostSpecificIds.includes(displayValueId)) {
-      result = true;
-      return result;
-    }
-  }
-
-  return result;
-}
-
-function lineMatchesDisplayUnit(
-  lineTaggedIdsByScheme: Map<string, Set<string>>,
-  displayValueId: string,
-  displayValueIds: string[],
-  contextParentValueId: string | null | undefined,
-  graph: ClassificationGraph,
-): boolean {
-  let result = false;
-  const displayValue = graph.valuesById.get(displayValueId);
-  /* v8 ignore start */
-  if (!displayValue) {
-    return result;
-  }
-  /* v8 ignore stop */
-
-  if (contextParentValueId) {
-    const contextValue = graph.valuesById.get(contextParentValueId);
-    /* v8 ignore start */
-    if (!contextValue) {
-      return result;
-    }
-    /* v8 ignore stop */
-
-    const contextAllowedIds = getDescendantValueIds(contextParentValueId, graph);
-    const contextTaggedIds = lineTaggedIdsByScheme.get(contextValue.schemeCode);
-    if (!contextTaggedIds) {
-      return result;
-    }
-
-    let matchesContext = false;
-    for (const taggedId of contextTaggedIds) {
-      if (contextAllowedIds.has(taggedId)) {
-        matchesContext = true;
-        break;
-      }
-    }
-
-    if (!matchesContext) {
-      return result;
-    }
-  }
-
-  const displayTaggedIds = lineTaggedIdsByScheme.get(displayValue.schemeCode);
-  if (!displayTaggedIds) {
-    return result;
-  }
-
-  result = lineTaggedValueMatchesDisplayUnit(
-    displayTaggedIds,
-    displayValueId,
-    displayValueIds,
-    graph,
-  );
-  return result;
-}
-
-function attributionMatchesDisplayUnit(
-  attribution: LineTagAttribution,
-  displayValueId: string,
-  displayValueIds: string[],
-  valueCodeBySchemeCode: Map<string, Map<string, string>>,
-  graph: ClassificationGraph,
-): boolean {
-  let result = false;
-  const codeMap = valueCodeBySchemeCode.get(attribution.tag.schemeCode);
-  if (!codeMap) {
-    return result;
-  }
-
-  const taggedValueId = codeMap.get(attribution.tag.valueCode);
-  if (!taggedValueId) {
-    return result;
-  }
-
-  const mostSpecificIds = pickMostSpecificDisplayValueIds(
+): string[] {
+  let result = pickMostSpecificDisplayValueIds(
     taggedValueId,
     displayValueIds,
     graph,
   );
-  result = mostSpecificIds.includes(displayValueId);
+
+  if (result.length <= 1) {
+    return result;
+  }
+
+  const taggedIds = lineTaggedIds ?? new Set<string>();
+  const disambiguated = result.filter((displayValueId) => taggedIds.has(displayValueId));
+  if (disambiguated.length > 0) {
+    result = disambiguated;
+    return result;
+  }
+
+  // 真正の多親按分（意図的な複数親ウェイト）ではなく共有葉の曖昧帰属なので除外
+  result = [];
+  return result;
+}
+
+/**
+ * ドリルダウン中、親タグ分は「その他（未細分）」になる。
+ * 同一明細に子タグがあれば残差ではなくその子へ振り替え、子設定済みなのに未細分になるのを防ぐ。
+ */
+function redirectParentResidualToTaggedChildren(
+  coveringIds: string[],
+  lineTaggedIds: Set<string> | undefined,
+  parentValueId: string | null | undefined,
+  displayValueIds: string[],
+): string[] {
+  let result = coveringIds;
+
+  if (!parentValueId || !lineTaggedIds) {
+    return result;
+  }
+
+  if (!coveringIds.includes(parentValueId)) {
+    return result;
+  }
+
+  const taggedChildIds = displayValueIds.filter(
+    (displayValueId) =>
+      displayValueId !== parentValueId && lineTaggedIds.has(displayValueId),
+  );
+  if (taggedChildIds.length === 0) {
+    return result;
+  }
+
+  const redirected: string[] = [];
+  for (const coveringId of coveringIds) {
+    if (coveringId === parentValueId) {
+      continue;
+    }
+    redirected.push(coveringId);
+  }
+  for (const childId of taggedChildIds) {
+    if (redirected.includes(childId)) {
+      continue;
+    }
+    redirected.push(childId);
+  }
+
+  result = redirected;
+  return result;
+}
+
+function lineMatchesHierarchyContext(
+  lineTaggedIdsByScheme: Map<string, Set<string>>,
+  contextParentValueId: string | null | undefined,
+  graph: ClassificationGraph,
+): boolean {
+  let result = true;
+
+  if (!contextParentValueId) {
+    return result;
+  }
+
+  const contextValue = graph.valuesById.get(contextParentValueId);
+  /* v8 ignore start */
+  if (!contextValue) {
+    result = false;
+    return result;
+  }
+  /* v8 ignore stop */
+
+  const contextAllowedIds = getDescendantValueIds(contextParentValueId, graph);
+  const contextTaggedIds = lineTaggedIdsByScheme.get(contextValue.schemeCode);
+  if (!contextTaggedIds) {
+    result = false;
+    return result;
+  }
+
+  result = false;
+  for (const taggedId of contextTaggedIds) {
+    if (!contextAllowedIds.has(taggedId)) {
+      continue;
+    }
+
+    // 共有葉（多親）だけでは全親のドリルダウンに入ってしまうため、親タグ併記を要求する
+    const parentIds = graph.parentIdsByChildId.get(taggedId) ?? [];
+    if (parentIds.length > 1) {
+      if (!contextTaggedIds.has(contextParentValueId)) {
+        continue;
+      }
+    }
+
+    result = true;
+    break;
+  }
+
+  return result;
+}
+
+function splitAmountAcrossKeys(
+  keys: string[],
+  amountMinor: number,
+): Map<string, number> {
+  let result = new Map<string, number>();
+
+  if (keys.length === 0) {
+    return result;
+  }
+
+  if (keys.length === 1) {
+    result.set(keys[0]!, amountMinor);
+    return result;
+  }
+
+  if (amountMinor === 0) {
+    for (const key of keys) {
+      result.set(key, 0);
+    }
+    return result;
+  }
+
+  result = distributeAmountProportionally(
+    keys.map((key) => ({ key, weight: 1 })),
+    amountMinor,
+  );
+  return result;
+}
+
+function splitNullableAmountAcrossKeys(
+  keys: string[],
+  amountMinor: number | null,
+): Map<string, number | null> {
+  let result = new Map<string, number | null>();
+
+  if (amountMinor === null) {
+    for (const key of keys) {
+      result.set(key, null);
+    }
+    return result;
+  }
+
+  const splits = splitAmountAcrossKeys(keys, amountMinor);
+  for (const key of keys) {
+    result.set(key, splits.get(key) ?? 0);
+  }
+
   return result;
 }
 
@@ -924,53 +993,83 @@ export function buildHierarchicalAllocationBySchemeWithLines(
       valueCodeBySchemeCode,
     );
 
-    for (const displayValueId of displayValueIds) {
-      if (
-        !lineMatchesDisplayUnit(
-          lineTaggedIdsByScheme,
-          displayValueId,
-          displayValueIds,
-          options.parentValueId,
-          graph,
-        )
-      ) {
-        continue;
-      }
-
-      const displayValue = graph.valuesById.get(displayValueId);
-      /* v8 ignore start */
-      if (!displayValue) {
-        continue;
-      }
-      /* v8 ignore stop */
-
-      const isParentResidual = isParentResidualDisplayUnit(
-        displayValueId,
+    if (
+      !lineMatchesHierarchyContext(
+        lineTaggedIdsByScheme,
         options.parentValueId,
+        graph,
+      )
+    ) {
+      continue;
+    }
+
+    for (const attribution of attributions) {
+      const codeMap = valueCodeBySchemeCode.get(attribution.tag.schemeCode);
+      if (!codeMap) {
+        continue;
+      }
+
+      const taggedValueId = codeMap.get(attribution.tag.valueCode);
+      if (!taggedValueId) {
+        continue;
+      }
+
+      const coveringIds = redirectParentResidualToTaggedChildren(
+        resolveAttributionCoveringDisplayValueIds(
+          taggedValueId,
+          displayValueIds,
+          lineTaggedIdsByScheme.get(attribution.tag.schemeCode),
+          graph,
+        ),
+        lineTaggedIdsByScheme.get(attribution.tag.schemeCode),
+        options.parentValueId,
+        displayValueIds,
+      );
+      if (coveringIds.length === 0) {
+        continue;
+      }
+
+      // covering が複数（親タグで曖昧性解消済みの複数親）なら等分する
+      const marketByDisplay = splitAmountAcrossKeys(
+        coveringIds,
+        attribution.marketValueMinor,
+      );
+      const gainByDisplay = splitNullableAmountAcrossKeys(
+        coveringIds,
+        attribution.gainMinor,
+      );
+      const bookByDisplay = splitNullableAmountAcrossKeys(
+        coveringIds,
+        attribution.bookValueMinor,
       );
 
-      for (const attribution of attributions) {
-        if (
-          !attributionMatchesDisplayUnit(
-            attribution,
-            displayValueId,
-            displayValueIds,
-            valueCodeBySchemeCode,
-            graph,
-          )
-        ) {
+      for (const displayValueId of coveringIds) {
+        const displayValue = graph.valuesById.get(displayValueId);
+        /* v8 ignore start */
+        if (!displayValue) {
           continue;
         }
+        /* v8 ignore stop */
 
+        const isParentResidual = isParentResidualDisplayUnit(
+          displayValueId,
+          options.parentValueId,
+        );
+        const splitAttribution: LineTagAttribution = {
+          tag: attribution.tag,
+          marketValueMinor: marketByDisplay.get(displayValueId) ?? 0,
+          gainMinor: gainByDisplay.get(displayValueId) ?? null,
+          bookValueMinor: bookByDisplay.get(displayValueId) ?? null,
+        };
         const lineInSlice = buildAllocationLineInSlice(
           line,
-          attribution,
+          splitAttribution,
           { line },
           0,
         );
         const existing = totals.get(displayValue.code);
         if (existing) {
-          existing.marketValueMinor += attribution.marketValueMinor;
+          existing.marketValueMinor += splitAttribution.marketValueMinor;
           existing.lines.push(lineInSlice);
           continue;
         }
@@ -980,7 +1079,7 @@ export function buildHierarchicalAllocationBySchemeWithLines(
             ? PARENT_RESIDUAL_SLICE_NAME
             : displayValue.name,
           sortOrder: displayValue.sortOrder,
-          marketValueMinor: attribution.marketValueMinor,
+          marketValueMinor: splitAttribution.marketValueMinor,
           lines: [lineInSlice],
           isParentResidual,
         });

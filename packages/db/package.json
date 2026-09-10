@@ -13,6 +13,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/migrate.ts",
     "db:repair-tags": "tsx src/repair-tags.ts",
+    "db:restore-monex-parent-tags": "tsx src/restore-monex-parent-tags.ts",
+    "db:apply-monex-paste-asset-class": "tsx src/apply-monex-paste-asset-class-weights.ts",
     "pages:export": "tsx src/export-pages-data.ts"
   },
   "dependencies": {

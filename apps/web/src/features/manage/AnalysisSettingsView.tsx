@@ -49,6 +49,7 @@ import { InstrumentTagHierarchyPicker } from "@/features/manage/InstrumentTagHie
 import { SchemeInstrumentTagPanel } from "@/features/manage/SchemeInstrumentTagPanel";
 import {
   addInstrumentsToClassificationValue,
+  removeInstrumentsFromClassificationValue,
   copyClassificationValue,
   createClassificationScheme,
   createClassificationValue,
@@ -118,9 +119,13 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
     [pathname, router, searchParams],
   );
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (options?: { quiet?: boolean }) => {
     let result: void = undefined;
-    setLoading(true);
+    const quiet = options?.quiet === true;
+
+    if (!quiet) {
+      setLoading(true);
+    }
 
     const [schemeResponse, instrumentResponse, instrumentTagResponse] = await Promise.all([
       fetchClassificationSchemes(portfolioCode),
@@ -130,7 +135,9 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
 
     if (!schemeResponse.ok) {
       toast.error(schemeResponse.message);
-      setLoading(false);
+      if (!quiet) {
+        setLoading(false);
+      }
       return result;
     }
 
@@ -160,7 +167,9 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
       setInstrumentTagMap(tagMap);
     }
 
-    setLoading(false);
+    if (!quiet) {
+      setLoading(false);
+    }
     return result;
   }, [portfolioCode]);
 
@@ -485,7 +494,38 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
     }
 
     toast.success(`${response.data.updated} 件の銘柄にタグを追加しました。`);
-    await load();
+    // 分析軸パネルの選択状態（親一覧表示）を保つためフルローディングは使わない
+    await load({ quiet: true });
+    if (tagInstrumentId) {
+      await loadInstrumentTags(tagInstrumentId);
+    }
+    return result;
+  }
+
+  async function handleRemoveClassificationValue(
+    valueId: string,
+    instrumentIds: string[],
+    label: string,
+  ) {
+    let result: void = undefined;
+
+    if (!valueId || instrumentIds.length === 0) {
+      return result;
+    }
+
+    setSubmitting(true);
+    const response = await removeInstrumentsFromClassificationValue(valueId, {
+      instrumentIds,
+    });
+    setSubmitting(false);
+
+    if (!response.ok) {
+      toast.error(response.message);
+      return result;
+    }
+
+    toast.success(`${response.data.updated} 件の銘柄から${label}を外しました。`);
+    await load({ quiet: true });
     if (tagInstrumentId) {
       await loadInstrumentTags(tagInstrumentId);
     }
@@ -734,6 +774,20 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
                         disabled={submitting}
                         onAssign={(childValueId, instrumentIds) => {
                           void handleAssignChildValue(childValueId, instrumentIds);
+                        }}
+                        onRemoveParent={(parentValueId, instrumentIds) => {
+                          void handleRemoveClassificationValue(
+                            parentValueId,
+                            instrumentIds,
+                            "親タグ",
+                          );
+                        }}
+                        onRemoveChild={(childValueId, instrumentIds) => {
+                          void handleRemoveClassificationValue(
+                            childValueId,
+                            instrumentIds,
+                            "子タグ",
+                          );
                         }}
                       />
                     </div>

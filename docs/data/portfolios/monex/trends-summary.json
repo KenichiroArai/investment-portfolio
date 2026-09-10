@@ -16,62 +16,74 @@
           {
             "valueCode": "income",
             "valueName": "インカム",
-            "marketValueMinor": 12093,
-            "ratio": 0.3232730966638152
+            "marketValueMinor": 7876,
+            "ratio": 0.2105431993156544
+          },
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 3247,
+            "ratio": 0.08679961505560307
           },
           {
             "valueCode": "growth",
             "valueName": "成長",
-            "marketValueMinor": 5615,
-            "ratio": 0.15010158254918735
+            "marketValueMinor": 6437,
+            "ratio": 0.17207549187339607
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 11415,
+            "ratio": 0.3051486313088109
           },
           {
             "valueCode": "emerging_equity",
             "valueName": "新興国株式",
-            "marketValueMinor": 5862,
-            "ratio": 0.15670444824636443
+            "marketValueMinor": 2611,
+            "ratio": 0.06979790419161677
           },
           {
             "valueCode": "domestic_bond",
             "valueName": "国内債券",
-            "marketValueMinor": 2453,
-            "ratio": 0.06557420872540633
+            "marketValueMinor": 1054,
+            "ratio": 0.02817579127459367
           },
           {
             "valueCode": "developed_bond",
             "valueName": "先進国債券",
-            "marketValueMinor": 2408,
-            "ratio": 0.06437125748502993
+            "marketValueMinor": 1761,
+            "ratio": 0.04707549187339607
           },
           {
             "valueCode": "high_yield_bond",
             "valueName": "ハイ・イールド債券",
-            "marketValueMinor": 730,
-            "ratio": 0.01951454234388366
+            "marketValueMinor": 365,
+            "ratio": 0.00975727117194183
           },
           {
             "valueCode": "emerging_bond",
             "valueName": "新興国債券",
-            "marketValueMinor": 2025,
-            "ratio": 0.05413280581693755
+            "marketValueMinor": 600,
+            "ratio": 0.0160393498716852
           },
           {
             "valueCode": "domestic_reit",
             "valueName": "国内REIT",
-            "marketValueMinor": 3193,
-            "ratio": 0.08535607356715141
+            "marketValueMinor": 943,
+            "ratio": 0.025208511548331907
           },
           {
             "valueCode": "foreign_reit",
             "valueName": "海外REIT",
-            "marketValueMinor": 2262,
-            "ratio": 0.060468349016253205
+            "marketValueMinor": 716,
+            "ratio": 0.019140290846877673
           },
           {
             "valueCode": "commodity",
             "valueName": "コモディティ",
-            "marketValueMinor": 767,
-            "ratio": 0.020503635585970917
+            "marketValueMinor": 383,
+            "ratio": 0.010238451668092386
           }
         ],
         "__portfolio_instruments__": [
@@ -329,68 +341,74 @@
           {
             "valueCode": "income",
             "valueName": "インカム",
-            "marketValueMinor": 14920,
-            "ratio": 0.3358696141551484
+            "marketValueMinor": 10138,
+            "ratio": 0.23342236139252165
+          },
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 3623,
+            "ratio": 0.08341775649290846
           },
           {
             "valueCode": "growth",
             "valueName": "成長",
-            "marketValueMinor": 5645,
-            "ratio": 0.1270766737202287
+            "marketValueMinor": 6491,
+            "ratio": 0.14945201694603058
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 12975,
+            "ratio": 0.29874286240559955
           },
           {
             "valueCode": "emerging_equity",
             "valueName": "新興国株式",
-            "marketValueMinor": 6774,
-            "ratio": 0.15249200846427446
+            "marketValueMinor": 3077,
+            "ratio": 0.07084638054890403
           },
           {
             "valueCode": "domestic_bond",
             "valueName": "国内債券",
-            "marketValueMinor": 2601,
-            "ratio": 0.05855206879474134
+            "marketValueMinor": 1156,
+            "ratio": 0.02661631976422914
           },
           {
             "valueCode": "developed_bond",
             "valueName": "先進国債券",
-            "marketValueMinor": 3839,
-            "ratio": 0.08642114267705191
+            "marketValueMinor": 2503,
+            "ratio": 0.057630318659053235
           },
           {
             "valueCode": "high_yield_bond",
             "valueName": "ハイ・イールド債券",
-            "marketValueMinor": 942,
-            "ratio": 0.021205708882985907
+            "marketValueMinor": 470,
+            "ratio": 0.010821514090992817
           },
           {
             "valueCode": "emerging_bond",
             "valueName": "新興国債券",
-            "marketValueMinor": 2178,
-            "ratio": 0.049029760028814554
+            "marketValueMinor": 726,
+            "ratio": 0.01671578559587401
           },
           {
             "valueCode": "domestic_reit",
             "valueName": "国内REIT",
-            "marketValueMinor": 3335,
-            "ratio": 0.07507541308360723
+            "marketValueMinor": 1048,
+            "ratio": 0.024129673973107387
           },
           {
             "valueCode": "foreign_reit",
             "valueName": "海外REIT",
-            "marketValueMinor": 2413,
-            "ratio": 0.05431993156544055
+            "marketValueMinor": 834,
+            "ratio": 0.019202431386995764
           },
           {
             "valueCode": "commodity",
             "valueName": "コモディティ",
-            "marketValueMinor": 785,
-            "ratio": 0.017671424069154923
-          },
-          {
-            "valueCode": "other",
-            "valueName": "その他資産",
-            "marketValueMinor": 990,
-            "ratio": 0.022286254558552068
+            "marketValueMinor": 391,
+            "ratio": 0.009002578743783386
           }
         ],
         "__portfolio_instruments__": [
@@ -711,62 +729,74 @@
           {
             "valueCode": "income",
             "valueName": "インカム",
-            "marketValueMinor": 17689,
-            "ratio": 0.3572741410999576
+            "marketValueMinor": 13504,
+            "ratio": 0.2727474702591343
+          },
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 3909,
+            "ratio": 0.07895215204701986
           },
           {
             "valueCode": "growth",
             "valueName": "成長",
-            "marketValueMinor": 5173,
-            "ratio": 0.10448183232009048
+            "marketValueMinor": 6155,
+            "ratio": 0.12431580860818808
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 13847,
+            "ratio": 0.27967522368766534
           },
           {
             "valueCode": "emerging_equity",
             "valueName": "新興国株式",
-            "marketValueMinor": 7091,
-            "ratio": 0.14322069843065177
+            "marketValueMinor": 3201,
+            "ratio": 0.06465229948900245
           },
           {
             "valueCode": "domestic_bond",
             "valueName": "国内債券",
-            "marketValueMinor": 2685,
-            "ratio": 0.05423037304841349
+            "marketValueMinor": 1199,
+            "ratio": 0.024216840702066207
           },
           {
             "valueCode": "developed_bond",
             "valueName": "先進国債券",
-            "marketValueMinor": 6756,
-            "ratio": 0.1364545252570136
+            "marketValueMinor": 3952,
+            "ratio": 0.07982064591706893
           },
           {
             "valueCode": "high_yield_bond",
             "valueName": "ハイ・イールド債券",
-            "marketValueMinor": 929,
-            "ratio": 0.01876350709943245
+            "marketValueMinor": 464,
+            "ratio": 0.009371654783785422
           },
           {
             "valueCode": "emerging_bond",
             "valueName": "新興国債券",
-            "marketValueMinor": 2251,
-            "ratio": 0.04546464422047626
+            "marketValueMinor": 770,
+            "ratio": 0.015552099533437015
           },
           {
             "valueCode": "domestic_reit",
             "valueName": "国内REIT",
-            "marketValueMinor": 3349,
-            "ratio": 0.06764153420452021
+            "marketValueMinor": 1064,
+            "ratio": 0.021490173900749327
           },
           {
             "valueCode": "foreign_reit",
             "valueName": "海外REIT",
-            "marketValueMinor": 2592,
-            "ratio": 0.05235200258528408
+            "marketValueMinor": 949,
+            "ratio": 0.01916745773666458
           },
           {
             "valueCode": "commodity",
             "valueName": "コモディティ",
-            "marketValueMinor": 996,
-            "ratio": 0.020116741734160084
+            "marketValueMinor": 497,
+            "ratio": 0.010038173335218436
           }
         ],
         "__portfolio_instruments__": [
@@ -1129,68 +1159,74 @@
           {
             "valueCode": "income",
             "valueName": "インカム",
-            "marketValueMinor": 18278,
-            "ratio": 0.3611824684819982
+            "marketValueMinor": 13820,
+            "ratio": 0.2735875202914044
+          },
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 3968,
+            "ratio": 0.07855248050045532
           },
           {
             "valueCode": "growth",
             "valueName": "成長",
-            "marketValueMinor": 5301,
-            "ratio": 0.10475042485080821
+            "marketValueMinor": 6293,
+            "ratio": 0.12457932454369086
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 14220,
+            "ratio": 0.28150611711604706
           },
           {
             "valueCode": "emerging_equity",
             "valueName": "新興国株式",
-            "marketValueMinor": 7418,
-            "ratio": 0.14658340908192705
+            "marketValueMinor": 3358,
+            "ratio": 0.06647662034287524
           },
           {
             "valueCode": "domestic_bond",
             "valueName": "国内債券",
-            "marketValueMinor": 2705,
-            "ratio": 0.0534521598229459
+            "marketValueMinor": 1209,
+            "ratio": 0.02393395890248248
           },
           {
             "valueCode": "developed_bond",
             "valueName": "先進国債券",
-            "marketValueMinor": 6737,
-            "ratio": 0.13312650673833143
+            "marketValueMinor": 3948,
+            "ratio": 0.07815655065922318
           },
           {
             "valueCode": "high_yield_bond",
             "valueName": "ハイ・イールド債券",
-            "marketValueMinor": 921,
-            "ratio": 0.01819942299332095
+            "marketValueMinor": 460,
+            "ratio": 0.009106386348339074
           },
           {
             "valueCode": "emerging_bond",
             "valueName": "新興国債券",
-            "marketValueMinor": 2261,
-            "ratio": 0.044678496620954036
+            "marketValueMinor": 768,
+            "ratio": 0.015203705903313932
           },
           {
             "valueCode": "domestic_reit",
             "valueName": "国内REIT",
-            "marketValueMinor": 3320,
-            "ratio": 0.06560486898786705
+            "marketValueMinor": 1043,
+            "ratio": 0.02064774122025577
           },
           {
             "valueCode": "foreign_reit",
             "valueName": "海外REIT",
-            "marketValueMinor": 2583,
-            "ratio": 0.051041378492668855
+            "marketValueMinor": 933,
+            "ratio": 0.018470127093479036
           },
           {
             "valueCode": "commodity",
             "valueName": "コモディティ",
-            "marketValueMinor": 990,
-            "ratio": 0.019562897680116983
-          },
-          {
-            "valueCode": "short_term",
-            "valueName": "短期金融資産",
-            "marketValueMinor": 92,
-            "ratio": 0.0018179662490613762
+            "marketValueMinor": 494,
+            "ratio": 0.009779467078433702
           }
         ],
         "__portfolio_instruments__": [
@@ -1560,62 +1596,74 @@
           {
             "valueCode": "income",
             "valueName": "インカム",
-            "marketValueMinor": 20592,
-            "ratio": 0.3752733634640618
+            "marketValueMinor": 15581,
+            "ratio": 0.2839517422364776
+          },
+          {
+            "valueCode": "domestic_equity",
+            "valueName": "国内株式",
+            "marketValueMinor": 4483,
+            "ratio": 0.08169922729260826
           },
           {
             "valueCode": "growth",
             "valueName": "成長",
-            "marketValueMinor": 5330,
-            "ratio": 0.09713515089663216
+            "marketValueMinor": 6616,
+            "ratio": 0.12057151188219857
+          },
+          {
+            "valueCode": "developed_equity",
+            "valueName": "先進国株式",
+            "marketValueMinor": 14972,
+            "ratio": 0.27285318559556787
           },
           {
             "valueCode": "emerging_equity",
             "valueName": "新興国株式",
-            "marketValueMinor": 8756,
-            "ratio": 0.15957136608835107
+            "marketValueMinor": 4004,
+            "ratio": 0.07296982067356758
           },
           {
             "valueCode": "domestic_bond",
             "valueName": "国内債券",
-            "marketValueMinor": 3010,
-            "ratio": 0.05485493512173786
+            "marketValueMinor": 1360,
+            "ratio": 0.024784954074938036
           },
           {
             "valueCode": "developed_bond",
             "valueName": "先進国債券",
-            "marketValueMinor": 6703,
-            "ratio": 0.12215701997375711
+            "marketValueMinor": 3931,
+            "ratio": 0.0716394518151334
           },
           {
             "valueCode": "high_yield_bond",
             "valueName": "ハイ・イールド債券",
-            "marketValueMinor": 933,
-            "ratio": 0.017003207464644992
+            "marketValueMinor": 465,
+            "ratio": 0.008474267385916315
           },
           {
             "valueCode": "emerging_bond",
             "valueName": "新興国債券",
-            "marketValueMinor": 2371,
-            "ratio": 0.043209651552704474
+            "marketValueMinor": 825,
+            "ratio": 0.015034990523399912
           },
           {
             "valueCode": "domestic_reit",
             "valueName": "国内REIT",
-            "marketValueMinor": 3319,
-            "ratio": 0.060486222481411285
+            "marketValueMinor": 1043,
+            "ratio": 0.01900787286776498
           },
           {
             "valueCode": "foreign_reit",
             "valueName": "海外REIT",
-            "marketValueMinor": 2799,
-            "ratio": 0.05100962239393498
+            "marketValueMinor": 1064,
+            "ratio": 0.019390581717451522
           },
           {
             "valueCode": "commodity",
             "valueName": "コモディティ",
-            "marketValueMinor": 1059,
-            "ratio": 0.019299460562764253
+            "marketValueMinor": 528,
+            "ratio": 0.009622393934975944
           }
         ],
         "__portfolio_instruments__": [

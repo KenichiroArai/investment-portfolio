@@ -21,16 +21,15 @@ import { AnalysisPanelSummary } from "@/features/analysis/AnalysisPanelSummary";
 import { AllocationDetailPanel } from "@/features/allocation/AllocationDetailPanel";
 import { AllocationPeriodShareSummary } from "@/features/allocation/AllocationPeriodShareSummary";
 import { AllocationSnapshotPanel } from "@/features/allocation/AllocationSnapshotPanel";
-import {
-  AllocationHierarchyControls,
-  mergeClassificationLinks,
-} from "@/features/allocation/AllocationHierarchyControls";
+import { mergeClassificationLinks } from "@/features/allocation/AllocationHierarchyControls";
 import { buildAllocationRebalanceDisplayRows } from "@/features/allocation/build-allocation-rebalance-display-rows";
-import { buildSchemeAllocationWithHierarchy } from "@/features/allocation/build-scheme-allocation-with-hierarchy";
+import {
+  buildChildAllocationSlicesByParentId,
+  buildSchemeAllocationWithHierarchy,
+} from "@/features/allocation/build-scheme-allocation-with-hierarchy";
 import { RebalanceSettingsCard } from "@/features/allocation/RebalanceSettingsCard";
 import { RebalanceTradesSummary } from "@/features/allocation/RebalanceTradesSummary";
 import { TargetAllocationEditCard } from "@/features/allocation/TargetAllocationEditCard";
-import { useAllocationHierarchyParam } from "@/features/allocation/useAllocationHierarchyParam";
 import { buildClassificationDescriptionByCode } from "@/components/classification-value-label";
 import { useAllocationSchemeParam } from "@/features/allocation/useAllocationSchemeParam";
 import { useRebalanceDeposit } from "@/features/allocation/useRebalanceDeposit";
@@ -185,7 +184,6 @@ export function AnalysisView({
   const { activeSchemeCode, setActiveSchemeCode } = useAllocationSchemeParam({
     schemeCodes,
   });
-  const { parentValueId, setParentValueId } = useAllocationHierarchyParam();
 
   const activeClassificationScheme =
     classificationSchemes.find((scheme) => scheme.code === activeSchemeCode) ?? null;
@@ -203,20 +201,6 @@ export function AnalysisView({
     );
     return result;
   }, [activeClassificationScheme]);
-  const drillDownValueIds = useMemo(() => {
-    let result = new Set<string>();
-    for (const value of activeClassificationScheme?.values ?? []) {
-      if ((value.childIds?.length ?? 0) === 0) {
-        continue;
-      }
-      // ドリルダウン中の親は残差行として並ぶため、自分自身への再ドリルダウンは無効にする
-      if (value.id === parentValueId) {
-        continue;
-      }
-      result.add(value.id);
-    }
-    return result;
-  }, [activeClassificationScheme, parentValueId]);
 
   const trendPeriodSummaryData = useTrendPeriodSummaryData({
     mode: "allocation",
@@ -337,7 +321,7 @@ export function AnalysisView({
       schemeCode: scheme.schemeCode,
       schemeName: scheme.schemeName,
       classificationSchemes,
-      parentValueId,
+      parentValueId: null,
     });
     return result;
   };
@@ -358,10 +342,7 @@ export function AnalysisView({
       : "構成単位の売買を、各構成内の現状比率で銘柄に按分して表示します。";
     const schemeValues =
       classificationSchemes.find((item) => item.code === scheme.schemeCode)?.values ?? [];
-    const classificationValues = resolveTargetAllocationValues(
-      schemeValues,
-      parentValueId,
-    );
+    const classificationValues = resolveTargetAllocationValues(schemeValues);
 
     let content = (
       <div className="space-y-6">
@@ -424,6 +405,13 @@ export function AnalysisView({
       schemeAllocation.slices,
       gapRows,
     );
+    const childSlicesByParentValueId = buildChildAllocationSlicesByParentId({
+      lines: snapshot.lines,
+      schemeCode: scheme.schemeCode,
+      schemeName: scheme.schemeName,
+      classificationSchemes,
+      rootTotalMarketValueMinor: schemeAllocation.totalMarketValueMinor,
+    });
 
     let content = (
       <AllocationSnapshotPanel
@@ -433,15 +421,12 @@ export function AnalysisView({
         asOfDate={asOfDate}
         valueIdByCode={valueIdByCode}
         descriptionByValueCode={descriptionByValueCode}
-        drillDownValueIds={drillDownValueIds}
-        onDrillDown={setParentValueId}
-        hierarchyControls={
+        childSlicesByParentValueId={childSlicesByParentValueId}
+        hierarchyNote={
           hasHierarchy ? (
-            <AllocationHierarchyControls
-              activeScheme={activeClassificationScheme}
-              parentValueId={parentValueId}
-              onParentChange={setParentValueId}
-            />
+            <p className="text-sm text-muted-foreground">
+              親分類ごとの構成比を表示しています。分類名の矢印から子分類を展開できます。
+            </p>
           ) : null
         }
       />
@@ -533,18 +518,8 @@ export function AnalysisView({
 
 function resolveTargetAllocationValues(
   values: ClassificationValueDto[],
-  parentValueId: string | null,
 ): ClassificationValueDto[] {
   let result: ClassificationValueDto[] = [];
-
-  if (parentValueId) {
-    // 親自身は残差行として表示されるだけなので、目標設定の対象は直下の子に限る
-    result = values.filter((value) =>
-      (value.parentIds ?? []).includes(parentValueId),
-    );
-    return result;
-  }
-
   result = values.filter((value) => (value.parentIds?.length ?? 0) === 0);
   return result;
 }

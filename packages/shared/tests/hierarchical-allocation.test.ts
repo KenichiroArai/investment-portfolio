@@ -586,6 +586,202 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
     expect(child?.isParentResidual).toBe(false);
   });
 
+  it("folds parent residual into tagged children on drilldown when both coexist", () => {
+    const multiParentValues = [
+      {
+        id: "parent-a",
+        code: "parent_a",
+        name: "親A",
+        sortOrder: 1,
+        schemeId: "scheme-a",
+        schemeCode: "asset_class",
+      },
+      {
+        id: "parent-b",
+        code: "parent_b",
+        name: "親B",
+        sortOrder: 2,
+        schemeId: "scheme-a",
+        schemeCode: "asset_class",
+      },
+      {
+        id: "shared-leaf",
+        code: "shared_leaf",
+        name: "共有葉",
+        sortOrder: 1,
+        schemeId: "scheme-a",
+        schemeCode: "asset_class",
+      },
+    ];
+    const multiParentLinks = [
+      { parentValueId: "parent-a", childValueId: "shared-leaf", sortOrder: 1 },
+      { parentValueId: "parent-b", childValueId: "shared-leaf", sortOrder: 1 },
+    ];
+    const lines = [
+      makeTaggedLine(1_000_000, [
+        {
+          schemeCode: "asset_class",
+          schemeName: "資産クラス",
+          valueCode: "parent_a",
+          valueName: "親A",
+          allocationWeight: 0.5,
+        },
+        {
+          schemeCode: "asset_class",
+          schemeName: "資産クラス",
+          valueCode: "shared_leaf",
+          valueName: "共有葉",
+          allocationWeight: 0.5,
+        },
+      ]),
+    ];
+    const allocation = buildHierarchicalAllocationBySchemeWithLines(
+      lines,
+      "asset_class",
+      "資産クラス",
+      {
+        parentValueId: "parent-a",
+        links: multiParentLinks,
+        schemeValues: multiParentValues,
+        schemeId: "scheme-a",
+      },
+    );
+
+    expect(allocation.slices.map((slice) => slice.valueCode)).toEqual(["shared_leaf"]);
+    expect(allocation.slices[0]?.marketValueMinor).toBe(1_000_000);
+    expect(allocation.slices[0]?.isParentResidual).toBe(false);
+    expect(
+      allocation.slices.some((slice) => slice.isParentResidual === true),
+    ).toBe(false);
+  });
+
+  it("keeps drilldown child totals aligned with the root parent amount", () => {
+    const multiParentValues = [
+      {
+        id: "parent-a",
+        code: "parent_a",
+        name: "親A",
+        sortOrder: 1,
+        schemeId: "scheme-a",
+        schemeCode: "asset_class",
+      },
+      {
+        id: "parent-b",
+        code: "parent_b",
+        name: "親B",
+        sortOrder: 2,
+        schemeId: "scheme-a",
+        schemeCode: "asset_class",
+      },
+      {
+        id: "income",
+        code: "income",
+        name: "インカム",
+        sortOrder: 1,
+        schemeId: "scheme-a",
+        schemeCode: "asset_class",
+      },
+      {
+        id: "growth",
+        code: "growth",
+        name: "成長",
+        sortOrder: 2,
+        schemeId: "scheme-a",
+        schemeCode: "asset_class",
+      },
+    ];
+    const multiParentLinks = [
+      { parentValueId: "parent-a", childValueId: "income", sortOrder: 1 },
+      { parentValueId: "parent-a", childValueId: "growth", sortOrder: 2 },
+      { parentValueId: "parent-b", childValueId: "income", sortOrder: 1 },
+      { parentValueId: "parent-b", childValueId: "growth", sortOrder: 2 },
+    ];
+    const lines = [
+      makeTaggedLine(600_000, [
+        {
+          schemeCode: "asset_class",
+          schemeName: "資産クラス",
+          valueCode: "parent_a",
+          valueName: "親A",
+          allocationWeight: 1,
+        },
+        {
+          schemeCode: "asset_class",
+          schemeName: "資産クラス",
+          valueCode: "income",
+          valueName: "インカム",
+          allocationWeight: 1,
+        },
+      ]),
+      makeTaggedLine(400_000, [
+        {
+          schemeCode: "asset_class",
+          schemeName: "資産クラス",
+          valueCode: "parent_a",
+          valueName: "親A",
+          allocationWeight: 1,
+        },
+        {
+          schemeCode: "asset_class",
+          schemeName: "資産クラス",
+          valueCode: "growth",
+          valueName: "成長",
+          allocationWeight: 1,
+        },
+      ]),
+      // 他親向けの共有葉のみ → 親Aのドリルダウンには入れない
+      makeTaggedLine(900_000, [
+        {
+          schemeCode: "asset_class",
+          schemeName: "資産クラス",
+          valueCode: "parent_b",
+          valueName: "親B",
+          allocationWeight: 1,
+        },
+        {
+          schemeCode: "asset_class",
+          schemeName: "資産クラス",
+          valueCode: "income",
+          valueName: "インカム",
+          allocationWeight: 1,
+        },
+      ]),
+    ];
+
+    const rootAllocation = buildHierarchicalAllocationBySchemeWithLines(
+      lines,
+      "asset_class",
+      "資産クラス",
+      {
+        links: multiParentLinks,
+        schemeValues: multiParentValues,
+        schemeId: "scheme-a",
+      },
+    );
+    const parentARoot = rootAllocation.slices.find((slice) => slice.valueCode === "parent_a");
+    expect(parentARoot?.marketValueMinor).toBe(1_000_000);
+
+    const drilledAllocation = buildHierarchicalAllocationBySchemeWithLines(
+      lines,
+      "asset_class",
+      "資産クラス",
+      {
+        parentValueId: "parent-a",
+        links: multiParentLinks,
+        schemeValues: multiParentValues,
+        schemeId: "scheme-a",
+      },
+    );
+
+    expect(drilledAllocation.totalMarketValueMinor).toBe(1_000_000);
+    expect(
+      drilledAllocation.slices.map((slice) => [slice.valueCode, slice.marketValueMinor]),
+    ).toEqual([
+      ["income", 600_000],
+      ["growth", 400_000],
+    ]);
+  });
+
   it("leaves no residual once the parent weight has been moved to the child", () => {
     // 修復後のデータ形（親タグは付けず、子タグだけが重みを持つ）
     const lines = [
@@ -630,5 +826,194 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
     ]);
     expect(drilledAllocation.slices[0]?.marketValueMinor).toBe(1_000_000);
     expect(drilledAllocation.slices[0]?.weight).toBeCloseTo(1);
+  });
+
+  it("splits a multi-parent leaf equally across two covering parents", () => {
+    const multiParentValues = [
+      {
+        id: "parent-a",
+        code: "parent_a",
+        name: "親A",
+        sortOrder: 1,
+        schemeId: "scheme-a",
+        schemeCode: "asset_class",
+      },
+      {
+        id: "parent-b",
+        code: "parent_b",
+        name: "親B",
+        sortOrder: 2,
+        schemeId: "scheme-a",
+        schemeCode: "asset_class",
+      },
+      {
+        id: "shared-leaf",
+        code: "shared_leaf",
+        name: "共有葉",
+        sortOrder: 1,
+        schemeId: "scheme-a",
+        schemeCode: "asset_class",
+      },
+    ];
+    const multiParentLinks = [
+      { parentValueId: "parent-a", childValueId: "shared-leaf", sortOrder: 1 },
+      { parentValueId: "parent-b", childValueId: "shared-leaf", sortOrder: 1 },
+    ];
+    const lines = [makeHierarchyLine(1_000_000, "shared_leaf")];
+    const allocation = buildHierarchicalAllocationBySchemeWithLines(
+      lines,
+      "asset_class",
+      "資産クラス",
+      {
+        links: multiParentLinks,
+        schemeValues: multiParentValues,
+        schemeId: "scheme-a",
+      },
+    );
+
+    // 親タグ無しの共有葉はルートへ曖昧帰属させない
+    expect(allocation.slices).toEqual([]);
+    expect(allocation.totalMarketValueMinor).toBe(0);
+  });
+
+  it("attributes a multi-parent leaf to tagged parents only", () => {
+    const multiParentValues = [
+      {
+        id: "parent-a",
+        code: "parent_a",
+        name: "親A",
+        sortOrder: 1,
+        schemeId: "scheme-a",
+        schemeCode: "asset_class",
+      },
+      {
+        id: "parent-b",
+        code: "parent_b",
+        name: "親B",
+        sortOrder: 2,
+        schemeId: "scheme-a",
+        schemeCode: "asset_class",
+      },
+      {
+        id: "shared-leaf",
+        code: "shared_leaf",
+        name: "共有葉",
+        sortOrder: 1,
+        schemeId: "scheme-a",
+        schemeCode: "asset_class",
+      },
+    ];
+    const multiParentLinks = [
+      { parentValueId: "parent-a", childValueId: "shared-leaf", sortOrder: 1 },
+      { parentValueId: "parent-b", childValueId: "shared-leaf", sortOrder: 1 },
+    ];
+    const lines = [
+      makeTaggedLine(1_000_000, [
+        {
+          schemeCode: "asset_class",
+          schemeName: "資産クラス",
+          valueCode: "parent_a",
+          valueName: "親A",
+          allocationWeight: 1,
+        },
+        {
+          schemeCode: "asset_class",
+          schemeName: "資産クラス",
+          valueCode: "shared_leaf",
+          valueName: "共有葉",
+          allocationWeight: 1,
+        },
+      ]),
+    ];
+    const allocation = buildHierarchicalAllocationBySchemeWithLines(
+      lines,
+      "asset_class",
+      "資産クラス",
+      {
+        links: multiParentLinks,
+        schemeValues: multiParentValues,
+        schemeId: "scheme-a",
+      },
+    );
+
+    expect(allocation.totalMarketValueMinor).toBe(1_000_000);
+    expect(allocation.slices.map((slice) => slice.valueCode)).toEqual(["parent_a"]);
+    expect(allocation.slices[0]?.weight).toBeCloseTo(1);
+  });
+
+  it("splits a multi-parent leaf across multiple tagged parents without double counting", () => {
+    const multiParentValues = [
+      {
+        id: "parent-a",
+        code: "parent_a",
+        name: "親A",
+        sortOrder: 1,
+        schemeId: "scheme-a",
+        schemeCode: "asset_class",
+      },
+      {
+        id: "parent-b",
+        code: "parent_b",
+        name: "親B",
+        sortOrder: 2,
+        schemeId: "scheme-a",
+        schemeCode: "asset_class",
+      },
+      {
+        id: "shared-leaf",
+        code: "shared_leaf",
+        name: "共有葉",
+        sortOrder: 1,
+        schemeId: "scheme-a",
+        schemeCode: "asset_class",
+      },
+    ];
+    const multiParentLinks = [
+      { parentValueId: "parent-a", childValueId: "shared-leaf", sortOrder: 1 },
+      { parentValueId: "parent-b", childValueId: "shared-leaf", sortOrder: 1 },
+    ];
+    const lines = [
+      makeTaggedLine(1_200_000, [
+        {
+          schemeCode: "asset_class",
+          schemeName: "資産クラス",
+          valueCode: "parent_a",
+          valueName: "親A",
+          allocationWeight: 1,
+        },
+        {
+          schemeCode: "asset_class",
+          schemeName: "資産クラス",
+          valueCode: "parent_b",
+          valueName: "親B",
+          allocationWeight: 1,
+        },
+        {
+          schemeCode: "asset_class",
+          schemeName: "資産クラス",
+          valueCode: "shared_leaf",
+          valueName: "共有葉",
+          allocationWeight: 1,
+        },
+      ]),
+    ];
+    const allocation = buildHierarchicalAllocationBySchemeWithLines(
+      lines,
+      "asset_class",
+      "資産クラス",
+      {
+        links: multiParentLinks,
+        schemeValues: multiParentValues,
+        schemeId: "scheme-a",
+      },
+    );
+
+    expect(allocation.totalMarketValueMinor).toBe(1_200_000);
+    expect(
+      allocation.slices.map((slice) => [slice.valueCode, slice.marketValueMinor]),
+    ).toEqual([
+      ["parent_a", 600_000],
+      ["parent_b", 600_000],
+    ]);
   });
 });

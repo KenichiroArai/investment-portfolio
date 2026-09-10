@@ -577,6 +577,52 @@ describe("resolveHierarchyTagWeights", () => {
     expect(resolved).toEqual([{ valueId: "income", weight: 0.5 }]);
   });
 
+  it("keeps parent tags when the child is a shared multi-parent leaf", () => {
+    const sharedLeafValues = [
+      {
+        id: "parent-a",
+        code: "parent_a",
+        name: "親A",
+        sortOrder: 1,
+        schemeId: schemeA,
+        schemeCode: "asset_class",
+      },
+      {
+        id: "parent-b",
+        code: "parent_b",
+        name: "親B",
+        sortOrder: 2,
+        schemeId: schemeA,
+        schemeCode: "asset_class",
+      },
+      {
+        id: "shared-leaf",
+        code: "shared_leaf",
+        name: "共有葉",
+        sortOrder: 1,
+        schemeId: schemeA,
+        schemeCode: "asset_class",
+      },
+    ];
+    const sharedLeafLinks = [
+      { parentValueId: "parent-a", childValueId: "shared-leaf", sortOrder: 1 },
+      { parentValueId: "parent-b", childValueId: "shared-leaf", sortOrder: 1 },
+    ];
+    const sharedGraph = buildClassificationGraph(sharedLeafValues, sharedLeafLinks);
+    const resolved = resolveHierarchyTagWeights(
+      [
+        { valueId: "parent-a", weight: 0.5 },
+        { valueId: "shared-leaf", weight: 0.5 },
+      ],
+      sharedGraph,
+    );
+
+    expect(resolved).toEqual([
+      { valueId: "parent-a", weight: 0.5 },
+      { valueId: "shared-leaf", weight: 0.5 },
+    ]);
+  });
+
   it("keeps sibling weights untouched when repairing one branch", () => {
     const resolved = resolveHierarchyTagWeights(
       [

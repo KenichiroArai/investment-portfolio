@@ -7,6 +7,7 @@ import {
   createClassificationValue,
   getTagsForInstruments,
   setInstrumentClassificationsWithWeights,
+  type InstrumentClassificationWeightInput,
 } from "../src/repositories/classifications";
 import { createInstrument } from "../src/repositories/instruments";
 import { createPortfolio } from "../src/repositories/portfolios";
@@ -74,6 +75,29 @@ describe("repairInstrumentClassificationHierarchy", () => {
     return result;
   }
 
+  /** 階層正規化を迂回し、親+子併存の壊れたデータを用意する */
+  async function insertRawInstrumentClassifications(
+    db: ReturnType<typeof setup>,
+    instrumentId: string,
+    weights: InstrumentClassificationWeightInput[],
+  ) {
+    let result: void = undefined;
+    await db
+      .delete(instrumentClassifications)
+      .where(eq(instrumentClassifications.instrumentId, instrumentId));
+    if (weights.length === 0) {
+      return result;
+    }
+    await db.insert(instrumentClassifications).values(
+      weights.map((weight) => ({
+        instrumentId,
+        classificationValueId: weight.classificationValueId,
+        allocationWeight: weight.allocationWeight,
+      })),
+    );
+    return result;
+  }
+
   it("moves the parent tag weight onto the child tag", async () => {
     const db = setup();
     const values = await seedAssetClassScheme(db);
@@ -82,7 +106,7 @@ describe("repairInstrumentClassificationHierarchy", () => {
       name: "ＳＢＩ日本高配当株式（分配）ファンド",
     });
 
-    await setInstrumentClassificationsWithWeights(db, fund.id, [
+    await insertRawInstrumentClassifications(db, fund.id, [
       { classificationValueId: values.domesticEquity.id, allocationWeight: 0.5 },
       { classificationValueId: values.income.id, allocationWeight: 0.5 },
     ]);
@@ -103,7 +127,7 @@ describe("repairInstrumentClassificationHierarchy", () => {
       name: "ｅＭＡＸＩＳ Ｓｌｉｍ バランス",
     });
 
-    await setInstrumentClassificationsWithWeights(db, fund.id, [
+    await insertRawInstrumentClassifications(db, fund.id, [
       { classificationValueId: values.domesticEquity.id, allocationWeight: 1 / 3 },
       { classificationValueId: values.growth.id, allocationWeight: 1 / 3 },
       { classificationValueId: values.developedEquity.id, allocationWeight: 1 / 3 },
@@ -129,7 +153,7 @@ describe("repairInstrumentClassificationHierarchy", () => {
       name: "重み未設定ファンド",
     });
 
-    await setInstrumentClassificationsWithWeights(db, fund.id, [
+    await insertRawInstrumentClassifications(db, fund.id, [
       { classificationValueId: values.domesticEquity.id, allocationWeight: 1 },
       { classificationValueId: values.growth.id, allocationWeight: 1 },
     ]);
@@ -163,11 +187,34 @@ describe("repairInstrumentClassificationHierarchy", () => {
       movedTagCount: 0,
     });
 
-    await setInstrumentClassificationsWithWeights(db, fund.id, [
+    await insertRawInstrumentClassifications(db, fund.id, [
       { classificationValueId: values.domesticEquity.id, allocationWeight: 0.5 },
       { classificationValueId: values.income.id, allocationWeight: 0.5 },
     ]);
     await repairInstrumentClassificationHierarchy(db);
+
+    expect(await repairInstrumentClassificationHierarchy(db)).toEqual({
+      repairedInstrumentCount: 0,
+      movedTagCount: 0,
+    });
+  });
+
+  it("normalizes parent+child on setInstrumentClassificationsWithWeights", async () => {
+    const db = setup();
+    const values = await seedAssetClassScheme(db);
+    const fund = await createInstrument(db, {
+      portfolioCode: "monex",
+      name: "保存時正規化ファンド",
+    });
+
+    await setInstrumentClassificationsWithWeights(db, fund.id, [
+      { classificationValueId: values.domesticEquity.id, allocationWeight: 0.5 },
+      { classificationValueId: values.income.id, allocationWeight: 0.5 },
+    ]);
+
+    const tags = (await getTagsForInstruments(db, [fund.id])).get(fund.id) ?? [];
+    expect(tags.map((tag) => tag.valueCode)).toEqual(["income"]);
+    expect(tags[0]?.allocationWeight).toBe(1);
 
     expect(await repairInstrumentClassificationHierarchy(db)).toEqual({
       repairedInstrumentCount: 0,

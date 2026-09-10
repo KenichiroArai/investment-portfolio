@@ -2,6 +2,7 @@ import {
   applyMonexAssetClassWeights,
   addClassificationLink,
   addClassificationValueToInstruments,
+  removeClassificationValueFromInstruments,
   copyClassificationValue,
   createClassificationScheme,
   createClassificationValue,
@@ -453,6 +454,33 @@ export function createApp(options?: CreateAppOptions) {
     }
 
     const updated = await addClassificationValueToInstruments(
+      db,
+      valueId,
+      parsed.data.instrumentIds,
+    );
+    result = c.json({ ok: true, updated });
+    return result;
+  });
+
+  app.post("/classification-values/:id/remove-instruments", async (c) => {
+    let result!: Response;
+
+    const body = await c.req.json();
+    const parsed = addClassificationValueInstrumentsSchema.safeParse(body);
+    if (!parsed.success) {
+      result = c.json({ error: parsed.error.flatten() }, 400);
+      return result;
+    }
+
+    const valueId = c.req.param("id");
+    const db = resolveDb();
+    const value = await findClassificationValueById(db, valueId);
+    if (!value) {
+      result = c.json({ error: "Classification value not found" }, 404);
+      return result;
+    }
+
+    const updated = await removeClassificationValueFromInstruments(
       db,
       valueId,
       parsed.data.instrumentIds,
