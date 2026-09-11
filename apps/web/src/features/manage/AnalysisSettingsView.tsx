@@ -3,6 +3,7 @@
 import type {
   ClassificationSchemeWithValuesDto,
   CopyClassificationMode,
+  CopyClassificationSchemeInput,
   InstrumentListItemDto,
 } from "@repo/shared";
 import Link from "next/link";
@@ -26,6 +27,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -50,6 +58,7 @@ import { SchemeInstrumentTagPanel } from "@/features/manage/SchemeInstrumentTagP
 import {
   addInstrumentsToClassificationValue,
   removeInstrumentsFromClassificationValue,
+  copyClassificationScheme,
   copyClassificationValue,
   createClassificationScheme,
   createClassificationValue,
@@ -105,6 +114,12 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
   const [instrumentTagMap, setInstrumentTagMap] = useState<Record<string, string[]>>({});
   const [deleteSchemeId, setDeleteSchemeId] = useState<string | null>(null);
   const [deleteValueId, setDeleteValueId] = useState<string | null>(null);
+  const [copySchemeTarget, setCopySchemeTarget] =
+    useState<ClassificationSchemeWithValuesDto | null>(null);
+  const [copySchemeCode, setCopySchemeCode] = useState("");
+  const [copySchemeName, setCopySchemeName] = useState("");
+  const [copySchemeHierarchy, setCopySchemeHierarchy] =
+    useState<CopyClassificationSchemeInput["hierarchy"]>("as_is");
 
   const onTabValueChange = useCallback(
     (nextTab: string) => {
@@ -306,6 +321,41 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
 
     setDeleteSchemeId(null);
     toast.success("分析軸を削除しました。");
+    await load();
+    return result;
+  }
+
+  function openCopySchemeDialog(scheme: ClassificationSchemeWithValuesDto) {
+    let result: void = undefined;
+    setCopySchemeTarget(scheme);
+    setCopySchemeCode(`${scheme.code}_copy`);
+    setCopySchemeName(`${scheme.name}（コピー）`);
+    setCopySchemeHierarchy("as_is");
+    return result;
+  }
+
+  async function handleCopyScheme(event: React.FormEvent) {
+    let result: void = undefined;
+    event.preventDefault();
+    if (!copySchemeTarget) {
+      return result;
+    }
+
+    setSubmitting(true);
+    const response = await copyClassificationScheme(copySchemeTarget.id, {
+      code: copySchemeCode.trim(),
+      name: copySchemeName.trim(),
+      hierarchy: copySchemeHierarchy,
+    });
+    setSubmitting(false);
+
+    if (!response.ok) {
+      toast.error(response.message);
+      return result;
+    }
+
+    setCopySchemeTarget(null);
+    toast.success("分析軸をコピーしました。");
     await load();
     return result;
   }
@@ -609,6 +659,9 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
                             onSave={(name) => {
                               void handleRenameScheme(scheme.id, name);
                             }}
+                            onCopy={() => {
+                              openCopySchemeDialog(scheme);
+                            }}
                             onDelete={() => {
                               setDeleteSchemeId(scheme.id);
                             }}
@@ -827,6 +880,76 @@ export function AnalysisSettingsView({ portfolioCode, initialTab }: AnalysisSett
               </AlertDialogContent>
             </AlertDialog>
 
+            <Dialog
+              open={copySchemeTarget !== null}
+              onOpenChange={(open) => {
+                if (!open) {
+                  setCopySchemeTarget(null);
+                }
+              }}
+            >
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>分析軸をコピー</DialogTitle>
+                </DialogHeader>
+                <form className="space-y-4" onSubmit={handleCopyScheme}>
+                  <FormField label="軸コード" htmlFor="copy-scheme-code">
+                    <Input
+                      id="copy-scheme-code"
+                      value={copySchemeCode}
+                      onChange={(event) => {
+                        setCopySchemeCode(event.target.value);
+                      }}
+                      required
+                    />
+                  </FormField>
+                  <FormField label="軸名" htmlFor="copy-scheme-name">
+                    <Input
+                      id="copy-scheme-name"
+                      value={copySchemeName}
+                      onChange={(event) => {
+                        setCopySchemeName(event.target.value);
+                      }}
+                      required
+                    />
+                  </FormField>
+                  <FormField label="階層の向き" htmlFor="copy-scheme-hierarchy">
+                    <Select
+                      value={copySchemeHierarchy}
+                      onValueChange={(value) => {
+                        if (value === "as_is" || value === "inverted") {
+                          setCopySchemeHierarchy(value);
+                        }
+                      }}
+                    >
+                      <SelectTrigger id="copy-scheme-hierarchy">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="as_is">そのまま</SelectItem>
+                        <SelectItem value="inverted">逆方向（親と子を入れ替え）</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormField>
+                  <DialogFooter>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      disabled={submitting}
+                      onClick={() => {
+                        setCopySchemeTarget(null);
+                      }}
+                    >
+                      キャンセル
+                    </Button>
+                    <Button type="submit" disabled={submitting}>
+                      コピー
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+
             <AlertDialog
               open={deleteValueId !== null}
               onOpenChange={(open) => {
@@ -865,10 +988,11 @@ type SchemeTableRowProps = {
   scheme: ClassificationSchemeWithValuesDto;
   disabled: boolean;
   onSave: (name: string) => void;
+  onCopy: () => void;
   onDelete: () => void;
 };
 
-function SchemeTableRow({ scheme, disabled, onSave, onDelete }: SchemeTableRowProps) {
+function SchemeTableRow({ scheme, disabled, onSave, onCopy, onDelete }: SchemeTableRowProps) {
   const [name, setName] = useState(scheme.name);
 
   let result = (
@@ -895,6 +1019,9 @@ function SchemeTableRow({ scheme, disabled, onSave, onDelete }: SchemeTableRowPr
             }}
           >
             更新
+          </Button>
+          <Button type="button" size="sm" variant="secondary" disabled={disabled} onClick={onCopy}>
+            コピー
           </Button>
           <Button type="button" size="sm" variant="destructive" disabled={disabled} onClick={onDelete}>
             削除

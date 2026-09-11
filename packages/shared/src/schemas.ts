@@ -62,6 +62,12 @@ export const copyClassificationValueSchema = z.object({
   name: z.string().min(1).max(256).optional(),
 });
 
+export const copyClassificationSchemeSchema = z.object({
+  code: z.string().min(1).max(64),
+  name: z.string().min(1).max(256),
+  hierarchy: z.enum(["as_is", "inverted"]),
+});
+
 export const createInstrumentSchema = z.object({
   portfolioCode: z.string().min(1).max(64),
   accountId: z.string().min(1).max(128),
@@ -146,6 +152,9 @@ export type CreateClassificationSchemeInput = z.infer<
 >;
 export type UpdateClassificationSchemeInput = z.infer<
   typeof updateClassificationSchemeSchema
+>;
+export type CopyClassificationSchemeInput = z.infer<
+  typeof copyClassificationSchemeSchema
 >;
 export type CreateClassificationValueInput = z.infer<
   typeof createClassificationValueSchema

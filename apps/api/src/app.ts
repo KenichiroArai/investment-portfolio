@@ -4,6 +4,7 @@ import {
   addClassificationValueToInstruments,
   removeClassificationValueFromInstruments,
   copyClassificationValue,
+  copyClassificationScheme,
   createClassificationScheme,
   createClassificationValue,
   createPortfolio,
@@ -53,6 +54,7 @@ import {
   applyMonexAssetClassWeightsSchema,
   backupImportModeSchema,
   buildSnapshotTrends,
+  copyClassificationSchemeSchema,
   copyClassificationValueSchema,
   createClassificationSchemeSchema,
   createClassificationValueLinkSchema,
@@ -276,6 +278,34 @@ export function createApp(options?: CreateAppOptions) {
       code: scheme.code,
       name: parsed.data.name,
     });
+    return result;
+  });
+
+  app.post("/classification-schemes/:id/copy", async (c) => {
+    let result!: Response;
+
+    const body = await c.req.json();
+    const parsed = copyClassificationSchemeSchema.safeParse(body);
+    if (!parsed.success) {
+      result = c.json({ error: parsed.error.flatten() }, 400);
+      return result;
+    }
+
+    const schemeId = c.req.param("id");
+    const db = resolveDb();
+    const copyResult = await copyClassificationScheme(db, schemeId, parsed.data);
+    if (!copyResult.ok) {
+      result = c.json({ error: copyResult.reason }, 400);
+      return result;
+    }
+
+    result = c.json(
+      {
+        scheme: copyResult.scheme,
+        copiedValueIds: copyResult.copiedValueIds,
+      },
+      201,
+    );
     return result;
   });
 

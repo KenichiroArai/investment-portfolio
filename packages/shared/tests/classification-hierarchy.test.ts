@@ -15,6 +15,7 @@ import {
   getNearestTaggedDescendantIds,
   getRootValueIds,
   getTaggedAncestorValueIds,
+  invertClassificationLinks,
   isLeafValue,
   lineMatchesCrossSchemeChildFilter,
   lineMatchesDescendantFilter,
@@ -713,5 +714,82 @@ describe("resolveHierarchyTagWeights", () => {
       { valueId: "missing", weight: 0.5 },
       { valueId: "income", weight: 0.25 },
     ]);
+  });
+});
+
+describe("invertClassificationLinks", () => {
+  it("swaps parent and child for a two-level asset-class style hierarchy", () => {
+    const sourceLinks = [
+      { parentValueId: "domestic_equity", childValueId: "income", sortOrder: 0 },
+      { parentValueId: "domestic_equity", childValueId: "growth", sortOrder: 1 },
+      { parentValueId: "domestic_equity", childValueId: "blend", sortOrder: 2 },
+      { parentValueId: "developed_equity", childValueId: "income", sortOrder: 0 },
+      { parentValueId: "developed_equity", childValueId: "growth", sortOrder: 1 },
+      { parentValueId: "developed_equity", childValueId: "blend", sortOrder: 2 },
+    ];
+
+    const inverted = invertClassificationLinks(sourceLinks);
+    const graphValues = [
+      {
+        id: "domestic_equity",
+        code: "domestic_equity",
+        name: "国内株式",
+        sortOrder: 0,
+        schemeId: schemeA,
+        schemeCode: "asset_class",
+      },
+      {
+        id: "developed_equity",
+        code: "developed_equity",
+        name: "先進国株式",
+        sortOrder: 1,
+        schemeId: schemeA,
+        schemeCode: "asset_class",
+      },
+      {
+        id: "income",
+        code: "income",
+        name: "インカム",
+        sortOrder: 0,
+        schemeId: schemeA,
+        schemeCode: "asset_class",
+      },
+      {
+        id: "growth",
+        code: "growth",
+        name: "成長",
+        sortOrder: 1,
+        schemeId: schemeA,
+        schemeCode: "asset_class",
+      },
+      {
+        id: "blend",
+        code: "blend",
+        name: "成長・配当",
+        sortOrder: 2,
+        schemeId: schemeA,
+        schemeCode: "asset_class",
+      },
+    ];
+    const graph = buildClassificationGraph(graphValues, inverted);
+    const roots = getRootValueIds(schemeA, graph);
+
+    expect(inverted).toEqual([
+      { parentValueId: "income", childValueId: "domestic_equity", sortOrder: 0 },
+      { parentValueId: "growth", childValueId: "domestic_equity", sortOrder: 1 },
+      { parentValueId: "blend", childValueId: "domestic_equity", sortOrder: 2 },
+      { parentValueId: "income", childValueId: "developed_equity", sortOrder: 0 },
+      { parentValueId: "growth", childValueId: "developed_equity", sortOrder: 1 },
+      { parentValueId: "blend", childValueId: "developed_equity", sortOrder: 2 },
+    ]);
+    expect(roots.sort()).toEqual(["blend", "growth", "income"]);
+    expect(getDirectChildIds("income", graph).sort()).toEqual([
+      "developed_equity",
+      "domestic_equity",
+    ]);
+  });
+
+  it("returns an empty array for empty input", () => {
+    expect(invertClassificationLinks([])).toEqual([]);
   });
 });

@@ -575,6 +575,22 @@ export function collectSubtreeLinks(
   return result;
 }
 
+export function invertClassificationLinks(
+  links: ClassificationValueLinkDto[],
+): ClassificationValueLinkDto[] {
+  let result: ClassificationValueLinkDto[] = [];
+
+  for (const link of links) {
+    result.push({
+      parentValueId: link.childValueId,
+      childValueId: link.parentValueId,
+      sortOrder: link.sortOrder,
+    });
+  }
+
+  return result;
+}
+
 export function buildValueCodeToIdMap(
   values: ClassificationGraphValue[],
   schemeCode: string,

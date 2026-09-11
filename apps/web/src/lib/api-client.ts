@@ -4,6 +4,7 @@ import type {
   BackupImportPreview,
   BackupImportResult,
   ClassificationSchemeWithValuesDto,
+  CopyClassificationSchemeInput,
   CreateClassificationSchemeInput,
   CreateClassificationValueInput,
   CreateInstrumentInput,
@@ -420,6 +421,20 @@ export async function deleteClassificationScheme(schemeId: string) {
     `/classification-schemes/${schemeId}`,
     { method: "DELETE" },
   );
+  return result;
+}
+
+export async function copyClassificationScheme(
+  schemeId: string,
+  input: CopyClassificationSchemeInput,
+) {
+  let result = await requestWritableJson<{
+    scheme: { id: string; code: string; name: string };
+    copiedValueIds: string[];
+  }>(`/classification-schemes/${schemeId}/copy`, {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
   return result;
 }
 

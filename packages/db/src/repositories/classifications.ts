@@ -4,6 +4,7 @@ import {
   collectSubtreeLinks,
   collectSubtreeValueIds,
   enrichClassificationValues,
+  invertClassificationLinks,
   isIdecoAnalysisSchemeCode,
   isMonexAnalysisSchemeCode,
   resolveHierarchyTagWeights,
@@ -394,6 +395,132 @@ export async function copyClassificationValue(
   /* v8 ignore stop */
 
   result = { ok: true, value: copiedRoot, copiedValueIds };
+  return result;
+}
+
+export async function copyClassificationScheme(
+  db: AppDatabase,
+  schemeId: string,
+  params: {
+    code: string;
+    name: string;
+    hierarchy: "as_is" | "inverted";
+  },
+) {
+  let result:
+    | {
+        ok: true;
+        scheme: typeof classificationSchemes.$inferSelect;
+        copiedValueIds: string[];
+      }
+    | { ok: false; reason: string } = { ok: false, reason: "Unknown error" };
+
+  const sourceScheme = await findSchemeById(db, schemeId);
+  if (!sourceScheme) {
+    result = { ok: false, reason: "分析軸が見つかりません。" };
+    return result;
+  }
+
+  const duplicateRows = await db
+    .select()
+    .from(classificationSchemes)
+    .where(
+      and(
+        eq(classificationSchemes.portfolioId, sourceScheme.portfolioId),
+        eq(classificationSchemes.code, params.code),
+      ),
+    )
+    .limit(1);
+  if (duplicateRows[0]) {
+    result = { ok: false, reason: `コード ${params.code} は既に存在します。` };
+    return result;
+  }
+
+  const newScheme = {
+    id: newId(),
+    portfolioId: sourceScheme.portfolioId,
+    code: params.code,
+    name: params.name,
+    createdAt: nowIso(),
+  };
+  await db.insert(classificationSchemes).values(newScheme);
+
+  const sourceValues = await listClassificationValuesBySchemeId(db, schemeId);
+  const sourceValueIds = new Set(sourceValues.map((value) => value.id));
+  const idMap = new Map<string, string>();
+  const copiedValueIds: string[] = [];
+
+  for (const source of sourceValues) {
+    const copied = await createClassificationValue(db, {
+      schemeId: newScheme.id,
+      code: source.code,
+      name: source.name,
+      description: source.description,
+      sortOrder: source.sortOrder,
+    });
+    idMap.set(source.id, copied.id);
+    copiedValueIds.push(copied.id);
+  }
+
+  const portfolioLinks = await listLinksForPortfolio(db, sourceScheme.portfolioId);
+  const schemeLinks = collectSubtreeLinks(sourceValueIds, portfolioLinks);
+  let linksToInsert = schemeLinks;
+  if (params.hierarchy === "inverted") {
+    linksToInsert = invertClassificationLinks(schemeLinks);
+  }
+
+  for (const link of linksToInsert) {
+    const parentValueId = idMap.get(link.parentValueId);
+    const childValueId = idMap.get(link.childValueId);
+    /* v8 ignore start */
+    if (!parentValueId || !childValueId) {
+      continue;
+    }
+    /* v8 ignore stop */
+
+    await db.insert(classificationValueLinks).values({
+      parentValueId,
+      childValueId,
+      sortOrder: link.sortOrder,
+    });
+  }
+
+  const sourceValueIdList = [...sourceValueIds];
+  if (sourceValueIdList.length > 0) {
+    const tagRows = await db
+      .select({
+        instrumentId: instrumentClassifications.instrumentId,
+        classificationValueId: instrumentClassifications.classificationValueId,
+        allocationWeight: instrumentClassifications.allocationWeight,
+      })
+      .from(instrumentClassifications)
+      .where(inArray(instrumentClassifications.classificationValueId, sourceValueIdList));
+
+    const copiedTagRows: Array<{
+      instrumentId: string;
+      classificationValueId: string;
+      allocationWeight: number | null;
+    }> = [];
+
+    for (const row of tagRows) {
+      const classificationValueId = idMap.get(row.classificationValueId);
+      if (!classificationValueId) {
+        continue;
+      }
+
+      copiedTagRows.push({
+        instrumentId: row.instrumentId,
+        classificationValueId,
+        allocationWeight: row.allocationWeight,
+      });
+    }
+
+    if (copiedTagRows.length > 0) {
+      await db.insert(instrumentClassifications).values(copiedTagRows);
+    }
+  }
+
+  result = { ok: true, scheme: newScheme, copiedValueIds };
   return result;
 }
 
