@@ -2,7 +2,8 @@
 
 import type { AllocationSliceWithLines } from "@repo/shared";
 import { sortAllocationSlices } from "@repo/shared";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, ExternalLink } from "lucide-react";
+import Link from "next/link";
 import { Fragment, useMemo, type ReactNode } from "react";
 
 import { SortableTableHeader } from "@/components/SortableTableHeader";
@@ -41,9 +42,11 @@ type AllocationTableProps = {
   valueIdByCode?: Map<string, string>;
   descriptionByValueCode?: Map<string, string | null>;
   childSlicesByParentValueId?: Map<string, AllocationSliceTableRow[]>;
+  drillableValueIds?: Set<string>;
   onSliceHover: (valueCode: string) => void;
   onSliceLeave: () => void;
   onToggleExpand: (expandKey: string) => void;
+  onDrillDown?: (valueId: string) => void;
 };
 
 function formatNullableYen(value: number | null): string {
@@ -97,6 +100,38 @@ function resolveChildSlices(
   return result;
 }
 
+function canDrillDownSlice(
+  slice: AllocationSliceTableRow,
+  valueId: string | undefined,
+  drillableValueIds: Set<string> | undefined,
+  onDrillDown: ((valueId: string) => void) | undefined,
+): boolean {
+  let result = false;
+
+  if (!onDrillDown || !valueId || slice.isParentResidual === true) {
+    return result;
+  }
+
+  result = drillableValueIds?.has(valueId) === true;
+  return result;
+}
+
+function buildHoldingsHref(
+  portfolioCode: string | undefined,
+  schemeCode: string | undefined,
+  valueCode: string,
+  asOfDate: string | null | undefined,
+): string | null {
+  let result: string | null = null;
+
+  if (!portfolioCode || !schemeCode) {
+    return result;
+  }
+
+  result = `${buildPortfolioPath(portfolioCode, "portfolio-allocation")}?scheme=${encodeURIComponent(schemeCode)}&value=${encodeURIComponent(valueCode)}${asOfDate ? `&asOf=${encodeURIComponent(asOfDate)}` : ""}`;
+  return result;
+}
+
 export function AllocationTable({
   slices,
   highlightedValueCode,
@@ -108,9 +143,11 @@ export function AllocationTable({
   valueIdByCode,
   descriptionByValueCode,
   childSlicesByParentValueId,
+  drillableValueIds,
   onSliceHover,
   onSliceLeave,
   onToggleExpand,
+  onDrillDown,
 }: AllocationTableProps) {
   const { sortColumn, sortDirection, toggleSort } =
     useTableSort<AllocationSortColumn>("displayOrder", "asc");
@@ -131,21 +168,30 @@ export function AllocationTable({
       for (const slice of sortedGroup) {
         const expandKey = buildAllocationRowExpandKey(pathPrefix, slice);
         const isExpanded = expandedValueCodes.includes(expandKey);
+        const valueId = valueIdByCode?.get(slice.valueCode);
         const childSlices = resolveChildSlices(
           slice,
           valueIdByCode,
           childSlicesByParentValueId,
         );
         const hasChildCategories = childSlices.length > 0;
+        const canDrillDown = canDrillDownSlice(
+          slice,
+          valueId,
+          drillableValueIds,
+          onDrillDown,
+        );
         const isHighlighted = highlightedValueCode === slice.valueCode;
         const rowClassName = cn(
           "data-table__row--parent",
           isHighlighted ? "allocation-table__row--highlight data-table__row--highlight" : undefined,
         );
-        const holdingsHref =
-          portfolioCode && schemeCode
-            ? `${buildPortfolioPath(portfolioCode, "portfolio-allocation")}?scheme=${encodeURIComponent(schemeCode)}&value=${encodeURIComponent(slice.valueCode)}${asOfDate ? `&asOf=${encodeURIComponent(asOfDate)}` : ""}`
-            : null;
+        const holdingsHref = buildHoldingsHref(
+          portfolioCode,
+          schemeCode,
+          slice.valueCode,
+          asOfDate,
+        );
         const expandLabel = hasChildCategories
           ? `${slice.valueName} の子分類を${isExpanded ? "閉じる" : "開く"}`
           : `${slice.valueName} の内訳を${isExpanded ? "閉じる" : "開く"}`;
@@ -179,13 +225,32 @@ export function AllocationTable({
                 </button>
               </td>
               <td>
-                <div style={depth > 0 ? { paddingLeft: `${depth * 1.25}rem` } : undefined}>
+                <div
+                  className="flex min-w-0 items-center gap-1.5"
+                  style={depth > 0 ? { paddingLeft: `${depth * 1.25}rem` } : undefined}
+                >
                   <ClassificationValueLabel
                     name={slice.valueName}
                     description={descriptionByValueCode?.get(slice.valueCode)}
-                    href={holdingsHref}
+                    onClick={
+                      canDrillDown && valueId && onDrillDown
+                        ? () => {
+                            onDrillDown(valueId);
+                          }
+                        : undefined
+                    }
                     nameClassName="max-w-[12rem]"
                   />
+                  {holdingsHref ? (
+                    <Link
+                      href={holdingsHref}
+                      className="inline-flex shrink-0 text-muted-foreground hover:text-foreground"
+                      aria-label={`${slice.valueName} の保有明細を見る`}
+                      title="保有明細を見る"
+                    >
+                      <ExternalLink className="size-3.5" aria-hidden />
+                    </Link>
+                  ) : null}
                 </div>
               </td>
               <td className="data-table__cell-numeric">
@@ -266,8 +331,10 @@ export function AllocationTable({
     childSlicesByParentValueId,
     columnCount,
     descriptionByValueCode,
+    drillableValueIds,
     expandedValueCodes,
     highlightedValueCode,
+    onDrillDown,
     onSliceHover,
     onSliceLeave,
     onToggleExpand,

@@ -17,6 +17,7 @@ type ClassificationValueLabelProps = {
   description?: string | null;
   code?: string | null;
   href?: string | null;
+  onClick?: () => void;
   className?: string;
   nameClassName?: string;
   /** 名前を truncate してホバーで全文を出す（既定 true） */
@@ -43,6 +44,7 @@ export function ClassificationValueLabel({
   description,
   code,
   href,
+  onClick,
   className,
   nameClassName,
   truncateName = true,
@@ -51,6 +53,16 @@ export function ClassificationValueLabel({
   const trimmedDescription = description?.trim() ?? "";
   const hasDescription = trimmedDescription !== "";
   const tooltipBody = buildTooltipBody(name, description);
+  const interactiveClassName = cn(
+    "min-w-0 text-primary hover:underline",
+    truncateName ? "truncate" : undefined,
+    nameClassName,
+  );
+  const plainClassName = cn(
+    "min-w-0",
+    truncateName ? "truncate" : undefined,
+    nameClassName,
+  );
 
   const nameContent = (
     <>
@@ -60,6 +72,24 @@ export function ClassificationValueLabel({
       ) : null}
     </>
   );
+
+  let nameNode: ReactNode = (
+    <span className={plainClassName}>{nameContent}</span>
+  );
+
+  if (href) {
+    nameNode = (
+      <Link href={href} className={interactiveClassName}>
+        {nameContent}
+      </Link>
+    );
+  } else if (onClick) {
+    nameNode = (
+      <button type="button" className={interactiveClassName} onClick={onClick}>
+        {nameContent}
+      </button>
+    );
+  }
 
   let result = (
     <TooltipProvider delayDuration={200}>
@@ -82,30 +112,7 @@ export function ClassificationValueLabel({
         ) : null}
 
         <Tooltip>
-          <TooltipTrigger asChild>
-            {href ? (
-              <Link
-                href={href}
-                className={cn(
-                  "min-w-0 text-primary hover:underline",
-                  truncateName ? "truncate" : undefined,
-                  nameClassName,
-                )}
-              >
-                {nameContent}
-              </Link>
-            ) : (
-              <span
-                className={cn(
-                  "min-w-0",
-                  truncateName ? "truncate" : undefined,
-                  nameClassName,
-                )}
-              >
-                {nameContent}
-              </span>
-            )}
-          </TooltipTrigger>
+          <TooltipTrigger asChild>{nameNode}</TooltipTrigger>
           <TooltipContent side="top" align="start">
             {tooltipBody}
           </TooltipContent>

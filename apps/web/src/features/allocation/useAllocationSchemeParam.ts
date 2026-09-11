@@ -43,6 +43,8 @@ export function useAllocationSchemeParam({
       setLocalSchemeCode(schemeCode);
 
       const params = new URLSearchParams(searchParams.toString());
+      // 分析軸切替時は階層ドリルダウンをリセットする
+      params.delete("parent");
 
       if (schemeCode === "" || schemeCode === schemeCodes[0]) {
         params.delete("scheme");

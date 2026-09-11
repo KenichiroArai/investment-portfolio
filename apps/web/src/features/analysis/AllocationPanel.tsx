@@ -24,6 +24,8 @@ type AllocationPanelProps = {
   valueIdByCode?: Map<string, string>;
   descriptionByValueCode?: Map<string, string | null>;
   childSlicesByParentValueId?: Map<string, AllocationSliceTableRow[]>;
+  drillableValueIds?: Set<string>;
+  onDrillDown?: (valueId: string) => void;
 };
 
 function formatNullableYen(value: number | null): string {
@@ -55,6 +57,8 @@ export function AllocationPanel({
   valueIdByCode,
   descriptionByValueCode,
   childSlicesByParentValueId,
+  drillableValueIds,
+  onDrillDown,
 }: AllocationPanelProps) {
   const [highlightedValueCode, setHighlightedValueCode] = useState<string | null>(
     null,
@@ -169,11 +173,13 @@ export function AllocationPanel({
           valueIdByCode={valueIdByCode}
           descriptionByValueCode={descriptionByValueCode}
           childSlicesByParentValueId={childSlicesByParentValueId}
+          drillableValueIds={drillableValueIds}
           onSliceHover={(valueCode) => {
             handleHighlight(valueCode);
           }}
           onSliceLeave={handleSliceLeave}
           onToggleExpand={handleToggleExpand}
+          onDrillDown={onDrillDown}
         />
       </div>
     </div>

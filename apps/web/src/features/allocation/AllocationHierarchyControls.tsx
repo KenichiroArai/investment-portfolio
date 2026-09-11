@@ -78,7 +78,7 @@ export function AllocationHierarchyControls({
         </>
       ) : (
         <span className="text-muted-foreground">
-          親分類ごとの構成比を表示しています。分類名の矢印から子分類にドリルダウンできます。
+          親分類ごとの構成比を表示しています。矢印で子分類を展開でき、分類名をクリックするとドリルダウンできます。
         </span>
       )}
     </div>

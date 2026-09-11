@@ -21,7 +21,10 @@ import { AnalysisPanelSummary } from "@/features/analysis/AnalysisPanelSummary";
 import { AllocationDetailPanel } from "@/features/allocation/AllocationDetailPanel";
 import { AllocationPeriodShareSummary } from "@/features/allocation/AllocationPeriodShareSummary";
 import { AllocationSnapshotPanel } from "@/features/allocation/AllocationSnapshotPanel";
-import { mergeClassificationLinks } from "@/features/allocation/AllocationHierarchyControls";
+import {
+  AllocationHierarchyControls,
+  mergeClassificationLinks,
+} from "@/features/allocation/AllocationHierarchyControls";
 import { buildAllocationRebalanceDisplayRows } from "@/features/allocation/build-allocation-rebalance-display-rows";
 import {
   buildChildAllocationSlicesByParentId,
@@ -31,6 +34,7 @@ import { RebalanceSettingsCard } from "@/features/allocation/RebalanceSettingsCa
 import { RebalanceTradesSummary } from "@/features/allocation/RebalanceTradesSummary";
 import { TargetAllocationEditCard } from "@/features/allocation/TargetAllocationEditCard";
 import { buildClassificationDescriptionByCode } from "@/components/classification-value-label";
+import { useAllocationHierarchyParam } from "@/features/allocation/useAllocationHierarchyParam";
 import { useAllocationSchemeParam } from "@/features/allocation/useAllocationSchemeParam";
 import { useRebalanceDeposit } from "@/features/allocation/useRebalanceDeposit";
 import { useTargetAllocations } from "@/features/allocation/useTargetAllocations";
@@ -139,6 +143,7 @@ export function AnalysisView({
   const subview = usePortfolioSubviewParam({ page: "analysis" });
   const mainView = subview.mainView;
   const setMainView = subview.setMainView;
+  const { parentValueId, setParentValueId } = useAllocationHierarchyParam();
 
   const [classificationSchemes, setClassificationSchemes] = useState<
     ClassificationSchemeWithValuesDto[]
@@ -199,6 +204,15 @@ export function AnalysisView({
     let result = buildClassificationDescriptionByCode(
       activeClassificationScheme?.values ?? [],
     );
+    return result;
+  }, [activeClassificationScheme]);
+  const drillableValueIds = useMemo(() => {
+    let result = new Set<string>();
+    for (const value of activeClassificationScheme?.values ?? []) {
+      if ((value.childIds?.length ?? 0) > 0) {
+        result.add(value.id);
+      }
+    }
     return result;
   }, [activeClassificationScheme]);
 
@@ -315,13 +329,16 @@ export function AnalysisView({
     return overview;
   };
 
-  const buildActiveSchemeAllocation = (scheme: AnalysisSchemeConfig) => {
+  const buildActiveSchemeAllocation = (
+    scheme: AnalysisSchemeConfig,
+    allocationParentValueId: string | null = null,
+  ) => {
     let result = buildSchemeAllocationWithHierarchy({
       lines: snapshot.lines,
       schemeCode: scheme.schemeCode,
       schemeName: scheme.schemeName,
       classificationSchemes,
-      parentValueId: null,
+      parentValueId: allocationParentValueId,
     });
     return result;
   };
@@ -398,9 +415,18 @@ export function AnalysisView({
   };
 
   const renderSnapshotContent = (scheme: AnalysisSchemeConfig): ReactNode => {
-    const schemeAllocation = buildActiveSchemeAllocation(scheme);
+    const schemeAllocation = buildActiveSchemeAllocation(scheme, parentValueId);
     const targets = allocationsByScheme[scheme.schemeCode] ?? [];
-    const gapRows = buildAllocationGapRows(schemeAllocation.slices, targets);
+    const displayedValueCodes = new Set(
+      schemeAllocation.slices
+        .filter((slice) => slice.isParentResidual !== true)
+        .map((slice) => slice.valueCode),
+    );
+    const gapTargets =
+      parentValueId !== null
+        ? targets.filter((target) => displayedValueCodes.has(target.valueCode))
+        : targets;
+    const gapRows = buildAllocationGapRows(schemeAllocation.slices, gapTargets);
     const slicesWithGap = mergeAllocationGapIntoSlices(
       schemeAllocation.slices,
       gapRows,
@@ -410,6 +436,7 @@ export function AnalysisView({
       schemeCode: scheme.schemeCode,
       schemeName: scheme.schemeName,
       classificationSchemes,
+      // 展開行の構成比も、いま表示中のコンテキスト合計（ルート or ドリルダウン親）基準にする
       rootTotalMarketValueMinor: schemeAllocation.totalMarketValueMinor,
     });
 
@@ -421,12 +448,24 @@ export function AnalysisView({
         asOfDate={asOfDate}
         valueIdByCode={valueIdByCode}
         descriptionByValueCode={descriptionByValueCode}
-        childSlicesByParentValueId={childSlicesByParentValueId}
+        childSlicesByParentValueId={
+          hasHierarchy ? childSlicesByParentValueId : undefined
+        }
+        drillableValueIds={hasHierarchy ? drillableValueIds : undefined}
+        onDrillDown={
+          hasHierarchy
+            ? (valueId) => {
+                setParentValueId(valueId);
+              }
+            : undefined
+        }
         hierarchyNote={
           hasHierarchy ? (
-            <p className="text-sm text-muted-foreground">
-              親分類ごとの構成比を表示しています。分類名の矢印から子分類を展開できます。
-            </p>
+            <AllocationHierarchyControls
+              activeScheme={activeClassificationScheme}
+              parentValueId={parentValueId}
+              onParentChange={setParentValueId}
+            />
           ) : null
         }
       />

@@ -410,4 +410,76 @@ describe("AllocationTable", () => {
       screen.getByRole("button", { name: "インカム の内訳を開く" }),
     ).toBeInTheDocument();
   });
+
+  it("drills down via category name while chevron still expands", async () => {
+    const user = userEvent.setup();
+    const onDrillDown = vi.fn();
+    const onToggleExpand = vi.fn();
+    const rootSlices = [
+      makeAllocationSlice({
+        valueCode: "stock",
+        valueName: "株式",
+        marketValueMinor: 1_000_000,
+        weight: 1,
+      }),
+      makeAllocationSlice({
+        valueCode: "bond",
+        valueName: "債券",
+        marketValueMinor: 500_000,
+        weight: 0.5,
+      }),
+    ];
+    const valueIdByCode = new Map([
+      ["stock", "stock-id"],
+      ["bond", "bond-id"],
+    ]);
+    const childSlicesByParentValueId = new Map([
+      [
+        "stock-id",
+        [
+          makeAllocationSlice({
+            valueCode: "domestic",
+            valueName: "国内株式",
+            marketValueMinor: 600_000,
+            weight: 0.6,
+          }),
+        ],
+      ],
+    ]);
+    const drillableValueIds = new Set(["stock-id"]);
+
+    render(
+      <AllocationTable
+        slices={rootSlices}
+        highlightedValueCode={null}
+        expandedValueCodes={[]}
+        portfolioCode="ideco"
+        schemeCode="ideco_region"
+        valueIdByCode={valueIdByCode}
+        childSlicesByParentValueId={childSlicesByParentValueId}
+        drillableValueIds={drillableValueIds}
+        onSliceHover={vi.fn()}
+        onSliceLeave={vi.fn()}
+        onToggleExpand={onToggleExpand}
+        onDrillDown={onDrillDown}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "株式 の子分類を開く" }));
+    expect(onToggleExpand).toHaveBeenCalledWith("stock");
+    expect(onDrillDown).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole("button", { name: "株式" }));
+    expect(onDrillDown).toHaveBeenCalledWith("stock-id");
+
+    expect(
+      screen.getByRole("link", { name: "株式 の保有明細を見る" }),
+    ).toHaveAttribute(
+      "href",
+      expect.stringContaining("/portfolios/ideco/portfolio-allocation"),
+    );
+
+    await user.click(screen.getByRole("button", { name: "債券 の内訳を開く" }));
+    expect(onToggleExpand).toHaveBeenCalledWith("bond");
+  });
 });
