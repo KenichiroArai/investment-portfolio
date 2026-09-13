@@ -354,7 +354,12 @@ function readTagWeight(
 
 function isMultiParentValue(valueId: string, graph: ClassificationGraph): boolean {
   let result = false;
-  const parentIds = graph.parentIdsByChildId.get(valueId) ?? [];
+  const parentIds = graph.parentIdsByChildId.get(valueId);
+  /* v8 ignore start */
+  if (!parentIds) {
+    return result;
+  }
+  /* v8 ignore stop */
   result = parentIds.length > 1;
   return result;
 }

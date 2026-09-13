@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import {
   detectRakutenBlockKind,
+  detectRakutenPasteFormat,
   isRakutenAccountTypeLabel,
   isRakutenHeaderLine,
+  isRakutenPageMutualFundNameLine,
   isRakutenPageNoiseLine,
   isRakutenStockCode,
   parseRakutenPasteNumber,
@@ -43,7 +45,11 @@ describe("rakuten-paste-utils", () => {
     expect(isRakutenStockCode("1489")).toBe(true);
     expect(isRakutenStockCode("ABCD")).toBe(false);
     expect(isRakutenPageNoiseLine("315")).toBe(false);
+    expect(isRakutenPageNoiseLine("")).toBe(true);
+    expect(isRakutenPageNoiseLine("   ")).toBe(true);
     expect(isRakutenPageNoiseLine("現金等［円］")).toBe(true);
+    expect(isRakutenPageNoiseLine("0.00 USD")).toBe(true);
+    expect(isRakutenPageNoiseLine("米ドル")).toBe(true);
   });
 
   it("returns null for standalone MMF rows without foreign section", () => {
@@ -63,5 +69,29 @@ describe("rakuten-paste-utils", () => {
     expect(detectRakutenBlockKind(lines, 0)).toBe("fx_mmf");
     expect(detectRakutenBlockKind(lines, 1)).toBe("fx_mmf");
     expect(detectRakutenBlockKind(lines, 2)).toBe("wrap_cash");
+  });
+
+  it("rejects money fund and cash lines as mutual fund name lines", () => {
+    expect(isRakutenPageMutualFundNameLine("楽天・マネーファンド")).toBe(false);
+    expect(isRakutenPageMutualFundNameLine("楽天・マネーファンド（追加）")).toBe(false);
+    expect(isRakutenPageMutualFundNameLine("現金等")).toBe(false);
+    expect(isRakutenPageMutualFundNameLine("現金等［円］")).toBe(false);
+    expect(isRakutenPageMutualFundNameLine("1489")).toBe(false);
+    expect(isRakutenPageMutualFundNameLine("【楽ラップ専用】テスト＜ラップ専用＞")).toBe(
+      false,
+    );
+    expect(isRakutenPageMutualFundNameLine("個人国債　変動10年　第195回")).toBe(false);
+    expect(isRakutenPageMutualFundNameLine("テストオープンファンド")).toBe(true);
+  });
+
+  it("treats short fund header rows as non-legacy and non-blocks", () => {
+    expect(detectRakutenPasteFormat(["投資信託\tテストファンド"])).toBe("legacy");
+    expect(detectRakutenPasteFormat(["楽天・マネーファンド\t楽天・マネーファンド"])).toBe(
+      "legacy",
+    );
+    expect(detectRakutenBlockKind(["楽天・マネーファンド"], 0)).toBeNull();
+    expect(
+      detectRakutenBlockKind(["楽天・マネーファンド\t楽天・マネーファンド"], 0),
+    ).toBeNull();
   });
 });

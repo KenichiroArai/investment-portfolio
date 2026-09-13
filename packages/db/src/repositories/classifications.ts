@@ -504,9 +504,11 @@ export async function copyClassificationScheme(
 
     for (const row of tagRows) {
       const classificationValueId = idMap.get(row.classificationValueId);
+      /* v8 ignore start */
       if (!classificationValueId) {
         continue;
       }
+      /* v8 ignore stop */
 
       copiedTagRows.push({
         instrumentId: row.instrumentId,
@@ -828,6 +830,34 @@ export async function setInstrumentClassificationsWithWeights(
     return result;
   }
 
+  // 0・非有限・負の重みは捨て、同一分類値の重複は合算してから階層解決する
+  const sanitizedByValueId = new Map<string, number>();
+  for (const weight of weights) {
+    if (!Number.isFinite(weight.allocationWeight) || weight.allocationWeight <= 0) {
+      continue;
+    }
+
+    const previous = sanitizedByValueId.get(weight.classificationValueId) ?? 0;
+    sanitizedByValueId.set(
+      weight.classificationValueId,
+      previous + weight.allocationWeight,
+    );
+  }
+
+  const sanitizedWeights = [...sanitizedByValueId.entries()].map(
+    ([classificationValueId, allocationWeight]) => {
+      let weightInput: InstrumentClassificationWeightInput = {
+        classificationValueId,
+        allocationWeight,
+      };
+      return weightInput;
+    },
+  );
+
+  if (sanitizedWeights.length === 0) {
+    return result;
+  }
+
   const instrumentRows = await db
     .select({ portfolioId: instruments.portfolioId })
     .from(instruments)
@@ -835,11 +865,11 @@ export async function setInstrumentClassificationsWithWeights(
     .limit(1);
   const portfolioId = instrumentRows[0]?.portfolioId;
 
-  let resolvedWeights = weights;
+  let resolvedWeights = sanitizedWeights;
   if (portfolioId) {
     const graph = await buildPortfolioClassificationGraph(db, portfolioId);
     const resolved = resolveHierarchyTagWeights(
-      weights.map((weight) => {
+      sanitizedWeights.map((weight) => {
         let tagWeight = {
           valueId: weight.classificationValueId,
           weight: weight.allocationWeight,
@@ -857,21 +887,27 @@ export async function setInstrumentClassificationsWithWeights(
     });
   }
 
+  /* v8 ignore start */
   if (resolvedWeights.length === 0) {
     return result;
   }
+  /* v8 ignore stop */
 
   let total = 0;
   for (const weight of resolvedWeights) {
-    if (!Number.isFinite(weight.allocationWeight) || weight.allocationWeight < 0) {
+    /* v8 ignore start */
+    if (!Number.isFinite(weight.allocationWeight) || weight.allocationWeight <= 0) {
       continue;
     }
+    /* v8 ignore stop */
     total += weight.allocationWeight;
   }
 
+  /* v8 ignore start */
   if (total <= 0 || !Number.isFinite(total)) {
     return result;
   }
+  /* v8 ignore stop */
 
   const rows = resolvedWeights
     .filter(

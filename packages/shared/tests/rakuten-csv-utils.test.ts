@@ -14,6 +14,24 @@ describe("rakuten-csv-utils", () => {
     const error = new RakutenPasteError("test");
     expect(error.name).toBe("RakutenPasteError");
     expect(error.message).toBe("test");
+    expect(error.displayMessage).toBe("test");
+  });
+
+  it("formats RakutenPasteError displayMessage with line and hint", () => {
+    const withLine = new RakutenPasteError("失敗", { lineNumber: 3 });
+    expect(withLine.displayMessage).toBe("行 3: 失敗");
+
+    const withHint = new RakutenPasteError("失敗", { hint: "再コピー" });
+    expect(withHint.displayMessage).toBe("失敗（再コピー）");
+
+    const withBoth = new RakutenPasteError("失敗", {
+      lineNumber: 2,
+      hint: "範囲を確認",
+    });
+    expect(withBoth.displayMessage).toBe("行 2: 失敗（範囲を確認）");
+
+    const emptyHint = new RakutenPasteError("失敗", { hint: "" });
+    expect(emptyHint.displayMessage).toBe("失敗");
   });
 
   it("builds account id and name for empty and wrap accounts", () => {

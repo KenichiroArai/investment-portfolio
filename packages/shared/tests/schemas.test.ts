@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  copyClassificationSchemeSchema,
   createPortfolioSchema,
   replaceCurrentSnapshotSchema,
   setInstrumentClassificationsSchema,
@@ -90,5 +91,19 @@ describe("shared schemas", () => {
 
     const instrument = updateInstrumentSchema.safeParse({ name: "銘柄A" });
     expect(instrument.success).toBe(true);
+
+    const copyScheme = copyClassificationSchemeSchema.safeParse({
+      code: "investment_style",
+      name: "投資スタイル",
+      hierarchy: "inverted",
+    });
+    expect(copyScheme.success).toBe(true);
+
+    const invalidCopyScheme = copyClassificationSchemeSchema.safeParse({
+      code: "",
+      name: "投資スタイル",
+      hierarchy: "sideways",
+    });
+    expect(invalidCopyScheme.success).toBe(false);
   });
 });

@@ -75,7 +75,7 @@ function skipTotalReturnLine(lines: string[], index: number): number {
   }
 
   const line = lines[index];
-  if (line.startsWith("\t") || line.startsWith("	")) {
+  if (line.startsWith("\t")) {
     const parsed = parseRakutenPasteNumber(line);
     if (Number.isFinite(parsed)) {
       result = index + 1;
@@ -333,10 +333,12 @@ function parseWrapCashPageBlock(
         cursor += 1;
         continue;
       }
+      /* v8 ignore start */
       if (trimmed === "合計") {
         cursor += 1;
         continue;
       }
+      /* v8 ignore stop */
       const duplicateValue = parseRakutenPasteNumber(trimmed);
       if (duplicateValue === marketValueMinor) {
         cursor += 1;

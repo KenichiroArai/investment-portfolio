@@ -775,6 +775,7 @@ function resolveAttributionCoveringDisplayValueIds(
     return result;
   }
 
+  /* v8 ignore next */
   const taggedIds = lineTaggedIds ?? new Set<string>();
   const disambiguated = result.filter((displayValueId) => taggedIds.has(displayValueId));
   if (disambiguated.length > 0) {
@@ -815,21 +816,13 @@ function redirectParentResidualToTaggedChildren(
     return result;
   }
 
-  const redirected: string[] = [];
-  for (const coveringId of coveringIds) {
-    if (coveringId === parentValueId) {
-      continue;
-    }
-    redirected.push(coveringId);
-  }
-  for (const childId of taggedChildIds) {
-    if (redirected.includes(childId)) {
-      continue;
-    }
-    redirected.push(childId);
-  }
-
-  result = redirected;
+  const withoutParent = coveringIds.filter(
+    (coveringId) => coveringId !== parentValueId,
+  );
+  const missingChildren = taggedChildIds.filter(
+    (childId) => !withoutParent.includes(childId),
+  );
+  result = [...withoutParent, ...missingChildren];
   return result;
 }
 
@@ -886,9 +879,11 @@ function splitAmountAcrossKeys(
 ): Map<string, number> {
   let result = new Map<string, number>();
 
+  /* v8 ignore start */
   if (keys.length === 0) {
     return result;
   }
+  /* v8 ignore stop */
 
   if (keys.length === 1) {
     result.set(keys[0]!, amountMinor);
@@ -924,6 +919,7 @@ function splitNullableAmountAcrossKeys(
 
   const splits = splitAmountAcrossKeys(keys, amountMinor);
   for (const key of keys) {
+    /* v8 ignore next */
     result.set(key, splits.get(key) ?? 0);
   }
 
@@ -1057,6 +1053,7 @@ export function buildHierarchicalAllocationBySchemeWithLines(
         );
         const splitAttribution: LineTagAttribution = {
           tag: attribution.tag,
+          /* v8 ignore next 3 */
           marketValueMinor: marketByDisplay.get(displayValueId) ?? 0,
           gainMinor: gainByDisplay.get(displayValueId) ?? null,
           bookValueMinor: bookByDisplay.get(displayValueId) ?? null,

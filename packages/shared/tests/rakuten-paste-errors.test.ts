@@ -105,6 +105,13 @@ abc
     ).toThrow(RakutenPasteError);
 
     expect(() =>
+      parseRakutenPaste(`楽天・マネーファンド\t楽天・マネーファンド\t不正口座\t100,000 口\t-\t-
+-
+100,000 円
+-`),
+    ).toThrow(RakutenPasteError);
+
+    expect(() =>
       parseRakutenPaste(`投資信託\tテストファンド\t特定\tabc\t9,000 円
 9,000 円
 +10 円

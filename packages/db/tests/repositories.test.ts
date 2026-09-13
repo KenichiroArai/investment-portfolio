@@ -8,6 +8,7 @@ import {
   addClassificationValueToInstruments,
   removeClassificationValueFromInstruments,
   copyClassificationValue,
+  copyClassificationScheme,
   createClassificationScheme,
   createClassificationValue,
   deleteClassificationSchemeById,
@@ -1002,6 +1003,131 @@ describe("portfolio repositories", () => {
     expect(missingCopy.ok).toBe(false);
   });
 
+  it("copies a classification scheme as-is or inverted with tags", async () => {
+    const db = setup();
+    await createPortfolio(db, {
+      code: "ideco",
+      name: "iDeCo",
+      kind: "ideco",
+    });
+    const scheme = await createClassificationScheme(db, {
+      portfolioCode: "ideco",
+      code: "asset_class",
+      name: "資産クラス",
+    });
+    const parent = await createClassificationValue(db, {
+      schemeId: scheme!.id,
+      code: "stock",
+      name: "株式",
+      description: "親",
+      sortOrder: 0,
+    });
+    const child = await createClassificationValue(db, {
+      schemeId: scheme!.id,
+      code: "domestic",
+      name: "国内株式",
+      sortOrder: 1,
+    });
+    await addClassificationLink(db, {
+      parentValueId: parent.id,
+      childValueId: child.id,
+      sortOrder: 2,
+    });
+    const instrument = await createInstrument(db, { name: "Tagged Fund" });
+    await setInstrumentClassificationsWithWeights(db, instrument.id, [
+      { classificationValueId: child.id, allocationWeight: 1 },
+    ]);
+
+    const missing = await copyClassificationScheme(db, "missing-scheme", {
+      code: "style",
+      name: "投資スタイル",
+      hierarchy: "as_is",
+    });
+    expect(missing.ok).toBe(false);
+
+    const duplicate = await copyClassificationScheme(db, scheme!.id, {
+      code: "asset_class",
+      name: "重複",
+      hierarchy: "as_is",
+    });
+    expect(duplicate.ok).toBe(false);
+
+    const asIs = await copyClassificationScheme(db, scheme!.id, {
+      code: "asset_class_copy",
+      name: "資産クラス（コピー）",
+      hierarchy: "as_is",
+    });
+    expect(asIs.ok).toBe(true);
+    if (asIs.ok) {
+      expect(asIs.scheme.code).toBe("asset_class_copy");
+      expect(asIs.copiedValueIds).toHaveLength(2);
+    }
+
+    const asIsSchemes = await listSchemesWithValuesForPortfolio(db, "ideco");
+    const asIsCopied = asIsSchemes.find((item) => item.code === "asset_class_copy");
+    const asIsParent = asIsCopied?.values.find((value) => value.code === "stock");
+    const asIsChild = asIsCopied?.values.find((value) => value.code === "domestic");
+    expect(asIsParent?.description).toBe("親");
+    const asIsLink = asIsCopied?.links.find(
+      (link) =>
+        link.parentValueId === asIsParent?.id && link.childValueId === asIsChild?.id,
+    );
+    expect(asIsLink).toEqual({
+      parentValueId: asIsParent?.id,
+      childValueId: asIsChild?.id,
+      sortOrder: 2,
+    });
+
+    const asIsTags = (await getTagsForInstruments(db, [instrument.id])).get(
+      instrument.id,
+    );
+    expect(asIsTags?.some((tag) => tag.valueCode === "domestic")).toBe(true);
+    expect(asIsTags?.filter((tag) => tag.schemeCode === "asset_class_copy")).toHaveLength(
+      1,
+    );
+
+    const inverted = await copyClassificationScheme(db, scheme!.id, {
+      code: "investment_style",
+      name: "投資スタイル",
+      hierarchy: "inverted",
+    });
+    expect(inverted.ok).toBe(true);
+
+    const invertedSchemes = await listSchemesWithValuesForPortfolio(db, "ideco");
+    const invertedCopied = invertedSchemes.find(
+      (item) => item.code === "investment_style",
+    );
+    const invertedParent = invertedCopied?.values.find((value) => value.code === "stock");
+    const invertedChild = invertedCopied?.values.find(
+      (value) => value.code === "domestic",
+    );
+    const invertedLink = invertedCopied?.links.find(
+      (link) =>
+        link.parentValueId === invertedChild?.id &&
+        link.childValueId === invertedParent?.id,
+    );
+    expect(invertedLink).toEqual({
+      parentValueId: invertedChild?.id,
+      childValueId: invertedParent?.id,
+      sortOrder: 2,
+    });
+
+    const emptyScheme = await createClassificationScheme(db, {
+      portfolioCode: "ideco",
+      code: "empty_axis",
+      name: "空",
+    });
+    const emptyCopy = await copyClassificationScheme(db, emptyScheme!.id, {
+      code: "empty_axis_copy",
+      name: "空コピー",
+      hierarchy: "as_is",
+    });
+    expect(emptyCopy.ok).toBe(true);
+    if (emptyCopy.ok) {
+      expect(emptyCopy.copiedValueIds).toEqual([]);
+    }
+  });
+
   it("allows non-leaf classification tags on instruments", async () => {
     const db = setup();
     await createPortfolio(db, {
@@ -1292,11 +1418,22 @@ describe("portfolio repositories", () => {
       ]),
     ).toBe(0);
 
-    await setInstrumentClassificationsWithWeights(db, alpha.id, [
-      { classificationValueId: parent.id, allocationWeight: 3 },
-      { classificationValueId: foreign.id, allocationWeight: 1 },
-    ]);
     await setInstrumentClassifications(db, gamma.id, [domestic.id]);
+
+    // setInstrumentClassificationsWithWeights は階層解決で親+子を畳むため、
+    // 親タグ残存状態は DB 直書きで再現する（修復・一括付与パスの前提データ）
+    await db.insert(instrumentClassifications).values([
+      {
+        instrumentId: alpha.id,
+        classificationValueId: parent.id,
+        allocationWeight: 0.75,
+      },
+      {
+        instrumentId: alpha.id,
+        classificationValueId: foreign.id,
+        allocationWeight: 0.25,
+      },
+    ]);
 
     const updated = await addClassificationValueToInstruments(db, domestic.id, [
       alpha.id,
@@ -1398,14 +1535,20 @@ describe("portfolio repositories", () => {
       sortOrder: 2,
     });
     const fund = await createInstrument(db, { name: "Remove Tag Fund" });
+    const bare = await createInstrument(db, { name: "Bare Fund" });
     await setInstrumentClassificationsWithWeights(db, fund.id, [
       { classificationValueId: domestic.id, allocationWeight: 0.4 },
       { classificationValueId: foreign.id, allocationWeight: 0.6 },
     ]);
+    await db
+      .update(instrumentClassifications)
+      .set({ allocationWeight: null })
+      .where(eq(instrumentClassifications.instrumentId, fund.id));
 
     expect(
       await removeClassificationValueFromInstruments(db, domestic.id, [
         fund.id,
+        bare.id,
         "00000000-0000-4000-8000-000000000099",
       ]),
     ).toBe(1);

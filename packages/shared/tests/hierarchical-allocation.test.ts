@@ -1016,4 +1016,80 @@ describe("buildHierarchicalAllocationBySchemeWithLines", () => {
       ["parent_b", 600_000],
     ]);
   });
+
+  it("splits a zero-value multi-parent leaf across tagged parents as zeros", () => {
+    const multiParentValues = [
+      {
+        id: "parent-a",
+        code: "parent_a",
+        name: "親A",
+        sortOrder: 1,
+        schemeId: "scheme-a",
+        schemeCode: "asset_class",
+      },
+      {
+        id: "parent-b",
+        code: "parent_b",
+        name: "親B",
+        sortOrder: 2,
+        schemeId: "scheme-a",
+        schemeCode: "asset_class",
+      },
+      {
+        id: "shared-leaf",
+        code: "shared_leaf",
+        name: "共有葉",
+        sortOrder: 1,
+        schemeId: "scheme-a",
+        schemeCode: "asset_class",
+      },
+    ];
+    const multiParentLinks = [
+      { parentValueId: "parent-a", childValueId: "shared-leaf", sortOrder: 1 },
+      { parentValueId: "parent-b", childValueId: "shared-leaf", sortOrder: 1 },
+    ];
+    const lines = [
+      makeTaggedLine(0, [
+        {
+          schemeCode: "asset_class",
+          schemeName: "資産クラス",
+          valueCode: "parent_a",
+          valueName: "親A",
+          allocationWeight: 1,
+        },
+        {
+          schemeCode: "asset_class",
+          schemeName: "資産クラス",
+          valueCode: "parent_b",
+          valueName: "親B",
+          allocationWeight: 1,
+        },
+        {
+          schemeCode: "asset_class",
+          schemeName: "資産クラス",
+          valueCode: "shared_leaf",
+          valueName: "共有葉",
+          allocationWeight: 1,
+        },
+      ]),
+    ];
+    const allocation = buildHierarchicalAllocationBySchemeWithLines(
+      lines,
+      "asset_class",
+      "資産クラス",
+      {
+        links: multiParentLinks,
+        schemeValues: multiParentValues,
+        schemeId: "scheme-a",
+      },
+    );
+
+    expect(allocation.totalMarketValueMinor).toBe(0);
+    expect(
+      allocation.slices.map((slice) => [slice.valueCode, slice.marketValueMinor]),
+    ).toEqual([
+      ["parent_a", 0],
+      ["parent_b", 0],
+    ]);
+  });
 });

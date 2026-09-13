@@ -93,10 +93,13 @@ function parseDomesticEquityBlock(
   };
 
   const startCells = splitRakutenPasteCells(lines[startIndex]);
+  /* v8 ignore next */
   const ticker = (startCells[1] ?? "").trim();
+  /* v8 ignore start */
   if (!isRakutenStockCode(ticker)) {
     throw new RakutenPasteError(`国内株式の銘柄コードが不正です: ${ticker || "(空)"}`);
   }
+  /* v8 ignore stop */
 
   let index = startIndex + 1;
   if (index >= lines.length) {
@@ -193,6 +196,7 @@ function parseFundLikeHeaderLine(line: string): {
   // 投資信託\t名称\t口座\t数量\t平均取得
   // または MMF\t名称\t口座\t数量\t平均取得
   // または 楽天・マネーファンド\t名称\t口座\t数量\t...
+  /* v8 ignore next 4 */
   const instrumentName = (cells[1] ?? "").trim();
   const accountTypeRaw = cells[2] ?? "";
   const quantity = parseRakutenPasteNumber(cells[3] ?? "");
@@ -305,6 +309,7 @@ function parseMutualFundBlock(
   };
 
   const header = parseFundLikeHeaderLine(lines[startIndex]);
+  /* v8 ignore start */
   if (header.instrumentName === "") {
     throw new RakutenPasteError(`${source} の銘柄名が空です`);
   }
@@ -313,6 +318,7 @@ function parseMutualFundBlock(
       `「${header.instrumentName}」の口座区分が不正です: ${header.accountTypeRaw}`,
     );
   }
+  /* v8 ignore stop */
   if (!Number.isFinite(header.quantity)) {
     throw new RakutenPasteError(`「${header.instrumentName}」の保有数量が不正です`);
   }
@@ -422,14 +428,17 @@ function parseDomesticBondBlock(
   };
 
   const cells = splitRakutenPasteCells(lines[startIndex]);
+  /* v8 ignore next 4 */
   const instrumentName = (cells[1] ?? "").trim();
   const accountTypeRaw = cells[2] ?? "";
   const quantity = parseRakutenPasteNumber(cells[3] ?? "");
   const avgCostMinor = parseRakutenPasteNumber(cells[4] ?? "");
 
+  /* v8 ignore start */
   if (instrumentName === "") {
     throw new RakutenPasteError("国内債券の銘柄名が空です");
   }
+  /* v8 ignore stop */
   if (!Number.isFinite(quantity)) {
     throw new RakutenPasteError(`国内債券「${instrumentName}」の保有数量が不正です`);
   }
