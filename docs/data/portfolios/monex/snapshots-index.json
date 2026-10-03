@@ -2,8 +2,12 @@
   "portfolioCode": "monex",
   "dates": [
     {
-      "asOfDate": "2026-09-04",
+      "asOfDate": "2026-10-04",
       "isCurrent": true
+    },
+    {
+      "asOfDate": "2026-09-04",
+      "isCurrent": false
     },
     {
       "asOfDate": "2026-08-09",

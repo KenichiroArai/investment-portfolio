@@ -2,8 +2,12 @@
   "portfolioCode": "ideco",
   "dates": [
     {
-      "asOfDate": "2026-09-05",
+      "asOfDate": "2026-10-04",
       "isCurrent": true
+    },
+    {
+      "asOfDate": "2026-09-05",
+      "isCurrent": false
     },
     {
       "asOfDate": "2026-08-05",
